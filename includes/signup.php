@@ -80,7 +80,7 @@ function user_signup() {
 			'user_id' => $user_id,
 			'image_credits' => 30  // Définir les crédits d'image initiaux à 30
 		),
-		array('%d', '%s', '%d')  // Les formats de chaque champ
+               array('%d', '%d')  // Les formats de chaque champ
 	);
 
 	// Connexion automatique après inscription
