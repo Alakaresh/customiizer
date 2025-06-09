@@ -1,0 +1,38 @@
+/* Style global pour le conteneur des images */
+.image-container {
+    display: flex; /* Utilise flexbox pour une disposition flexible des colonnes */
+    justify-content: center; /* Centre les colonnes horizontalement */
+    flex-wrap: wrap; /* Permet aux colonnes de passer à la ligne suivante si nécessaire */
+    margin: 0 auto; /* Centrage du conteneur */
+    padding: 20px; /* Espacement autour du conteneur global */
+}
+
+/* Style pour chaque colonne d'images */
+.image-column {
+    flex: 1 1 10%; /* Chaque colonne prend environ un sixième de l'espace, mais peut s'ajuster */
+    margin: 0 10px; /* Marges entre les colonnes pour un peu d'espacement */
+    box-sizing: border-box; /* Inclut padding et border dans la largeur de l'élément */
+}
+
+/* Style pour chaque conteneur individuel d'image */
+.imageContainer {
+    background: #fff; /* Arrière-plan blanc pour chaque conteneur d'image */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Ombre légère pour un effet de profondeur */
+    border-radius: 8px; /* Bordures arrondies */
+    overflow: hidden; /* Empêche le contenu de déborder */
+    margin-bottom: 20px; /* Espacement entre les conteneurs d'image */
+    transition: transform 0.3s ease-in-out; /* Transition pour l'effet de survol */
+}
+
+/* Style pour les images à l'intérieur des conteneurs */
+.dynamic-image {
+    width: 100%; /* Largeur complète pour s'adapter au conteneur parent */
+    height: auto; /* Hauteur automatique pour maintenir l'aspect ratio */
+    display: block; /* Évite les problèmes de marges inattendues */
+}
+
+/* Effet de survol pour les conteneurs d'image */
+.imageContainer:hover {
+    transform: translateY(-5px); /* Déplace légèrement le conteneur vers le haut au survol */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Ombre plus prononcée pour un effet de soulèvement */
+}

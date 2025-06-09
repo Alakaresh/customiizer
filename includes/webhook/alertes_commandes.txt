@@ -1,0 +1,2 @@
+Commande #1004 échouée deux fois
+Commande #1006 échouée deux fois

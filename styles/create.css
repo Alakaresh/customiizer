@@ -1,0 +1,81 @@
+.customization-section, .image-list-section {
+    width: 100%;
+    margin: 20px 0;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.customization-header h1, .image-list-header h2 {
+    margin: 0;
+    padding: 10px 0;
+    text-align: center;
+    color: #333;
+}
+
+.customization-body {
+    display: flex;
+}
+
+.sidebar {
+    flex: 1;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+}
+
+.main-content {
+    flex: 3;
+    padding: 10px;
+}
+
+.container-2d, .container-3d {
+    margin: 10px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    height: 300px; /* Adjust height as needed */
+}
+
+.customization-footer {
+    text-align: center;
+    padding: 10px;
+}
+
+.action-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+}
+
+.images-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.images-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+.images-container li {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.images-container li:hover {
+    border-color: #007BFF;
+}

@@ -1,0 +1,76 @@
+#userModal {
+    position: fixed;
+    z-index: 1000;
+    right: 50px;
+    top: 65px;
+    width: 220px;
+    display: block;
+    box-sizing: border-box;
+    max-height: calc(100% - 65px);
+    overflow: auto;
+    background-color: transparent;
+    border: none;
+}
+
+#userModal .modal-content {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#userModal .user-info {
+    text-align: center; /* Centrer tout le contenu de user-info */
+}
+
+#userModal .user-logo, #userModal .user-name, #userModal .user-credits {
+    margin-bottom: 10px; /* Espacement uniforme entre les éléments */
+}
+
+#userModal .lower-container {
+    padding: 10px;
+    background-color: #2a2a2a; /* Un fond légèrement différent pour distinguer cette section */
+}
+
+#userModal .modal-button {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 10px 15px;
+	font-size: 15px;
+	font-weight: 600;
+	background-color: transparent;
+	border: none;
+	color: white;
+	text-align: left;
+	cursor: pointer;
+	text-decoration: none; /* pour <a> */
+	border-radius: 6px;
+	transition: background-color 0.3s;
+}
+
+#userModal .modal-button:hover {
+	background-color: #444;
+	color: #ddd;
+}
+
+#userModal .modal-button i {
+	font-size: 18px;
+	min-width: 20px;
+	text-align: center;
+}
+
+#userModal .modal-button:last-child {
+	background-color: #d14343;
+	color: white;
+	justify-content: center;
+	text-align: center;
+}
+
+#userModal .modal-button:last-child:hover {
+	background-color: #b93232;
+}

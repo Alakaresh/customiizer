@@ -1,0 +1,11 @@
+.woocommerce {
+    margin-top: 100px; /* Ajouter une marge au-dessus de tout le contenu WooCommerce */
+}
+
+.return-to-shop {
+    text-align: center; /* Centrer le contenu à l'intérieur */
+}
+
+.return-to-shop .button.wc-backward {
+    display: inline-block; /* Afficher le bouton en ligne pour le centrage */
+}

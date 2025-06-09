@@ -1,0 +1,281 @@
+let selectedVariant = null;
+let myGeneratedImages = [];
+let communityImages = [];
+let currentProductId = null;
+jQuery(document).ready(function ($) {
+	const apiBaseURL = '/wp-json/api/v1/products';
+	const mainProductImage = $('#product-main-image');
+
+	let currentVariants = [];
+
+	// Dès le chargement général de la page
+	preloadCommunityImages().then(() => {
+		const images = getAllCommunityImages();
+		myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
+		communityImages = images.filter(img => img.user_id !== currentUser.ID);
+
+		console.log("myGeneratedImages :", myGeneratedImages);
+		displayGeneratedImages(myGeneratedImages);
+	});
+
+
+
+	// Charger les détails d'un produit
+	function loadProductDetails(productId) {
+		console.log("productId :", productId);
+		fetch(`${apiBaseURL}/${productId}`)
+			.then(response => {
+			if (!response.ok) {
+				throw new Error(`Erreur serveur: ${response.status}`);
+			}
+			return response.json();
+		})
+			.then(productData => {
+			currentVariants = productData.variants;
+			$('.description-content').html(productData.product_description || "<p>Description non disponible</p>");
+			updateProductDisplay(currentVariants);
+			console.group("🎨 Variantes disponibles (couleurs & tailles)");
+			currentVariants.forEach(v => {
+				console.log(`- ID: ${v.variant_id} | Couleur: ${v.color || '(aucune)'} | Taille: ${v.size || '(aucune)'} | Stock: ${v.stock}`);
+			});
+			console.groupEnd();
+
+		})
+			.catch(error => {
+			console.error("Erreur lors de la récupération du produit :", error);
+		});
+	}
+
+	function updateProductDisplay(variants) {
+		const urlParams = new URLSearchParams(window.location.search);
+		const variantParam = urlParams.get('variant');
+		selectedVariant = variants[0];
+
+		updateColors(variants);
+		updateSizes(variants);
+
+		// ✅ Si un paramètre variant est présent dans l'URL
+		if (variantParam) {
+			const foundVariant = variants.find(v => v.variant_id == variantParam);
+			if (foundVariant) {
+				selectedVariant = foundVariant;
+
+				// 👉 Sélectionne automatiquement les bonnes options dans l'interface
+				$('.color-option').removeClass('selected');
+				$(`.color-option[data-color="${selectedVariant.color}"]`).addClass('selected');
+
+				$('.size-option').removeClass('selected');
+				$(`.size-option[data-size="${selectedVariant.size}"]`).addClass('selected');
+			}
+		}
+
+		updateSelectedVariant();
+	}
+
+
+	function updateMainImage(variant) {
+		if (variant.mockups.length > 0) {
+			const mockup = variant.mockups[0];
+			mainProductImage.attr('src', mockup.mockup_image).css({
+				'position': 'absolute',
+				'top': `${mockup.position_top}%`,
+				'left': `${mockup.position_left}%`
+			});
+		}
+	}
+
+	function updateSelectedVariant() {
+		const selectedColor = $('.color-option.selected').attr('data-color');
+		const selectedSize = $('.size-option.selected').attr('data-size');
+
+		const newVariant = currentVariants.find(variant =>
+												(!selectedColor || variant.color === selectedColor) &&
+												(!selectedSize || variant.size === selectedSize)
+											   );
+
+		if (newVariant) {
+			selectedVariant = newVariant;
+
+			// 🔄 Mise à jour de l'URL
+			const url = new URL(window.location.href);
+			url.searchParams.set("variant", selectedVariant.variant_id);
+			history.replaceState(null, '', url.toString());
+
+			updatePriceAndDelivery(selectedVariant);
+			updateMainImage(selectedVariant);
+			updateThumbnails([selectedVariant]);
+			console.log("selectedVariant :", selectedVariant);
+
+			// Gestion du stock
+			const outOfStock = selectedVariant.stock === 'out of stock' || selectedVariant.stock === 'discontinued';
+
+			$('#customize-button')
+				.prop('disabled', outOfStock)
+				.toggleClass('disabled', outOfStock);
+
+			$('#no-stock-message').toggle(outOfStock);
+
+			// Affichage des images communautaires selon le ratio
+			const allImages = getAllCommunityImages();
+			const filteredImages = allImages.filter(img => img.format === selectedVariant.ratio_image);
+			displayImagesInBottomBar(filteredImages);
+		} else {
+			console.warn("Aucune variante trouvée pour cette combinaison !");
+			$('#customize-button').prop('disabled', true).addClass('disabled');
+			$('#no-stock-message').text("❌ Cette combinaison est indisponible.").show();
+		}
+	}
+
+
+
+	function updateColors(variants) {
+		const colorsContainer = $('.colors-container').empty();
+		const colorSet = new Set();
+
+		variants.forEach(v => {
+			if (v.color) {
+				colorSet.add(v.color);
+			}
+		});
+
+		Array.from(colorSet).forEach((color, index) => {
+			const isOutOfStock = !variants.some(v => v.color === color && v.stock !== 'out of stock' && v.stock !== 'discontinued');
+
+			const colorOption = $('<div>')
+			.addClass('color-option')
+			.css('background-color', color)
+			.attr('data-color', color)
+			.toggleClass('disabled', isOutOfStock)
+			.on('click', function () {
+				if ($(this).hasClass('disabled')) return;
+				$('.color-option').removeClass('selected');
+				$(this).addClass('selected');
+				updateSelectedVariant();
+			});
+
+			colorsContainer.append(colorOption);
+
+			if (index === 0 && !isOutOfStock) {
+				colorOption.addClass('selected');
+			}
+		});
+		// ✅ Affichage conditionnel
+		if (colorSet.size <= 1) {
+			$('.product-colors').hide();
+		} else {
+			$('.product-colors').show();
+		}
+
+	}
+
+
+
+	function updateSizes(variants) {
+		const sizesContainer = $('.sizes-container').empty();
+		const sizeMap = {};
+
+		variants.forEach(v => {
+			if (v.size && !sizeMap[v.size]) {
+				sizeMap[v.size] = v.stock;
+			}
+		});
+
+		Object.entries(sizeMap).forEach(([size, stock], index) => {
+			const sizeOption = $('<div>')
+			.addClass('size-option')
+			.text(size)
+			.attr('data-size', size)
+			.toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
+			.on('click', function () {
+				if ($(this).hasClass('disabled')) return;
+				$('.size-option').removeClass('selected');
+				$(this).addClass('selected');
+				updateSelectedVariant();
+			});
+
+			sizesContainer.append(sizeOption);
+			if (index === 0 && !sizeOption.hasClass('disabled')) {
+				sizeOption.addClass('selected');
+			}
+		});
+	}
+
+	function updatePriceAndDelivery(variant) {
+		const priceHT = variant.price ? variant.price : 0;
+		const priceTTC = priceHT * 1.20; // ✅ Ajoute la TVA de 20%
+		const discountedPriceTTC = priceTTC * 0.95; // ✅ 5% de remise sur TTC
+
+		$('.price-value span').text(priceTTC ? priceTTC.toFixed(2) + " € TTC" : "--");
+		$('.discounted-price span').text(priceTTC ? discountedPriceTTC.toFixed(2) + " € TTC" : "--");
+		$('.delivery-time span').text(variant.delivery_time || "--");
+		$('.shipping-cost span').text(variant.delivery_price ? parseFloat(variant.delivery_price).toFixed(2) + " €" : "--");
+	}
+
+
+	function updateThumbnails(variants) {
+		const thumbnailsContainer = $('.image-thumbnails').empty();
+
+		variants.forEach(variant => {
+			variant.mockups.forEach((mockup, index) => {
+				const imgElement = $('<img>')
+				.addClass('thumbnail')
+				.attr('src', mockup.mockup_image)
+				.attr('data-style-id', mockup.mockup_id)
+				.on('click', function () {
+					mainProductImage.attr('src', $(this).attr('src'));
+					$('.image-thumbnails .thumbnail').removeClass('selected');
+					$(this).addClass('selected');
+				});
+
+				thumbnailsContainer.append(imgElement);
+
+				if (index === 0) imgElement.addClass('selected');
+			});
+		});
+	}
+
+	// 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
+	$(document).on('productSelected', function (event, productId) {
+		loadProductDetails(productId);
+	});
+	// ✅ Permet d'ouvrir ou fermer la description détaillée du produit
+	$(document).on('click', '.toggle-description', function () {
+		$('.description-content').toggleClass('open');
+	});
+
+
+	// 🔥 Charge le produit si un ID est présent au démarrage
+	const urlParams = new URLSearchParams(window.location.search);
+	currentProductId = urlParams.get('id');
+	if (currentProductId) {
+		loadProductDetails(currentProductId);
+	}
+	// 🔄 Auto-génération du mockup si mockup=1
+	if (urlParams.get("mockup") === "1") {
+		const imageUrl = urlParams.get("image_url");
+		const variantId = urlParams.get("variant");
+
+		// ⏳ Attendre que les variantes soient chargées
+		const checkReady = setInterval(() => {
+			if (selectedVariant && selectedVariant.variant_id == variantId) {
+				clearInterval(checkReady);
+
+				const mockupData = {
+					image_url: imageUrl,
+					product_id: currentProductId,
+					variant_id: selectedVariant.variant_id,
+					placement: selectedVariant.placement,
+					technique: selectedVariant.technique,
+					width: selectedVariant.print_area_width,
+					height: selectedVariant.print_area_height,
+					left: 0,
+					top: 0
+				};
+
+				console.log("🚀 Déclenchement automatique de generateMockup :", mockupData);
+				generateMockup(mockupData);
+			}
+		}, 200);
+	}
+
+});

@@ -1,0 +1,534 @@
+#main-container {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    overflow: auto;
+}
+
+#content-container {
+	overflow: auto;
+}
+
+.content {
+    background-color: #666;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    overflow: auto; /* gestion de débordement */
+}
+
+#sidebar-footer {
+	justify-content: center;
+}
+
+#additional-options {
+    flex-grow: 1;
+	width: 100%;
+	background: #222222;
+	overflow: auto;
+}
+
+.options-container {
+    padding: 10px; /* Ajoute un décalage de contenu de 10px en haut et en bas */
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Deux colonnes */
+    grid-gap: 10px; /* Espacement entre les images */
+}
+
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc((100vh - 90px - 30px) / 2); /* Hauteur disponible pour chaque image */
+    overflow: hidden; /* Cache les parties de l'image qui débordent */
+}
+
+.centered-image {
+	max-width: 100%;
+	height: calc(100vh - 90px - 30px);
+}
+
+.image-grid img {
+    width: auto; /* Adaptation automatique de la largeur */
+    height: 100%; /* Hauteur complète du conteneur */
+    object-fit: contain; /* Maintient le ratio sans découper l'image */
+}
+
+.bottom {
+  object-position: top;
+}
+
+.top {
+  object-position: bottom;
+}
+#container {
+    position: relative;
+	margin: 10px;
+    height: 100px; /* Hauteur fixe pour la zone mobile */
+}
+
+#custom-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    border: 1px solid #ccc; /* Ajoute une bordure pour la délimitation */
+	border-radius: 5px;
+    background-color: #fff; /* Fond blanc */
+    font-size: 16px; /* Taille de police réduite */
+	padding: 5px; /* Ajoute une marge de 5px à gauche du texte */
+	color: #000; /* Texte noir */
+	line-height: 1; /* Réduit l'espace entre les lignes */
+}
+
+#resizer {
+	border-radius: 2.5px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 5px;
+    background-color: #ccc;
+    cursor: ns-resize;
+}
+
+#placeholder {
+    position: absolute;
+	left: 5px; /* Ajoute une marge de 5px à gauche du texte */
+	font-size: 16px; /* Taille de police réduite */
+    color: #888; /* Couleur du texte de l'indication */
+    pointer-events: none; /* Ignorer les événements de souris sur le texte d'indication */
+}
+
+/* Style pour le conteneur du texte */
+#aspect-ratio-info {
+    text-align: left; /* Aligner le texte à gauche */
+    margin-top: 10px; /* Ajout d'une marge au-dessus */
+    font-family: 'Poppins', sans-serif; /* Utilisation d'une police proche */
+    font-size: 12px; /* Taille plus petite */
+    font-weight: bold; /* Mettre en gras */
+    color: #e0e0e0; /* Couleur gris clair */
+}
+
+
+.info-icon {
+    margin-left: 5px;
+	font-size: 14px; /* Réduit la taille de la police */
+    cursor: pointer;
+    border-radius: 50%; /* Met le point d'interrogation dans un cercle */
+    background-color: #ccc; /* Couleur de fond pour le cercle */
+    width: 15px; /* Réduit la taille du cercle */
+    height: 15px; /* Réduit la taille du cercle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	color: black;
+}
+
+#product-groups-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%; /* Assurez-vous que cela correspond à la largeur désirée ou est limité par un parent */
+    max-width: 100%; /* Empêche le conteneur de déborder */
+}
+
+.product-group {
+    flex: 1 1 auto; /* Maintient la flexibilité, mais ajustez en fonction du besoin */
+    max-width: 100%;
+    display: flex;
+    flex-direction: row; /* Alignement horizontal des produits à l'intérieur du groupe */
+    flex-wrap: wrap;
+}
+
+.product-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 25%;
+	min-height: 100px;
+	margin: 3px 3px 0px;
+	flex: 0 0 auto;
+	text-align: center;
+	box-sizing: border-box;
+	transition: all 0.2s ease-in-out; /* met ici pour éviter le duplicate */
+}
+
+.product-item.selected {
+	border: 2px solid #888;
+	border-radius: 4px;
+	background-color: rgba(255, 255, 255, 0.05);
+	box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.product-container {
+    width: 100px;
+    height: 100px; /* Taille de l'image carrée */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	border: 1px solid #ccc; /* Bordure autour de chaque produit */
+	border-radius: 10px;
+}
+
+.product-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Assure que l'image couvre toute la zone */
+}
+
+.hidden {
+    display: none; /* Masque les groupes de produits avec la classe "hidden" */
+}
+
+.product-item p {
+    text-align: center;
+	margin: 0; /* ✅ Supprime la marge par défaut */
+    padding: 0;
+}
+
+#ratio-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+/* styles.css */
+#product-container {
+    display: flex; /* Active Flexbox pour aligner les enfants horizontalement */
+    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne suivante si l'espace horizontal est insuffisant */
+    justify-content: space-around; /* Distribue l'espace autour des éléments pour une meilleure apparence */
+    align-items: center; /* Centre les éléments verticalement */
+    margin-bottom: 20px; /* Espace en dessous du conteneur pour la clarté */
+}
+#selected-display {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#selected-info {
+    padding: 10px 20px;
+    border: none;
+    background-color: #ddd;
+    color: #333;
+}
+
+/* Style supplémentaire pour les images pour assurer l'uniformité */
+.modal-background {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.modal {
+  position: absolute;
+  left: 350px;
+  top: 20%;
+	width: 200px;
+}
+
+.modal-content {
+  background-color: #333;
+  color: #fff;
+ text-align: left; 
+}
+
+.modal-title {
+    font-size: 20px; /* Réduire la taille de la police du titre */
+    margin-bottom: 10px;
+	
+}
+.modal-content p {
+    margin-bottom: 15px; /* Réduire l'écart entre les paragraphes */
+    font-size: 16px; /* Réduire la taille de la police du paragraphe */
+    line-height: 1.2; /* Ajuster l'écart entre les lignes */
+	color: #fff;
+}
+
+.modal-footer {
+    text-align: right; /* Aligner le contenu à droite */
+}
+
+.ok-button {
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    padding: 8px 12px; /* Réduire la marge interne du bouton */
+    font-size: 12px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.ok-button:hover {
+  background-color: #0056b3;
+}
+
+.content-images {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Assurez-vous que la hauteur est suffisante pour la visibilité */
+}
+
+.loading-container {
+    position: absolute;
+    width: 400px;
+    height: auto;
+    z-index: 10; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loading-bar-border {
+    width: 100%; 
+    height: 30px;
+    border: 3px solid #3498db;
+    background-color: #222;
+    box-sizing: border-box;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-bar {
+    width: 0%; 
+    height: 100%;
+    background-color: #3498db;
+    transition: width 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-text {
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    position: absolute; /* Permet de centrer par rapport à la barre */
+    width: 100%; /* Occupe toute la largeur pour un centrage horizontal */
+}
+
+
+
+.section-title .title {
+    font-size: 24px; /* Taille de police appropriée */
+    color: #e0e0e0; /* Gris clair pour une bonne visibilité sur le fond sombre */
+    font-weight: bold; /* Police en gras pour accentuer le titre */
+    text-align: center; /* Centre le texte */
+    margin: 20px 0; /* Espacement vertical pour une bonne structuration */
+}
+
+.format-button {
+    background-color: #505050; /* Gris moyen pour le fond du bouton */
+    color: #f0f0f0; /* Gris très clair pour le texte, pour un contraste suffisant */
+    border: 1px solid #686868; /* Bordure légèrement plus claire que le fond du bouton */
+    padding: 10px 20px; /* Espacement interne un peu plus grand pour rendre le bouton plus large */
+    font-size: 16px; /* Taille de la police */
+    border-radius: 30px; /* Coins très arrondis pour un design moderne */
+    cursor: pointer; /* Indique que le bouton est cliquable */
+    transition: background-color 0.3s, transform 0.2s; /* Douce transition pour survol */
+    margin: 5px; /* Marge externe pour espacer les boutons */
+	min-width: 150px;
+}
+
+/* Effet de survol et focus */
+.format-button:hover, .format-button:focus {
+    background-color: #707070; /* Gris légèrement plus clair pour le survol */
+    color: #ffffff; /* Texte blanc pour améliorer le contraste au survol */
+    transform: scale(1.05); /* Légère augmentation de taille pour un feedback visuel */
+}
+
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hide {
+    display: none;
+}
+/* Couleur de fond du popover */
+.driver-popover {
+    background-color: #333 !important; /* Fond blanc */
+}
+
+/* Couleur du texte dans le popover */
+.driver-popover-title, .driver-popover-description {
+    color: #fff !important; /* Texte noir */
+}
+/* Cibler la flèche à droite avec alignement au début */
+.driver-popover-arrow.driver-popover-arrow-side-right.driver-popover-arrow-align-start::before {
+    border-color: transparent !important; /* Assure-toi de rendre transparents tous les autres côtés de la bordure qui ne sont pas nécessaires */
+    border-right-color: #333 !important; /* Modifie cette couleur à #333 pour la flèche à droite */
+}
+
+.driver-popover-arrow.driver-popover-arrow-side-right.driver-popover-arrow-align-start::after {
+    content: ''; /* S'assurer que le pseudo-élément :after est vide et n'interfère pas */
+    border-color: transparent !important;
+}
+#infoButton {
+    background-color: white; /* Fond blanc */
+    color: black; /* Icône noire */
+    border: none;
+    padding: 0.5em; /* Padding basé sur la taille de la police */
+    width: 1.5em; /* Largeur du bouton basée sur la taille de la police */
+    height: 1.5em; /* Hauteur du bouton basée sur la taille de la police */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Rond */
+    font-size: 12px; /* Taille initiale de la police, ajustable */
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Ombre pour le relief */
+    transition: background-color 0.3s, color 0.3s; /* Transition pour le survol */
+}
+
+#infoButton:hover {
+    background-color: #e8e8e8; /* Changement de couleur au survol */
+    color: #333; /* Changement de la couleur de l'icône au survol */
+}
+
+.intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 9999;
+}
+
+.intro-content {
+    background: #333;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+	color: fff;
+}
+
+p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+/* Style commun pour les boutons Ratio et Generate */
+button {
+    background-color: #505050; /* Couleur de fond gris */
+    color: white; /* Texte blanc */
+    padding: 10px 20px; /* Ajout de padding pour agrandir les boutons */
+    border: none; /* Pas de bordure */
+    border-radius: 30px; /* Boutons arrondis */
+    font-size: 16px; /* Taille de la police */
+    cursor: pointer; /* Curseur de pointeur au survol */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Transition douce */
+    text-align: center; /* Centre le texte dans le bouton */
+}
+
+/* Alignement des boutons dans un conteneur centré */
+#buttons-container {
+    display: flex;
+    justify-content: center; /* Centre les boutons horizontalement */
+    gap: 20px; /* Espacement entre les boutons */
+    margin-top: 20px; /* Espacement par rapport aux autres éléments */
+}
+
+/* Effet de survol pour les boutons */
+button:hover {
+    background-color: #707070; /* Couleur plus claire au survol */
+    transform: scale(1.05); /* Légère augmentation de taille pour le feedback visuel */
+}
+
+/* Style pour la flèche du bouton Ratio */
+#arrow-icon {
+    display: inline-block;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    padding: 5px;
+    margin-left: 10px;
+    transform: rotate(45deg); /* Flèche vers le bas */
+    transition: transform 0.3s ease;
+}
+
+/* Flèche vers le haut lorsque le menu est ouvert */
+#arrow-icon.open {
+    transform: rotate(-135deg); /* Flèche vers le haut */
+}
+
+/* Maintenir le style du bouton même lorsqu'il est focus (après clic) */
+#ratioButton:focus {
+    outline: none; /* Retirer la bordure bleue par défaut du focus */
+    background-color: #505050; /* Conserver la couleur d'origine */
+}
+
+.ratio-selection {
+    display: flex; /* Activer le mode Flexbox */
+    flex-wrap: wrap; /* Permettre aux éléments de se répartir sur plusieurs lignes si nécessaire */
+    justify-content: space-around; /* Espacer les boutons de manière égale autour du conteneur */
+}
+
+/* Style du bouton "Generate" */
+#validate-button {
+    background-color: #007BFF; /* Couleur bleue */
+    color: white; /* Texte blanc */
+    padding: 10px 20px; /* Espace intérieur */
+    border: none; /* Pas de bordure */
+    border-radius: 30px; /* Coins arrondis */
+    font-size: 16px; /* Taille de la police */
+    cursor: pointer; /* Curseur de pointeur */
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Transitions fluides */
+    min-width: 150px; /* Largeur minimale du bouton */
+    text-align: center; /* Centrer le texte */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre pour donner du volume */
+}
+
+/* Effet de survol et de clic */
+#validate-button:hover {
+    background-color: #0056b3; /* Couleur bleue plus foncée au survol */
+    transform: translateY(-2px); /* Légère remontée pour l'effet de volume */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Ombre plus forte au survol */
+}
+
+#validate-button:active {
+    background-color: #004080; /* Couleur encore plus foncée lors du clic */
+    transform: translateY(0); /* Revenir à la position initiale au clic */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Diminuer l'ombre lors du clic */
+}

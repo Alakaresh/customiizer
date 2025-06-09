@@ -1,0 +1,92 @@
+:root {
+    --dark-gray: #1a1a1a;  /* plus foncé que votre original #333333 */
+    --darker-gray: #2b2b2b; /* ajout d'une nouvelle nuance */
+    --charcoal-gray: #404040; /* autre nouvelle nuance plus foncée */
+    --medium-gray: #555555;
+    --light-gray: #cccccc;
+    --very-light-gray: #e0e0e0;
+}
+
+#customize-main {
+    display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
+    color: white;
+	flex-grow: 1;
+}
+
+.sidebar {
+	flex: 0 0 auto;
+    background-color: var(--darker-gray);
+    color: white;
+    height: calc(100vh - 65px);
+    display: flex;
+    flex-direction: column; /* Organise les enfants (header, content, footer) verticalement */
+}
+
+#sidebar-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Assurez-vous que cela prend toute la hauteur de la sidebar */
+}
+
+
+#left-sidebar {
+	height: 100%;
+	display: flex; /* Assurer que les enfants peuvent utiliser flexbox */
+    flex-direction: column; /* Aligner les enfants en colonne */
+    width: 360px;
+	background-color: var(--dark-gray);
+    flex: none; /* Empêche la sidebar de s'ajuster ou de se redimensionner */
+	max-height: calc(100vh - 65px);
+}
+
+#right-sidebar {
+    width: 250px;
+}
+
+#content {
+    flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
+    background-color: var(--charcoal-gray);
+    /*padding: 20px;*/ 
+	/* max-height: calc(100vh - 65px); */
+}
+
+#sidebar-header, #sidebar-footer {
+	background-color: var(--dark-gray);
+    color: white;
+	
+}
+
+#sidebar-header {
+    padding: 10px;
+}
+
+#sidebar-content {
+	display: flex;
+    flex-direction: column; /* Organisation verticale des éléments */
+    padding: 10px;
+    flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
+    overflow-y: auto; /* Ajoute un scroll si le contenu dépasse la hauteur calculée */
+	margin-bottom: 100px;
+}
+
+
+#sidebar-footer {
+    padding: 10px;
+    align-items: center; /* Centre verticalement */
+    text-align: center;
+}
+#user_images {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Pour aligner les images sur les côtés */
+}
+
+#user_images img {
+    width: calc(50% - 5px); /* Pour afficher deux images par ligne avec une marge de 10px */
+    margin-bottom: 5px; /* Marge inférieure entre les lignes */
+    border-radius: 10px; /* Coins arrondis */
+}
+
+.hidden {
+    display: none;
+}

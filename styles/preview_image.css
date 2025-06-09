@@ -1,0 +1,263 @@
+/* Styles pour l'overlay */
+.preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Styles pour le conteneur principal */
+.preview-main-container {
+    display: flex;
+    align-items: center;
+    background-color: #222; /* Couleur plus sombre */
+    box-sizing: border-box;
+    padding: 20px;
+    max-width: 80%; /* Pour éviter que le conteneur dépasse de l'écran */
+    max-height: 80%; /* Pour éviter que le conteneur dépasse de l'écran */
+    position: relative; /* Pour positionner le bouton de fermeture */
+}
+
+/* Styles pour le conteneur d'image */
+.preview-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centrer le contenu verticalement */
+    height: 70vh; /* La hauteur est 70% de la hauteur de la fenêtre */
+    width: 70vh; /* La largeur est égale à la hauteur pour obtenir un carré */
+    background-color: #333;
+    margin-right: 20px; /* Marge autour du conteneur d'image */
+    box-sizing: border-box;
+    padding: 20px; /* Padding autour de l'image */
+}
+
+/* Styles pour l'image agrandie */
+.preview-enlarged-img {
+    max-width: 100%;
+    max-height: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Styles pour le conteneur d'informations */
+.preview-info-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Aligner en haut */
+    color: white;
+    box-sizing: border-box;
+    height: 70vh; /* La hauteur du conteneur d'informations est égale à celle du conteneur d'image */
+    width: 300px; /* Largeur définie explicitement en pixels */
+    padding-left: 20px;
+}
+
+/* Styles pour l'utilisateur */
+.user-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    background-color: #4a4a4a;
+    text-transform: uppercase;
+}
+
+
+/* Styles pour le lien utilisateur */
+.user-login-link {
+    color: white;
+    text-decoration: none;
+    padding: 5px;
+}
+
+.user-login-link:hover {
+    background-color: #ccc; /* Fond gris clair au survol */
+    color: black;
+    border-radius: 5px; /* Optionnel : arrondir les coins */
+}
+
+/* Styles pour le conteneur du prompt, job id, et format */
+.prompt-container, .job-id-container, .format-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.prompt-title-container, .format-title-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative; /* Pour positionner le message de confirmation */
+}
+
+.prompt-title, .format-title{
+    font-weight: bold;
+}
+
+.prompt-text, .format-text {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    color: white;
+    word-wrap: break-word;
+}
+
+.prompt-text {
+    max-height: 30vh;
+    overflow: auto;
+}
+
+/* Styles pour le bouton de copie */
+.copy-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px 10px; /* Padding horizontal et vertical */
+    display: flex;
+    align-items: center;
+    border-radius: 5px; /* Optionnel : arrondir les coins */
+}
+
+.copy-button:hover {
+    background-color: #ccc; /* Gris clair au survol */
+    color: black;
+}
+
+.copy-button i {
+    font-size: 16px; /* Taille intermédiaire de l'icône */
+    pointer-events: none; /* Empêche l'icône de capturer les événements de clic */
+    margin-right: 5px; /* Espace entre l'icône et le texte */
+}
+
+/* Styles pour le message de confirmation de copie */
+.copy-confirmation {
+    position: absolute;
+    bottom: 100%; /* Positionner au-dessus du bouton */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #444;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    white-space: nowrap; /* Pour éviter que le texte ne se casse sur plusieurs lignes */
+}
+
+/* Styles pour le bouton de fermeture */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px; /* Carré */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px; /* Optionnel : arrondir les coins */
+}
+
+.close-button:hover {
+    background-color: #ccc; /* Gris clair au survol */
+    color: black;
+}
+
+.close-button i {
+    font-size: 16px; /* Taille intermédiaire de l'icône */
+}
+
+/* Styles pour les boutons Use Prompt et Use Image */
+.use-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    width: 100%;
+    padding-top: 20px; /* Espace en haut des boutons */
+}
+
+.use-button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 48%; /* Pour que les boutons occupent la même largeur et soient espacés */
+    text-align: center;
+}
+
+.use-button:hover {
+    background-color: #666;
+}
+
+.preview-enlarge {
+    cursor: zoom-in; /* Change le curseur en loupe */
+}
+
+.product-chooser-overlay {
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(0,0,0,0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+}
+
+.product-chooser-box {
+	background: #1f1f1f;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px #000;
+	max-width: 400px;
+	width: 90%;
+	text-align: center;
+}
+
+.product-choice-button {
+	display: block;
+	margin: 10px 0;
+	padding: 10px 15px;
+	background: #444;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.product-choice-button:hover {
+	background: #666;
+}
+
+.close-choice-button {
+	margin-top: 15px;
+	padding: 6px 12px;
+	font-size: 14px;
+	background: #888;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
