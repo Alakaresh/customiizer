@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         for (const p of products) {
             if (!window.customizerCache.variants[p.product_id]) {
                 try {
-                    const res = await fetch(`/wp-json/custom-api/v1/product-variants/${p.product_id}`);
+                    const res = await fetch(`/wp-json/api/v1/products/${p.product_id}`);
                     const data = await res.json();
                     window.customizerCache.variants[p.product_id] = data;
                 } catch (e) {
