@@ -4,7 +4,15 @@ let communityImages = [];
 let currentProductId = null;
 
 // 🌐 Cache global pour les templates et modèles 3D préchargés
-window.customizerCache = window.customizerCache || { templates: {}, models: {} };
+try {
+    const saved = sessionStorage.getItem('customizerCache');
+    window.customizerCache = saved ? JSON.parse(saved) : {};
+} catch (e) {
+    window.customizerCache = {};
+}
+window.customizerCache.templates = window.customizerCache.templates || {};
+window.customizerCache.models = window.customizerCache.models || {};
+window.customizerCache.variants = window.customizerCache.variants || {};
 jQuery(document).ready(function ($) {
         const apiBaseURL = '/wp-json/api/v1/products';
         const mainProductImage = $('#product-main-image');
