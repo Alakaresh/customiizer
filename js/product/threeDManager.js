@@ -63,16 +63,15 @@ function init3DScene(containerId, modelUrl) {
 	light.position.set(3, 5, 3);
 	scene.add(light);
 
-	loadModel(modelUrl);
-	animate();
+        loadModel(modelUrl);
+        animate();
 }
 
 
 
 function loadModel(modelUrl) {
-	const loader = new THREE.GLTFLoader();
-	loader.load(modelUrl, (gltf) => {
-		printableMeshes = {};
+        const handleModel = (gltf) => {
+                printableMeshes = {};
 
 		gltf.scene.traverse((child) => {
 			if (!child.isMesh) return;
@@ -134,11 +133,24 @@ function loadModel(modelUrl) {
 			child.material.needsUpdate = true;
 		});
 
-		scene.add(gltf.scene);
-		console.log("[3D] ✅ Zones imprimables :", Object.keys(printableMeshes));
-	}, undefined, (error) => {
-		console.error("Erreur chargement modèle :", error);
-	});
+                scene.add(gltf.scene);
+                console.log("[3D] ✅ Zones imprimables :", Object.keys(printableMeshes));
+        };
+
+        if (window.customizerCache?.models?.[modelUrl]) {
+                handleModel(window.customizerCache.models[modelUrl]);
+                return;
+        }
+
+        const loader = new THREE.GLTFLoader();
+        loader.load(modelUrl, (gltf) => {
+                if (window.customizerCache) {
+                        window.customizerCache.models[modelUrl] = gltf;
+                }
+                handleModel(gltf);
+        }, undefined, (error) => {
+                console.error("Erreur chargement modèle :", error);
+        });
 }
 
 

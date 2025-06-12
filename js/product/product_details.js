@@ -2,11 +2,45 @@ let selectedVariant = null;
 let myGeneratedImages = [];
 let communityImages = [];
 let currentProductId = null;
-jQuery(document).ready(function ($) {
-	const apiBaseURL = '/wp-json/api/v1/products';
-	const mainProductImage = $('#product-main-image');
 
-	let currentVariants = [];
+// 🌐 Cache global pour les templates et modèles 3D préchargés
+window.customizerCache = window.customizerCache || { templates: {}, models: {} };
+jQuery(document).ready(function ($) {
+        const apiBaseURL = '/wp-json/api/v1/products';
+        const mainProductImage = $('#product-main-image');
+
+        let currentVariants = [];
+
+        // Préchargement du template et du modèle 3D pour une variante
+        async function preloadVariantAssets(variant) {
+                if (!variant) return;
+
+                const vid = variant.variant_id;
+
+                if (vid && !window.customizerCache.templates[vid]) {
+                        try {
+                                const res = await fetch(`/wp-json/custom-api/v1/variant-template/${vid}`);
+                                const data = await res.json();
+                                if (data.success && data.template) {
+                                        window.customizerCache.templates[vid] = data.template;
+                                        console.log('[Cache] Template préchargé pour', vid);
+                                }
+                        } catch (e) {
+                                console.error('[Cache] Erreur préchargement template:', e);
+                        }
+                }
+
+                const modelUrl = variant.url_3d;
+                if (modelUrl && !window.customizerCache.models[modelUrl]) {
+                        const loader = new THREE.GLTFLoader();
+                        loader.load(modelUrl, (gltf) => {
+                                window.customizerCache.models[modelUrl] = gltf;
+                                console.log('[Cache] Modèle 3D préchargé pour', modelUrl);
+                        }, undefined, (err) => {
+                                console.error('[Cache] Erreur préchargement modèle 3D:', err);
+                        });
+                }
+        }
 
 	// Dès le chargement général de la page
 	preloadCommunityImages().then(() => {
@@ -118,8 +152,11 @@ jQuery(document).ready(function ($) {
 			// Affichage des images communautaires selon le ratio
 			const allImages = getAllCommunityImages();
 			const filteredImages = allImages.filter(img => img.format === selectedVariant.ratio_image);
-			displayImagesInBottomBar(filteredImages);
-		} else {
+                        displayImagesInBottomBar(filteredImages);
+
+                        // 🚀 Précharge les ressources du configurateur pour la variante courante
+                        preloadVariantAssets(selectedVariant);
+                } else {
 			console.warn("Aucune variante trouvée pour cette combinaison !");
 			$('#customize-button').prop('disabled', true).addClass('disabled');
 			$('#no-stock-message').text("❌ Cette combinaison est indisponible.").show();
