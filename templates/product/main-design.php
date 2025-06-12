@@ -21,9 +21,11 @@
                 </div>
 
                 <div class="image-controls">
-                        <button id="alignLeftButton" class="align-button">Gauche</button>
-                        <button id="alignCenterButton" class="align-button">Centrer</button>
-                        <button id="alignRightButton" class="align-button">Droite</button>
+                        <button id="alignLeftButton" class="align-button"><i class="fas fa-align-left"></i></button>
+                        <button id="alignCenterButton" class="align-button"><i class="fas fa-align-center"></i></button>
+                        <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
+                        <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
+                        <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
                 </div>
 
                 <div class="modal-footer">
