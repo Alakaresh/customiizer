@@ -188,7 +188,7 @@ function convert_webp_to_png_server($image_url) {
 	$output_path = $output_dir . '/' . $output_filename;
 
 	// Convertir et enregistrer l'image en PNG
-	if (!imagepng($webp_image, $output_path)) {
+        if (!imagepng($webp_image, $output_path, PNG_COMPRESSION_LEVEL)) {
 		imagedestroy($webp_image);
 		customiizer_log("❌ Échec de conversion en PNG : $output_path");
 		return ['success' => false, 'message' => 'Erreur lors de l\'enregistrement PNG.'];

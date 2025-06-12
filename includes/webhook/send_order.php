@@ -192,7 +192,7 @@ function convertir_webp_en_png(string $webp_url, string $order_id): ?string {
 	$png_path   = UPLOADS_BASE_PATH . '/' . $file_name;
 	$public_url = UPLOADS_BASE_URL  . '/' . $file_name;
 
-	imagepng($img, $png_path);
+        imagepng($img, $png_path);
 	imagedestroy($img);
 	unlink($tmp_webp);
 
