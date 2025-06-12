@@ -160,10 +160,11 @@ jQuery(document).ready(function ($) {
 	const uploadPcImageButton = $('#uploadPcImageButton');
 	const imageToggle = $('#imageToggle');
 
-	// 2) Ouvrir le modal de personnalisation
-	customizeButton.on('click', async function () {
-		fetchUserImages(); // images perso si besoin
-		customizeModal.show();
+        // 2) Ouvrir le modal de personnalisation
+        customizeButton.on('click', async function () {
+                fetchUserImages(); // images perso si besoin
+                addImageButton.show();
+                customizeModal.show();
 
 		try {
 			// 1. Charger les données du template depuis l'API
@@ -195,10 +196,16 @@ jQuery(document).ready(function ($) {
 	});
 
 
-	// 3) Fermer le modal principal
-	closeButtonMain.on('click', function () {
-		customizeModal.hide();
-	});
+        // 3) Fermer le modal principal
+        closeButtonMain.on('click', function () {
+                customizeModal.hide();
+                addImageButton.show();
+        });
+
+        // Afficher le bouton lors du changement de produit
+        $(document).on('productSelected', function () {
+                addImageButton.show();
+        });
 
 	// 4) Ouvrir le sélecteur d’image
 	addImageButton.on('click', function () {
