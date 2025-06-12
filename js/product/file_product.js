@@ -13,16 +13,18 @@ jQuery(document).ready(function () {
 
 
 	// Fermer les modals
-	closeButton.on('click', function () {
-		jQuery(this).closest('.modal').hide();
-	});
+        closeButton.on('click', function () {
+                jQuery(this).closest('.modal').hide();
+                addImageButton.show();
+        });
 
 	// Fermer en cliquant à l'extérieur du modal principal
-	jQuery(window).on('click', function (event) {
-		if (jQuery(event.target).is(customizeModal)) {
-			customizeModal.hide();
-		}
-	});
+        jQuery(window).on('click', function (event) {
+                if (jQuery(event.target).is(customizeModal)) {
+                        customizeModal.hide();
+                        addImageButton.show();
+                }
+        });
 
 	// Gestion du clic sur les boutons "Mes images" et "Images de la communauté"
 	jQuery('#userImagesButton').on('click', function () {
@@ -338,21 +340,28 @@ jQuery(document).ready(function () {
 
 
 	// Appel au moment de l’ouverture du modal
-	customizeButton.on('click', function () {
-		console.log("[Modal] 🔄 Ouverture du modal...");
-		customizeModal.show();
-		loadProductImage();
-		checkAndDisplay3DModel();
-	});
+        customizeButton.on('click', function () {
+                console.log("[Modal] 🔄 Ouverture du modal...");
+                addImageButton.show();
+                customizeModal.show();
+                loadProductImage();
+                checkAndDisplay3DModel();
+        });
+
+        // Afficher le bouton lorsqu'un produit est sélectionné
+        jQuery(document).on('productSelected', function () {
+                addImageButton.show();
+        });
 
 
 	// Fonction pour charger l'image du produit sur le canvas à l'ouverture du modal
 	// Ouvrir le modal principal
-	customizeButton.on('click', function () {
-		customizeModal.show();
-		loadProductImage();
-		checkAndDisplay3DModel();
-	});
+        customizeButton.on('click', function () {
+                addImageButton.show();
+                customizeModal.show();
+                loadProductImage();
+                checkAndDisplay3DModel();
+        });
 
 	// Gestion du clic sur le bouton "Supprimer"
 	pcFilesList.on('click', '.delete-button', function () {
