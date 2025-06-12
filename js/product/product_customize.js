@@ -144,10 +144,10 @@ jQuery(document).ready(function ($) {
 });
 
 jQuery(document).ready(function ($) {
-	console.log("[JS] Initialisation du modal de personnalisation...");
+        console.log("[JS] Initialisation du modal de personnalisation...");
 
-	let importedFiles = [];
-	let allGeneratedImages = [];
+        let importedFiles = [];
+        let allGeneratedImages = [];
 
 	const pcFilesList = $('#pcFilesList');
 	const siteFilesList = $('#siteFilesList');
@@ -158,13 +158,41 @@ jQuery(document).ready(function ($) {
 	const imageSourceModal = $('#imageSourceModal');
 	const closeButtonImageModal = $('#imageSourceModal .close-button');
 	const uploadPcImageButton = $('#uploadPcImageButton');
-	const imageToggle = $('#imageToggle');
+        const imageToggle = $('#imageToggle');
+
+        function trapFocus(modal) {
+                const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+                if (!focusable.length) return;
+                const first = focusable.first();
+                const last = focusable.last();
+                modal.on('keydown.trapFocus', function (e) {
+                        if (e.key === 'Tab') {
+                                if (e.shiftKey) {
+                                        if ($(document.activeElement).is(first)) {
+                                                last.focus();
+                                                e.preventDefault();
+                                        }
+                                } else {
+                                        if ($(document.activeElement).is(last)) {
+                                                first.focus();
+                                                e.preventDefault();
+                                        }
+                                }
+                        }
+                });
+                first.focus();
+        }
+
+        function releaseFocus(modal) {
+                modal.off('keydown.trapFocus');
+        }
 
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function () {
                 fetchUserImages(); // images perso si besoin
                 addImageButton.show();
                 customizeModal.show();
+                trapFocus(customizeModal);
 
                 try {
                         // 1. Charger le template depuis le cache ou l'API
@@ -205,6 +233,7 @@ jQuery(document).ready(function ($) {
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
                 customizeModal.hide();
+                releaseFocus(customizeModal);
                 addImageButton.show();
         });
 
@@ -214,14 +243,16 @@ jQuery(document).ready(function ($) {
         });
 
 	// 4) Ouvrir le sélecteur d’image
-	addImageButton.on('click', function () {
-		imageSourceModal.show();
-	});
+        addImageButton.on('click', function () {
+                imageSourceModal.show();
+                trapFocus(imageSourceModal);
+        });
 
 	// 5) Fermer le sélecteur d’image
-	closeButtonImageModal.on('click', function () {
-		imageSourceModal.hide();
-	});
+        closeButtonImageModal.on('click', function () {
+                imageSourceModal.hide();
+                releaseFocus(imageSourceModal);
+        });
 
 	// 6) Toggle Mes images / Communauté
 	imageToggle.on('change', function () {
@@ -232,19 +263,34 @@ jQuery(document).ready(function ($) {
 	});
 
 	// 7) Clic sur une miniature
-	siteFilesList.on('click', '.image-thumbnail', function () {
-		const url = $(this).data('image-url');
-		CanvasManager.addImage(url);
-		imageSourceModal.hide();
-		addImageButton.hide();
-	});
+        siteFilesList.on('click', '.image-thumbnail', function () {
+                const url = $(this).data('image-url');
+                CanvasManager.addImage(url);
+                imageSourceModal.hide();
+                releaseFocus(imageSourceModal);
+                addImageButton.hide();
+        });
 
-	pcFilesList.on('click', '.image-thumbnail', function () {
-		const url = $(this).data('image-url');
-		CanvasManager.addImage(url);
-		imageSourceModal.hide();
-		addImageButton.hide();
-	});
+        pcFilesList.on('click', '.image-thumbnail', function () {
+                const url = $(this).data('image-url');
+                CanvasManager.addImage(url);
+                imageSourceModal.hide();
+                releaseFocus(imageSourceModal);
+                addImageButton.hide();
+        });
+
+        $(document).on('keydown', function (e) {
+                if (e.key === 'Escape') {
+                        if (imageSourceModal.is(':visible')) {
+                                imageSourceModal.hide();
+                                releaseFocus(imageSourceModal);
+                        } else if (customizeModal.is(':visible')) {
+                                customizeModal.hide();
+                                releaseFocus(customizeModal);
+                                addImageButton.show();
+                        }
+                }
+        });
 
 
 	async function fetchUserImages() {

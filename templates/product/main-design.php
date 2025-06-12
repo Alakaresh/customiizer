@@ -1,7 +1,8 @@
 <!-- Modal principal -->
-<div id="customizeModal" class="modal">
-	<div class="modal-content">
-		<span class="close-button">&times;</span>
+<div id="customizeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="customizeModalTitle">
+        <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2 id="customizeModalTitle">Customize Product</h2>
 		<div class="visual-zone">
 			<button id="addImageButton" class="add-image-button">Ajouter une image</button>
 
@@ -27,12 +28,12 @@
 
 
 <!-- Second modal pour choisir l'image -->
-<div id="imageSourceModal" class="modal">
+<div id="imageSourceModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="imageSourceModalTitle">
 	<div class="small-modal">
 		<div class="modal-header">
 			<span class="close-button">&times;</span>
 		</div>
-		<h3>File Library</h3>
+               <h3 id="imageSourceModalTitle">File Library</h3>
 
 		<!-- Section recherche et upload -->
 		<div class="search-upload">
