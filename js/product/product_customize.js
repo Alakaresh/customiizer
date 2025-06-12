@@ -166,19 +166,25 @@ jQuery(document).ready(function ($) {
                 addImageButton.show();
                 customizeModal.show();
 
-		try {
-			// 1. Charger les données du template depuis l'API
-			const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
-			const data = await res.json();
+                try {
+                        // 1. Charger le template depuis le cache ou l'API
+                        let template = window.customizerCache.templates[selectedVariant.variant_id];
+                        if (!template) {
+                                const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
+                                const data = await res.json();
 
-			if (!data.success || !data.template) {
-				console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
-				$('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
-				return;
-			}
+                                if (!data.success || !data.template) {
+                                        console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
+                                        $('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
+                                        return;
+                                }
 
-			const template = data.template;
-			console.log("[UI] ✅ Template reçu :", template);
+                                template = data.template;
+                                window.customizerCache.templates[selectedVariant.variant_id] = template;
+                                console.log('[Cache] Template chargé et stocké pour', selectedVariant.variant_id);
+                        } else {
+                                console.log('[Cache] Template récupéré depuis le cache pour', selectedVariant.variant_id);
+                        }
 
 			// 2. Lancer Fabric.js dans le container
 			CanvasManager.init(template, 'product2DContainer');
