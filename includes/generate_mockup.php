@@ -104,7 +104,8 @@ function handle_generate_mockup() {
     if (!$conversion_result['success']) {
         wp_send_json_error(['message' => $conversion_result['message']]);
     }
-    $png_url = $conversion_result['png_url'];
+    $png_url   = $conversion_result['png_url'];
+    $file_path = $conversion_result['file_path'];
 
     // 🎯 Appel API Printful avec les pouces tels quels
     $response = generate_mockup_printful(
@@ -131,24 +132,39 @@ function handle_generate_mockup() {
 			if (!empty($mockups)) {
 				$mockup_url = $mockups[0]['mockups'][0]['mockup_url'] ?? null;
 
-				if ($mockup_url) {
-					wp_send_json_success(['mockup_url' => $mockup_url]);
-				} else {
-					customiizer_log("❌ Aucun mockup_url trouvé");
-					wp_send_json_error(['message' => 'URL du mockup introuvable.']);
-				}
-			} else {
-				customiizer_log("❌ Aucun mockup généré.");
-				wp_send_json_error(['message' => 'Aucun mockup généré.']);
-			}
-		} else {
-			customiizer_log("❌ Erreur de statut : " . $mockup_status['error']);
-			wp_send_json_error(['message' => $mockup_status['error']]);
-		}
-	} else {
-		customiizer_log("❌ Erreur API : " . ($response['error'] ?? 'Non spécifiée'));
-		wp_send_json_error(['message' => $response['error'] ?? 'Erreur inconnue']);
-	}
+                                if ($mockup_url) {
+                                        if (!unlink($file_path)) {
+                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                                        }
+                                        wp_send_json_success(['mockup_url' => $mockup_url]);
+                                } else {
+                                        customiizer_log("❌ Aucun mockup_url trouvé");
+                                        if (!unlink($file_path)) {
+                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                                        }
+                                        wp_send_json_error(['message' => 'URL du mockup introuvable.']);
+                                }
+                        } else {
+                                customiizer_log("❌ Aucun mockup généré.");
+                                if (!unlink($file_path)) {
+                                        customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                                }
+                                wp_send_json_error(['message' => 'Aucun mockup généré.']);
+                        }
+                } else {
+                        customiizer_log("❌ Erreur de statut : " . $mockup_status['error']);
+                        if (!unlink($file_path)) {
+                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                        }
+                        wp_send_json_error(['message' => $mockup_status['error']]);
+                }
+        } else {
+                customiizer_log("❌ Erreur API : " . ($response['error'] ?? 'Non spécifiée'));
+                if (!unlink($file_path)) {
+                        customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                }
+                wp_send_json_error(['message' => $response['error'] ?? 'Erreur inconnue']);
+        }
 }
 function convert_webp_to_png_server($image_url) {
 	// Télécharger l'image WebP
@@ -181,10 +197,14 @@ function convert_webp_to_png_server($image_url) {
 	// Libérer la mémoire
 	imagedestroy($webp_image);
 
-	// Retourner l'URL publique
-	$upload_url = $upload_dir['url'];
-	$png_url = $upload_url . '/' . $output_filename;
-	return ['success' => true, 'png_url' => $png_url];
+        // Retourner l'URL publique et le chemin local
+        $upload_url = $upload_dir['url'];
+        $png_url = $upload_url . '/' . $output_filename;
+        return [
+                'success'   => true,
+                'png_url'   => $png_url,
+                'file_path' => $output_path
+        ];
 }
 function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 	$api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
