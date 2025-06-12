@@ -345,31 +345,47 @@ jQuery(document).ready(function ($) {
 		input.click();
 	});
 
-	async function uploadFileToServer(fileData) {
-		try {
-			const response = await fetch("/wp-json/customiizer/v1/upload-image/", {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					url: fileData.url,
-					name: fileData.name,
-					size: fileData.size,
-					user_id: currentUser.ID
-				})
-			});
+        async function uploadFileToServer(fileData) {
+                try {
+                        const response = await fetch("/wp-json/customiizer/v1/upload-image/", {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                        url: fileData.url,
+                                        name: fileData.name,
+                                        size: fileData.size,
+                                        user_id: currentUser.ID
+                                })
+                        });
 
-			const result = await response.json();
-			console.log("result :",result);
-			if (result.success) {
-				fetchUserImages();
-			} else {
-				alert("Erreur lors du téléversement.");
-			}
-		} catch (error) {
-			console.error("[Upload] Erreur serveur :", error);
-			alert("Erreur lors du téléversement.");
-		}
-	}
+                        const result = await response.json();
+                        console.log("result :",result);
+                        if (result.success) {
+                                fetchUserImages();
+                        } else {
+                                alert("Erreur lors du téléversement.");
+                        }
+                } catch (error) {
+                        console.error("[Upload] Erreur serveur :", error);
+                        alert("Erreur lors du téléversement.");
+                }
+        }
+
+        // Recherche dans les listes d'images
+        jQuery('#searchInput').on('input', function () {
+                const searchValue = jQuery(this).val().toLowerCase();
+
+                jQuery('#siteFilesList .site-image').each(function () {
+                        const altText = jQuery(this).find('.image-thumbnail').attr('alt') || '';
+                        jQuery(this).toggle(altText.toLowerCase().includes(searchValue));
+                });
+
+                jQuery('#pcFilesList .site-image').each(function () {
+                        const fileUrl = jQuery(this).find('.image-thumbnail').attr('src') || '';
+                        const fileName = fileUrl.split('/').pop().split('.').slice(0, -1).join('.').toLowerCase();
+                        jQuery(this).toggle(fileName.includes(searchValue));
+                });
+        });
 });
