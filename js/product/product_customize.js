@@ -162,6 +162,8 @@ jQuery(document).ready(function ($) {
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
         const alignRightButton = $('#alignRightButton');
+        const alignTopButton = $('#alignTopButton');
+        const alignBottomButton = $('#alignBottomButton');
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -290,6 +292,12 @@ jQuery(document).ready(function ($) {
         });
         alignRightButton.on('click', function () {
                 CanvasManager.alignImage('right');
+        });
+        alignTopButton.on('click', function () {
+                CanvasManager.alignImage('top');
+        });
+        alignBottomButton.on('click', function () {
+                CanvasManager.alignImage('bottom');
         });
 
         $(document).on('keydown', function (e) {
