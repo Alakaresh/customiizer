@@ -339,7 +339,7 @@ jQuery(document).ready(function () {
 
 
 
-	// Appel au moment de l’ouverture du modal
+        // Appel au moment de l’ouverture du modal
         customizeButton.on('click', function () {
                 console.log("[Modal] 🔄 Ouverture du modal...");
                 addImageButton.show();
@@ -353,21 +353,11 @@ jQuery(document).ready(function () {
                 addImageButton.show();
         });
 
-
-	// Fonction pour charger l'image du produit sur le canvas à l'ouverture du modal
-	// Ouvrir le modal principal
-        customizeButton.on('click', function () {
-                addImageButton.show();
-                customizeModal.show();
-                loadProductImage();
-                checkAndDisplay3DModel();
-        });
-
-	// Gestion du clic sur le bouton "Supprimer"
-	pcFilesList.on('click', '.delete-button', function () {
-		const fileIndex = jQuery(this).data('index'); // Récupérer l'index du fichier
-		importedFiles.splice(fileIndex, 1); // Supprimer le fichier de la liste
-		displayImportedFiles(); // Mettre à jour l'affichage
+        // Gestion du clic sur le bouton "Supprimer"
+        pcFilesList.on('click', '.delete-button', function () {
+                const fileIndex = jQuery(this).data('index'); // Récupérer l'index du fichier
+                importedFiles.splice(fileIndex, 1); // Supprimer le fichier de la liste
+                displayImportedFiles(); // Mettre à jour l'affichage
 	});
 
 	// Gestion du clic sur le bouton "Sélectionner"
