@@ -157,8 +157,11 @@ jQuery(document).ready(function ($) {
 	const addImageButton = $('#addImageButton');
 	const imageSourceModal = $('#imageSourceModal');
 	const closeButtonImageModal = $('#imageSourceModal .close-button');
-	const uploadPcImageButton = $('#uploadPcImageButton');
+        const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
+        const alignLeftButton = $('#alignLeftButton');
+        const alignCenterButton = $('#alignCenterButton');
+        const alignRightButton = $('#alignRightButton');
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -277,6 +280,16 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
+        });
+
+        alignLeftButton.on('click', function () {
+                CanvasManager.alignImage('left');
+        });
+        alignCenterButton.on('click', function () {
+                CanvasManager.alignImage('center');
+        });
+        alignRightButton.on('click', function () {
+                CanvasManager.alignImage('right');
         });
 
         $(document).on('keydown', function (e) {
