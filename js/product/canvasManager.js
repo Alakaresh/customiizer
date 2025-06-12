@@ -163,11 +163,41 @@ const CanvasManager = {
 				canvas.renderAll();
 			}, 0);
 
-			CanvasManager.syncTo3D();
+               CanvasManager.syncTo3D();
 
 
-		}, { crossOrigin: 'anonymous' });
-	},
+               }, { crossOrigin: 'anonymous' });
+       },
+
+       alignImage: function (position) {
+               const img = canvas.getActiveObject();
+               if (!img) return;
+
+               const areaLeft = template.print_area_left;
+               const areaTop = template.print_area_top;
+               const areaWidth = template.print_area_width;
+               const areaHeight = template.print_area_height;
+               const imgWidth = img.width * img.scaleX;
+               const imgHeight = img.height * img.scaleY;
+
+               if (position === 'left') {
+                       img.set({ left: areaLeft });
+               } else if (position === 'right') {
+                       img.set({ left: areaLeft + areaWidth - imgWidth });
+               } else if (position === 'center') {
+                       img.set({ left: areaLeft + (areaWidth - imgWidth) / 2 });
+               } else if (position === 'top') {
+                       img.set({ top: areaTop });
+               } else if (position === 'bottom') {
+                       img.set({ top: areaTop + areaHeight - imgHeight });
+               } else if (position === 'middle') {
+                       img.set({ top: areaTop + (areaHeight - imgHeight) / 2 });
+               }
+
+               img.setCoords();
+               canvas.renderAll();
+               CanvasManager.syncTo3D();
+       },
 
 	syncTo3D: function () {
 		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');

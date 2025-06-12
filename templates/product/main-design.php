@@ -3,8 +3,8 @@
         <div class="modal-content">
                 <span class="close-button">&times;</span>
                 <h2 id="customizeModalTitle">Customize Product</h2>
-		<div class="visual-zone">
-			<button id="addImageButton" class="add-image-button">Ajouter une image</button>
+                <div class="visual-zone">
+                        <button id="addImageButton" class="add-image-button">Ajouter une image</button>
 
 			<!-- Conteneur pour l'affichage 2D -->
 			<div id="product2DContainer">
@@ -18,11 +18,17 @@
 			<div id="product3DContainer">
 				<canvas id="threeDCanvas"></canvas>
 			</div>
-		</div>
+                </div>
 
-		<div class="modal-footer">
-			<button id="saveDesignButton">Enregistrer</button>
-		</div>
+                <div class="image-controls">
+                        <button id="alignLeftButton" class="align-button">Gauche</button>
+                        <button id="alignCenterButton" class="align-button">Centrer</button>
+                        <button id="alignRightButton" class="align-button">Droite</button>
+                </div>
+
+                <div class="modal-footer">
+                        <button id="saveDesignButton">Enregistrer</button>
+                </div>
 	</div>
 </div>
 

@@ -372,3 +372,25 @@ h4 {
 .switch-toggle input:checked + .slider::before {
   transform: translateX(22px);
 }
+
+/* Zone de contrôle de position de l'image */
+.image-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.image-controls button {
+  padding: 8px 12px;
+  background-color: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.image-controls button:hover {
+  background-color: #666;
+}
