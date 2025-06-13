@@ -229,10 +229,10 @@ jQuery(document).ready(function ($) {
 			CanvasManager.init(template, 'product2DContainer');
 
 			// 3. Lancer Three.js si dispo
-			if (selectedVariant.url_3d) {
-				$('#product3DContainer').show();
-				init3DScene('product3DContainer', selectedVariant.url_3d);
-			} else {
+                        if (selectedVariant.url_3d) {
+                                $('#product3DContainer').show();
+                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
+                        } else {
 				$('#product3DContainer').hide();
 			}
 		} catch (error) {
