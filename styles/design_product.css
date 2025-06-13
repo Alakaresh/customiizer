@@ -385,6 +385,13 @@ h4 {
   display: flex;
   justify-content: center;
   gap: 10px;
+
+}
+
+.image-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .image-controls button {
