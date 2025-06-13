@@ -164,6 +164,7 @@ jQuery(document).ready(function ($) {
         const alignRightButton = $('#alignRightButton');
         const alignTopButton = $('#alignTopButton');
         const alignBottomButton = $('#alignBottomButton');
+        const imageControls = $('.image-controls');
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -197,6 +198,7 @@ jQuery(document).ready(function ($) {
                 fetchUserImages(); // images perso si besoin
                 addImageButton.show();
                 customizeModal.show();
+                imageControls.hide();
                 trapFocus(customizeModal);
 
                 try {
@@ -240,6 +242,7 @@ jQuery(document).ready(function ($) {
                 customizeModal.hide();
                 releaseFocus(customizeModal);
                 addImageButton.show();
+                imageControls.hide();
         });
 
         // Afficher le bouton lors du changement de produit
@@ -274,6 +277,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
+                imageControls.show();
         });
 
         pcFilesList.on('click', '.image-thumbnail', function () {
@@ -282,6 +286,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
+                imageControls.show();
         });
 
         alignLeftButton.on('click', function () {
@@ -309,6 +314,7 @@ jQuery(document).ready(function ($) {
                                 customizeModal.hide();
                                 releaseFocus(customizeModal);
                                 addImageButton.show();
+                                imageControls.hide();
                         }
                 }
         });
