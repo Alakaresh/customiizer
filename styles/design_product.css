@@ -81,11 +81,22 @@
     margin: auto;
     position: relative;
 
-    display: flex;               /* ✅ active l’alignement horizontal */
-    flex-direction: row;         /* ✅ disposition horizontale */
-    justify-content: center;     /* ✅ centré horizontalement */
-    align-items: center;         /* ✅ centré verticalement */
-    gap: 20px;                   /* ✅ espace entre 2D et 3D */
+    display: flex;               /* ✅ active l’alignement vertical */
+    flex-direction: column;      /* ✅ header au-dessus du contenu */
+    justify-content: flex-start; /* ✅ alignement vertical */
+    align-items: center;         /* ✅ centré horizontalement */
+    gap: 20px;                   /* ✅ espace entre les éléments */
+}
+
+/* Zone contenant l'affichage 2D et 3D */
+.visual-containers {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
 }
 
 /* Conteneur de l'image produit 2D */
