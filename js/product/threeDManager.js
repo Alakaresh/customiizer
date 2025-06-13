@@ -119,6 +119,8 @@ function loadModel(modelUrl, productColor = null) {
                         // 🎯 Zones d’impression personnalisables
                         if (name.startsWith("impression")) {
                                 child.material = new THREE.MeshStandardMaterial({
+
+                                        color: baseColorHex,
                                         color: 0xfafafa,
                                         roughness: 0.3,
                                         metalness: 0.1,
