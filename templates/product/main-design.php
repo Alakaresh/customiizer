@@ -3,15 +3,18 @@
         <div class="modal-content">
                 <span class="close-button">&times;</span>
                 <h2 id="customizeModalTitle">Customize Product</h2>
-                <div class="visual-zone">
-                        <div class="image-controls">
-                                <button id="alignLeftButton" class="align-button"><i class="fas fa-align-left"></i></button>
-                                <button id="alignCenterButton" class="align-button"><i class="fas fa-align-center"></i></button>
-                                <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
-                                <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
-                                <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                <div class="design-main">
+                        <div class="design-sidebar">
+                                <div class="image-controls">
+                                        <button id="alignLeftButton" class="align-button"><i class="fas fa-align-left"></i></button>
+                                        <button id="alignCenterButton" class="align-button"><i class="fas fa-align-center"></i></button>
+                                        <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
+                                        <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
+                                        <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                                </div>
+                                <button id="addImageButton" class="add-image-button">Ajouter une image</button>
                         </div>
-                        <button id="addImageButton" class="add-image-button">Ajouter une image</button>
+                        <div class="visual-zone">
 
                         <!-- Conteneur pour l'affichage 2D -->
                         <div id="product2DContainer">
@@ -22,11 +25,11 @@
 
 
 			<!-- Conteneur pour l'affichage 3D -->
-			<div id="product3DContainer">
-				<canvas id="threeDCanvas"></canvas>
-			</div>
-                </div>
-
+                        <div id="product3DContainer">
+                                <canvas id="threeDCanvas"></canvas>
+                        </div>
+                        </div> <!-- /.visual-zone -->
+                </div> <!-- /.design-main -->
 
                 <div class="modal-footer">
                         <button id="saveDesignButton">Enregistrer</button>
