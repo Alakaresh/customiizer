@@ -110,7 +110,7 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.05); /* debug visuel */
+  /* background-color: rgba(0, 0, 0, 0.05); */ /* debug visuel */
 }
 
 .canvas-container {
@@ -118,7 +118,7 @@
   display: block !important;
   margin: 0 auto !important;
   transform: none !important;
-  background-color: rgba(0, 255, 0, 0.05); /* debug */
+  /* background-color: rgba(0, 255, 0, 0.05); */ /* debug */
 }
 
 .canvas-container canvas {
@@ -128,10 +128,10 @@
 
 
 .fabric-wrapper {
-	background-color: rgba(255, 0, 0, 0.05); /* rouge léger */
+        /* background-color: rgba(255, 0, 0, 0.05); */ /* rouge léger */
 }
 .canvas-container {
-	background-color: rgba(0, 255, 0, 0.05); /* vert léger */
+        /* background-color: rgba(0, 255, 0, 0.05); */ /* vert léger */
 }
 
 /* Conteneur 3D */
