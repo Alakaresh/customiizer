@@ -378,7 +378,11 @@ h4 {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
 }
 
 .image-controls button {
