@@ -163,9 +163,11 @@ jQuery(document).ready(function ($) {
         const alignCenterButton = $('#alignCenterButton');
         const alignRightButton = $('#alignRightButton');
         const alignTopButton = $('#alignTopButton');
+        const alignMiddleButton = $('#alignMiddleButton');
         const alignBottomButton = $('#alignBottomButton');
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
+        const visualHeader = $('.visual-header');
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -200,6 +202,7 @@ jQuery(document).ready(function ($) {
                 addImageButton.show();
                 customizeModal.show();
                 imageControls.hide();
+                visualHeader.hide();
                 trapFocus(customizeModal);
 
                 try {
@@ -244,6 +247,7 @@ jQuery(document).ready(function ($) {
                 releaseFocus(customizeModal);
                 addImageButton.show();
                 imageControls.hide();
+                visualHeader.hide();
         });
 
         // Afficher le bouton lors du changement de produit
@@ -278,6 +282,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
+                visualHeader.css('display', 'flex').show();
                 imageControls.css('display', 'flex').show();
         });
 
@@ -287,6 +292,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
+                visualHeader.css('display', 'flex').show();
                 imageControls.css('display', 'flex').show();
         });
 
@@ -302,6 +308,9 @@ jQuery(document).ready(function ($) {
         alignTopButton.on('click', function () {
                 CanvasManager.alignImage('top');
         });
+        alignMiddleButton.on('click', function () {
+                CanvasManager.alignImage('middle');
+        });
         alignBottomButton.on('click', function () {
                 CanvasManager.alignImage('bottom');
         });
@@ -310,6 +319,7 @@ jQuery(document).ready(function ($) {
                 CanvasManager.removeImage();
                 addImageButton.show();
                 imageControls.hide();
+                visualHeader.hide();
         });
 
         $(document).on('keydown', function (e) {
@@ -323,6 +333,13 @@ jQuery(document).ready(function ($) {
                                 addImageButton.show();
                                 imageControls.hide();
                         }
+                }
+
+                if (e.key === 'Delete' && customizeModal.is(':visible')) {
+                        CanvasManager.removeImage();
+                        addImageButton.show();
+                        imageControls.hide();
+                        visualHeader.hide();
                 }
         });
 

@@ -4,13 +4,16 @@
                 <span class="close-button">&times;</span>
                 <h2 id="customizeModalTitle">Customize Product</h2>
                 <div class="visual-zone">
-                        <div class="image-controls">
-                                <button id="alignLeftButton" class="align-button"><i class="fas fa-align-left"></i></button>
-                                <button id="alignCenterButton" class="align-button"><i class="fas fa-align-center"></i></button>
-                                <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
-                                <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
-                                <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
-                                <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
+                        <div class="visual-header">
+                                <div class="image-controls">
+                                        <button id="alignLeftButton" class="align-button"><i class="fas fa-arrow-left"></i></button>
+                                        <button id="alignCenterButton" class="align-button"><i class="fas fa-arrows-alt-h"></i></button>
+                                        <button id="alignRightButton" class="align-button"><i class="fas fa-arrow-right"></i></button>
+                                        <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
+                                        <button id="alignMiddleButton" class="align-button"><i class="fas fa-arrows-alt-v"></i></button>
+                                        <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                                        <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
+                                </div>
                         </div>
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
 

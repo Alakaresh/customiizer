@@ -374,15 +374,17 @@ h4 {
 }
 
 /* Zone de contrôle de position de l'image */
+.visual-header {
+  width: 100%;
+  display: none;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
 .image-controls {
   display: flex;
   justify-content: center;
   gap: 10px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 5;
 }
 
 .image-controls button {
