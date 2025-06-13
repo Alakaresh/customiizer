@@ -17,18 +17,20 @@
                         </div>
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
 
-                        <!-- Conteneur pour l'affichage 2D -->
-                        <div id="product2DContainer">
-                                <div class="fabric-wrapper" id="productCanvasWrapper">
-                                        <!-- Le canvas y sera injecté dynamiquement par Fabric.js -->
+                        <div class="visual-containers">
+                                <!-- Conteneur pour l'affichage 2D -->
+                                <div id="product2DContainer">
+                                        <div class="fabric-wrapper" id="productCanvasWrapper">
+                                                <!-- Le canvas y sera injecté dynamiquement par Fabric.js -->
+                                        </div>
+                                </div>
+
+
+                                <!-- Conteneur pour l'affichage 3D -->
+                                <div id="product3DContainer">
+                                        <canvas id="threeDCanvas"></canvas>
                                 </div>
                         </div>
-
-
-			<!-- Conteneur pour l'affichage 3D -->
-			<div id="product3DContainer">
-				<canvas id="threeDCanvas"></canvas>
-			</div>
                 </div>
 
 
