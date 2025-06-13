@@ -119,7 +119,9 @@ function loadModel(modelUrl, productColor = null) {
                         // 🎯 Zones d’impression personnalisables
                         if (name.startsWith("impression")) {
                                 child.material = new THREE.MeshStandardMaterial({
+
                                         color: baseColorHex,
+                                        color: 0xfafafa,
                                         roughness: 0.3,
                                         metalness: 0.1,
                                         transparent: true
@@ -228,7 +230,29 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 		return;
 	}
 
-	mesh.material.map = texture;
-	mesh.material.needsUpdate = true;
-	console.log(`[3D] ✅ Texture appliquée à '${mesh.name}'`);
+        mesh.material.map = texture;
+        mesh.material.needsUpdate = true;
+        console.log(`[3D] ✅ Texture appliquée à '${mesh.name}'`);
+};
+
+// Permet de supprimer la texture appliquée sur le modèle 3D
+window.clear3DTexture = function (zoneName = null) {
+        let mesh = null;
+        if (zoneName) {
+                mesh = printableMeshes[zoneName];
+        } else {
+                const keys = Object.keys(printableMeshes);
+                if (keys.length > 0) {
+                        mesh = printableMeshes[keys[0]];
+                }
+        }
+
+        if (!mesh) {
+                console.warn("[3D] ❌ Zone imprimable non trouvée pour :", zoneName);
+                return;
+        }
+
+        mesh.material.map = null;
+        mesh.material.needsUpdate = true;
+        console.log(`[3D] ✅ Texture nettoyée pour '${mesh.name}'`);
 };

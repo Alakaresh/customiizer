@@ -208,11 +208,14 @@ const CanvasManager = {
        },
 
 	syncTo3D: function () {
-		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
-		if (!imageObject) {
-			console.warn("[Canvas] ❌ Aucune image utilisateur trouvée.");
-			return;
-		}
+               const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
+               if (!imageObject) {
+                       console.warn("[Canvas] ❌ Aucune image utilisateur trouvée.");
+                       if (window.clear3DTexture) {
+                               window.clear3DTexture();
+                       }
+                       return;
+               }
 
 		const outputCanvas = document.createElement('canvas');
 		outputCanvas.width = template.print_area_width;
