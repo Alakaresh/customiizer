@@ -124,6 +124,7 @@ function loadModel(modelUrl, productColor = null) {
                                        metalness: 0.1,
                                        transparent: true
                                });
+                               child.material.userData.baseColor = baseColorHex;
                                 printableMeshes[child.name] = child;
                         }
 
@@ -229,6 +230,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 	}
 
         mesh.material.map = texture;
+        mesh.material.color.setHex(0xffffff);
         mesh.material.needsUpdate = true;
         console.log(`[3D] ✅ Texture appliquée à '${mesh.name}'`);
 };
@@ -251,6 +253,9 @@ window.clear3DTexture = function (zoneName = null) {
         }
 
         mesh.material.map = null;
+        if (mesh.material.userData?.baseColor !== undefined) {
+                mesh.material.color.setHex(mesh.material.userData.baseColor);
+        }
         mesh.material.needsUpdate = true;
         console.log(`[3D] ✅ Texture nettoyée pour '${mesh.name}'`);
 };
