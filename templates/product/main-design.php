@@ -7,11 +7,18 @@
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
 
 			<!-- Conteneur pour l'affichage 2D -->
-			<div id="product2DContainer">
-				<div class="fabric-wrapper" id="productCanvasWrapper">
-					<!-- Le canvas y sera injecté dynamiquement par Fabric.js -->
-				</div>
-			</div>
+                        <div id="product2DContainer">
+                                <div class="fabric-wrapper" id="productCanvasWrapper">
+                                        <!-- Le canvas y sera injecté dynamiquement par Fabric.js -->
+                                </div>
+                                <div class="image-controls">
+                                        <button id="alignLeftButton" class="align-button"><i class="fas fa-align-left"></i></button>
+                                        <button id="alignCenterButton" class="align-button"><i class="fas fa-align-center"></i></button>
+                                        <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
+                                        <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
+                                        <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                                </div>
+                        </div>
 
 
 			<!-- Conteneur pour l'affichage 3D -->
@@ -20,13 +27,6 @@
 			</div>
                 </div>
 
-                <div class="image-controls">
-                        <button id="alignLeftButton" class="align-button"><i class="fas fa-align-left"></i></button>
-                        <button id="alignCenterButton" class="align-button"><i class="fas fa-align-center"></i></button>
-                        <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
-                        <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
-                        <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
-                </div>
 
                 <div class="modal-footer">
                         <button id="saveDesignButton">Enregistrer</button>
