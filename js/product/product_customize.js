@@ -277,7 +277,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
-                imageControls.show();
+                imageControls.css('display', 'flex').show();
         });
 
         pcFilesList.on('click', '.image-thumbnail', function () {
@@ -286,7 +286,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
-                imageControls.show();
+                imageControls.css('display', 'flex').show();
         });
 
         alignLeftButton.on('click', function () {
