@@ -163,6 +163,7 @@ jQuery(document).ready(function ($) {
         const alignCenterButton = $('#alignCenterButton');
         const alignRightButton = $('#alignRightButton');
         const alignTopButton = $('#alignTopButton');
+        const alignMiddleButton = $('#alignMiddleButton');
         const alignBottomButton = $('#alignBottomButton');
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
@@ -302,6 +303,9 @@ jQuery(document).ready(function ($) {
         alignTopButton.on('click', function () {
                 CanvasManager.alignImage('top');
         });
+        alignMiddleButton.on('click', function () {
+                CanvasManager.alignImage('middle');
+        });
         alignBottomButton.on('click', function () {
                 CanvasManager.alignImage('bottom');
         });
@@ -323,6 +327,12 @@ jQuery(document).ready(function ($) {
                                 addImageButton.show();
                                 imageControls.hide();
                         }
+                }
+
+                if (e.key === 'Delete' && customizeModal.is(':visible')) {
+                        CanvasManager.removeImage();
+                        addImageButton.show();
+                        imageControls.hide();
                 }
         });
 
