@@ -3,7 +3,41 @@
 let scene, camera, renderer, controls;
 let printableMeshes = {};
 
-function init3DScene(containerId, modelUrl) {
+function parseColorToHex(color) {
+        if (!color) return 0xfafafa;
+
+        if (typeof color === 'string') {
+                color = color.trim().toLowerCase();
+
+                const map = {
+                        black: 0x000000,
+                        noir: 0x000000,
+                        white: 0xffffff,
+                        blanc: 0xffffff,
+                        grey: 0x808080,
+                        gray: 0x808080,
+                        gris: 0x808080
+                };
+
+                if (color.startsWith('#')) {
+                        const hex = parseInt(color.slice(1), 16);
+                        if (!isNaN(hex)) return hex;
+                }
+
+                if (map[color]) return map[color];
+
+                try {
+                        const c = new THREE.Color(color);
+                        return c.getHex();
+                } catch (e) {
+                        return 0xfafafa;
+                }
+        }
+
+        return 0xfafafa;
+}
+
+function init3DScene(containerId, modelUrl, productColor = null) {
 	const container = document.getElementById(containerId);
 	const width = container.clientWidth;
 	const height = container.clientHeight;
@@ -63,15 +97,17 @@ function init3DScene(containerId, modelUrl) {
 	light.position.set(3, 5, 3);
 	scene.add(light);
 
-        loadModel(modelUrl);
+        loadModel(modelUrl, productColor);
         animate();
 }
 
 
 
-function loadModel(modelUrl) {
+function loadModel(modelUrl, productColor = null) {
         const handleModel = (gltf) => {
                 printableMeshes = {};
+
+                const baseColorHex = parseColorToHex(productColor);
 
 		gltf.scene.traverse((child) => {
 			if (!child.isMesh) return;
@@ -80,55 +116,55 @@ function loadModel(modelUrl) {
 
 			const name = child.name.toLowerCase();
 
-			// 🎯 Zones d’impression personnalisables
-			if (name.startsWith("impression")) {
-				child.material = new THREE.MeshStandardMaterial({
-					color: 0xfafafa,
-					roughness: 0.3,
-					metalness: 0.1,
-					transparent: true
-				});
-				printableMeshes[child.name] = child;
-			}
+                        // 🎯 Zones d’impression personnalisables
+                        if (name.startsWith("impression")) {
+                                child.material = new THREE.MeshStandardMaterial({
+                                        color: 0xfafafa,
+                                        roughness: 0.3,
+                                        metalness: 0.1,
+                                        transparent: true
+                                });
+                                printableMeshes[child.name] = child;
+                        }
 
-			// 🎨 WaterBottle : blanc + métal gris
-			else if (name === "waterbottle") {
-				child.material = new THREE.MeshStandardMaterial({
-					color: 0xfafafa,
-					roughness: 0.3,
-					metalness: 0.1
-				});
-			} else if (name === "waterbottlecap" || name === "waterbottlebottom") {
-				child.material = new THREE.MeshStandardMaterial({
-					color: 0xaaaaaa,
-					roughness: 0.2,
-					metalness: 0.7
-				});
-			}
+                        // 🎨 WaterBottle : couleur personnalisée + métal gris
+                        else if (name === "waterbottle") {
+                                child.material = new THREE.MeshStandardMaterial({
+                                        color: baseColorHex,
+                                        roughness: 0.3,
+                                        metalness: 0.1
+                                });
+                        } else if (name === "waterbottlecap" || name === "waterbottlebottom") {
+                                child.material = new THREE.MeshStandardMaterial({
+                                        color: 0xaaaaaa,
+                                        roughness: 0.2,
+                                        metalness: 0.7
+                                });
+                        }
 
-			// 🧊 Tumbler : blanc + métal gris
-			else if (name === "tumbler") {
-				child.material = new THREE.MeshStandardMaterial({
-					color: 0xfafafa,
-					roughness: 0.3,
-					metalness: 0.1
-				});
-			} else if (name === "tumblercap" || name === "tumblerbottom") {
-				child.material = new THREE.MeshStandardMaterial({
-					color: 0xaaaaaa,
-					roughness: 0.2,
-					metalness: 0.7
-				});
-			}
+                        // 🧊 Tumbler : couleur personnalisée + métal gris
+                        else if (name === "tumbler") {
+                                child.material = new THREE.MeshStandardMaterial({
+                                        color: baseColorHex,
+                                        roughness: 0.3,
+                                        metalness: 0.1
+                                });
+                        } else if (name === "tumblercap" || name === "tumblerbottom") {
+                                child.material = new THREE.MeshStandardMaterial({
+                                        color: 0xaaaaaa,
+                                        roughness: 0.2,
+                                        metalness: 0.7
+                                });
+                        }
 
-			// 🎭 Sinon, matériau par défaut
-			else {
-				child.material = new THREE.MeshStandardMaterial({
-					color: 0xfafafa,
-					roughness: 0.3,
-					metalness: 0.1
-				});
-			}
+                        // 🎭 Sinon, matériau par défaut
+                        else {
+                                child.material = new THREE.MeshStandardMaterial({
+                                        color: baseColorHex,
+                                        roughness: 0.3,
+                                        metalness: 0.1
+                                });
+                        }
 
 			child.material.needsUpdate = true;
 		});
