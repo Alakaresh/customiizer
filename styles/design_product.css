@@ -399,3 +399,12 @@ h4 {
 .image-controls button:hover {
   background-color: #666;
 }
+
+/* Bouton pour supprimer l'image du canvas */
+.remove-image-button {
+  background-color: #b23b3b;
+}
+
+.remove-image-button:hover {
+  background-color: #d9534f;
+}

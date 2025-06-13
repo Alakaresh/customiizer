@@ -164,6 +164,7 @@ jQuery(document).ready(function ($) {
         const alignRightButton = $('#alignRightButton');
         const alignTopButton = $('#alignTopButton');
         const alignBottomButton = $('#alignBottomButton');
+        const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
 
         function trapFocus(modal) {
@@ -303,6 +304,12 @@ jQuery(document).ready(function ($) {
         });
         alignBottomButton.on('click', function () {
                 CanvasManager.alignImage('bottom');
+        });
+
+        removeImageButton.on('click', function () {
+                CanvasManager.removeImage();
+                addImageButton.show();
+                imageControls.hide();
         });
 
         $(document).on('keydown', function (e) {

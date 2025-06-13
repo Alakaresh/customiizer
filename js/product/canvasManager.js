@@ -199,6 +199,14 @@ const CanvasManager = {
                CanvasManager.syncTo3D();
        },
 
+       removeImage: function () {
+               const img = canvas.getObjects().find(obj => obj.type === 'image');
+               if (!img) return;
+               canvas.remove(img);
+               canvas.renderAll();
+               CanvasManager.syncTo3D();
+       },
+
 	syncTo3D: function () {
 		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
 		if (!imageObject) {

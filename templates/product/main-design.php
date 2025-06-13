@@ -10,6 +10,7 @@
                                 <button id="alignRightButton" class="align-button"><i class="fas fa-align-right"></i></button>
                                 <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
                                 <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                                <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
                         </div>
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
 
