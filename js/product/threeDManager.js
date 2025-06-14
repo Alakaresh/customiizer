@@ -9,10 +9,10 @@ function parseColorToHex(color) {
         if (typeof color === 'string') {
                 color = color.trim().toLowerCase();
 
-                if (color === '#000000' || color === '000000') return 0x383838;
+                if (color === '#000000' || color === '000000') return 0x000000;
 
                 const map = {
-                        black: 0x383838,
+                        black: 0x000000,
                         noir: 0x383838,
                         white: 0xffffff,
                         blanc: 0xffffff,
@@ -23,7 +23,7 @@ function parseColorToHex(color) {
 
                 if (color.startsWith('#')) {
                         const hex = parseInt(color.slice(1), 16);
-                        if (!isNaN(hex)) return hex === 0x000000 ? 0x383838 : hex;
+                        if (!isNaN(hex)) return hex === 0x000000 ? 0x000000 : hex;
 
                 }
 
