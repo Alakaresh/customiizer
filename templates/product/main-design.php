@@ -3,6 +3,13 @@
         <div class="modal-content">
         <div class="modal-header">
                 <h2 id="customizeModalTitle"></h2>
+                <div class="switch-wrapper">
+                        <span class="switch-label">Afficher l’aperçu 3D</span>
+                        <label class="switch-toggle">
+                                <input type="checkbox" id="toggle3D" class="switch-checkbox" checked>
+                                <span class="slider"></span>
+                        </label>
+                </div>
                 <button class="close-button" aria-label="Fermer">&times;</button>
         </div>
                 <div class="visual-zone">
@@ -15,13 +22,6 @@
                                         <button id="alignMiddleButton" class="align-button"><i class="fas fa-arrows-alt-v"></i></button>
                                         <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
                                         <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
-                                </div>
-                                <div class="switch-wrapper">
-                                        <span class="switch-label">Afficher l’aperçu 3D</span>
-                                        <label class="switch-toggle">
-                                                <input type="checkbox" id="toggle3D" class="switch-checkbox" checked>
-                                                <span class="slider"></span>
-                                        </label>
                                 </div>
                         </div>
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
