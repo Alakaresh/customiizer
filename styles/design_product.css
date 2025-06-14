@@ -52,6 +52,8 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 /* Bouton de fermeture */
@@ -90,7 +92,8 @@
 /* Zone visuelle pour affichage */
 .visual-zone {
     width: 70%;
-    height: 70%;
+    height: 100%;
+    flex-grow: 1;
     border: 1px solid #444;
     background-color: #2a2a2a;
     color: #aaa;
