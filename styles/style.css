@@ -4,17 +4,19 @@
 }
 
 .site-content {
-    min-height: calc(100vh - 215px);
-	max-width: 1250px;
-	flex-direction: column;
+    /* Use the dynamic viewport unit to avoid layout jumps */
+    min-height: calc(100dvh - 215px);
+    max-width: 1250px;
+    flex-direction: column;
 }
 
 .full-content {
-    min-height: calc(100vh - 65px);
+    /* Adjust for pages without footer */
+    min-height: calc(100dvh - 65px);
 }
 
 body {
-  font-family: 'Arial', sans-serif; */
+  font-family: 'Arial', sans-serif;
   color: #ffffff;
   background-color: #030F32;
 }

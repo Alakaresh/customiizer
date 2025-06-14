@@ -29,8 +29,8 @@
     display: flex;
     align-items: center;
     justify-content: center; /* Centrer le contenu verticalement */
-    height: 70vh; /* La hauteur est 70% de la hauteur de la fenêtre */
-    width: 70vh; /* La largeur est égale à la hauteur pour obtenir un carré */
+    height: 70dvh; /* La hauteur est 70% de la hauteur de la fenêtre */
+    width: 70dvh; /* La largeur est égale à la hauteur pour obtenir un carré */
     background-color: #333;
     margin-right: 20px; /* Marge autour du conteneur d'image */
     box-sizing: border-box;
@@ -51,7 +51,7 @@
     justify-content: flex-start; /* Aligner en haut */
     color: white;
     box-sizing: border-box;
-    height: 70vh; /* La hauteur du conteneur d'informations est égale à celle du conteneur d'image */
+    height: 70dvh; /* La hauteur du conteneur d'informations est égale à celle du conteneur d'image */
     width: 300px; /* Largeur définie explicitement en pixels */
     padding-left: 20px;
 }
@@ -118,7 +118,7 @@
 }
 
 .prompt-text {
-    max-height: 30vh;
+    max-height: 30dvh;
     overflow: auto;
 }
 
