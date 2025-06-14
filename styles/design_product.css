@@ -83,6 +83,7 @@
     margin: 0 10px;
     color: #e0e0e0;
     font-size: 22px;
+	padding: 10px;
 }
 
 
@@ -357,6 +358,7 @@ h4 {
   align-items: center;
   gap: 10px;
   font-family: sans-serif;
+	margin-right: 50px;
 }
 
 .switch-label {
