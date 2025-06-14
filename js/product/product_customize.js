@@ -213,6 +213,7 @@ jQuery(document).ready(function ($) {
                 jQuery(".summary-price").text(productPrice);
                 imageControls.hide();
                 visualHeader.css('display', 'none');
+                $('.visual-zone').removeClass('with-header');
                 trapFocus(customizeModal);
 
                 try {
@@ -259,6 +260,7 @@ jQuery(document).ready(function ($) {
                 addImageButton.show();
                 imageControls.hide();
                 visualHeader.css('display', 'none');
+                $('.visual-zone').removeClass('with-header');
         });
 
         // Afficher le bouton lors du changement de produit
@@ -307,6 +309,7 @@ jQuery(document).ready(function ($) {
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
                 visualHeader.css('display', 'flex');
+                $('.visual-zone').addClass('with-header');
                 imageControls.css('display', 'flex').show();
         });
 
@@ -317,6 +320,7 @@ jQuery(document).ready(function ($) {
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
                 visualHeader.css('display', 'flex');
+                $('.visual-zone').addClass('with-header');
                 imageControls.css('display', 'flex').show();
         });
 
@@ -344,6 +348,7 @@ jQuery(document).ready(function ($) {
                 addImageButton.show();
                 imageControls.hide();
                 visualHeader.css('display', 'none');
+                $('.visual-zone').removeClass('with-header');
         });
 
         $(document).on('keydown', function (e) {
@@ -356,6 +361,7 @@ jQuery(document).ready(function ($) {
                                 releaseFocus(customizeModal);
                                 addImageButton.show();
                                 imageControls.hide();
+                                $('.visual-zone').removeClass('with-header');
                         }
                 }
 
@@ -364,6 +370,7 @@ jQuery(document).ready(function ($) {
                         addImageButton.show();
                         imageControls.hide();
                         visualHeader.css('display', 'none');
+                        $('.visual-zone').removeClass('with-header');
                 }
         });
 

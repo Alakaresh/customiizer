@@ -100,8 +100,13 @@
     justify-content: flex-start; /* ✅ alignement vertical */
     align-items: center;         /* ✅ centré horizontalement */
     flex-direction: column;
-    flex-grow: 1;                /* Take remaining height */
-    height: 100%;
+    flex-grow: 1;
+    min-height: 0;               /* Allow flexbox to manage height */
+}
+
+/* Padding when header is visible */
+.visual-zone.with-header .visual-containers {
+    padding-top: 40px;
 }
 
 /* Zone contenant l'affichage 2D et 3D */
@@ -420,14 +425,15 @@ h4 {
 
 /* Zone de contrôle de position de l'image */
 .visual-header {
+  position: absolute;
+  top: 0;
   width: 100%;
   height: 40px;
+  z-index: 10;
   display: none;
   justify-content: center;
   align-items: center;
-  position: relative;
   margin: 0;
-  z-index: 5;
 }
 
 .image-controls {
