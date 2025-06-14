@@ -443,12 +443,6 @@ h4 {
 
 }
 
-.image-controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
 .image-controls button {
   padding: 8px;
   background-color: #444;
