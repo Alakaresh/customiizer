@@ -64,16 +64,6 @@
     cursor: pointer;
 }
 
-/* Les styles globaux positionnent ce bouton en absolu. Pour les modals
-   de personnalisation, nous voulons qu'il s'aligne naturellement avec
-   les autres éléments de l'en-tête. */
-#customizeModal .modal-header .close-button,
-#imageSourceModal .modal-header .close-button {
-    position: static;
-    top: auto;
-    right: auto;
-}
-
 .close-button:hover,
 .close-button:focus {
     color: #fff;
