@@ -311,3 +311,12 @@ add_action('wp_head', function() {
         echo '<link rel="shortcut icon" href="' . esc_url(get_site_icon_url()) . '" type="image/png">' . "\n";
     }
 });
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_script(
+        'header-height',
+        get_stylesheet_directory_uri() . '/js/utils/header-height.js',
+        [],
+        null,
+        true
+    );
+});
