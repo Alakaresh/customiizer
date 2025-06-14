@@ -90,8 +90,6 @@
 
 /* Zone visuelle pour affichage */
 .visual-zone {
-    width: 70%;
-    height: 100%;
     flex-grow: 1;
     border: 1px solid #444;
     background-color: #2a2a2a;
@@ -99,9 +97,7 @@
     font-size: 18px;
     margin: auto;
     position: relative;
-
     display: flex;               /* ✅ active l’alignement vertical */
-    flex-direction: column;      /* ✅ header au-dessus du contenu */
     justify-content: flex-start; /* ✅ alignement vertical */
     align-items: center;         /* ✅ centré horizontalement */
     gap: 20px;                   /* ✅ espace entre les éléments */
