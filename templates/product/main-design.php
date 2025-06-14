@@ -12,7 +12,9 @@
                 </div>
                 <button class="close-button" aria-label="Fermer">&times;</button>
         </div>
-                <div class="visual-zone">
+                <div class="modal-body">
+                        <div class="modal-sidebar"></div>
+                        <div class="visual-zone">
                         <div class="visual-header">
                                 <div class="image-controls">
                                         <button id="alignLeftButton" class="align-button"><i class="fas fa-arrow-left"></i></button>

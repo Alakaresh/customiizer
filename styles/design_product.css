@@ -55,6 +55,18 @@
     box-sizing: border-box;
 }
 
+/* Main area inside the modal between header and footer */
+#customizeModal .modal-body {
+    flex-direction: row;
+    padding: 0;
+}
+
+/* Narrow sidebar on the left of the visual zone */
+#customizeModal .modal-sidebar {
+    width: 40px;
+    background-color: #2a2a2a;
+}
+
 /* Bouton de fermeture */
 .close-button {
     background: none;
