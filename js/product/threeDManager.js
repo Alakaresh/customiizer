@@ -52,14 +52,14 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 	let lookAtY = 0;
 
 	// Ajustements spécifiques
-	if (modelName.includes("tumbler")) {
-		camY = 0;
-		camZ = 0.7;
-		lookAtY = 2;
-	} else if (modelName.includes("waterbottle")) {
-		camY = 0;
-		camZ = 0.7;
-		lookAtY = -20;
+       if (modelName.includes("tumbler")) {
+               camY = 0;
+               camZ = 0.7;
+               lookAtY = 0; // recentre verticalement
+       } else if (modelName.includes("waterbottle")) {
+               camY = 0;
+               camZ = 0.7;
+               lookAtY = -0.1; // recentre verticalement
 	} else if (modelName.includes("mug15oz")) {
 		camY = 0;
 		camZ = 0.5;
@@ -87,10 +87,13 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 	renderer.setSize(width, height);
 	renderer.outputEncoding = THREE.sRGBEncoding;
 
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
-	controls.enableDamping = true;
-	controls.enableZoom = false;
-	controls.enablePan = false;
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        // ensure orbit controls keep the chosen vertical offset
+        controls.target.set(0, lookAtY, 0);
+        controls.update();
 
 	scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 	const light = new THREE.DirectionalLight(0xffffff, 0.8);
