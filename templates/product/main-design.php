@@ -43,14 +43,15 @@
                                 </div>
                         </div>
                 </div>
-                <div class="modal-footer">
+                
+	</div>
+		<div class="modal-footer">
                         <div class="product-summary">
                                 <img id="footerProductImage" alt="Produit" />
                                 <span class="summary-name"></span> - <span class="summary-price"></span>
                         </div>
                         <button id="saveDesignButton">Save to template</button>
                 </div>
-	</div>
 </div>
 
 
