@@ -90,7 +90,8 @@ function customiizer_enqueue_customize_assets() {
 
 		wp_enqueue_script('product-canvas', get_stylesheet_directory_uri() . '/js/product/canvasManager.js', ['jquery'], null, true);
 		wp_enqueue_script('product-cart', get_stylesheet_directory_uri() . '/js/product/product_add_to_cart.js', ['jquery'], null, true);
-		wp_enqueue_script('product-imageManager', get_stylesheet_directory_uri() . '/js/product/imageManager.js', ['jquery'], null, true);
+                wp_enqueue_script('product-imageManager', get_stylesheet_directory_uri() . '/js/product/imageManager.js', ['jquery'], null, true);
+                wp_enqueue_script('product-layout', get_stylesheet_directory_uri() . '/js/product/product_layout.js', ['jquery'], null, true);
 
 
 		// Page /community
