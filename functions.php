@@ -9,16 +9,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Sortir si accédé directement.
 }
-function customiizer_fix_layout_scripts() {
-  wp_enqueue_script(
-    'fix-layout',
-    get_stylesheet_directory_uri() . '/js/fix-layout.js',
-    [],
-    null,
-    true
-  );
-}
-add_action('wp_enqueue_scripts', 'customiizer_fix_layout_scripts');
 
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
