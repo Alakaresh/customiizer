@@ -2,11 +2,11 @@
     position: fixed;
     z-index: 1000;
     right: 50px;
-    top: 65px;
+    top: var(--header-height);
     width: 220px;
     display: block;
     box-sizing: border-box;
-    max-height: calc(100% - 65px);
+    max-height: calc(100% - var(--header-height));
     overflow: auto;
     background-color: transparent;
     border: none;
