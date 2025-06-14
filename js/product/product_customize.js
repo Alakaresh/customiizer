@@ -159,6 +159,7 @@ jQuery(document).ready(function ($) {
 	const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
+        const toggle3D = $('#toggle3D');
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
         const alignRightButton = $('#alignRightButton');
@@ -168,6 +169,7 @@ jQuery(document).ready(function ($) {
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
         const visualHeader = $('.visual-header');
+        let threeDInitialized = false;
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -198,6 +200,7 @@ jQuery(document).ready(function ($) {
 
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function () {
+                threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 addImageButton.show();
                 customizeModal.show();
@@ -235,13 +238,14 @@ jQuery(document).ready(function ($) {
 			// 2. Lancer Fabric.js dans le container
 			CanvasManager.init(template, 'product2DContainer');
 
-			// 3. Lancer Three.js si dispo
-                        if (selectedVariant.url_3d) {
+                        // 3. Lancer Three.js si dispo et si l'aperçu est activé
+                        if (selectedVariant.url_3d && toggle3D.is(':checked')) {
                                 $('#product3DContainer').show();
                                 init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
+                                threeDInitialized = true;
                         } else {
-				$('#product3DContainer').hide();
-			}
+                                $('#product3DContainer').hide();
+                        }
 		} catch (error) {
 			console.error("[UI] ❌ Erreur de chargement template :", error);
 		}
@@ -275,12 +279,25 @@ jQuery(document).ready(function ($) {
         });
 
 	// 6) Toggle Mes images / Communauté
-	imageToggle.on('change', function () {
-		const isCommunity = $(this).is(':checked');
-		displayGeneratedImages(isCommunity ? communityImages : myGeneratedImages);
-		$('#switch-label-left').toggleClass('active', !isCommunity);
-		$('#switch-label-right').toggleClass('active', isCommunity);
-	});
+        imageToggle.on('change', function () {
+                const isCommunity = $(this).is(':checked');
+                displayGeneratedImages(isCommunity ? communityImages : myGeneratedImages);
+                $('#switch-label-left').toggleClass('active', !isCommunity);
+                $('#switch-label-right').toggleClass('active', isCommunity);
+        });
+
+        // 6b) Toggle affichage 3D
+        toggle3D.on('change', function () {
+                if ($(this).is(':checked') && selectedVariant.url_3d) {
+                        $('#product3DContainer').show();
+                        if (!threeDInitialized) {
+                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
+                                threeDInitialized = true;
+                        }
+                } else {
+                        $('#product3DContainer').hide();
+                }
+        });
 
 	// 7) Clic sur une miniature
         siteFilesList.on('click', '.image-thumbnail', function () {

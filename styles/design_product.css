@@ -419,7 +419,8 @@ h4 {
 .visual-header {
   width: 100%;
   display: none;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 10px;
 }
 
