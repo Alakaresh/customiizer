@@ -11,8 +11,8 @@
 }
 
 .full-content {
-    /* min-height: calc(100dvh - 65px); Adjust for pages without footer */
-    
+    /* Adjust for pages without footer */
+    min-height: calc(100dvh - 65px);
 }
 
 body {
