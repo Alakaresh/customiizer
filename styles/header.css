@@ -1,10 +1,9 @@
 /* Variables CSS pour les couleurs et dimensions récurrentes */
 :root {
-        --dark-gray: #282828; /* Gris très foncé pour le fond */
-        --medium-gray: #555555; /* Gris moyen pour les éléments moins importants */
-        --light-gray: #cccccc; /* Gris clair pour les bordures et les séparateurs */
-        --font-color: #ffffff; /* Couleur du texte */
-        --header-height: 65px; /* Hauteur du header par défaut */
+	--dark-gray: #282828; /* Gris très foncé pour le fond */
+	--medium-gray: #555555; /* Gris moyen pour les éléments moins importants */
+	--light-gray: #cccccc; /* Gris clair pour les bordures et les séparateurs */
+	--font-color: #ffffff; /* Couleur du texte */
 }
 
 /* Styles généraux pour le header */
@@ -12,7 +11,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-       height: var(--header-height);
+	height: 65px;
 	background-color: var(--dark-gray);
 	color: var(--font-color);
 	padding: 0 10px;

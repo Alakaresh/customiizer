@@ -10,7 +10,7 @@
 }
 
 .full-content {
-    min-height: calc(100dvh - var(--header-height));
+    min-height: calc(100vh - 65px);
 }
 
 body {
