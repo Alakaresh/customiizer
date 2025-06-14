@@ -52,14 +52,14 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 	let lookAtY = 0;
 
 	// Ajustements spécifiques
-	if (modelName.includes("tumbler")) {
-		camY = 0;
-		camZ = 0.7;
-		lookAtY = 2;
-	} else if (modelName.includes("waterbottle")) {
-		camY = 0;
-		camZ = 0.7;
-		lookAtY = -20;
+       if (modelName.includes("tumbler")) {
+               camY = 0;
+               camZ = 0.7;
+               lookAtY = 0; // recentre verticalement
+       } else if (modelName.includes("waterbottle")) {
+               camY = 0;
+               camZ = 0.7;
+               lookAtY = -0.1; // recentre verticalement
 	} else if (modelName.includes("mug15oz")) {
 		camY = 0;
 		camZ = 0.5;
