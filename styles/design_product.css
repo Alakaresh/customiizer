@@ -125,9 +125,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
   width: 100%;
   height: 100%;
-  max-width: 50%;
+  max-width: none;
   max-height: 100%;
   position: relative;
   background-color: #1f1f1f;
@@ -168,9 +169,10 @@
 
 /* Conteneur 3D */
 #product3DContainer {
+    flex: 1;
     width: 100%;
     height: 100%;
-    max-width: 50%;
+    max-width: none;
     max-height: 100%;
     display: flex;
     justify-content: center;
