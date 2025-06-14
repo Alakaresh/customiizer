@@ -45,13 +45,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc((100vh - 90px - 30px) / 2); /* Hauteur disponible pour chaque image */
+    height: calc((100dvh - 90px - 30px) / 2); /* Hauteur disponible pour chaque image */
     overflow: hidden; /* Cache les parties de l'image qui débordent */
 }
 
 .centered-image {
 	max-width: 100%;
-	height: calc(100vh - 90px - 30px);
+        height: calc(100dvh - 90px - 30px);
 }
 
 .image-grid img {

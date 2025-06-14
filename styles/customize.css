@@ -17,7 +17,7 @@
 	flex: 0 0 auto;
     background-color: var(--darker-gray);
     color: white;
-    height: calc(100vh - 65px);
+    height: calc(100dvh - 65px);
     display: flex;
     flex-direction: column; /* Organise les enfants (header, content, footer) verticalement */
 }
@@ -36,7 +36,7 @@
     width: 360px;
 	background-color: var(--dark-gray);
     flex: none; /* Empêche la sidebar de s'ajuster ou de se redimensionner */
-	max-height: calc(100vh - 65px);
+        max-height: calc(100dvh - 65px);
 }
 
 #right-sidebar {
@@ -46,8 +46,8 @@
 #content {
     flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
     background-color: var(--charcoal-gray);
-    /*padding: 20px;*/ 
-	/* max-height: calc(100vh - 65px); */
+    /*padding: 20px;*/
+        /* max-height: calc(100dvh - 65px); */
 }
 
 #sidebar-header, #sidebar-footer {

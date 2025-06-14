@@ -7,7 +7,7 @@
 .sidebar {
 	flex-grow: 0;
 	height: auto;
-	max-height: 100vh;
+        max-height: 100dvh;
 	width: 20%;
 	padding: 10px;
 	box-sizing: border-box;
