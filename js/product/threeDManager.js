@@ -8,6 +8,7 @@ function parseColorToHex(color) {
 
         if (typeof color === 'string') {
                 color = color.trim().toLowerCase();
+
                 if (color === '#000000' || color === '000000') return 0x111111;
 
                 const map = {
@@ -23,6 +24,7 @@ function parseColorToHex(color) {
                 if (color.startsWith('#')) {
                         const hex = parseInt(color.slice(1), 16);
                         if (!isNaN(hex)) return hex === 0x000000 ? 0x111111 : hex;
+
                 }
 
                 if (map[color]) return map[color];
