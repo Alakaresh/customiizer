@@ -201,6 +201,13 @@ jQuery(document).ready(function ($) {
                 fetchUserImages(); // images perso si besoin
                 addImageButton.show();
                 customizeModal.show();
+                const productImageSrc = jQuery("#product-main-image").attr("src");
+                jQuery("#footerProductImage").attr("src", productImageSrc);
+                const productName = jQuery(".product-name").text().trim();
+                jQuery("#customizeModalTitle").text(productName);
+                jQuery(".summary-name").text(productName);
+                const productPrice = jQuery(".price-value span").text().trim();
+                jQuery(".summary-price").text(productPrice);
                 imageControls.hide();
                 visualHeader.hide();
                 trapFocus(customizeModal);

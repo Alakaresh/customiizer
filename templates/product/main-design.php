@@ -1,8 +1,10 @@
 <!-- Modal principal -->
 <div id="customizeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="customizeModalTitle">
         <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <h2 id="customizeModalTitle">Customize Product</h2>
+        <div class="modal-header">
+                <h2 id="customizeModalTitle"></h2>
+                <button class="close-button" aria-label="Fermer">&times;</button>
+        </div>
                 <div class="visual-zone">
                         <div class="visual-header">
                                 <div class="image-controls">
@@ -32,10 +34,12 @@
                                 </div>
                         </div>
                 </div>
-
-
                 <div class="modal-footer">
-                        <button id="saveDesignButton">Enregistrer</button>
+                        <div class="product-summary">
+                                <img id="footerProductImage" alt="Produit" />
+                                <span class="summary-name"></span> - <span class="summary-price"></span>
+                        </div>
+                        <button id="saveDesignButton">Save to template</button>
                 </div>
 	</div>
 </div>
@@ -71,7 +75,7 @@
 				<span id="switch-label-left" class="switch-label active">Mes images</span>
 
 				<label class="switch-toggle">
-					<input type="checkbox" id="imageToggle" class="switch-checkbox" false>
+					<input type="checkbox" id="imageToggle" class="switch-checkbox" >
 					<span class="slider"></span>
 				</label>
 

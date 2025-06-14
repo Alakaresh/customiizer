@@ -56,9 +56,8 @@
 
 /* Bouton de fermeture */
 .close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
+    background: none;
+    border: none;
     color: #bbb;
     font-size: 24px;
     font-weight: bold;
@@ -69,6 +68,20 @@
 .close-button:focus {
     color: #fff;
 }
+/* Header du modal */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #e0e0e0;
+    font-size: 20px;
+}
+
 
 /* Zone visuelle pour affichage */
 .visual-zone {
@@ -194,8 +207,21 @@
 .modal-footer {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 10px;
+}
+
+.modal-footer .product-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-footer .product-summary img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 .modal-footer button {
@@ -211,6 +237,7 @@
 .modal-footer button:hover {
     background-color: #666;
 }
+
 
 /* Section Recherche et Upload */
 .search-upload {
