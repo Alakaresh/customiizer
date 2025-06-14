@@ -52,7 +52,6 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-    padding: 20px;
     box-sizing: border-box;
 }
 
@@ -117,6 +116,7 @@
     justify-content: center;
     align-items: center;
     gap: 20px;
+    padding: 20px;
 }
 
 /* Conteneur de l'image produit 2D */
