@@ -90,7 +90,6 @@
 
 /* Zone visuelle pour affichage */
 .visual-zone {
-    flex-grow: 1;
     border: 1px solid #444;
     background-color: #2a2a2a;
     color: #aaa;
@@ -100,7 +99,6 @@
     display: flex;               /* ✅ active l’alignement vertical */
     justify-content: flex-start; /* ✅ alignement vertical */
     align-items: center;         /* ✅ centré horizontalement */
-    gap: 20px;                   /* ✅ espace entre les éléments */
 }
 
 /* Zone contenant l'affichage 2D et 3D */
