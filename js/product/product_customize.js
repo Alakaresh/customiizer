@@ -169,6 +169,8 @@ jQuery(document).ready(function ($) {
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
         const visualHeader = $('.visual-header');
+        const sidebarChangeProductButton = $('#sidebarChangeProductButton');
+        const sidebarAddImageButton = $('#sidebarAddImageButton');
         let threeDInitialized = false;
 
         function trapFocus(modal) {
@@ -272,6 +274,16 @@ jQuery(document).ready(function ($) {
         addImageButton.on('click', function () {
                 imageSourceModal.show();
                 trapFocus(imageSourceModal);
+        });
+
+        sidebarAddImageButton.on('click', function () {
+                imageSourceModal.show();
+                trapFocus(imageSourceModal);
+        });
+
+        sidebarChangeProductButton.on('click', function () {
+                closeButtonMain.click();
+                $('.dropdown-icon').trigger('click');
         });
 
 	// 5) Fermer le sélecteur d’image
