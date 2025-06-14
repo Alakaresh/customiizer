@@ -4,6 +4,10 @@ html, body {
     padding: 0;
 }
 
+body {
+    overflow: hidden; /* Empêche le scroll sur la page produit */
+}
+
 .product-sizes p, .product-colors p{
     margin-top: 30px;
     margin-bottom: 10px;
