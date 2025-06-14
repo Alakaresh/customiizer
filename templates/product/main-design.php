@@ -13,7 +13,16 @@
                 <button class="close-button" aria-label="Fermer">&times;</button>
         </div>
                 <div class="modal-body">
-                        <div class="modal-sidebar"></div>
+                        <div class="modal-sidebar">
+                                <button id="sidebarChangeProductButton" class="sidebar-btn">
+                                        <i class="fas fa-exchange-alt"></i>
+                                        <span>Produit</span>
+                                </button>
+                                <button id="sidebarAddImageButton" class="sidebar-btn">
+                                        <i class="fas fa-image"></i>
+                                        <span>Image</span>
+                                </button>
+                        </div>
                         <div class="visual-zone">
                         <div class="visual-header">
                                 <div class="image-controls">
