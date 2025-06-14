@@ -99,6 +99,7 @@
     display: flex;               /* ✅ active l’alignement vertical */
     justify-content: flex-start; /* ✅ alignement vertical */
     align-items: center;         /* ✅ centré horizontalement */
+    flex-direction: column;
 }
 
 /* Zone contenant l'affichage 2D et 3D */
