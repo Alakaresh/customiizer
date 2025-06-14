@@ -87,10 +87,13 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 	renderer.setSize(width, height);
 	renderer.outputEncoding = THREE.sRGBEncoding;
 
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
-	controls.enableDamping = true;
-	controls.enableZoom = false;
-	controls.enablePan = false;
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        // ensure orbit controls keep the chosen vertical offset
+        controls.target.set(0, lookAtY, 0);
+        controls.update();
 
 	scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 	const light = new THREE.DirectionalLight(0xffffff, 0.8);
