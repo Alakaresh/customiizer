@@ -16,6 +16,13 @@
                                         <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
                                         <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
                                 </div>
+                                <div class="switch-wrapper">
+                                        <span class="switch-label">Afficher l’aperçu 3D</span>
+                                        <label class="switch-toggle">
+                                                <input type="checkbox" id="toggle3D" class="switch-checkbox" checked>
+                                                <span class="slider"></span>
+                                        </label>
+                                </div>
                         </div>
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
 
