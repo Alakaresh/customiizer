@@ -64,6 +64,13 @@
     cursor: pointer;
 }
 
+<<<<<<< 5yp03q-codex/corriger-superposition-toggle-et-croix
+/* Le bouton de fermeture est positionné absolument dans les styles globaux.
+   On prévoit donc un espace pour le toggle 3D. */
+
+#customizeModal .modal-header .switch-wrapper {
+    margin-right: 40px; /* espace pour le bouton de fermeture */
+=======
 /* Les styles globaux positionnent ce bouton en absolu. Pour les modals
    de personnalisation, nous voulons qu'il s'aligne naturellement avec
    les autres éléments de l'en-tête. */
@@ -72,6 +79,7 @@
     position: static;
     top: auto;
     right: auto;
+>>>>>>> main
 }
 
 .close-button:hover,
