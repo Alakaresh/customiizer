@@ -212,7 +212,7 @@ jQuery(document).ready(function ($) {
                 const productPrice = jQuery(".price-value span").text().trim();
                 jQuery(".summary-price").text(productPrice);
                 imageControls.hide();
-                visualHeader.css('visibility', 'hidden');
+                visualHeader.hide();
                 trapFocus(customizeModal);
 
                 try {
@@ -258,7 +258,7 @@ jQuery(document).ready(function ($) {
                 releaseFocus(customizeModal);
                 addImageButton.show();
                 imageControls.hide();
-                visualHeader.css('visibility', 'hidden');
+                visualHeader.hide();
         });
 
         // Afficher le bouton lors du changement de produit
@@ -306,7 +306,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
-                visualHeader.css('visibility', 'visible');
+                visualHeader.css('display', 'flex').show();
                 imageControls.css('display', 'flex').show();
         });
 
@@ -316,7 +316,7 @@ jQuery(document).ready(function ($) {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
                 addImageButton.hide();
-                visualHeader.css('visibility', 'visible');
+                visualHeader.css('display', 'flex').show();
                 imageControls.css('display', 'flex').show();
         });
 
@@ -343,7 +343,7 @@ jQuery(document).ready(function ($) {
                 CanvasManager.removeImage();
                 addImageButton.show();
                 imageControls.hide();
-                visualHeader.css('visibility', 'hidden');
+                visualHeader.hide();
         });
 
         $(document).on('keydown', function (e) {
@@ -356,7 +356,6 @@ jQuery(document).ready(function ($) {
                                 releaseFocus(customizeModal);
                                 addImageButton.show();
                                 imageControls.hide();
-                                visualHeader.css('visibility', 'hidden');
                         }
                 }
 
@@ -364,7 +363,7 @@ jQuery(document).ready(function ($) {
                         CanvasManager.removeImage();
                         addImageButton.show();
                         imageControls.hide();
-                        visualHeader.css('visibility', 'hidden');
+                        visualHeader.hide();
                 }
         });
 
