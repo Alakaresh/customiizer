@@ -100,6 +100,8 @@
     justify-content: flex-start; /* ✅ alignement vertical */
     align-items: center;         /* ✅ centré horizontalement */
     flex-direction: column;
+    flex-grow: 1;                /* Take remaining height */
+    height: 100%;
 }
 
 /* Zone contenant l'affichage 2D et 3D */
