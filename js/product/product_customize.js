@@ -96,6 +96,10 @@ jQuery(document).ready(function ($) {
         const customizeButton = $('.design-button');
         const customizeModal = $('#customizeModal');
         const closeButtonMain = $('#customizeModal .close-button');
+        const unsavedChangesModal = $('#unsavedChangesModal');
+        const confirmQuitButton = $('#confirmQuitButton');
+        const cancelQuitButton = $('#cancelQuitButton');
+        const closeButtonUnsaved = $('#unsavedChangesModal .close-button');
         const addImageButton = $('#addImageButton');
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
@@ -236,15 +240,30 @@ jQuery(document).ready(function ($) {
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
                 if (CanvasManager.hasImage()) {
-                        const confirmClose = window.confirm('Cette action va annuler la personnalisation en cours.\nÊtes-vous sûr de vouloir quitter ?');
-                        if (!confirmClose) {
-                                return;
-                        }
+                        unsavedChangesModal.show();
+                        trapFocus(unsavedChangesModal);
+                        return;
                 }
                 customizeModal.hide();
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
         });
+
+        confirmQuitButton.on('click', function () {
+                unsavedChangesModal.hide();
+                customizeModal.hide();
+                releaseFocus(unsavedChangesModal);
+                releaseFocus(customizeModal);
+                updateAddImageButtonVisibility();
+        });
+
+        function hideUnsavedModal() {
+                unsavedChangesModal.hide();
+                releaseFocus(unsavedChangesModal);
+        }
+
+        cancelQuitButton.on('click', hideUnsavedModal);
+        closeButtonUnsaved.on('click', hideUnsavedModal);
 
         // Afficher le bouton lors du changement de produit et mettre à jour le ratio
         $(document).on('productSelected', function () {
@@ -386,7 +405,9 @@ jQuery(document).ready(function ($) {
 
         $(document).on('keydown', function (e) {
                 if (e.key === 'Escape') {
-                        if (imageSourceModal.is(':visible')) {
+                        if (unsavedChangesModal.is(':visible')) {
+                                hideUnsavedModal();
+                        } else if (imageSourceModal.is(':visible')) {
                                 imageSourceModal.hide();
                                 releaseFocus(imageSourceModal);
                         } else if (customizeModal.is(':visible')) {
