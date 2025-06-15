@@ -327,13 +327,15 @@ const CanvasManager = {
                 let maxRight = -Infinity;
                 let maxBottom = -Infinity;
 
-                images.forEach(imgObj => {
-                        const b = imgObj.getBoundingRect(true);
-                        if (b.left < minLeft) minLeft = b.left;
-                        if (b.top < minTop) minTop = b.top;
-                        if (b.left + b.width > maxRight) maxRight = b.left + b.width;
-                        if (b.top + b.height > maxBottom) maxBottom = b.top + b.height;
-                });
+               images.forEach(imgObj => {
+                       const b = imgObj.getBoundingRect(true);
+                       if (b.left < minLeft) minLeft = b.left;
+                       if (b.top < minTop) minTop = b.top;
+                       if (b.left + b.width > maxRight) maxRight = b.left + b.width;
+                       if (b.top + b.height > maxBottom) maxBottom = b.top + b.height;
+               });
+
+               console.log('[Printful] Union bounds:', { minLeft, minTop, maxRight, maxBottom });
 
                 const zoneLeft = template.print_area_left;
                 const zoneTop = template.print_area_top;
@@ -353,25 +355,30 @@ const CanvasManager = {
                         return null;
                 }
 
-                const dataUrl = canvas.toDataURL({
-                        left,
-                        top,
-                        width,
-                        height,
-                        format: 'png',
-                        withoutBackground: true
-                });
+               const dataUrl = canvas.toDataURL({
+                       left,
+                       top,
+                       width,
+                       height,
+                       format: 'png',
+                       withoutBackground: true
+               });
 
-                return {
-                        imageDataUrl: dataUrl,
-                        placement: {
-                                x: left - zoneLeft,
-                                y: top - zoneTop,
-                                width,
-                                height
-                        }
-                };
-        },
+               const placement = {
+                       x: left - zoneLeft,
+                       y: top - zoneTop,
+                       width,
+                       height
+               };
+
+               console.log('[Printful] Cropped region:', { left, top, width, height });
+               console.log('[Printful] Placement:', placement);
+
+               return {
+                       imageDataUrl: dataUrl,
+                       placement
+               };
+       },
 
 	// Fonction privée : recadre le canvas dans la print_area
         _getCroppedImageInPrintArea: function () {

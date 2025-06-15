@@ -112,11 +112,16 @@ jQuery(document).ready(function ($) {
 				return;
 			}
 
-			const placement = exportData.placement;
-			console.log("placement :",placement);
+                       const placement = exportData.placement;
+                       console.log("placement :",placement);
 
-			// ✅ ENVOYER IMAGE RECADRÉE VERS SERVEUR (base64 → PNG + URL publique)
-			uploadBase64ToServer(exportData.imageDataUrl).then(response => {
+                       console.log('[Debug] exportData:', {
+                               imageDataUrlLength: exportData.imageDataUrl.length,
+                               placement: exportData.placement
+                       });
+
+                       // ✅ ENVOYER IMAGE RECADRÉE VERS SERVEUR (base64 → PNG + URL publique)
+                       uploadBase64ToServer(exportData.imageDataUrl).then(response => {
 				console.log("[Debug] Réponse upload base64 :", response);
 				if (!response.success) {
 					alert("Erreur lors de l'envoi de l’image : " + response.message);
