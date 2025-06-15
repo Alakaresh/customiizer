@@ -574,3 +574,11 @@ h4 {
     gap: 10px;
     margin-top: 20px;
 }
+
+/* Override generic small-modal dimensions for the confirmation dialog */
+#unsavedChangesModal .small-modal {
+    width: auto;
+    height: auto;
+    max-width: 400px;      /* or another small value */
+    padding: 20px;         /* keep content readable */
+}
