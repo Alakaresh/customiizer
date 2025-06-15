@@ -353,6 +353,10 @@ const CanvasManager = {
 
         exportPrintAreaPNG: function () {
                 const savedBg = canvas.backgroundImage;
+                const activeObj = canvas.getActiveObject();
+                if (activeObj) {
+                        canvas.discardActiveObject();
+                }
                 canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
 
                 const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
@@ -369,6 +373,10 @@ const CanvasManager = {
                 );
 
                 canvas.setBackgroundImage(savedBg, canvas.renderAll.bind(canvas));
+                if (activeObj) {
+                        canvas.setActiveObject(activeObj);
+                }
+                canvas.requestRenderAll();
                 return outputCanvas.toDataURL('image/png');
         },
 
