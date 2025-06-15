@@ -353,12 +353,13 @@ const CanvasManager = {
                 ctx.clearRect(0, 0, print_area_width, print_area_height);
 
                 const zoom = canvas.getZoom();
+                const ratio = canvas.getRetinaScaling ? canvas.getRetinaScaling() : 1;
                 ctx.drawImage(
                         canvas.lowerCanvasEl,
-                        print_area_left * zoom,
-                        print_area_top * zoom,
-                        print_area_width * zoom,
-                        print_area_height * zoom,
+                        print_area_left * zoom * ratio,
+                        print_area_top * zoom * ratio,
+                        print_area_width * zoom * ratio,
+                        print_area_height * zoom * ratio,
                         0,
                         0,
                         print_area_width,
@@ -385,12 +386,13 @@ const CanvasManager = {
                 ctx.clearRect(0, 0, print_area_width, print_area_height);
 
                 const zoom = canvas.getZoom();
+                const ratio = canvas.getRetinaScaling ? canvas.getRetinaScaling() : 1;
                 ctx.drawImage(
                         canvas.lowerCanvasEl,
-                        print_area_left * zoom,
-                        print_area_top * zoom,
-                        print_area_width * zoom,
-                        print_area_height * zoom,
+                        print_area_left * zoom * ratio,
+                        print_area_top * zoom * ratio,
+                        print_area_width * zoom * ratio,
+                        print_area_height * zoom * ratio,
                         0,
                         0,
                         print_area_width,
