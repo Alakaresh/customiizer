@@ -100,9 +100,11 @@ const CanvasManager = {
 			CanvasManager.resizeToContainer(containerId);
 		});
 
-		// 🔁 Sync 3D à chaque modif
-		canvas.on('object:modified', CanvasManager.syncTo3D);
-	},
+                // 🔁 Sync 3D à chaque changement sur le canvas
+                canvas.on('object:modified', CanvasManager.syncTo3D);
+                canvas.on('object:added', CanvasManager.syncTo3D);
+                canvas.on('object:removed', CanvasManager.syncTo3D);
+        },
 
 
 	addImage: function (url) {
@@ -207,42 +209,33 @@ const CanvasManager = {
                CanvasManager.syncTo3D();
        },
 
-	syncTo3D: function () {
-               const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
-               if (!imageObject) {
-                       console.warn("[Canvas] ❌ Aucune image utilisateur trouvée.");
+       syncTo3D: function () {
+               const imgDataUrl = CanvasManager.exportPrintAreaPNG();
+
+               if (!imgDataUrl) {
+                       console.warn("[Canvas] ❌ Aucune donnée exportable.");
                        if (window.clear3DTexture) {
                                window.clear3DTexture();
                        }
                        return;
                }
 
-		const outputCanvas = document.createElement('canvas');
-		outputCanvas.width = template.print_area_width;
-		outputCanvas.height = template.print_area_height;
-		const ctx = outputCanvas.getContext('2d');
-		ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+               const offscreen = document.createElement('canvas');
+               offscreen.width = template.print_area_width;
+               offscreen.height = template.print_area_height;
+               const ctx = offscreen.getContext('2d');
+               ctx.clearRect(0, 0, offscreen.width, offscreen.height);
 
-		const drawX = imageObject.left - template.print_area_left;
-		const drawY = imageObject.top - template.print_area_top;
-		const drawWidth = imageObject.width * imageObject.scaleX;
-		const drawHeight = imageObject.height * imageObject.scaleY;
-
-		ctx.save();
-		if (imageObject.angle) {
-			ctx.translate(drawX + drawWidth / 2, drawY + drawHeight / 2);
-			ctx.rotate((imageObject.angle * Math.PI) / 180);
-			ctx.translate(-drawWidth / 2, -drawHeight / 2);
-			ctx.drawImage(imageObject._element, 0, 0, drawWidth, drawHeight);
-		} else {
-			ctx.drawImage(imageObject._element, drawX, drawY, drawWidth, drawHeight);
-		}
-		ctx.restore();
-
-		if (window.update3DTextureFromCanvas) {
-			window.update3DTextureFromCanvas(outputCanvas);
-		}
-	},
+               const img = new Image();
+               img.onload = function () {
+                       ctx.drawImage(img, 0, 0);
+                       if (window.update3DTextureFromCanvas) {
+                               window.update3DTextureFromCanvas(offscreen);
+                       }
+               };
+               img.crossOrigin = 'anonymous';
+               img.src = imgDataUrl;
+       },
 	getExportDataForPrintful: function () {
 		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
 		if (!imageObject || !imageObject._element) {
@@ -337,7 +330,10 @@ const CanvasManager = {
         },
 
         exportPrintAreaPNG: function () {
-                return canvas.toDataURL({
+                const savedBg = canvas.backgroundImage;
+                canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+
+                const dataUrl = canvas.toDataURL({
                         left: template.print_area_left,
                         top: template.print_area_top,
                         width: template.print_area_width,
@@ -345,6 +341,9 @@ const CanvasManager = {
                         format: 'png',
                         withoutBackground: true
                 });
+
+                canvas.setBackgroundImage(savedBg, canvas.renderAll.bind(canvas));
+                return dataUrl;
         },
 
 	// Fonction privée : retourne position visible de l'image dans la zone imprimable

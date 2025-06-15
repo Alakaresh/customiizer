@@ -102,7 +102,9 @@ jQuery(document).ready(function ($) {
         const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
         const ratioFilter = $('#ratioFilter');
+
         const favoriteFilter = $('#favoriteFilter');
+
         const toggle3D = $('#toggle3D');
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
@@ -121,6 +123,7 @@ jQuery(document).ready(function ($) {
         ratioFilter.val('current');
         favoriteFilter.val('all');
         filterFavorites = false;
+
         const startCommunity = imageToggle.is(':checked');
         filterAndDisplayImages(startCommunity ? communityImages : myGeneratedImages);
 
@@ -221,8 +224,10 @@ jQuery(document).ready(function ($) {
                 addImageButton.show();
                 currentRatio = selectedVariant?.ratio_image || '';
                 ratioFilter.val('current');
+
                 favoriteFilter.val('all');
                 filterFavorites = false;
+
                 const isCommunity = imageToggle.is(':checked');
                 filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
@@ -276,6 +281,7 @@ jQuery(document).ready(function ($) {
                 const isCommunity = imageToggle.is(':checked');
                 filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
+
 
         // 6b) Toggle affichage 3D
         toggle3D.on('change', function () {
