@@ -93,10 +93,14 @@ jQuery(document).ready(function ($) {
 				dpi_x: dpiX,
 				dpi_y: dpiY
 			};
-			console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
+                        console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
 
-			console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
-			generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
+                        console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
+
+                        const fullPrintArea = CanvasManager.exportPrintAreaPNG();
+                        uploadBase64ToServer(fullPrintArea, 'print_area_full');
+
+                        generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
 		} else {
 			console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
 
@@ -138,10 +142,14 @@ jQuery(document).ready(function ($) {
 				};
 
 
-				console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
-				generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
-			});
-		}
+                                console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
+
+                                const fullPrintArea = CanvasManager.exportPrintAreaPNG();
+                                uploadBase64ToServer(fullPrintArea, 'print_area_full');
+
+                                generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
+                        });
+                }
 
 	});
 });
