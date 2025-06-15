@@ -33,6 +33,8 @@
                                         <button id="alignMiddleButton" class="align-button"><i class="fas fa-arrows-alt-v"></i></button>
                                         <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
                                         <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
+                                        <button id="bringForwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
+                                        <button id="sendBackwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
                                 </div>
                         </div>
                         <button id="addImageButton" class="add-image-button">Ajouter une image</button>
