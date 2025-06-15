@@ -17,3 +17,4 @@ pixels.
 ## Position editor
 
 Enable the checkbox "Activer l'éditeur de position" in the **Custom Produits** admin page to adjust the mockup position on product pages. When enabled, `js/product/position_editor.js` is enqueued automatically.
+The editor shows two range sliders controlling the top and left position (in percent). Each slider displays its current value next to it. After tweaking the values, press **Save** to send them to `/variant/<id>/mockup-position`.
