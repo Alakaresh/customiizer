@@ -118,11 +118,11 @@ jQuery(document).ready(function ($) {
 	function updateMainImage(variant) {
 		if (variant.mockups.length > 0) {
 			const mockup = variant.mockups[0];
-                        mainProductImage.attr('src', mockup.mockup_image).css({
-                                'position': 'absolute',
-                                'top': `${mockup.position_top}px`,
-                                'left': `${mockup.position_left}px`
-                        });
+			mainProductImage.attr('src', mockup.mockup_image).css({
+				'position': 'absolute',
+				'top': `${mockup.position_top}%`,
+				'left': `${mockup.position_left}%`
+			});
 		}
 	}
 

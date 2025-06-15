@@ -3,15 +3,12 @@ jQuery(document).ready(function ($) {
     if (!$img.length) return;
 
     const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;color:#000;border:1px solid #ccc;padding:10px;z-index:9999;">');
-    const inputTop = $('<input>', {type:'range', min:-200, max:200, step:'1', id:'dev-pos-top'});
-    const topDisplay = $('<span>', {id:'dev-pos-top-value', text:'0px'});
-    const inputLeft = $('<input>', {type:'range', min:-200, max:200, step:'1', id:'dev-pos-left'});
+    const inputTop = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-top'});
+    const topDisplay = $('<span>', {id:'dev-pos-top-value', text:'0%'});
+    const inputLeft = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-left'});
 
-    const leftDisplay = $('<span>', {id:'dev-pos-left-value', text:'0px'});
-    const saveBtn = $('<button>', {
-        text:'Save',
-        style:'background:#007bff;color:#fff;border:none;padding:5px 10px;margin-top:10px;border-radius:4px;'
-    });
+    const leftDisplay = $('<span>', {id:'dev-pos-left-value', text:'0%'});
+    const saveBtn = $('<button>', {text:'Save'});
 
     box.append(
         $('<div>').append('Top: ', inputTop, ' ', topDisplay),
@@ -24,17 +21,17 @@ jQuery(document).ready(function ($) {
         const top = parseFloat($img.css('top')) || 0;
         const left = parseFloat($img.css('left')) || 0;
         inputTop.val(top);
-        topDisplay.text(top + 'px');
+        topDisplay.text(top + '%');
         inputLeft.val(left);
-        leftDisplay.text(left + 'px');
+        leftDisplay.text(left + '%');
     }
     refreshInputs();
 
     function applyPosition() {
 
-        $img.css({top: inputTop.val() + 'px', left: inputLeft.val() + 'px'});
-        topDisplay.text(inputTop.val() + 'px');
-        leftDisplay.text(inputLeft.val() + 'px');
+        $img.css({top: inputTop.val() + '%', left: inputLeft.val() + '%'});
+        topDisplay.text(inputTop.val() + '%');
+        leftDisplay.text(inputLeft.val() + '%');
     }
 
     inputTop.add(inputLeft).on('input', applyPosition);
