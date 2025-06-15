@@ -106,7 +106,7 @@ jQuery(document).ready(function ($) {
 
 			console.log("[Mockup] ✂️ Image déborde – export recadré");
 
-			const exportData = CanvasManager.getExportDataForPrintful();
+                        const exportData = CanvasManager.getMergedExportDataForPrintful();
 			if (!exportData) {
 				alert("L’image est complètement hors de la zone imprimable.");
 				return;
