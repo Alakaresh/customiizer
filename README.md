@@ -11,8 +11,7 @@ Adjust `PNG_COMPRESSION_LEVEL` if you need smaller mockup files or faster image 
 The default value is set to `8` for near-maximum compression.
 
 `MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.
-Images larger than this value are downscaled before saving. The default is `1500`
-pixels.
+Images larger than this value are downscaled before saving. The default is `1500` pixels.
 
 ## Position editor
 

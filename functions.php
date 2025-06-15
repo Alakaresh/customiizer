@@ -96,6 +96,7 @@ add_action( 'init', function() {
 		'/admin/logs/admin-logs.php',
 		'/admin/update/admin-update.php',
                '/admin/products/admin-products.php',
+               '/admin/devtools/admin-dev-tools.php',
                '/utilities.php',
 		'/assets.php',
 		'/includes/azure.php',
@@ -315,7 +316,7 @@ add_action('wp_head', function() {
 });
 
 // ===============================
-// 🛠️ Position editor setting
+// 🔧 Dev Tools settings page
 // ===============================
-// Option managed from the "Custom Produits" admin page
+// Code moved to /admin/devtools/admin-dev-tools.php
 

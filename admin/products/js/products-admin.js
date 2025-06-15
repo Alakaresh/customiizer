@@ -1,21 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-        const toggle = document.getElementById("customiizer-dev-editor-toggle");
-        if (toggle) {
-                fetch("/wp-json/api/v1/settings/dev-editor")
-                        .then(res => res.json())
-                        .then(data => { toggle.checked = !!data.enabled; })
-                        .catch(() => {});
-                toggle.addEventListener("change", () => {
-                        fetch("/wp-json/api/v1/settings/dev-editor", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ enabled: toggle.checked ? 1 : 0 })
-                        });
-                });
-        }
-
-        const root = document.getElementById("customiizer-product-admin-root");
-        if (!root) return;
+	const root = document.getElementById("customiizer-product-admin-root");
+	if (!root) return;
 
 	root.innerHTML = `
 			<div id="product-form-container"></div>
