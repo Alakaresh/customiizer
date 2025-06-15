@@ -122,8 +122,8 @@ function handle_generate_mockup() {
         $top_in,
         $left_in
     );
-	
-	if (isset($response['data'][0]['id'])) {
+
+        if (isset($response['data'][0]['id'])) {
 		$task_id = $response['data'][0]['id'];
 
 		$mockup_status = wait_for_mockup_completion($task_id);
@@ -203,6 +203,22 @@ function convert_webp_to_png_server($image_url) {
                         customiizer_log("❌ Échec de création GD à partir du fichier téléchargé.");
                         return ['success' => false, 'message' => 'Conversion vers image GD échouée.'];
                 }
+
+                $width  = imagesx($image);
+                $height = imagesy($image);
+                $max_dim = MOCKUP_MAX_DIMENSION;
+                if ($width > $max_dim || $height > $max_dim) {
+                        $scale      = min($max_dim / $width, $max_dim / $height);
+                        $new_width  = (int)($width * $scale);
+                        $new_height = (int)($height * $scale);
+                        $resized = imagecreatetruecolor($new_width, $new_height);
+                        imagealphablending($resized, false);
+                        imagesavealpha($resized, true);
+                        imagecopyresampled($resized, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                        imagedestroy($image);
+                        $image = $resized;
+                }
+
                 if (!imagepng($image, $output_path, PNG_COMPRESSION_LEVEL)) {
                         imagedestroy($image);
                         customiizer_log("❌ Échec de conversion en PNG : $output_path");

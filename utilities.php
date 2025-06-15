@@ -4,7 +4,13 @@
 // 0 = no compression, 9 = maximum compression.
 // Higher values produce smaller files but require more CPU time.
 if (!defined('PNG_COMPRESSION_LEVEL')) {
-    define('PNG_COMPRESSION_LEVEL', 7);
+    define('PNG_COMPRESSION_LEVEL', 8);
+}
+
+// Maximum width or height for PNG mockups generated for Printful.
+// Images larger than this size are downscaled before saving.
+if (!defined('MOCKUP_MAX_DIMENSION')) {
+    define('MOCKUP_MAX_DIMENSION', 1500);
 }
 
 function customiizer_log($message) {
