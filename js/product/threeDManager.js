@@ -3,6 +3,24 @@
 let scene, camera, renderer, controls;
 let printableMeshes = {};
 
+function show3DLoader(container) {
+    let loader = container.querySelector('.loading-overlay');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.className = 'loading-overlay';
+        loader.innerHTML = '<div class="loading-spinner"></div>';
+        container.appendChild(loader);
+    }
+    loader.style.display = 'flex';
+}
+
+function hide3DLoader(container) {
+    const loader = container.querySelector('.loading-overlay');
+    if (loader) {
+        loader.remove();
+    }
+}
+
 function parseColorToHex(color) {
         if (!color) return 0xfafafa;
 
@@ -41,9 +59,10 @@ function parseColorToHex(color) {
 }
 
 function init3DScene(containerId, modelUrl, productColor = null) {
-	const container = document.getElementById(containerId);
-	const width = container.clientWidth;
-	const height = container.clientHeight;
+        const container = document.getElementById(containerId);
+        show3DLoader(container);
+        const width = container.clientWidth;
+        const height = container.clientHeight;
 	const modelName = modelUrl.split('/').pop().toLowerCase();
 
 	scene = new THREE.Scene();
@@ -178,6 +197,7 @@ function loadModel(modelUrl, productColor = null) {
 
                 scene.add(gltf.scene);
                 console.log("[3D] ✅ Zones imprimables :", Object.keys(printableMeshes));
+                hide3DLoader(renderer.domElement.parentElement);
         };
 
         if (window.customizerCache?.models?.[modelUrl]) {
@@ -193,6 +213,7 @@ function loadModel(modelUrl, productColor = null) {
                 handleModel(gltf);
         }, undefined, (error) => {
                 console.error("Erreur chargement modèle :", error);
+                hide3DLoader(renderer.domElement.parentElement);
         });
 }
 
