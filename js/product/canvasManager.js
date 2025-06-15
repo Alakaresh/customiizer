@@ -331,40 +331,40 @@ const CanvasManager = {
         _getCroppedImageInPrintArea: function () {
                 const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
 
-		const outputCanvas = document.createElement('canvas');
-		outputCanvas.width = print_area_width;
-		outputCanvas.height = print_area_height;
+                const outputCanvas = document.createElement('canvas');
+                outputCanvas.width = print_area_width;
+                outputCanvas.height = print_area_height;
 
-		const ctx = outputCanvas.getContext('2d');
-		ctx.drawImage(
-			canvas.lowerCanvasEl,
-			print_area_left,
-			print_area_top,
-			print_area_width,
-			print_area_height,
-			0, 0,
-			print_area_width,
-			print_area_height
-		);
+                const ctx = outputCanvas.getContext('2d');
+                ctx.clearRect(0, 0, print_area_width, print_area_height);
+                ctx.drawImage(
+                        canvas.lowerCanvasEl,
+                        -print_area_left,
+                        -print_area_top
+                );
 
-                return outputCanvas.toDataURL("image/png");
+                return outputCanvas.toDataURL('image/png');
         },
 
         exportPrintAreaPNG: function () {
                 const savedBg = canvas.backgroundImage;
                 canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
 
-                const dataUrl = canvas.toDataURL({
-                        left: template.print_area_left,
-                        top: template.print_area_top,
-                        width: template.print_area_width,
-                        height: template.print_area_height,
-                        format: 'png',
-                        withoutBackground: true
-                });
+                const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
+                const outputCanvas = document.createElement('canvas');
+                outputCanvas.width = print_area_width;
+                outputCanvas.height = print_area_height;
+
+                const ctx = outputCanvas.getContext('2d');
+                ctx.clearRect(0, 0, print_area_width, print_area_height);
+                ctx.drawImage(
+                        canvas.lowerCanvasEl,
+                        -print_area_left,
+                        -print_area_top
+                );
 
                 canvas.setBackgroundImage(savedBg, canvas.renderAll.bind(canvas));
-                return dataUrl;
+                return outputCanvas.toDataURL('image/png');
         },
 
 	// Fonction privée : retourne position visible de l'image dans la zone imprimable
