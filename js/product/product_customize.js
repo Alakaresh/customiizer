@@ -112,8 +112,6 @@ jQuery(document).ready(function ($) {
         const alignTopButton = $('#alignTopButton');
         const alignMiddleButton = $('#alignMiddleButton');
         const alignBottomButton = $('#alignBottomButton');
-        const bringForwardButton = $('#bringForwardButton');
-        const sendBackwardButton = $('#sendBackwardButton');
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
         const visualHeader = $('.visual-header');
@@ -343,12 +341,6 @@ jQuery(document).ready(function ($) {
         });
         alignBottomButton.on('click', function () {
                 CanvasManager.alignImage('bottom');
-        });
-        bringForwardButton.on('click', function () {
-                CanvasManager.bringImageForward();
-        });
-        sendBackwardButton.on('click', function () {
-                CanvasManager.sendImageBackward();
         });
 
         removeImageButton.on('click', function () {
