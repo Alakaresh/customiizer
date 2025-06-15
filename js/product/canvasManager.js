@@ -243,12 +243,12 @@ const CanvasManager = {
 			window.update3DTextureFromCanvas(outputCanvas);
 		}
 	},
-        getExportDataForPrintful: function () {
-                const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
-                if (!imageObject || !imageObject._element) {
-                        console.warn("[CanvasManager] ❌ Aucune image trouvée.");
-                        return null;
-                }
+	getExportDataForPrintful: function () {
+		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
+		if (!imageObject || !imageObject._element) {
+			console.warn("[CanvasManager] ❌ Aucune image trouvée.");
+			return null;
+		}
 
 		const img = imageObject._element;
 		const scaleX = imageObject.scaleX;
@@ -299,79 +299,19 @@ const CanvasManager = {
 		// ✅ Visualisation (pour toi)
 		const debugDataUrl = outputCanvas.toDataURL("image/png");
 
-                return {
-                        imageDataUrl: debugDataUrl,
-                        placement: {
-                                x: Math.max(0, offsetX),
-                                y: Math.max(0, offsetY),
-                                width: visibleWidth,
-                                height: visibleHeight
-                        }
-                };
-        },
+		return {
+			imageDataUrl: debugDataUrl,
+			placement: {
+				x: Math.max(0, offsetX),
+				y: Math.max(0, offsetY),
+				width: visibleWidth,
+				height: visibleHeight
+			}
+		};
+	}
 
-        /**
-         * Merge all image objects and export the combined area within the print area.
-         * Returns { imageDataUrl, placement }
-         */
-        getMergedExportDataForPrintful: function () {
-                const images = canvas.getObjects().filter(obj => obj.type === 'image');
-                if (!images.length) {
-                        console.warn('[CanvasManager] ❌ Aucune image trouvée.');
-                        return null;
-                }
 
-                // Compute union bounds of all images (transformed bounds)
-                let minLeft = Infinity;
-                let minTop = Infinity;
-                let maxRight = -Infinity;
-                let maxBottom = -Infinity;
-
-                images.forEach(imgObj => {
-                        const b = imgObj.getBoundingRect(true);
-                        if (b.left < minLeft) minLeft = b.left;
-                        if (b.top < minTop) minTop = b.top;
-                        if (b.left + b.width > maxRight) maxRight = b.left + b.width;
-                        if (b.top + b.height > maxBottom) maxBottom = b.top + b.height;
-                });
-
-                const zoneLeft = template.print_area_left;
-                const zoneTop = template.print_area_top;
-                const zoneRight = zoneLeft + template.print_area_width;
-                const zoneBottom = zoneTop + template.print_area_height;
-
-                const left = Math.max(minLeft, zoneLeft);
-                const top = Math.max(minTop, zoneTop);
-                const right = Math.min(maxRight, zoneRight);
-                const bottom = Math.min(maxBottom, zoneBottom);
-
-                const width = Math.max(0, right - left);
-                const height = Math.max(0, bottom - top);
-
-                if (width === 0 || height === 0) {
-                        console.warn('[CanvasManager] 🚫 Zone fusionnée hors zone imprimable');
-                        return null;
-                }
-
-                const dataUrl = canvas.toDataURL({
-                        left,
-                        top,
-                        width,
-                        height,
-                        format: 'png',
-                        withoutBackground: true
-                });
-
-                return {
-                        imageDataUrl: dataUrl,
-                        placement: {
-                                x: left - zoneLeft,
-                                y: top - zoneTop,
-                                width,
-                                height
-                        }
-                };
-        },
+	,
 
 	// Fonction privée : recadre le canvas dans la print_area
         _getCroppedImageInPrintArea: function () {
