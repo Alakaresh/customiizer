@@ -168,19 +168,21 @@ jQuery(document).ready(function ($) {
                 modal.off('keydown.trapFocus');
         }
 
-        function updateAddImageButtonVisibility() {
-                if (CanvasManager.hasImage()) {
-                        addImageButton.hide();
-                        visualHeader.css('display', 'flex');
-                        $('.visual-zone').addClass('with-header');
-                        imageControls.css('display', 'flex').show();
-                } else {
-                        addImageButton.show();
-                        imageControls.hide();
-                        visualHeader.css('display', 'none');
-                        $('.visual-zone').removeClass('with-header');
-                }
-        }
+       function updateAddImageButtonVisibility() {
+               if (CanvasManager.hasImage()) {
+                       addImageButton.hide();
+                       visualHeader.css('display', 'flex');
+                       $('.visual-zone').addClass('with-header');
+                       imageControls.css('display', 'flex').show();
+                       CanvasManager.resizeToContainer('product2DContainer');
+               } else {
+                       addImageButton.show();
+                       imageControls.hide();
+                       visualHeader.css('display', 'none');
+                       $('.visual-zone').removeClass('with-header');
+                       CanvasManager.resizeToContainer('product2DContainer');
+               }
+       }
 
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function () {
