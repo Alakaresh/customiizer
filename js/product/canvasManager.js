@@ -225,6 +225,11 @@ const CanvasManager = {
                CanvasManager.syncTo3D();
        },
 
+       hasImage: function () {
+               if (!canvas) return false;
+               return canvas.getObjects().some(obj => obj.type === 'image');
+       },
+
        syncTo3D: function () {
                const imgDataUrl = CanvasManager.exportPrintAreaPNG();
 

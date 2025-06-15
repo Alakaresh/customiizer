@@ -156,11 +156,24 @@ jQuery(document).ready(function ($) {
                 modal.off('keydown.trapFocus');
         }
 
+        function updateAddImageButtonVisibility() {
+                if (CanvasManager.hasImage()) {
+                        addImageButton.hide();
+                        visualHeader.css('display', 'flex');
+                        $('.visual-zone').addClass('with-header');
+                        imageControls.css('display', 'flex').show();
+                } else {
+                        addImageButton.show();
+                        imageControls.hide();
+                        visualHeader.css('display', 'none');
+                        $('.visual-zone').removeClass('with-header');
+                }
+        }
+
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function () {
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
-                addImageButton.show();
                 customizeModal.show();
                 const productImageSrc = jQuery("#product-main-image").attr("src");
                 jQuery("#footerProductImage").attr("src", productImageSrc);
@@ -194,8 +207,9 @@ jQuery(document).ready(function ($) {
                                 console.log('[Cache] Template récupéré depuis le cache pour', selectedVariant.variant_id);
                         }
 
-			// 2. Lancer Fabric.js dans le container
-			CanvasManager.init(template, 'product2DContainer');
+                        // 2. Lancer Fabric.js dans le container
+                        CanvasManager.init(template, 'product2DContainer');
+                        updateAddImageButtonVisibility();
 
                         // 3. Lancer Three.js si dispo et si l'aperçu est activé
                         if (selectedVariant.url_3d && toggle3D.is(':checked')) {
@@ -215,15 +229,12 @@ jQuery(document).ready(function ($) {
         closeButtonMain.on('click', function () {
                 customizeModal.hide();
                 releaseFocus(customizeModal);
-                addImageButton.show();
-                imageControls.hide();
-                visualHeader.css('display', 'none');
-                $('.visual-zone').removeClass('with-header');
+                updateAddImageButtonVisibility();
         });
 
         // Afficher le bouton lors du changement de produit et mettre à jour le ratio
         $(document).on('productSelected', function () {
-                addImageButton.show();
+                updateAddImageButtonVisibility();
                 currentRatio = selectedVariant?.ratio_image || '';
                 ratioFilter.val('current');
 
@@ -304,10 +315,7 @@ jQuery(document).ready(function ($) {
                 CanvasManager.addImage(url);
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
-                addImageButton.hide();
-                visualHeader.css('display', 'flex');
-                $('.visual-zone').addClass('with-header');
-                imageControls.css('display', 'flex').show();
+                updateAddImageButtonVisibility();
         });
 
         pcFilesList.on('click', '.image-thumbnail', function () {
@@ -315,10 +323,7 @@ jQuery(document).ready(function ($) {
                 CanvasManager.addImage(url);
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
-                addImageButton.hide();
-                visualHeader.css('display', 'flex');
-                $('.visual-zone').addClass('with-header');
-                imageControls.css('display', 'flex').show();
+                updateAddImageButtonVisibility();
         });
 
         alignLeftButton.on('click', function () {
@@ -348,10 +353,7 @@ jQuery(document).ready(function ($) {
 
         removeImageButton.on('click', function () {
                 CanvasManager.removeImage();
-                addImageButton.show();
-                imageControls.hide();
-                visualHeader.css('display', 'none');
-                $('.visual-zone').removeClass('with-header');
+                updateAddImageButtonVisibility();
         });
 
         $(document).on('keydown', function (e) {
@@ -362,18 +364,13 @@ jQuery(document).ready(function ($) {
                         } else if (customizeModal.is(':visible')) {
                                 customizeModal.hide();
                                 releaseFocus(customizeModal);
-                                addImageButton.show();
-                                imageControls.hide();
-                                $('.visual-zone').removeClass('with-header');
+                                updateAddImageButtonVisibility();
                         }
                 }
 
                 if (e.key === 'Delete' && customizeModal.is(':visible')) {
                         CanvasManager.removeImage();
-                        addImageButton.show();
-                        imageControls.hide();
-                        visualHeader.css('display', 'none');
-                        $('.visual-zone').removeClass('with-header');
+                        updateAddImageButtonVisibility();
                 }
         });
 
