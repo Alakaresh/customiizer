@@ -2,6 +2,7 @@
 
 let canvas = null;
 let template = null;
+let resizeObserver = null;
 
 const CanvasManager = {
 	init: function (templateData, containerId) {
@@ -28,11 +29,19 @@ const CanvasManager = {
 
 
 		// 🔍 Conteneur principal
-		const container = document.getElementById(containerId);
-		if (!container) {
-			console.error("[CanvasManager] ❌ Conteneur introuvable :", containerId);
-			return;
-		}
+                const container = document.getElementById(containerId);
+                if (!container) {
+                        console.error("[CanvasManager] ❌ Conteneur introuvable :", containerId);
+                        return;
+                }
+
+                if (resizeObserver) {
+                        resizeObserver.disconnect();
+                }
+                resizeObserver = new ResizeObserver(() => {
+                        CanvasManager.resizeToContainer(containerId);
+                });
+                resizeObserver.observe(container);
 
                 // 🧹 Nettoyage du conteneur sans retirer le bouton "Ajouter une image"
                 const existingWrapper = container.querySelector('#productCanvasWrapper');
