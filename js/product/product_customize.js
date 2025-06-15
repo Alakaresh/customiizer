@@ -1,9 +1,9 @@
 function displayGeneratedImages(images) {
-	const siteFilesList = jQuery('#siteFilesList');
-	console.log("siteFilesList :",siteFilesList);
-	console.log("images :",images);
-	siteFilesList.empty();
-	if (!images.length) {
+        const siteFilesList = jQuery('#siteFilesList');
+        console.log("siteFilesList :",siteFilesList);
+        console.log("images :",images);
+        siteFilesList.empty();
+        if (!images.length) {
 		siteFilesList.append('<div class="no-images">Aucune image trouvée.</div>');
 		return;
 	}
@@ -16,7 +16,21 @@ function displayGeneratedImages(images) {
 						 data-image-url="${image.image_url}">
 				</div>
 			`);
-	});
+        });
+}
+
+let currentRatio = '';
+let filterFavorites = false;
+
+function filterAndDisplayImages(images) {
+        let filtered = images;
+        if (currentRatio) {
+                filtered = filtered.filter(img => img.format === currentRatio);
+        }
+        if (filterFavorites) {
+                filtered = filtered.filter(img => img.favorited_by_user === true);
+        }
+        displayGeneratedImages(filtered);
 }
 function uploadBase64ToServer(base64Data, debugId) {
         if (!debugId) {
@@ -87,6 +101,8 @@ jQuery(document).ready(function ($) {
 	const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
+        const ratioFilter = $('#ratioFilter');
+        const favoriteFilter = $('#favoriteFilter');
         const toggle3D = $('#toggle3D');
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
@@ -100,6 +116,13 @@ jQuery(document).ready(function ($) {
         const sidebarChangeProductButton = $('#sidebarChangeProductButton');
         const sidebarAddImageButton = $('#sidebarAddImageButton');
         let threeDInitialized = false;
+
+        currentRatio = selectedVariant?.ratio_image || '';
+        ratioFilter.val('current');
+        favoriteFilter.val('all');
+        filterFavorites = false;
+        const startCommunity = imageToggle.is(':checked');
+        filterAndDisplayImages(startCommunity ? communityImages : myGeneratedImages);
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -193,9 +216,15 @@ jQuery(document).ready(function ($) {
                 $('.visual-zone').removeClass('with-header');
         });
 
-        // Afficher le bouton lors du changement de produit
+        // Afficher le bouton lors du changement de produit et mettre à jour le ratio
         $(document).on('productSelected', function () {
                 addImageButton.show();
+                currentRatio = selectedVariant?.ratio_image || '';
+                ratioFilter.val('current');
+                favoriteFilter.val('all');
+                filterFavorites = false;
+                const isCommunity = imageToggle.is(':checked');
+                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
 
 	// 4) Ouvrir le sélecteur d’image
@@ -223,9 +252,29 @@ jQuery(document).ready(function ($) {
 	// 6) Toggle Mes images / Communauté
         imageToggle.on('change', function () {
                 const isCommunity = $(this).is(':checked');
-                displayGeneratedImages(isCommunity ? communityImages : myGeneratedImages);
+                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
                 $('#switch-label-left').toggleClass('active', !isCommunity);
                 $('#switch-label-right').toggleClass('active', isCommunity);
+        });
+
+        ratioFilter.on('change', function () {
+                const val = $(this).val();
+                if (val === 'all') {
+                        currentRatio = '';
+                } else if (val === 'current') {
+                        currentRatio = selectedVariant?.ratio_image || '';
+                } else {
+                        currentRatio = val;
+                }
+
+                const isCommunity = imageToggle.is(':checked');
+                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
+        });
+
+        favoriteFilter.on('change', function () {
+                filterFavorites = $(this).val() === 'fav';
+                const isCommunity = imageToggle.is(':checked');
+                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
 
         // 6b) Toggle affichage 3D
