@@ -39,111 +39,36 @@ function uploadBase64ToServer(base64Data, debugId) {
 
 
 jQuery(document).ready(function ($) {
-	jQuery('#saveDesignButton').on('click', function () {
-		console.log("[UI] 💾 Enregistrement du design (mockup)");
-		
-		jQuery('#customizeModal').hide();
+        jQuery('#saveDesignButton').on('click', function () {
+                console.log("[UI] 💾 Enregistrement du design (mockup)");
 
-		if (CanvasManager?.syncTo3D) {
-			CanvasManager.syncTo3D();
-		}
+                jQuery('#customizeModal').hide();
 
-		const imageObject = canvas?.getObjects().find(obj => obj.type === 'image');
-		if (!imageObject) {
-			console.warn("❌ Aucune image trouvée sur le canvas.");
-			return;
-		}
+                const base64 = CanvasManager.exportPrintAreaPNG();
+                uploadBase64ToServer(base64).then(response => {
+                        if (!response.success) {
+                                alert("Erreur lors de l'envoi de l’image : " + response.message);
+                                return;
+                        }
 
-		const bounds = imageObject.getBoundingRect(true);
-		const zoneLeft = template.print_area_left;
-		const zoneTop = template.print_area_top;
-		const zoneRight = zoneLeft + template.print_area_width;
-		const zoneBottom = zoneTop + template.print_area_height;
+                        const publicImageUrl = response.data.image_url + '?v=' + Date.now();
+                        const mockupData = {
+                                image_url: publicImageUrl,
+                                product_id: currentProductId || null,
+                                variant_id: selectedVariant?.variant_id || null,
+                                placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
+                                technique: selectedVariant?.technique || null,
+                                width: selectedVariant.print_area_width,
+                                height: selectedVariant.print_area_height,
+                                left: 0,
+                                top: 0
+                        };
 
-		const isFullyInside =
-			  bounds.left >= zoneLeft &&
-			  bounds.top >= zoneTop &&
-			  (bounds.left + bounds.width) <= zoneRight &&
-			  (bounds.top + bounds.height) <= zoneBottom;
+                        console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
+                        generateMockup(mockupData);
+                });
 
-		// Conversion des DPI
-		const dpiX = template.print_area_width / selectedVariant.print_area_width;
-		const dpiY = template.print_area_height / selectedVariant.print_area_height;
-
-		let mockupData = null;
-
-		if (isFullyInside) {
-			console.log("[Mockup] ✅ Image totalement dans la zone – export simple");
-
-			const widthPx  = imageObject.width * imageObject.scaleX;
-			const heightPx = imageObject.height * imageObject.scaleY;
-			const leftPx   = imageObject.left - zoneLeft;
-			const topPx    = imageObject.top - zoneTop;
-
-			mockupData = {
-				image_url: imageObject._element?.src || null,
-				product_id: currentProductId || null,
-				variant_id: selectedVariant?.variant_id || null,
-				placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
-				technique: selectedVariant?.technique || null,
-                                width: Math.round((widthPx / dpiX) * 100) / 100,
-                                height: Math.round((heightPx / dpiY) * 100) / 100,
-                                left: Math.round((leftPx / dpiX) * 100) / 100,
-                                top: Math.round((topPx / dpiY) * 100) / 100,
-				dpi_x: dpiX,
-				dpi_y: dpiY
-			};
-			console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
-
-			console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
-			generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
-		} else {
-			console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
-
-			console.log("[Mockup] ✂️ Image déborde – export recadré");
-
-			const exportData = CanvasManager.getExportDataForPrintful();
-			if (!exportData) {
-				alert("L’image est complètement hors de la zone imprimable.");
-				return;
-			}
-
-			const placement = exportData.placement;
-			console.log("placement :",placement);
-
-			// ✅ ENVOYER IMAGE RECADRÉE VERS SERVEUR (base64 → PNG + URL publique)
-			uploadBase64ToServer(exportData.imageDataUrl).then(response => {
-				console.log("[Debug] Réponse upload base64 :", response);
-				if (!response.success) {
-					alert("Erreur lors de l'envoi de l’image : " + response.message);
-					return;
-				}
-
-				// ✅ L’image est maintenant sur ton serveur, URL publique :
-				const publicImageUrl = response.data.image_url + '?v=' + Date.now();
-
-				// ✅ Calculs DPI → pouces
-				const mockupData = {
-					image_url: publicImageUrl,
-					product_id: currentProductId || null,
-					variant_id: selectedVariant?.variant_id || null,
-					placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
-					technique: selectedVariant?.technique || null,
-                                        width: Math.round((placement.width / dpiX) * 100) / 100,
-                                        height: Math.round((placement.height / dpiY) * 100) / 100,
-                                        left: Math.max(0, Math.round((placement.x / dpiX) * 100) / 100),  // ✅ clamp
-                                        top: Math.max(0, Math.round((placement.y / dpiY) * 100) / 100),   // ✅ clamp
-					dpi_x: dpiX,
-					dpi_y: dpiY
-				};
-
-
-				console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
-				generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
-			});
-		}
-
-	});
+        });
 });
 
 jQuery(document).ready(function ($) {
