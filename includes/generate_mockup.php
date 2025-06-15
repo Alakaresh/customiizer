@@ -107,6 +107,8 @@ function handle_generate_mockup() {
     $png_url   = $conversion_result['png_url'];
     $file_path = $conversion_result['file_path'];
 
+    customiizer_log("🖼️ Image combinée locale : $file_path");
+
     // 🎯 Appel API Printful avec les pouces tels quels
     $response = generate_mockup_printful(
         $png_url,
@@ -135,12 +137,16 @@ function handle_generate_mockup() {
                                 if ($mockup_url) {
                                         if (!unlink($file_path)) {
                                                 customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                                        } else {
+                                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                         }
                                         wp_send_json_success(['mockup_url' => $mockup_url]);
                                 } else {
                                         customiizer_log("❌ Aucun mockup_url trouvé");
                                         if (!unlink($file_path)) {
                                                 customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                                        } else {
+                                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                         }
                                         wp_send_json_error(['message' => 'URL du mockup introuvable.']);
                                 }
@@ -148,6 +154,8 @@ function handle_generate_mockup() {
                                 customiizer_log("❌ Aucun mockup généré.");
                                 if (!unlink($file_path)) {
                                         customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                                } else {
+                                        customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                 }
                                 wp_send_json_error(['message' => 'Aucun mockup généré.']);
                         }
@@ -155,6 +163,8 @@ function handle_generate_mockup() {
                         customiizer_log("❌ Erreur de statut : " . $mockup_status['error']);
                         if (!unlink($file_path)) {
                                 customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                        } else {
+                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                         }
                         wp_send_json_error(['message' => $mockup_status['error']]);
                 }
@@ -162,42 +172,45 @@ function handle_generate_mockup() {
                 customiizer_log("❌ Erreur API : " . ($response['error'] ?? 'Non spécifiée'));
                 if (!unlink($file_path)) {
                         customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
+                } else {
+                        customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                 }
                 wp_send_json_error(['message' => $response['error'] ?? 'Erreur inconnue']);
         }
 }
 function convert_webp_to_png_server($image_url) {
-	// Télécharger l'image WebP
-	$webp_content = file_get_contents($image_url);
-	if ($webp_content === false) {
-		customiizer_log("❌ Impossible de télécharger l'image WebP : $image_url");
-		return ['success' => false, 'message' => 'Échec du téléchargement de l\'image WebP.'];
-	}
+        $ext = strtolower(pathinfo(parse_url($image_url, PHP_URL_PATH), PATHINFO_EXTENSION));
 
-	// Créer une image GD à partir du contenu WebP
-	$webp_image = imagecreatefromstring($webp_content);
-	if (!$webp_image) {
-		customiizer_log("❌ Échec de création GD à partir du WebP.");
-		return ['success' => false, 'message' => 'Conversion WebP vers image GD échouée.'];
-	}
+        $downloaded = file_get_contents($image_url);
+        if ($downloaded === false) {
+                customiizer_log("❌ Impossible de télécharger l'image : $image_url");
+                return ['success' => false, 'message' => "Échec du téléchargement de l'image."];
+        }
 
-	// Générer un nom unique pour le fichier PNG
-	$upload_dir = wp_upload_dir();
-	$output_dir = $upload_dir['path'];
-	$output_filename = uniqid('converted_', true) . '.png';
-	$output_path = $output_dir . '/' . $output_filename;
+        $upload_dir = wp_upload_dir();
+        $output_dir = $upload_dir['path'];
+        $output_filename = uniqid('converted_', true) . '.png';
+        $output_path = $output_dir . '/' . $output_filename;
 
-	// Convertir et enregistrer l'image en PNG
-        if (!imagepng($webp_image, $output_path, PNG_COMPRESSION_LEVEL)) {
-		imagedestroy($webp_image);
-		customiizer_log("❌ Échec de conversion en PNG : $output_path");
-		return ['success' => false, 'message' => 'Erreur lors de l\'enregistrement PNG.'];
-	}
+        if ($ext === 'png') {
+                if (file_put_contents($output_path, $downloaded) === false) {
+                        customiizer_log("❌ Échec de la copie PNG : $output_path");
+                        return ['success' => false, 'message' => 'Erreur lors de la copie PNG.'];
+                }
+        } else {
+                $image = imagecreatefromstring($downloaded);
+                if (!$image) {
+                        customiizer_log("❌ Échec de création GD à partir du fichier téléchargé.");
+                        return ['success' => false, 'message' => 'Conversion vers image GD échouée.'];
+                }
+                if (!imagepng($image, $output_path, PNG_COMPRESSION_LEVEL)) {
+                        imagedestroy($image);
+                        customiizer_log("❌ Échec de conversion en PNG : $output_path");
+                        return ['success' => false, 'message' => "Erreur lors de l'enregistrement PNG."];
+                }
+                imagedestroy($image);
+        }
 
-	// Libérer la mémoire
-	imagedestroy($webp_image);
-
-        // Retourner l'URL publique et le chemin local
         $upload_url = $upload_dir['url'];
         $png_url = $upload_url . '/' . $output_filename;
         return [
