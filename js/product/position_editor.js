@@ -6,18 +6,26 @@ jQuery(document).ready(function ($) {
     $img.css('bottom', 'auto');
 
     const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;border:1px solid #ccc;padding:10px;z-index:9999;">');
-    const inputTop = $('<input>', {type:'number', step:'0.1', id:'dev-pos-top', style:'width:60px;'});
-    const inputLeft = $('<input>', {type:'number', step:'0.1', id:'dev-pos-left', style:'width:60px;'});
+    const inputTop = $('<input>', {type:'range', min:0, max:100, step:'0.1', id:'dev-pos-top'});
+    const topDisplay = $('<span>', {id:'dev-pos-top-value', text:'0%'});
+    const inputLeft = $('<input>', {type:'range', min:0, max:100, step:'0.1', id:'dev-pos-left'});
+    const leftDisplay = $('<span>', {id:'dev-pos-left-value', text:'0%'});
     const saveBtn = $('<button>', {text:'Save'});
 
-    box.append('Top:', inputTop, ' Left:', inputLeft, saveBtn);
+    box.append(
+        $('<div>').append('Top: ', inputTop, ' ', topDisplay),
+        $('<div>').append('Left: ', inputLeft, ' ', leftDisplay),
+        saveBtn
+    );
     $('body').append(box);
 
     function refreshInputs() {
         const top = parseFloat($img.css('top')) || 0;
         const left = parseFloat($img.css('left')) || 0;
         inputTop.val(top);
+        topDisplay.text(top + '%');
         inputLeft.val(left);
+        leftDisplay.text(left + '%');
     }
     refreshInputs();
 
@@ -27,20 +35,12 @@ jQuery(document).ready(function ($) {
             left: inputLeft.val() + '%',
             bottom: 'auto'
         });
+
+        topDisplay.text(inputTop.val() + '%');
+        leftDisplay.text(inputLeft.val() + '%');
     }
 
-    inputTop.on('input', applyPosition);
-    inputLeft.on('input', applyPosition);
-
-    inputTop.add(inputLeft).on('keydown', function (e) {
-        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            const dir = e.key === 'ArrowUp' ? 0.1 : -0.1;
-            const val = parseFloat(this.value) || 0;
-            this.value = (val + dir).toFixed(1);
-            $(this).trigger('input');
-        }
-    });
+    inputTop.add(inputLeft).on('input', applyPosition);
 
     saveBtn.on('click', function () {
         if (!window.selectedVariant) return alert('No variant');
