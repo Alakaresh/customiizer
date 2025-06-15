@@ -118,14 +118,13 @@ jQuery(document).ready(function ($) {
 	function updateMainImage(variant) {
 		if (variant.mockups.length > 0) {
 			const mockup = variant.mockups[0];
-                       mainProductImage.attr('src', mockup.mockup_image).css({
-                               'position': 'absolute',
-                               'top': `${mockup.position_top}px`,
-                               'left': `${mockup.position_left}px`,
-                               'bottom': 'auto'
-                       });
-               }
-       }
+                        mainProductImage.attr('src', mockup.mockup_image).css({
+                                'position': 'absolute',
+                                'top': `${mockup.position_top}px`,
+                                'left': `${mockup.position_left}px`
+                        });
+		}
+	}
 
 	function updateSelectedVariant() {
 		const selectedColor = $('.color-option.selected').attr('data-color');
@@ -262,34 +261,26 @@ jQuery(document).ready(function ($) {
 
 
 	function updateThumbnails(variants) {
-               const thumbnailsContainer = $('.image-thumbnails').empty();
+		const thumbnailsContainer = $('.image-thumbnails').empty();
 
-               variants.forEach(variant => {
-                       variant.mockups.forEach((mockup, index) => {
-                               const imgElement = $('<img>')
-                               .addClass('thumbnail')
-                               .attr('src', mockup.mockup_image)
-                               .attr('data-style-id', mockup.mockup_id)
-                               .attr('data-position-top', mockup.position_top)
-                               .attr('data-position-left', mockup.position_left)
-                               .on('click', function () {
-                                       mainProductImage.attr('src', $(this).attr('src'))
-                                       .css({
-                                               top: $(this).data('position-top') + 'px',
-                                               left: $(this).data('position-left') + 'px',
-                                               position: 'absolute',
-                                               bottom: 'auto'
-                                       });
-                                       $('.image-thumbnails .thumbnail').removeClass('selected');
-                                       $(this).addClass('selected');
-                               });
+		variants.forEach(variant => {
+			variant.mockups.forEach((mockup, index) => {
+				const imgElement = $('<img>')
+				.addClass('thumbnail')
+				.attr('src', mockup.mockup_image)
+				.attr('data-style-id', mockup.mockup_id)
+				.on('click', function () {
+					mainProductImage.attr('src', $(this).attr('src'));
+					$('.image-thumbnails .thumbnail').removeClass('selected');
+					$(this).addClass('selected');
+				});
 
-                               thumbnailsContainer.append(imgElement);
+				thumbnailsContainer.append(imgElement);
 
-                               if (index === 0) imgElement.addClass('selected');
-                       });
-               });
-       }
+				if (index === 0) imgElement.addClass('selected');
+			});
+		});
+	}
 
 	// 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
 	$(document).on('productSelected', function (event, productId) {
