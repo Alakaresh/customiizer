@@ -48,42 +48,100 @@ jQuery(document).ready(function ($) {
 			CanvasManager.syncTo3D();
 		}
 
-                const exportData = CanvasManager.getExportDataForPrintful();
-                if (!exportData) {
-                        alert("L’image est complètement hors de la zone imprimable.");
-                        return;
-                }
+		const imageObject = canvas?.getObjects().find(obj => obj.type === 'image');
+		if (!imageObject) {
+			console.warn("❌ Aucune image trouvée sur le canvas.");
+			return;
+		}
 
-                const dpiX = template.print_area_width / selectedVariant.print_area_width;
-                const dpiY = template.print_area_height / selectedVariant.print_area_height;
+		const bounds = imageObject.getBoundingRect(true);
+		const zoneLeft = template.print_area_left;
+		const zoneTop = template.print_area_top;
+		const zoneRight = zoneLeft + template.print_area_width;
+		const zoneBottom = zoneTop + template.print_area_height;
 
-                uploadBase64ToServer(exportData.imageDataUrl).then(response => {
-                        console.log("[Debug] Réponse upload base64 :", response);
-                        if (!response.success) {
-                                alert("Erreur lors de l'envoi de l’image : " + response.message);
-                                return;
-                        }
+		const isFullyInside =
+			  bounds.left >= zoneLeft &&
+			  bounds.top >= zoneTop &&
+			  (bounds.left + bounds.width) <= zoneRight &&
+			  (bounds.top + bounds.height) <= zoneBottom;
 
-                        const publicImageUrl = response.data.image_url + '?v=' + Date.now();
+		// Conversion des DPI
+		const dpiX = template.print_area_width / selectedVariant.print_area_width;
+		const dpiY = template.print_area_height / selectedVariant.print_area_height;
 
-                        const placement = exportData.placement;
-                        const mockupData = {
-                                image_url: publicImageUrl,
-                                product_id: currentProductId || null,
-                                variant_id: selectedVariant?.variant_id || null,
-                                placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
-                                technique: selectedVariant?.technique || null,
-                                width: placement.width,
-                                height: placement.height,
-                                left: Math.max(0, placement.left),
-                                top: Math.max(0, placement.top),
-                                dpi_x: dpiX,
-                                dpi_y: dpiY
-                        };
+		let mockupData = null;
 
-                        console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
-                        generateMockup(mockupData);
-                });
+		if (isFullyInside) {
+			console.log("[Mockup] ✅ Image totalement dans la zone – export simple");
+
+			const widthPx  = imageObject.width * imageObject.scaleX;
+			const heightPx = imageObject.height * imageObject.scaleY;
+			const leftPx   = imageObject.left - zoneLeft;
+			const topPx    = imageObject.top - zoneTop;
+
+			mockupData = {
+				image_url: imageObject._element?.src || null,
+				product_id: currentProductId || null,
+				variant_id: selectedVariant?.variant_id || null,
+				placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
+				technique: selectedVariant?.technique || null,
+                                width: Math.round((widthPx / dpiX) * 100) / 100,
+                                height: Math.round((heightPx / dpiY) * 100) / 100,
+                                left: Math.round((leftPx / dpiX) * 100) / 100,
+                                top: Math.round((topPx / dpiY) * 100) / 100,
+				dpi_x: dpiX,
+				dpi_y: dpiY
+			};
+			console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
+
+			console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
+			generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
+		} else {
+			console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
+
+			console.log("[Mockup] ✂️ Image déborde – export recadré");
+
+			const exportData = CanvasManager.getExportDataForPrintful();
+			if (!exportData) {
+				alert("L’image est complètement hors de la zone imprimable.");
+				return;
+			}
+
+			const placement = exportData.placement;
+			console.log("placement :",placement);
+
+			// ✅ ENVOYER IMAGE RECADRÉE VERS SERVEUR (base64 → PNG + URL publique)
+			uploadBase64ToServer(exportData.imageDataUrl).then(response => {
+				console.log("[Debug] Réponse upload base64 :", response);
+				if (!response.success) {
+					alert("Erreur lors de l'envoi de l’image : " + response.message);
+					return;
+				}
+
+				// ✅ L’image est maintenant sur ton serveur, URL publique :
+				const publicImageUrl = response.data.image_url + '?v=' + Date.now();
+
+				// ✅ Calculs DPI → pouces
+				const mockupData = {
+					image_url: publicImageUrl,
+					product_id: currentProductId || null,
+					variant_id: selectedVariant?.variant_id || null,
+					placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
+					technique: selectedVariant?.technique || null,
+                                        width: Math.round((placement.width / dpiX) * 100) / 100,
+                                        height: Math.round((placement.height / dpiY) * 100) / 100,
+                                        left: Math.max(0, Math.round((placement.x / dpiX) * 100) / 100),  // ✅ clamp
+                                        top: Math.max(0, Math.round((placement.y / dpiY) * 100) / 100),   // ✅ clamp
+					dpi_x: dpiX,
+					dpi_y: dpiY
+				};
+
+
+				console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
+				generateMockup(mockupData); // ✅ Appelé une fois l'image dispo
+			});
+		}
 
 	});
 });
@@ -264,6 +322,7 @@ jQuery(document).ready(function ($) {
                 CanvasManager.addImage(url);
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
+                addImageButton.hide();
                 visualHeader.css('display', 'flex');
                 $('.visual-zone').addClass('with-header');
                 imageControls.css('display', 'flex').show();
@@ -274,6 +333,7 @@ jQuery(document).ready(function ($) {
                 CanvasManager.addImage(url);
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
+                addImageButton.hide();
                 visualHeader.css('display', 'flex');
                 $('.visual-zone').addClass('with-header');
                 imageControls.css('display', 'flex').show();
