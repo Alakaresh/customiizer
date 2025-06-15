@@ -34,8 +34,11 @@ const CanvasManager = {
 			return;
 		}
 
-		// 🧹 Nettoyage du conteneur
-		container.innerHTML = "";
+                // 🧹 Nettoyage du conteneur sans retirer le bouton "Ajouter une image"
+                const existingWrapper = container.querySelector('#productCanvasWrapper');
+                if (existingWrapper) {
+                        existingWrapper.remove();
+                }
 
 		// 🧱 Créer wrapper + canvas
 		const wrapper = document.createElement("div");
