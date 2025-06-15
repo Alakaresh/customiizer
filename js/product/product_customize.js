@@ -86,10 +86,10 @@ jQuery(document).ready(function ($) {
 				variant_id: selectedVariant?.variant_id || null,
 				placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
 				technique: selectedVariant?.technique || null,
-				width: Math.round((widthPx / dpiX) * 10) / 10,
-				height: Math.round((heightPx / dpiY) * 10) / 10,
-				left: Math.round((leftPx / dpiX) * 10) / 10,
-				top: Math.round((topPx / dpiY) * 10) / 10,
+                                width: Math.round((widthPx / dpiX) * 100) / 100,
+                                height: Math.round((heightPx / dpiY) * 100) / 100,
+                                left: Math.round((leftPx / dpiX) * 100) / 100,
+                                top: Math.round((topPx / dpiY) * 100) / 100,
 				dpi_x: dpiX,
 				dpi_y: dpiY
 			};
@@ -129,10 +129,10 @@ jQuery(document).ready(function ($) {
 					variant_id: selectedVariant?.variant_id || null,
 					placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
 					technique: selectedVariant?.technique || null,
-					width: Math.round((placement.width / dpiX) * 10) / 10,
-					height: Math.round((placement.height / dpiY) * 10) / 10,
-					left: Math.max(0, Math.round((placement.x / dpiX) * 10) / 10),  // ✅ clamp
-					top: Math.max(0, Math.round((placement.y / dpiY) * 10) / 10),   // ✅ clamp
+                                        width: Math.round((placement.width / dpiX) * 100) / 100,
+                                        height: Math.round((placement.height / dpiY) * 100) / 100,
+                                        left: Math.max(0, Math.round((placement.x / dpiX) * 100) / 100),  // ✅ clamp
+                                        top: Math.max(0, Math.round((placement.y / dpiY) * 100) / 100),   // ✅ clamp
 					dpi_x: dpiX,
 					dpi_y: dpiY
 				};
