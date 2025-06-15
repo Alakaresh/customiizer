@@ -155,6 +155,8 @@
     justify-content: center;
     align-items: center;
     padding: 20px;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 /* Conteneur de l'image produit 2D */
