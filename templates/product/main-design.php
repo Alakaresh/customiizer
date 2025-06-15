@@ -73,10 +73,19 @@
                <h3 id="imageSourceModalTitle">File Library</h3>
 
 		<!-- Section recherche et upload -->
-		<div class="search-upload">
-			<input type="text" id="searchInput" placeholder="Rechercher un fichier..." class="search-bar">
-			<button id="uploadPcImageButton" class="source-button">Upload</button>
-		</div>
+                <div class="search-upload">
+                        <input type="text" id="searchInput" placeholder="Rechercher un fichier..." class="search-bar">
+                        <select id="ratioFilter" class="ratio-filter">
+                                <option value="current">Produit (ratio actuel)</option>
+                                <option value="1:1">1:1</option>
+                                <option value="4:3">4:3</option>
+                                <option value="3:4">3:4</option>
+                                <option value="16:9">16:9</option>
+                                <option value="9:16">9:16</option>
+                                <option value="all">Tous</option>
+                        </select>
+                        <button id="uploadPcImageButton" class="source-button">Upload</button>
+                </div>
 
 		<!-- Contenu principal du modal -->
 		<!-- Fichiers importés depuis le PC -->
