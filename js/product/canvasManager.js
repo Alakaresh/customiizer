@@ -171,9 +171,9 @@ const CanvasManager = {
                }, { crossOrigin: 'anonymous' });
        },
 
-       alignImage: function (position) {
-               const img = canvas.getActiveObject();
-               if (!img) return;
+        alignImage: function (position) {
+                const img = canvas.getActiveObject();
+                if (!img) return;
 
                const areaLeft = template.print_area_left;
                const areaTop = template.print_area_top;
@@ -196,10 +196,26 @@ const CanvasManager = {
                        img.set({ top: areaTop + (areaHeight - imgHeight) / 2 });
                }
 
-               img.setCoords();
-               canvas.renderAll();
-               CanvasManager.syncTo3D();
-       },
+                img.setCoords();
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
+        bringImageForward: function () {
+                const obj = canvas.getActiveObject();
+                if (!obj) return;
+                canvas.bringForward(obj);
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
+        sendImageBackward: function () {
+                const obj = canvas.getActiveObject();
+                if (!obj) return;
+                canvas.sendBackwards(obj);
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
 
        removeImage: function () {
                const img = canvas.getObjects().find(obj => obj.type === 'image');
