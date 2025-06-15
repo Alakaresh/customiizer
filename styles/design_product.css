@@ -348,7 +348,7 @@ h4 {
 .image-thumbnail {
     width: 150px;
     height: 150px;
-    object-fit: cover;
+    object-fit: contain;
     border: 2px solid #ddd;
     border-radius: 5px;
     cursor: pointer;
