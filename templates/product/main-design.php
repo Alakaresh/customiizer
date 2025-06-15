@@ -73,9 +73,18 @@
 		</div>
                <h3 id="imageSourceModalTitle">File Library</h3>
 
-                <!-- Section recherche et upload -->
+		<!-- Section recherche et upload -->
                 <div class="search-upload">
                         <input type="text" id="searchInput" placeholder="Rechercher un fichier..." class="search-bar">
+                        <select id="ratioFilter" class="ratio-filter">
+                                <option value="current">Produit (ratio actuel)</option>
+                                <option value="1:1">1:1</option>
+                                <option value="4:3">4:3</option>
+                                <option value="3:4">3:4</option>
+                                <option value="16:9">16:9</option>
+                                <option value="9:16">9:16</option>
+                                <option value="all">Tous</option>
+                        </select>
                         <button id="uploadPcImageButton" class="source-button">Upload</button>
                 </div>
 
@@ -91,27 +100,16 @@
 		<!-- Fichiers disponibles sur le site -->
 		<div class="site-files">
 			<h4>Generated images</h4>
-                        <div class="switch-wrapper">
-                                <span id="switch-label-left" class="switch-label active">Mes images</span>
-                                <label class="switch-toggle">
-                                        <input type="checkbox" id="imageToggle" class="switch-checkbox" >
-                                        <span class="slider"></span>
-                                </label>
-                                <span id="switch-label-right" class="switch-label">Communauté</span>
-                                <select id="ratioFilter" class="ratio-filter">
-                                        <option value="current">Produit (ratio actuel)</option>
-                                        <option value="1:1">1:1</option>
-                                        <option value="4:3">4:3</option>
-                                        <option value="3:4">3:4</option>
-                                        <option value="16:9">16:9</option>
-                                        <option value="9:16">9:16</option>
-                                        <option value="all">Tous</option>
-                                </select>
-                                <select id="favoriteFilter" class="favorite-filter">
-                                        <option value="all">Toutes</option>
-                                        <option value="fav">Favoris</option>
-                                </select>
-                        </div>
+			<div class="switch-wrapper">
+				<span id="switch-label-left" class="switch-label active">Mes images</span>
+
+				<label class="switch-toggle">
+					<input type="checkbox" id="imageToggle" class="switch-checkbox" >
+					<span class="slider"></span>
+				</label>
+
+				<span id="switch-label-right" class="switch-label">Communauté</span>
+			</div>
 
 
 			<div id="siteFilesList" class="file-list">
