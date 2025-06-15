@@ -142,7 +142,7 @@
 }
 
 /* Padding when header is visible */
-.visual-zone.with-header .visual-containers {
+.visual-zone.with-header {
     padding-top: 40px;
 }
 
