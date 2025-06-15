@@ -37,11 +37,10 @@
                                         <button id="sendBackwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
                                 </div>
                         </div>
-                        <button id="addImageButton" class="add-image-button">Ajouter une image</button>
-
                         <div class="visual-containers">
                                 <!-- Conteneur pour l'affichage 2D -->
                                 <div id="product2DContainer">
+                                        <button id="addImageButton" class="add-image-button">Ajouter une image</button>
                                         <div class="fabric-wrapper" id="productCanvasWrapper">
                                                 <!-- Le canvas y sera injecté dynamiquement par Fabric.js -->
                                         </div>
