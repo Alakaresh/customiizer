@@ -64,11 +64,12 @@ function displayImagesInBottomBar(images) {
 
 
 function generateMockup(mockupData) {
-	if (!mockupData || !selectedVariant?.mockups?.length) {
-		console.error("❌ Données insuffisantes pour générer un mockup.");
-		alert("Impossible de générer le mockup. Données manquantes.");
-		return;
-	}
+        console.log('[Printful] sending mockup data:', mockupData);
+        if (!mockupData || !selectedVariant?.mockups?.length) {
+                console.error("❌ Données insuffisantes pour générer un mockup.");
+                alert("Impossible de générer le mockup. Données manquantes.");
+                return;
+        }
 
 	const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
 	const primaryStyleId = styleIds[0];
