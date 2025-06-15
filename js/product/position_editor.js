@@ -42,6 +42,7 @@ jQuery(document).ready(function ($) {
 
     inputTop.add(inputLeft).on('input', applyPosition);
 
+
      saveBtn.on('click', function () {
       const variant = typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant;
       if (!variant) return alert('No variant');
