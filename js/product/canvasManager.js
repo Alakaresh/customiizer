@@ -253,13 +253,16 @@ const CanvasManager = {
                        return null;
                }
 
+               const outputCanvas = document.createElement('canvas');
+               outputCanvas.width = template.print_area_width;
+               outputCanvas.height = template.print_area_height;
+               const ctx = outputCanvas.getContext('2d');
+               ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+
                let minX = template.print_area_width;
                let minY = template.print_area_height;
                let maxX = 0;
                let maxY = 0;
-               const drawOps = [];
-               let ratioMismatch = false;
-               const requiredRatio = template.print_area_width / template.print_area_height;
 
                images.forEach(imgObj => {
                        if (!imgObj._element) return;
@@ -274,14 +277,8 @@ const CanvasManager = {
                        const cropX = Math.max(0, -offsetX);
                        const cropY = Math.max(0, -offsetY);
 
-                       const visibleWidth = Math.min(
-                               imgDisplayWidth - cropX,
-                               template.print_area_width - Math.max(0, offsetX)
-                       );
-                       const visibleHeight = Math.min(
-                               imgDisplayHeight - cropY,
-                               template.print_area_height - Math.max(0, offsetY)
-                       );
+                       const visibleWidth = Math.min(imgDisplayWidth - cropX, template.print_area_width - Math.max(0, offsetX));
+                       const visibleHeight = Math.min(imgDisplayHeight - cropY, template.print_area_height - Math.max(0, offsetY));
                        if (visibleWidth <= 0 || visibleHeight <= 0) return;
 
                        const destX = Math.max(0, offsetX);
@@ -292,22 +289,11 @@ const CanvasManager = {
                        const sourceW = visibleWidth / scaleX;
                        const sourceH = visibleHeight / scaleY;
 
-                       const naturalRatio = imgObj.width / imgObj.height;
-                       if (Math.abs(naturalRatio - requiredRatio) > 0.01) {
-                               ratioMismatch = true;
-                       }
-
-                       drawOps.push({
-                               element: imgObj._element,
-                               sx: sourceX,
-                               sy: sourceY,
-                               sw: sourceW,
-                               sh: sourceH,
-                               dx: destX,
-                               dy: destY,
-                               dw: visibleWidth,
-                               dh: visibleHeight
-                       });
+                       ctx.drawImage(
+                               imgObj._element,
+                               sourceX, sourceY, sourceW, sourceH,
+                               destX, destY, visibleWidth, visibleHeight
+                       );
 
                        minX = Math.min(minX, destX);
                        minY = Math.min(minY, destY);
@@ -318,27 +304,6 @@ const CanvasManager = {
                if (maxX <= minX || maxY <= minY) {
                        console.warn("[CanvasManager] 🚫 Images totalement hors zone imprimable");
                        return null;
-               }
-
-               if (ratioMismatch) {
-                       alert("Le format de l'image ne correspond pas au ratio requis.");
-                       return null;
-               }
-
-               const outputCanvas = document.createElement('canvas');
-               outputCanvas.width = maxX - minX;
-               outputCanvas.height = maxY - minY;
-               const ctx = outputCanvas.getContext('2d');
-               ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-
-               drawOps.forEach(op => {
-                       ctx.drawImage(op.element, op.sx, op.sy, op.sw, op.sh,
-                                       op.dx - minX, op.dy - minY, op.dw, op.dh);
-               });
-
-               const outputRatio = outputCanvas.width / outputCanvas.height;
-               if (Math.abs(outputRatio - requiredRatio) > 0.01) {
-                       console.warn(`[CanvasManager] Ratio final ${outputRatio.toFixed(2)} incompatible avec ${requiredRatio.toFixed(2)}`);
                }
 
                const dpiX = template.print_area_width / (selectedVariant?.print_area_width || 1);
