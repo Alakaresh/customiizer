@@ -43,10 +43,13 @@ jQuery(document).ready(function ($) {
         const variant = typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant;
         if (!variant) return alert('No variant');
         const vid = variant.variant_id || variant;
+        const selectedThumb = $('.image-thumbnails .thumbnail.selected');
+        const mid = selectedThumb.data('style-id') || (variant.mockups && variant.mockups[0]?.mockup_id);
         fetch(`/wp-json/custom-api/v1/variant/${vid}/mockup-position`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
+                mockup_id: parseInt(mid),
                 position_top: parseFloat(inputTop.val()),
                 position_left: parseFloat(inputLeft.val())
             })
