@@ -2,6 +2,9 @@ jQuery(document).ready(function ($) {
     const $img = $('#product-main-image');
     if (!$img.length) return;
 
+    // Override any default bottom positioning when the editor is active
+    $img.css('bottom', 'auto');
+
     const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;border:1px solid #ccc;padding:10px;z-index:9999;">');
     const inputTop = $('<input>', {type:'number', step:'0.1', id:'dev-pos-top', style:'width:60px;'});
     const inputLeft = $('<input>', {type:'number', step:'0.1', id:'dev-pos-left', style:'width:60px;'});
@@ -19,7 +22,11 @@ jQuery(document).ready(function ($) {
     refreshInputs();
 
     function applyPosition() {
-        $img.css({top: inputTop.val() + '%', left: inputLeft.val() + '%'});
+        $img.css({
+            top: inputTop.val() + '%',
+            left: inputLeft.val() + '%',
+            bottom: 'auto'
+        });
     }
 
     inputTop.on('input', applyPosition);
