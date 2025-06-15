@@ -63,6 +63,7 @@
                         <button id="saveDesignButton">Save to template</button>
                 </div>
 </div>
+</div>
 
 
 <!-- Second modal pour choisir l'image -->
