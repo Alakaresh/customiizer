@@ -312,18 +312,20 @@ jQuery(document).ready(function ($) {
 	// 7) Clic sur une miniature
         siteFilesList.on('click', '.image-thumbnail', function () {
                 const url = $(this).data('image-url');
-                CanvasManager.addImage(url);
+                CanvasManager.addImage(url, function () {
+                        updateAddImageButtonVisibility();
+                });
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
-                updateAddImageButtonVisibility();
         });
 
         pcFilesList.on('click', '.image-thumbnail', function () {
                 const url = $(this).data('image-url');
-                CanvasManager.addImage(url);
+                CanvasManager.addImage(url, function () {
+                        updateAddImageButtonVisibility();
+                });
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
-                updateAddImageButtonVisibility();
         });
 
         alignLeftButton.on('click', function () {
