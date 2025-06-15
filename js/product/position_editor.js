@@ -2,42 +2,43 @@ jQuery(document).ready(function ($) {
     const $img = $('#product-main-image');
     if (!$img.length) return;
 
-    const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;border:1px solid #ccc;padding:10px;z-index:9999;">');
-    const inputTop = $('<input>', {type:'number', step:'0.1', id:'dev-pos-top', style:'width:60px;'});
-    const inputLeft = $('<input>', {type:'number', step:'0.1', id:'dev-pos-left', style:'width:60px;'});
+    const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;color:#000;border:1px solid #ccc;padding:10px;z-index:9999;">');
+    const inputTop = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-top'});
+    const topDisplay = $('<span>', {id:'dev-pos-top-value', text:'0%'});
+    const inputLeft = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-left'});
+    const leftDisplay = $('<span>', {id:'dev-pos-left-value', text:'0%'});
     const saveBtn = $('<button>', {text:'Save'});
 
-    box.append('Top:', inputTop, ' Left:', inputLeft, saveBtn);
+    box.append(
+        $('<div>').append('Top: ', inputTop, ' ', topDisplay),
+        $('<div>').append('Left: ', inputLeft, ' ', leftDisplay),
+        saveBtn
+    );
     $('body').append(box);
 
     function refreshInputs() {
         const top = parseFloat($img.css('top')) || 0;
         const left = parseFloat($img.css('left')) || 0;
         inputTop.val(top);
+        topDisplay.text(top + '%');
         inputLeft.val(left);
+        leftDisplay.text(left + '%');
     }
     refreshInputs();
 
     function applyPosition() {
         $img.css({top: inputTop.val() + '%', left: inputLeft.val() + '%'});
+        topDisplay.text(inputTop.val() + '%');
+        leftDisplay.text(inputLeft.val() + '%');
     }
 
-    inputTop.on('input', applyPosition);
-    inputLeft.on('input', applyPosition);
-
-    inputTop.add(inputLeft).on('keydown', function (e) {
-        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            const dir = e.key === 'ArrowUp' ? 0.1 : -0.1;
-            const val = parseFloat(this.value) || 0;
-            this.value = (val + dir).toFixed(1);
-            $(this).trigger('input');
-        }
-    });
+    inputTop.add(inputLeft).on('input', applyPosition);
 
     saveBtn.on('click', function () {
-        if (!window.selectedVariant) return alert('No variant');
-        fetch(`/wp-json/custom-api/v1/variant/${window.selectedVariant.variant_id}/mockup-position`, {
+        const variant = typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant;
+        if (!variant) return alert('No variant');
+        const vid = variant.variant_id || variant;
+        fetch(`/wp-json/custom-api/v1/variant/${vid}/mockup-position`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
