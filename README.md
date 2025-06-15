@@ -13,3 +13,7 @@ The default value is set to `8` for near-maximum compression.
 `MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.
 Images larger than this value are downscaled before saving. The default is `1500`
 pixels.
+
+## Position editor
+
+Enable the checkbox "Activer l'éditeur de position" in the **Custom Produits** admin page to adjust the mockup position on product pages. When enabled, `js/product/position_editor.js` is enqueued automatically.
