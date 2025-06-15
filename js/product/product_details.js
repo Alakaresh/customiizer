@@ -164,6 +164,9 @@ jQuery(document).ready(function ($) {
 
                         // 🚀 Précharge les ressources du configurateur pour la variante courante
                         preloadVariantAssets(selectedVariant);
+
+                        // 📢 Signale que la variante est prête pour d'autres scripts
+                        $(document).trigger('variantReady', [selectedVariant]);
                 } else {
 			console.warn("Aucune variante trouvée pour cette combinaison !");
 			$('#customize-button').prop('disabled', true).addClass('disabled');

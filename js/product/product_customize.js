@@ -245,6 +245,18 @@ jQuery(document).ready(function ($) {
                 filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
 
+        // Mise à jour initiale quand la variante est prête
+        $(document).on('variantReady', function (event, variant) {
+                currentRatio = variant?.ratio_image || '';
+                ratioFilter.val('current');
+
+                favoriteFilter.val('all');
+                filterFavorites = false;
+
+                const isCommunity = imageToggle.is(':checked');
+                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
+        });
+
 	// 4) Ouvrir le sélecteur d’image
         addImageButton.on('click', function () {
                 imageSourceModal.show();
