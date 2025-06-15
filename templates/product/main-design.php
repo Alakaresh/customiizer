@@ -49,6 +49,9 @@
                                 <!-- Conteneur pour l'affichage 3D -->
                                 <div id="product3DContainer">
                                         <canvas id="threeDCanvas"></canvas>
+                                        <div id="threeDLoadingOverlay" class="loading-overlay" style="display:none;">
+                                                <div class="loading-spinner"></div>
+                                        </div>
                                 </div>
                         </div>
                 </div>
