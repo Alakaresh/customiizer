@@ -1,16 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
         const toggle = document.getElementById("customiizer-dev-editor-toggle");
+        const status = document.getElementById("dev-editor-status");
+        function showStatus(text, color) {
+                if (!status) return;
+                status.textContent = text;
+                status.style.color = color;
+                setTimeout(() => { status.textContent = ""; }, 2000);
+        }
         if (toggle) {
                 fetch("/wp-json/api/v1/settings/dev-editor")
                         .then(res => res.json())
                         .then(data => { toggle.checked = !!data.enabled; })
                         .catch(() => {});
                 toggle.addEventListener("change", () => {
+                        const enabled = toggle.checked ? 1 : 0;
                         fetch("/wp-json/api/v1/settings/dev-editor", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ enabled: toggle.checked ? 1 : 0 })
-                        });
+                                body: JSON.stringify({ enabled })
+                        })
+                                .then(res => res.ok ? res.json() : Promise.reject())
+                                .then(data => {
+                                        toggle.checked = !!data.enabled;
+                                        showStatus("Enregistré", "green");
+                                })
+                                .catch(() => {
+                                        toggle.checked = !toggle.checked;
+                                        showStatus("Erreur", "red");
+                                });
                 });
         }
 
