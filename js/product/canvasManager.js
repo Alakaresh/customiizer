@@ -337,7 +337,10 @@ const CanvasManager = {
         },
 
         exportPrintAreaPNG: function () {
-                return canvas.toDataURL({
+                const savedBg = canvas.backgroundImage;
+                canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+
+                const dataUrl = canvas.toDataURL({
                         left: template.print_area_left,
                         top: template.print_area_top,
                         width: template.print_area_width,
@@ -345,6 +348,9 @@ const CanvasManager = {
                         format: 'png',
                         withoutBackground: true
                 });
+
+                canvas.setBackgroundImage(savedBg, canvas.renderAll.bind(canvas));
+                return dataUrl;
         },
 
 	// Fonction privée : retourne position visible de l'image dans la zone imprimable
