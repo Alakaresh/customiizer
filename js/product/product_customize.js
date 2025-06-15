@@ -93,15 +93,23 @@ jQuery(document).ready(function ($) {
 
 	const pcFilesList = $('#pcFilesList');
 	const siteFilesList = $('#siteFilesList');
-	const customizeButton = $('.design-button');
-	const customizeModal = $('#customizeModal');
-	const closeButtonMain = $('#customizeModal .close-button');
-	const addImageButton = $('#addImageButton');
-	const imageSourceModal = $('#imageSourceModal');
-	const closeButtonImageModal = $('#imageSourceModal .close-button');
+        const customizeButton = $('.design-button');
+        const customizeModal = $('#customizeModal');
+        const closeButtonMain = $('#customizeModal .close-button');
+        const addImageButton = $('#addImageButton');
+        const imageSourceModal = $('#imageSourceModal');
+        const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
         const ratioFilter = $('#ratioFilter');
+
+        // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
+        window.addEventListener('beforeunload', function (e) {
+                if (customizeModal.is(':visible') && CanvasManager.hasImage()) {
+                        e.preventDefault();
+                        e.returnValue = '';
+                }
+        });
 
         const favoriteFilter = $('#favoriteFilter');
 
@@ -227,6 +235,12 @@ jQuery(document).ready(function ($) {
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
+                if (CanvasManager.hasImage()) {
+                        const confirmClose = window.confirm('Cette action va annuler la personnalisation en cours.\nÊtes-vous sûr de vouloir quitter ?');
+                        if (!confirmClose) {
+                                return;
+                        }
+                }
                 customizeModal.hide();
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
@@ -364,9 +378,7 @@ jQuery(document).ready(function ($) {
                                 imageSourceModal.hide();
                                 releaseFocus(imageSourceModal);
                         } else if (customizeModal.is(':visible')) {
-                                customizeModal.hide();
-                                releaseFocus(customizeModal);
-                                updateAddImageButtonVisibility();
+                                closeButtonMain.trigger('click');
                         }
                 }
 
