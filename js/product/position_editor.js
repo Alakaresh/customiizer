@@ -6,6 +6,7 @@ jQuery(document).ready(function ($) {
     const inputTop = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-top'});
     const topDisplay = $('<span>', {id:'dev-pos-top-value', text:'0%'});
     const inputLeft = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-left'});
+
     const leftDisplay = $('<span>', {id:'dev-pos-left-value', text:'0%'});
     const saveBtn = $('<button>', {text:'Save'});
 
@@ -27,6 +28,7 @@ jQuery(document).ready(function ($) {
     refreshInputs();
 
     function applyPosition() {
+
         $img.css({top: inputTop.val() + '%', left: inputLeft.val() + '%'});
         topDisplay.text(inputTop.val() + '%');
         leftDisplay.text(inputLeft.val() + '%');
