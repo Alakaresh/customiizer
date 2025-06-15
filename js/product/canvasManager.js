@@ -351,10 +351,18 @@ const CanvasManager = {
 
                 const ctx = outputCanvas.getContext('2d');
                 ctx.clearRect(0, 0, print_area_width, print_area_height);
+
+                const zoom = canvas.getZoom();
                 ctx.drawImage(
                         canvas.lowerCanvasEl,
-                        -print_area_left,
-                        -print_area_top
+                        print_area_left * zoom,
+                        print_area_top * zoom,
+                        template.template_width * zoom,
+                        template.template_height * zoom,
+                        0,
+                        0,
+                        print_area_width,
+                        print_area_height
                 );
 
                 return outputCanvas.toDataURL('image/png');
@@ -375,10 +383,18 @@ const CanvasManager = {
 
                 const ctx = outputCanvas.getContext('2d');
                 ctx.clearRect(0, 0, print_area_width, print_area_height);
+
+                const zoom = canvas.getZoom();
                 ctx.drawImage(
                         canvas.lowerCanvasEl,
-                        -print_area_left,
-                        -print_area_top
+                        print_area_left * zoom,
+                        print_area_top * zoom,
+                        template.template_width * zoom,
+                        template.template_height * zoom,
+                        0,
+                        0,
+                        print_area_width,
+                        print_area_height
                 );
 
                 canvas.setBackgroundImage(savedBg, canvas.renderAll.bind(canvas));
