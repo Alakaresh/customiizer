@@ -95,9 +95,8 @@ add_action( 'init', function() {
 		'/admin/dashboard/admin-dashboard.php',
 		'/admin/logs/admin-logs.php',
 		'/admin/update/admin-update.php',
-               '/admin/products/admin-products.php',
-               '/admin/devtools/admin-dev-tools.php',
-               '/utilities.php',
+		'/admin/products/admin-products.php',
+		'/utilities.php',
 		'/assets.php',
 		'/includes/azure.php',
 
@@ -128,10 +127,9 @@ add_action( 'init', function() {
                 '/includes/save_base64_image.php',
                 '/includes/image_status.php',
 		'/includes/api/api_images.php',
-                '/includes/api/api_imported_images.php',
-                '/includes/api/api_templates.php',
-                '/includes/api/api_update_mockup_position.php',
-                '/includes/add_to_cart.php',
+		'/includes/api/api_imported_images.php',
+		'/includes/api/api_templates.php',
+		'/includes/add_to_cart.php',
 		//'/includes/webhook/printful-hook.php',
 
 	];
@@ -314,9 +312,3 @@ add_action('wp_head', function() {
         echo '<link rel="shortcut icon" href="' . esc_url(get_site_icon_url()) . '" type="image/png">' . "\n";
     }
 });
-
-// ===============================
-// 🔧 Dev Tools settings page
-// ===============================
-// Code moved to /admin/devtools/admin-dev-tools.php
-
