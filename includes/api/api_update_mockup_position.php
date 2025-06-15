@@ -10,12 +10,13 @@ add_action('rest_api_init', function () {
 function customiizer_update_mockup_position(WP_REST_Request $request) {
     global $wpdb;
 
-    $variant_id = intval($request['id']);
-    $position_top = floatval($request->get_param('position_top'));
+    $variant_id  = intval($request['id']);
+    $mockup_id   = intval($request->get_param('mockup_id'));
+    $position_top  = floatval($request->get_param('position_top'));
     $position_left = floatval($request->get_param('position_left'));
 
-    if ($variant_id <= 0) {
-        return new WP_REST_Response(['success' => false, 'message' => 'Invalid variant id'], 400);
+    if ($variant_id <= 0 || $mockup_id <= 0) {
+        return new WP_REST_Response(['success' => false, 'message' => 'Invalid ids'], 400);
     }
 
     $result = $wpdb->update(
@@ -24,9 +25,9 @@ function customiizer_update_mockup_position(WP_REST_Request $request) {
             'position_top'  => $position_top,
             'position_left' => $position_left,
         ],
-        ['variant_id' => $variant_id],
+        ['variant_id' => $variant_id, 'mockup_id' => $mockup_id],
         ['%f', '%f'],
-        ['%d']
+        ['%d', '%d']
     );
 
     if (false === $result) {
