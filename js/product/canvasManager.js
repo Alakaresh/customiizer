@@ -314,22 +314,27 @@ const CanvasManager = {
 	,
 
 	// Fonction privée : recadre le canvas dans la print_area
-        _getCroppedImageInPrintArea: function () {
-                const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
+	_getCroppedImageInPrintArea: function () {
+		const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
 
-                return canvas.toDataURL({
-                        format: 'png',
-                        left: print_area_left,
-                        top: print_area_top,
-                        width: print_area_width,
-                        height: print_area_height,
-                        withoutBackground: true
-                });
-        },
+		const outputCanvas = document.createElement('canvas');
+		outputCanvas.width = print_area_width;
+		outputCanvas.height = print_area_height;
 
-        exportPrintAreaPNG: function () {
-                return CanvasManager._getCroppedImageInPrintArea();
-        },
+		const ctx = outputCanvas.getContext('2d');
+		ctx.drawImage(
+			canvas.lowerCanvasEl,
+			print_area_left,
+			print_area_top,
+			print_area_width,
+			print_area_height,
+			0, 0,
+			print_area_width,
+			print_area_height
+		);
+
+		return outputCanvas.toDataURL("image/png");
+	},
 
 	// Fonction privée : retourne position visible de l'image dans la zone imprimable
 	_getPrintfulPlacement: function (imageObject) {
