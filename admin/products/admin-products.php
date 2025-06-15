@@ -13,7 +13,8 @@ add_action('admin_menu', function () {
 });
 
 function render_product_manager_page() {
-	echo '<div class="wrap"><h1>🛍️ Gestion des Produits</h1>';
-	echo '<div id="customiizer-product-admin-root"></div></div>';
-	echo '<script type="module" src="' . get_stylesheet_directory_uri() . '/admin/products/js/products-admin.js"></script>';
+        echo '<div class="wrap"><h1>🛍️ Gestion des Produits</h1>';
+        echo "<label style='display:block;margin:8px 0;'><input type='checkbox' id='customiizer-dev-editor-toggle'> Activer l\'éditeur de position</label>";
+        echo '<div id="customiizer-product-admin-root"></div></div>';
+        echo '<script type="module" src="' . get_stylesheet_directory_uri() . '/admin/products/js/products-admin.js"></script>';
 }
