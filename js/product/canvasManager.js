@@ -314,8 +314,8 @@ const CanvasManager = {
 	,
 
 	// Fonction privée : recadre le canvas dans la print_area
-	_getCroppedImageInPrintArea: function () {
-		const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
+        _getCroppedImageInPrintArea: function () {
+                const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
 
 		const outputCanvas = document.createElement('canvas');
 		outputCanvas.width = print_area_width;
@@ -333,8 +333,19 @@ const CanvasManager = {
 			print_area_height
 		);
 
-		return outputCanvas.toDataURL("image/png");
-	},
+                return outputCanvas.toDataURL("image/png");
+        },
+
+        exportPrintAreaPNG: function () {
+                return canvas.toDataURL({
+                        left: template.print_area_left,
+                        top: template.print_area_top,
+                        width: template.print_area_width,
+                        height: template.print_area_height,
+                        format: 'png',
+                        withoutBackground: true
+                });
+        },
 
 	// Fonction privée : retourne position visible de l'image dans la zone imprimable
 	_getPrintfulPlacement: function (imageObject) {
