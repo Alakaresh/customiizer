@@ -41,10 +41,10 @@ function parseColorToHex(color) {
 }
 
 function init3DScene(containerId, modelUrl, productColor = null) {
-	const container = document.getElementById(containerId);
-	const width = container.clientWidth;
-	const height = container.clientHeight;
-	const modelName = modelUrl.split('/').pop().toLowerCase();
+        const container = document.getElementById(containerId);
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        const modelName = modelUrl.split('/').pop().toLowerCase();
 
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -103,15 +103,17 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 	light.position.set(3, 5, 3);
 	scene.add(light);
 
-        loadModel(modelUrl, productColor);
+        const promise = loadModel(modelUrl, productColor);
         animate();
+        return promise;
 }
 
 
 
 function loadModel(modelUrl, productColor = null) {
-        const handleModel = (gltf) => {
-                printableMeshes = {};
+        return new Promise((resolve, reject) => {
+                const handleModel = (gltf) => {
+                        printableMeshes = {};
 
                 const baseColorHex = parseColorToHex(productColor);
 
@@ -178,21 +180,24 @@ function loadModel(modelUrl, productColor = null) {
 
                 scene.add(gltf.scene);
                 console.log("[3D] ✅ Zones imprimables :", Object.keys(printableMeshes));
-        };
+                resolve();
+                };
 
-        if (window.customizerCache?.models?.[modelUrl]) {
-                handleModel(window.customizerCache.models[modelUrl]);
-                return;
-        }
-
-        const loader = new THREE.GLTFLoader();
-        loader.load(modelUrl, (gltf) => {
-                if (window.customizerCache) {
-                        window.customizerCache.models[modelUrl] = gltf;
+                if (window.customizerCache?.models?.[modelUrl]) {
+                        handleModel(window.customizerCache.models[modelUrl]);
+                        return;
                 }
-                handleModel(gltf);
-        }, undefined, (error) => {
-                console.error("Erreur chargement modèle :", error);
+
+                const loader = new THREE.GLTFLoader();
+                loader.load(modelUrl, (gltf) => {
+                        if (window.customizerCache) {
+                                window.customizerCache.models[modelUrl] = gltf;
+                        }
+                        handleModel(gltf);
+                }, undefined, (error) => {
+                        console.error("Erreur chargement modèle :", error);
+                        reject(error);
+                });
         });
 }
 

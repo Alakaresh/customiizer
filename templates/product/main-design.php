@@ -13,7 +13,16 @@
                 <button class="close-button" aria-label="Fermer">&times;</button>
         </div>
                 <div class="modal-body">
-                        <div class="modal-sidebar"></div>
+                        <div class="modal-sidebar">
+                                <button id="sidebarChangeProductButton" class="sidebar-btn">
+                                        <i class="fas fa-exchange-alt"></i>
+                                        <span>Produit</span>
+                                </button>
+                                <button id="sidebarAddImageButton" class="sidebar-btn">
+                                        <i class="fas fa-image"></i>
+                                        <span>Image</span>
+                                </button>
+                        </div>
                         <div class="visual-zone">
                         <div class="visual-header">
                                 <div class="image-controls">
@@ -40,6 +49,9 @@
                                 <!-- Conteneur pour l'affichage 3D -->
                                 <div id="product3DContainer">
                                         <canvas id="threeDCanvas"></canvas>
+                                        <div id="threeDLoadingOverlay" class="loading-overlay" style="display:none;">
+                                                <div class="loading-spinner"></div>
+                                        </div>
                                 </div>
                         </div>
                 </div>
