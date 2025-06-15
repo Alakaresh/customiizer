@@ -325,6 +325,15 @@
     color: #e0e0e0;
 }
 
+.favorite-filter {
+    margin-left: 10px;
+    padding: 8px 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
 .search-bar::placeholder {
     color: #888;
 }

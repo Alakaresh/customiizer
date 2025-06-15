@@ -20,11 +20,15 @@ function displayGeneratedImages(images) {
 }
 
 let currentRatio = '';
+let filterFavorites = false;
 
 function filterAndDisplayImages(images) {
         let filtered = images;
         if (currentRatio) {
-                filtered = images.filter(img => img.format === currentRatio);
+                filtered = filtered.filter(img => img.format === currentRatio);
+        }
+        if (filterFavorites) {
+                filtered = filtered.filter(img => img.favorited_by_user === true);
         }
         displayGeneratedImages(filtered);
 }
@@ -98,6 +102,9 @@ jQuery(document).ready(function ($) {
         const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
         const ratioFilter = $('#ratioFilter');
+
+        const favoriteFilter = $('#favoriteFilter');
+
         const toggle3D = $('#toggle3D');
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
@@ -114,6 +121,9 @@ jQuery(document).ready(function ($) {
 
         currentRatio = selectedVariant?.ratio_image || '';
         ratioFilter.val('current');
+        favoriteFilter.val('all');
+        filterFavorites = false;
+
         const startCommunity = imageToggle.is(':checked');
         filterAndDisplayImages(startCommunity ? communityImages : myGeneratedImages);
 
@@ -214,6 +224,10 @@ jQuery(document).ready(function ($) {
                 addImageButton.show();
                 currentRatio = selectedVariant?.ratio_image || '';
                 ratioFilter.val('current');
+
+                favoriteFilter.val('all');
+                filterFavorites = false;
+
                 const isCommunity = imageToggle.is(':checked');
                 filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
@@ -261,6 +275,13 @@ jQuery(document).ready(function ($) {
                 const isCommunity = imageToggle.is(':checked');
                 filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
+
+        favoriteFilter.on('change', function () {
+                filterFavorites = $(this).val() === 'fav';
+                const isCommunity = imageToggle.is(':checked');
+                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
+        });
+
 
         // 6b) Toggle affichage 3D
         toggle3D.on('change', function () {
