@@ -19,8 +19,11 @@ function displayGeneratedImages(images) {
 	});
 }
 function uploadBase64ToServer(base64Data, debugId) {
-	const filename = `${debugId}.png`;
-	console.log(`[Upload] 🔄 Envoi de l’image ${filename}`);
+        if (!debugId) {
+                debugId = `image_${Date.now()}`;
+        }
+        const filename = `${debugId}.png`;
+        console.log(`[Upload] 🔄 Envoi de l’image ${filename}`);
 
 	const formData = new FormData();
 	formData.append('action', 'save_image_from_base64');
