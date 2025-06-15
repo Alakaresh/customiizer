@@ -110,8 +110,8 @@ const CanvasManager = {
         },
 
 
-	addImage: function (url) {
-		fabric.Image.fromURL(url, function (img) {
+       addImage: function (url, callback) {
+               fabric.Image.fromURL(url, function (img) {
 			const drawX = template.print_area_left;
 			const drawY = template.print_area_top;
 
@@ -159,16 +159,18 @@ const CanvasManager = {
 				absolutePositioned: true
 			});
 
-			canvas.add(img);
-			img.setCoords();
-			canvas.renderAll();
+                       canvas.add(img);
+                       img.setCoords();
+                       canvas.renderAll();
 
-			setTimeout(() => {
-				canvas.setActiveObject(img);
-				canvas.renderAll();
-			}, 0);
-
-               CanvasManager.syncTo3D();
+                       setTimeout(() => {
+                               canvas.setActiveObject(img);
+                               canvas.renderAll();
+                               if (typeof callback === 'function') {
+                                       callback();
+                               }
+                               CanvasManager.syncTo3D();
+                       }, 0);
 
 
                }, { crossOrigin: 'anonymous' });
