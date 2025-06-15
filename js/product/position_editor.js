@@ -2,13 +2,11 @@ jQuery(document).ready(function ($) {
     const $img = $('#product-main-image');
     if (!$img.length) return;
 
-    // Override any default bottom positioning when the editor is active
-    $img.css('bottom', 'auto');
-
-    const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;border:1px solid #ccc;padding:10px;z-index:9999;">');
-    const inputTop = $('<input>', {type:'range', min:0, max:100, step:'0.1', id:'dev-pos-top'});
+    const box = $('<div id="dev-position-editor" style="position:fixed;bottom:20px;left:20px;background:#fff;color:#000;border:1px solid #ccc;padding:10px;z-index:9999;">');
+    const inputTop = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-top'});
     const topDisplay = $('<span>', {id:'dev-pos-top-value', text:'0%'});
-    const inputLeft = $('<input>', {type:'range', min:0, max:100, step:'0.1', id:'dev-pos-left'});
+    const inputLeft = $('<input>', {type:'range', min:-100, max:100, step:'0.1', id:'dev-pos-left'});
+
     const leftDisplay = $('<span>', {id:'dev-pos-left-value', text:'0%'});
     const saveBtn = $('<button>', {text:'Save'});
 
@@ -30,12 +28,8 @@ jQuery(document).ready(function ($) {
     refreshInputs();
 
     function applyPosition() {
-        $img.css({
-            top: inputTop.val() + '%',
-            left: inputLeft.val() + '%',
-            bottom: 'auto'
-        });
 
+        $img.css({top: inputTop.val() + '%', left: inputLeft.val() + '%'});
         topDisplay.text(inputTop.val() + '%');
         leftDisplay.text(inputLeft.val() + '%');
     }
@@ -43,8 +37,10 @@ jQuery(document).ready(function ($) {
     inputTop.add(inputLeft).on('input', applyPosition);
 
     saveBtn.on('click', function () {
-        if (!window.selectedVariant) return alert('No variant');
-        fetch(`/wp-json/custom-api/v1/variant/${window.selectedVariant.variant_id}/mockup-position`, {
+        const variant = typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant;
+        if (!variant) return alert('No variant');
+        const vid = variant.variant_id || variant;
+        fetch(`/wp-json/custom-api/v1/variant/${vid}/mockup-position`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
