@@ -255,8 +255,17 @@ const CanvasManager = {
                const img = new Image();
                img.onload = function () {
                        ctx.drawImage(img, 0, 0);
+                       const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
+                       if (imageObject) {
+                               const bounds = imageObject.getBoundingRect(true);
+                               console.log('[Debug] 2D bounds :', bounds, 'zoom=', canvas.getZoom());
+                       }
                        if (window.update3DTextureFromCanvas) {
+                               console.log('[Debug] Offscreen size:', offscreen.width, offscreen.height);
                                window.update3DTextureFromCanvas(offscreen);
+                               if (window.logPrintableMeshPosition) {
+                                       window.logPrintableMeshPosition();
+                               }
                        }
                };
                img.crossOrigin = 'anonymous';
