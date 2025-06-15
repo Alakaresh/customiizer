@@ -200,9 +200,12 @@ const CanvasManager = {
        },
 
        removeImage: function () {
-               const img = canvas.getObjects().find(obj => obj.type === 'image');
-               if (!img) return;
-               canvas.remove(img);
+               const active = canvas.getActiveObject();
+               if (active && active.type === 'image') {
+                       canvas.remove(active);
+               } else {
+                       canvas.getObjects('image').forEach(obj => canvas.remove(obj));
+               }
                canvas.renderAll();
                CanvasManager.syncTo3D();
        },
@@ -243,72 +246,81 @@ const CanvasManager = {
 			window.update3DTextureFromCanvas(outputCanvas);
 		}
 	},
-	getExportDataForPrintful: function () {
-		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
-		if (!imageObject || !imageObject._element) {
-			console.warn("[CanvasManager] ❌ Aucune image trouvée.");
-			return null;
-		}
+       getExportDataForPrintful: function () {
+               const images = canvas.getObjects('image');
+               if (!images.length) {
+                       console.warn("[CanvasManager] ❌ Aucune image trouvée.");
+                       return null;
+               }
 
-		const img = imageObject._element;
-		const scaleX = imageObject.scaleX;
-		const scaleY = imageObject.scaleY;
+               const outputCanvas = document.createElement('canvas');
+               outputCanvas.width = template.print_area_width;
+               outputCanvas.height = template.print_area_height;
+               const ctx = outputCanvas.getContext('2d');
+               ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
 
-		const imgDisplayWidth = imageObject.width * scaleX;
-		const imgDisplayHeight = imageObject.height * scaleY;
+               let minX = template.print_area_width;
+               let minY = template.print_area_height;
+               let maxX = 0;
+               let maxY = 0;
 
-		// Décalage de l’image dans la zone imprimable
-		const offsetX = imageObject.left - template.print_area_left;
-		const offsetY = imageObject.top - template.print_area_top;
+               images.forEach(imgObj => {
+                       if (!imgObj._element) return;
+                       const scaleX = imgObj.scaleX;
+                       const scaleY = imgObj.scaleY;
+                       const imgDisplayWidth = imgObj.width * scaleX;
+                       const imgDisplayHeight = imgObj.height * scaleY;
 
-		const cropX = Math.max(0, -offsetX);
-		const cropY = Math.max(0, -offsetY);
+                       const offsetX = imgObj.left - template.print_area_left;
+                       const offsetY = imgObj.top - template.print_area_top;
 
-		const visibleWidth = Math.min(imgDisplayWidth - cropX, template.print_area_width - Math.max(0, offsetX));
-		const visibleHeight = Math.min(imgDisplayHeight - cropY, template.print_area_height - Math.max(0, offsetY));
+                       const cropX = Math.max(0, -offsetX);
+                       const cropY = Math.max(0, -offsetY);
 
-		if (visibleWidth <= 0 || visibleHeight <= 0) {
-			console.warn("[CanvasManager] 🚫 Image totalement hors zone imprimable");
-			return null;
-		}
+                       const visibleWidth = Math.min(imgDisplayWidth - cropX, template.print_area_width - Math.max(0, offsetX));
+                       const visibleHeight = Math.min(imgDisplayHeight - cropY, template.print_area_height - Math.max(0, offsetY));
+                       if (visibleWidth <= 0 || visibleHeight <= 0) return;
 
-		// ✅ Création d’un canvas natif à la taille EXACTE
-		const outputCanvas = document.createElement('canvas');
-		outputCanvas.width = visibleWidth;
-		outputCanvas.height = visibleHeight;
+                       const destX = Math.max(0, offsetX);
+                       const destY = Math.max(0, offsetY);
 
-		const ctx = outputCanvas.getContext('2d');
-		ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+                       const sourceX = cropX / scaleX;
+                       const sourceY = cropY / scaleY;
+                       const sourceW = visibleWidth / scaleX;
+                       const sourceH = visibleHeight / scaleY;
 
-		// Source crop dans l'image originale (pré-scale)
-		const sourceX = cropX / scaleX;
-		const sourceY = cropY / scaleY;
-		const sourceW = visibleWidth / scaleX;
-		const sourceH = visibleHeight / scaleY;
+                       ctx.drawImage(
+                               imgObj._element,
+                               sourceX, sourceY, sourceW, sourceH,
+                               destX, destY, visibleWidth, visibleHeight
+                       );
 
-		console.log("[Crop Debug] 🖼️ Source image crop:", { sourceX, sourceY, sourceW, sourceH });
-		console.log("[Crop Debug] 🧱 Canvas output:", { width: visibleWidth, height: visibleHeight });
+                       minX = Math.min(minX, destX);
+                       minY = Math.min(minY, destY);
+                       maxX = Math.max(maxX, destX + visibleWidth);
+                       maxY = Math.max(maxY, destY + visibleHeight);
+               });
 
-		// ✅ Draw avec source + destination
-		ctx.drawImage(
-			img,
-			sourceX, sourceY, sourceW, sourceH, // src
-			0, 0, visibleWidth, visibleHeight   // dest
-		);
+               if (maxX <= minX || maxY <= minY) {
+                       console.warn("[CanvasManager] 🚫 Images totalement hors zone imprimable");
+                       return null;
+               }
 
-		// ✅ Visualisation (pour toi)
-		const debugDataUrl = outputCanvas.toDataURL("image/png");
+               const dpiX = template.print_area_width / (selectedVariant?.print_area_width || 1);
+               const dpiY = template.print_area_height / (selectedVariant?.print_area_height || 1);
 
-		return {
-			imageDataUrl: debugDataUrl,
-			placement: {
-				x: Math.max(0, offsetX),
-				y: Math.max(0, offsetY),
-				width: visibleWidth,
-				height: visibleHeight
-			}
-		};
-	}
+               const placement = {
+                       left: Math.round((minX / dpiX) * 100) / 100,
+                       top: Math.round((minY / dpiY) * 100) / 100,
+                       width: Math.round(((maxX - minX) / dpiX) * 100) / 100,
+                       height: Math.round(((maxY - minY) / dpiY) * 100) / 100
+               };
+
+               return {
+                       imageDataUrl: outputCanvas.toDataURL('image/png'),
+                       placement
+               };
+       }
 
 
 	,
