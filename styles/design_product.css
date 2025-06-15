@@ -566,3 +566,11 @@ h4 {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Boutons du modal de confirmation */
+#unsavedChangesModal .confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
