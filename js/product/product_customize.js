@@ -172,6 +172,7 @@ jQuery(document).ready(function ($) {
         const sidebarChangeProductButton = $('#sidebarChangeProductButton');
         const sidebarAddImageButton = $('#sidebarAddImageButton');
         const threeDLoadingOverlay = $('#threeDLoadingOverlay');
+
         let threeDInitialized = false;
 
         function trapFocus(modal) {
