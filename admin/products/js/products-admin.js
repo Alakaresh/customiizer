@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-	const root = document.getElementById("customiizer-product-admin-root");
-	if (!root) return;
+        const root = document.getElementById("customiizer-product-admin-root");
+        if (!root) return;
 
 	root.innerHTML = `
 			<div id="product-form-container"></div>
@@ -9,7 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		`;
 
 	renderProductForm();  // 🔁 Formulaire ajout produit
-	loadProducts();       // 🔁 Liste des produits avec variantes
+        loadProducts();       // 🔁 Liste des produits avec variantes
+
+        const toggle = document.getElementById('position-editor-toggle');
+        if (toggle) {
+                toggle.addEventListener('change', () => {
+                        const form = new FormData();
+                        form.append('action', 'customiizer_set_position_editor');
+                        form.append('enabled', toggle.checked ? '1' : '0');
+                        fetch(ajaxurl, { method: 'POST', body: form });
+                });
+        }
 });
 
 function renderProductForm () {
