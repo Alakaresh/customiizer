@@ -410,7 +410,7 @@
                 flex: 1;
                 justify-content: flex-start;
                 overflow-x: auto;
-                margin: 0 30px;
+                margin: 0 15px; /* Décalage de 10px des flèches par rapport aux images */
         }
 
         .bottom-bar .bottom-prev,
