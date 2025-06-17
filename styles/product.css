@@ -65,6 +65,7 @@ body {
 /* Conteneur des images dans la barre du bas */
 .bottom-bar .content {
     display: flex; /* Permet d'afficher les images sur une seule ligne */
+    flex: 1;
     flex-direction: row; /* Par défaut, mais explicité pour clarté */
     align-items: center; /* Aligne les images verticalement */
     justify-content: center; /* Centre les images horizontalement */
@@ -75,6 +76,23 @@ body {
     height: 100%; /* Assure que le contenu remplit la hauteur du conteneur */
     scrollbar-width: thin; /* Style plus fin pour les barres de défilement */
     scrollbar-color: #888 #444; /* Couleurs pour les navigateurs supportés */
+}
+
+/* Flèches de navigation */
+.bottom-bar .bottom-prev,
+.bottom-bar .bottom-next {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0 10px;
+}
+
+.bottom-bar .bottom-prev:disabled,
+.bottom-bar .bottom-next:disabled {
+    opacity: 0.3;
+    cursor: default;
 }
 
 /* Images de la barre du bas */
