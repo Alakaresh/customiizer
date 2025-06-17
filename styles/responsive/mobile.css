@@ -435,11 +435,11 @@
         }
 
         .bottom-bar .bottom-prev {
-                left: 5px;
+                left: 15px;
         }
 
         .bottom-bar .bottom-next {
-                right: 5px;
+                right: 15px;
         }
 
         .bottom-bar .bottom-prev:disabled,
