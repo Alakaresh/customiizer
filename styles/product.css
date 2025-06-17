@@ -1,0 +1,537 @@
+/* Styles de base */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow: hidden; /* Empêche le scroll sur la page produit */
+}
+
+.product-sizes p, .product-colors p{
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Section principale */
+.main-content {
+    display: flex;
+    flex: 1; /* Prend tout l'espace disponible entre le header et le footer */
+    position: relative;
+    overflow: hidden; /* Empêche tout débordement lié à l'image */
+}
+
+/* Bandes noires */
+.band {
+    flex: 1; /* Les bandes prennent tout l'espace restant */
+    background-color: black;
+    height: 100%; /* S'étendent sur toute la hauteur */
+}
+
+/* Conteneur central */
+.background {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1; /* Prend toute la hauteur disponible */
+    position: relative;
+}
+
+.background-image {
+    width: auto;
+    height: 100%; /* S'ajuste pour occuper toute la hauteur du conteneur */
+    max-width: none; /* Désactive la limite de largeur */
+    object-fit: contain; /* Conserve les proportions sans déborder */
+}
+
+/* Footer */
+.bottom-bar {
+    position: relative;
+    height: 100px; /* Hauteur fixe */
+    background-color: #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.bottom-bar-prev,
+.bottom-bar-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    border: none;
+    color: #fff;
+    padding: 6px;
+    cursor: pointer;
+    z-index: 5;
+}
+.bottom-bar-prev { left: 5px; }
+.bottom-bar-next { right: 5px; }
+
+/* Conteneur des images dans la barre du bas */
+.bottom-bar .content {
+    display: flex; /* Permet d'afficher les images sur une seule ligne */
+    flex-direction: row; /* Par défaut, mais explicité pour clarté */
+    align-items: center; /* Aligne les images verticalement */
+    justify-content: center; /* Centre les images horizontalement */
+    gap: 10px; /* Espacement entre les images */
+    overflow-x: auto; /* Défilement horizontal activé */
+    overflow-y: hidden; /* Supprime le défilement vertical */
+    padding: 10px; /* Ajoute de l'espace autour des images */
+    height: 100%; /* Assure que le contenu remplit la hauteur du conteneur */
+    scrollbar-width: thin; /* Style plus fin pour les barres de défilement */
+    scrollbar-color: #888 #444; /* Couleurs pour les navigateurs supportés */
+}
+
+/* Images de la barre du bas */
+.bottom-bar .content .thumbnail {
+    flex-shrink: 0; /* Empêche les images de rétrécir */
+    width: 80px;
+    height: 80px;
+    border-radius: 10%; /* Ajuste selon votre préférence */
+    object-fit: cover; /* Assure une mise à l'échelle appropriée des images */
+    border: 2px solid white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.bottom-bar .content .thumbnail:hover {
+    border-color: #ddd;
+}
+
+
+/* Section d'information du produit à gauche */
+.product-info {
+	position: absolute;
+	top: 0;
+	left: 1%;
+	width: 30%;
+	color: #fff;
+	font-family: Arial, sans-serif;
+	padding-top: 20px;
+}
+
+.product-name {
+	font-size: 1.7rem;
+	font-weight: bold;
+	margin-left: 10px;
+    margin-right: 10px;
+}
+
+.product-description {
+	font-size: 1rem;
+	margin: 0 0 15px;
+	line-height: 1.5;
+}
+
+.product-colors {
+	font-size: 1rem;
+	margin-bottom: 15px;
+}
+
+.color-option {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	margin-right: 8px;
+	cursor: pointer;
+	border: 1px solid #fff;
+}
+
+.color-option.selected, .size-option.selected {
+    border: 2px solid white; /* Couleur du contour */
+	box-sizing: border-box;
+}
+
+
+/* Section de sélection de taille */
+.product-sizes {
+	font-size: 1rem;
+	margin-bottom: 20px;
+}
+
+.size-option {
+	display: inline-block;
+	padding: 5px 10px;
+	border-radius: 4px;
+	margin-right: 8px;
+	cursor: pointer;
+	background-color: #444;
+	color: #fff;
+	transition: background-color 0.3s ease;
+	margin: 2px;
+}
+
+.size-option:hover {
+	background-color: #222;
+}
+
+/* Section de prix, délai de livraison et boutons d'action à droite */
+.product-details {
+	position: absolute;
+	top: 0;
+	right: 1%;
+	color: #fff;
+	font-family: Arial, sans-serif;
+	padding-top: 20px;
+}
+
+/* Ligne pour aligner price-info et delivery-info horizontalement et à droite */
+.info-row {
+	display: flex;
+	justify-content: flex-end; /* Aligne les éléments à droite */
+	gap: 20px; /* Espace entre price-info et delivery-info */
+	margin-bottom: 20px; /* Espace entre la ligne d'infos et les boutons */
+}
+
+.price-info, .delivery-info {
+	background-color: #222;
+	padding: 15px;
+	border-radius: 8px;
+	color: #ffffff;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	margin-bottom: 10px;
+}
+
+.price-title, .delivery-title {
+	font-size: 16px;
+	font-weight: bold;
+	color: #e6e6e6;
+	margin-bottom: 8px;
+}
+
+.price-value {
+	font-size: 24px;
+	font-weight: bold;
+	color: #ffffff;
+	margin: 5px 0;
+}
+
+.price-value span, .discounted-price, .shipping-cost {
+	color: #b3b3b3;
+}
+
+.discounted-price {
+	color: #a3d76d;
+}
+
+.delivery-location {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.flag-icon {
+	width: 20px;
+	height: auto;
+	border-radius: 3px;
+}
+
+.delivery-time {
+	font-size: 22px;
+	font-weight: bold;
+	color: #ffffff;
+	margin: 8px 0;
+}
+
+.shipping-cost {
+	font-size: 14px;
+	color: #b3b3b3;
+}
+
+.price-info p, .delivery-info p {
+	margin-bottom: 0;
+}
+
+/* Alignement des boutons d'action sous .info-row */
+.product-actions {
+	display: flex;
+	gap: 15px;
+	margin-top: 20px;
+}
+
+.design-button,
+.add-to-cart-button {
+	padding: 12px 24px;
+	font-size: 16px;
+	font-weight: bold;
+	border: none;
+	cursor: pointer;
+	border-radius: 5px;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	color: #ffffff;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Style sombre pour le bouton "Personnaliser le design" */
+.design-button {
+	background-color: #333333;
+}
+
+.design-button:hover {
+	background-color: #555555;
+	color: #e6e6e6;
+}
+
+/* Style sombre pour le bouton "Ajouter au panier" */
+.add-to-cart-button {
+	background-color: #444444;
+}
+
+.add-to-cart-button:hover {
+	background-color: #666666;
+	color: #e6e6e6;
+}
+
+/* Style pour l'image du produit */
+.product-image {
+	position: absolute;
+	bottom: 18%;
+	left: 48%;
+	transform: translateX(-50%);
+	width: 40%;
+}
+
+/* Position et style des bulles d'images */
+.image-thumbnails {
+	position: absolute;
+	bottom: 5%;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	gap: 10px;
+}
+
+.thumbnail {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	cursor: pointer;
+	border: 2px solid #fff;
+	transition: border-color 0.3s ease;
+	object-fit: cover;
+}
+
+.thumbnail:hover {
+	border-color: #ddd;
+}
+
+/* Conteneur de la liste déroulante */
+.custom-select {
+    position: relative;
+    border: none;
+    height: 40px; /* Hauteur uniforme */
+    background-color: transparent; /* Pas de fond */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Élément sélectionné */
+.selected-item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 25px 0 0 25px; /* Arrondi uniquement à gauche */
+    position: relative;
+}
+
+/* Image dans l'élément sélectionné */
+.dropdown-image {
+    width: 40px; /* Taille de l'image */
+    height: 40px;
+    object-fit: cover; /* Ajuste l'image sans déformer */
+    border-radius: 50%; /* Cercle parfait */
+    border: 2px solid #ddd; /* Bordure autour de l'image */
+}
+
+/* Icône de menu déroulant */
+.dropdown-icon {
+    width: 30px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff; /* Même fond que l'élément sélectionné */
+    border-radius: 0 25px 25px 0; /* Arrondi uniquement à droite */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre discrète */
+    font-size: 18px;
+    color: #888; /* Couleur grise */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-icon:hover {
+    background-color: #f0f0f0; /* Fond plus clair au survol */
+    color: #555; /* Couleur plus sombre au survol */
+}
+
+/* Options déroulantes */
+.options-list {
+    display: none; /* Cachées par défaut */
+    position: absolute;
+    top: 60px; /* En dessous du cercle */
+    left: 0;
+    width: 200px; /* Largeur de la liste */
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 20;
+}
+
+.options-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.options-list li:hover {
+    background-color: #555555;
+    color: #e6e6e6;
+}
+
+.options-list img {
+    width: 30px; /* Taille des images dans la liste */
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+}
+/* Style du conteneur de la description */
+.product-description {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+/* Style du bouton de toggle */
+.toggle-description {
+    background-color: #444444;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-description:hover {
+    background-color: #666666;
+}
+
+/* Conteneur de la description (caché par défaut) */
+.description-content {
+    max-height: 0; /* Cache le contenu */
+    overflow: hidden; /* Empêche le défilement */
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    padding: 0 15px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #333;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* ✅ Quand le toggle est activé */
+.description-content.open {
+    max-height: 500px; /* Ajuste selon la hauteur max de la description */
+    padding: 15px;
+    overflow-y: auto; /* Active le scroll si nécessaire */
+}
+.thumbnail.selected {
+    border: 4px solid #ffcc00 !important; /* Contour jaune vif pour tester */
+    box-shadow: 0 0 8px rgba(255, 204, 0, 0.8); /* Effet lumineux */
+}
+/* Conteneur du chargement au-dessus de l'image principale */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Roue de chargement */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top: 5px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Animation de rotation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Texte de chargement */
+.loading-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Effet de transparence sur l'image principale */
+.main-image.loading {
+    opacity: 0.7;
+}
+
+/* ✅ Style de l'info-bulle dynamique */
+.dynamic-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none; /* Empêche l'info-bulle d'interférer avec le clic */
+    z-index: 1000;
+}
+
+.color-option.disabled,
+.size-option.disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+	pointer-events: none;
+}

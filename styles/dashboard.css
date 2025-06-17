@@ -1,0 +1,127 @@
+.profile {
+    margin-top: 65px;
+    display: flex;
+    align-items: flex-start; 
+}
+
+.sidebar {
+    flex-grow: 0;
+    height: auto;
+    max-height: 100dvh;
+    width: 20%;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #031927;
+    border-radius: 20px;
+    overflow: auto;
+}
+
+.navigation-menu {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.navigation-menu a {
+  text-decoration: none;
+  color: #fff;
+  padding: 10px;
+  display: block;
+  border-radius: 4px; 
+}
+
+.navigation-menu a.active,
+.navigation-menu a:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.logout-button {
+    margin-top: 20px;
+    display: flex;
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.logout-button  {
+    text-align: center;
+}
+
+.profile-picture {
+    position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.circle-plus {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid #007bff;
+  background-color: #fff;
+}
+
+.plus-vertical, .plus-horizontal {
+  background-color: #007bff;
+  position: absolute;
+  border-radius: 2px;
+}
+
+.plus-vertical {
+  height: 40px;
+  width: 4px;
+}
+
+.plus-horizontal {
+  width: 40px;
+  height: 4px;
+}
+
+.profile-picture img {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  display: none;
+}
+
+.user-info {
+    text-align: center; /* Centre le texte à l'intérieur de l'élément */
+    width: 100%; /* Prend la pleine largeur pour le centrage */
+}
+
+.active-link {
+    color: #fff; /* Couleur du texte pour l'onglet actif */
+    background-color: #007bff; /* Couleur de fond pour l'onglet actif */
+}
+.close-btn {
+    float: right;        /* Positionne le bouton à droite */
+    font-size: 24px;     /* Augmente la taille du symbole */
+    font-weight: bold;   /* Rend le symbole plus épais */
+    cursor: pointer;     /* Change le curseur en main lors du survol */
+    padding: 0 15px;     /* Ajoute de l'espace autour du texte pour faciliter le clic */
+    color: #000;         /* Couleur du texte, ajustez selon votre design */
+}
+
+.modal-header {
+    display: flex;       /* Utilise flexbox pour aligner le titre et le bouton de fermeture */
+    justify-content: space-between; /* Éloigne le bouton du titre */
+    align-items: center; /* Centre les éléments verticalement */
+    padding: 10px;       /* Ajoute de l'espace intérieur pour esthétique */
+}
+/* Styles pour le cropper pour afficher la zone de recadrage comme un cercle */
+.cropper-view-box,
+.cropper-face {
+    border-radius: 50%;
+}

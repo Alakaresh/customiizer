@@ -1,0 +1,251 @@
+#content {
+    max-height: none;
+}
+.image-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: 10px;
+}
+
+.imageContainer {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.imageContainer img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.imageContainer .overlay {
+    position: absolute;
+    color: #fff;
+    text-align: center;
+}
+
+.overlay {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.3));
+    display: none;
+	box-sizing: border-box;
+}
+
+.overlay .prompt-info {
+	white-space: nowrap;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: 5px; /* Ajouter une petite marge en dessous */
+	margin-left: 5px;
+    color: #ccc;
+}
+
+.likes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.thumbIcon {
+    width: 15px !important;
+    height: auto !important;
+    margin-right: 10px;
+}
+
+.likes span {
+    font-size: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.imageContainer:hover .likes {
+    display: flex;
+}
+
+.imageContainer:hover .overlay {
+    display: block;
+}
+
+body {
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.search-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.icon-overlay {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Espace entre les icônes */
+    background-color: rgba(0, 0, 0, 0.5); /* Fond noir transparent */
+    border-radius: 10px; /* Optionnel : pour des coins arrondis */
+    padding: 5px 10px; /* Optionnel : pour ajouter du padding */
+    z-index: 1;
+}
+
+.like-icon, .star-icon {
+    font-size: 25px; /* Taille des icônes */
+    cursor: pointer;
+    color: white; /* Couleur de base des icônes */
+    transition: color 0.3s;
+}
+
+.thumbIcon {
+    font-size: 20px; /* Taille des icônes */
+    color: red; /* Couleur de base des icônes */
+    transition: color 0.3s;
+}
+
+.like-icon:hover {
+    color: red; /* Couleur des icônes au survol */
+}
+
+.star-icon:hover {
+    color: gold; /* Couleur des icônes au survol */
+}
+
+.like-icon.liked {
+    color: red; /* Couleur des icônes lorsqu'elles sont sélectionnées */
+}
+
+.star-icon.favorited {
+    color: gold; /* Couleur des icônes lorsqu'elles sont sélectionnées */
+}
+
+.search-and-sort-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.sorting-container {
+    display: flex;
+    align-items: center;
+}
+
+.sorting-container button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.sorting-container button:hover {
+    color: #ccc;
+}
+
+.sorting-container button.active {
+    color: #007bff;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+#search-input {
+    border: 2px solid #555;
+    padding: 5px 10px;
+    background-color: transparent;
+    color: #fff;
+    margin-right: 10px;
+    border-radius: 20px;
+    outline: none;
+}
+
+#search-input::placeholder {
+    color: #fff;
+}
+
+#search-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    font-size: 20px;
+    padding-left: 0px;
+}
+
+#search-button .fa-search {
+    margin-right: -10px;
+}
+
+#search-button .fa-search {
+    position: relative;
+    right: 50px;
+}
+
+#community-user-profile {
+    background-color: #333; /* Fond légèrement plus foncé */
+    padding: 30px; /* Bord du container */
+    border-radius: 30px;
+    margin-bottom: 20px;
+    display: inline-block; /* Adapter la taille du container à son contenu */
+}
+
+#community-user-profile-content {
+    display: flex;
+    align-items: center;
+}
+
+.community-user-logo {
+    width: 100px; /* Taille du logo */
+    height: 100px; /* Taille du logo */
+    border-radius: 50%;
+    background-color: #555; /* Couleur de fond pour le logo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px; /* Taille du texte dans le logo */
+    color: #fff;
+    margin-right: 20px;
+}
+
+.community-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.community-user-info .community-user-name {
+    font-weight: bold; /* Met en gras */
+    font-size: 20px; /* Taille légèrement augmentée */
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.community-user-info .community-user-stats {
+    display: flex;
+    gap: 15px; /* Espace entre les informations supplémentaires */
+}
+
+.community-user-info .community-user-stats p {
+    margin: 0;
+    color: #fff;
+}

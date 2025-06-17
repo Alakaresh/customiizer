@@ -1,0 +1,85 @@
+/* Upper band styles */
+.upper-band {
+    background-color: #0A0A23;
+    position: relative; /* This allows absolute positioning inside */
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the links container */
+    padding: 0 20px;
+}
+
+/* Container for the footer links to manage overall positioning */
+.footer-links-container {
+    display: flex;
+    justify-content: center; /* This centers the links container in the parent */
+    flex-grow: 1; /* Takes up the available space, pushing social icons to the right */
+}
+
+/* Footer links styling */
+.footer-links {
+    display: flex;
+    justify-content: center; /* This centers the actual links in their container */
+}
+
+.footer-link {
+    color: white;
+    text-decoration: none;
+    padding: 0 15px; /* Adjust spacing between links as needed */
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: #00f; /* Blue color on hover */
+}
+
+/* Social icons styling */
+.social-icons {
+    position: absolute;
+    right: 10%; /* Position from the right edge of the upper-band */
+    display: flex;
+    align-items: center;
+}
+
+/* Social icon styles */
+.social-icon {
+	display: none;
+    padding: 10px;
+}
+
+.social-icon .fa-youtube {
+    color: #FF0000; /* YouTube Red */
+}
+
+.social-icon .fa-facebook-f {
+    color: #1877F2; /* Facebook Blue */
+}
+
+.social-icon .fa-instagram {
+    background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+    -webkit-background-clip: text;
+    color: transparent; /* Assurez-vous que le texte est transparent */
+}
+.social-icon .fa-tiktok {
+    color: #000000; /* TikTok Black */
+}
+
+.social-icon:hover i {
+    opacity: 0.8; /* Slightly reduce opacity on hover for effect */
+}
+
+
+/* Lower band styles */
+.lower-band {
+    background-color: #000000;
+    text-align: center;
+    padding: 10px 20px;
+    border-top: 1px solid white;
+	height: 50px;
+}
+
+/* Copyright text styling */
+.lower-band p {
+    margin: 0;
+    font-size: 0.75rem;
+}

@@ -1,0 +1,637 @@
+/* Modal principal - Prend tout l'écran avec un fond semi-transparent */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Petite fenêtre modale */
+.small-modal {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    height: 70%;
+    background-color: #222;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+}
+
+/* Zone scrollable principale si besoin */
+.modal-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+/* Style général du contenu du modal */
+.modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenu spécifique à customizeModal */
+#customizeModal .modal-content {
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    position: relative;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Main area inside the modal between header and footer */
+#customizeModal .modal-body {
+    flex-direction: row;
+    padding: 0;
+}
+
+/* Narrow sidebar on the left of the visual zone */
+#customizeModal .modal-sidebar {
+    background-color: #2a2a2a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+#customizeModal .sidebar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#customizeModal .sidebar-btn i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+#customizeModal .sidebar-btn:hover {
+    background-color: #3a3a3a;
+}
+
+/* Bouton de fermeture */
+.close-button {
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #fff;
+}
+/* Header du modal */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #2a2a2a; /* Slightly lighter than the body */
+    border-bottom: 1px solid #333;
+    gap: 10px;
+}
+
+.modal-header h2 {
+    margin: 0 10px;
+    color: #e0e0e0;
+    font-size: 22px;
+	padding: 10px;
+}
+
+
+/* Zone visuelle pour affichage */
+.visual-zone {
+    border: 1px solid #444;
+    background-color: #2a2a2a;
+    color: #aaa;
+    font-size: 18px;
+    position: relative;
+    display: flex;               /* ✅ active l’alignement vertical */
+    justify-content: flex-start; /* ✅ alignement vertical */
+    align-items: center;         /* ✅ centré horizontalement */
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;               /* Allow flexbox to manage height */
+}
+
+/* Padding when header is visible */
+.visual-zone.with-header {
+    padding-top: 40px;
+}
+
+/* Zone contenant l'affichage 2D et 3D */
+.visual-containers {
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* Conteneur de l'image produit 2D */
+#product2DContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: 100%;
+  position: relative;
+  background-color: #1f1f1f;
+  border: 1px solid #555;
+}
+
+.fabric-wrapper {
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  /* background-color: rgba(0, 0, 0, 0.05); */ /* debug visuel */
+}
+
+.canvas-container {
+  position: relative !important;
+  display: block !important;
+  margin: 0 auto !important;
+  transform: none !important;
+  /* background-color: rgba(0, 255, 0, 0.05); */ /* debug */
+}
+
+.canvas-container canvas {
+  transform: none !important;
+  display: block;
+}
+
+
+.fabric-wrapper {
+        /* background-color: rgba(255, 0, 0, 0.05); */ /* rouge léger */
+}
+.canvas-container {
+        /* background-color: rgba(0, 255, 0, 0.05); */ /* vert léger */
+}
+
+/* Conteneur 3D */
+#product3DContainer {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 1px solid #555;
+    background-color: #1f1f1f;
+}
+
+
+/* Image du produit */
+#productImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    position: absolute;
+    z-index: 1;
+}
+
+/* Bouton centré pour ajouter une image */
+.add-image-button {
+    padding: 15px 25px;
+    font-size: 18px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.add-image-button:hover {
+    background-color: #666;
+}
+
+/* Pied du modal */
+.modal-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    background-color: #181818; /* Darker than the body */
+    border-top: 1px solid #333;
+}
+
+.modal-footer .product-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-footer .product-summary img {
+    height: 60px;
+    object-fit: contain;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #444;
+    color: #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-footer button:hover {
+    background-color: #666;
+}
+
+
+/* Section Recherche et Upload */
+.search-upload {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.search-upload.top-section {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #222;
+    padding: 10px 15px;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Barre de recherche */
+.search-bar {
+    width: 70%;
+    padding: 8px 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+.ratio-filter {
+    margin-left: 10px;
+    padding: 8px 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+.favorite-filter {
+    margin-left: 10px;
+    padding: 8px 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+}
+
+.search-bar::placeholder {
+    color: #888;
+}
+
+/* Bouton source/upload */
+.source-button {
+    padding: 8px 15px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.source-button:hover {
+    background-color: #666;
+}
+
+/* Titre de sections */
+h4 {
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #e0e0e0;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+}
+
+/* Miniatures */
+.image-thumbnail {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.image-thumbnail:hover {
+    transform: scale(1.05);
+    border-color: #007bff;
+}
+
+/* Section site files */
+.site-files {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* Grille d’images générées avec scroll */
+#siteFilesList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    overflow-y: auto;
+    flex-grow: 1;
+    min-height: 0;
+    max-height: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+}
+#pcFilesList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: flex-start;
+}
+
+#pcFilesList .site-image {
+	flex: 0 0 auto;
+	text-align: center;
+}
+.switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: sans-serif;
+	margin-right: 50px;
+}
+
+.switch-label {
+  font-size: 14px;
+  color: #aaa;
+  transition: color 0.3s, font-weight 0.3s;
+}
+
+.switch-label.active {
+  color: #fff;
+  font-weight: bold;
+}
+
+.switch-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: background-color 0.3s;
+  border-radius: 34px;
+}
+
+.switch-toggle .slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: transform 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.switch-toggle input:checked + .slider {
+  background-color: #2196F3;
+}
+
+.switch-toggle input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+/* Zone de contrôle de position de l'image */
+.visual-header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  z-index: 10;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.image-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+}
+
+.image-controls button {
+  padding: 8px;
+  background-color: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.image-controls button:hover {
+  background-color: #666;
+}
+
+#bringForwardButton,
+#sendBackwardButton {
+  padding: 8px;
+  background-color: #444;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#bringForwardButton:hover,
+#sendBackwardButton:hover {
+  background-color: #666;
+}
+
+/* Bouton pour supprimer l'image du canvas */
+.remove-image-button {
+  background-color: #b23b3b;
+}
+
+.remove-image-button:hover {
+  background-color: #d9534f;
+}
+
+/* Loader for 3D viewer */
+#product3DContainer .loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+#product3DContainer .loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Boutons du modal de confirmation */
+#unsavedChangesModal .confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Override generic small-modal dimensions for the confirmation dialog */
+#unsavedChangesModal .small-modal {
+    width: auto;
+    height: auto;
+    max-width: 400px;      /* or another small value */
+    padding: 20px;         /* keep content readable */
+}
+
+/* Sidebar for changing product variant */
+#product-sidebar {
+    position: relative;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    padding: 20px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+    z-index: 1100;
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#product-sidebar.open {
+    display: flex;
+}
+
+#hideProductSidebar {
+    position: absolute;
+    top: 50%;
+    right: -15px;
+    transform: translateY(-50%);
+    background: #444;
+    border: none;
+    color: #fff;
+    border-radius: 0 4px 4px 0;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+#hideProductSidebar i {
+    pointer-events: none;
+}
+
+#hideProductSidebar {
+    position: absolute;
+    top: 50%;
+    right: -15px;
+    transform: translateY(-50%);
+    background: #444;
+    border: none;
+    color: #fff;
+    border-radius: 0 4px 4px 0;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+#hideProductSidebar i {
+    pointer-events: none;
+}

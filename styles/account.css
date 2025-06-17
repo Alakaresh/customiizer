@@ -1,0 +1,608 @@
+.account {
+	margin-top: 5%;
+	display: flex;
+	align-items: flex-start; 
+}
+
+.sidebar {
+	flex-grow: 0;
+	height: auto;
+        max-height: 100dvh;
+	width: 20%;
+	padding: 10px;
+	box-sizing: border-box;
+	background-color: #031927;
+	border-radius: 20px;
+	overflow: auto;
+}
+
+.main-container {
+	width: 80%;
+	display: flex;
+	flex-wrap: wrap;
+	flex-grow: 1;
+}
+.dashboard-container{
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+}
+.content-container {
+	flex: 1;
+	position: relative;
+	overflow: hidden;
+	/*width: 100%;   calc(33.33% - 20px);*/
+	margin: 10px;
+	background-color: #5A7D9A;
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 10px;
+}
+
+.content-container h2 {
+	color: #333;
+	text-align: center;
+	font-size: 24px;
+	font-family: 'Roboto', sans-serif; 
+	font-weight: 500;
+	margin-bottom: 1em; 
+}
+.content-container.new-item::before {
+	content: 'New';
+	color: #FF0000;
+	background-color: #000000;
+	font-size: 0.75em;
+	font-weight: bold;
+	position: absolute;
+	top: 45px;
+	left: 0px;
+	width: 100px;
+	height: 25px;
+	line-height: 25px;
+	text-align: center;
+	transform: rotate(-45deg);
+	transform-origin: left bottom;
+	z-index: 10;
+}
+.profile-containers {
+	display: flex; /* Change to flex to use flexbox */
+	flex-direction: column; /* Stack children vertically */
+	width: 100%;
+	height: auto;
+	align-items: center; /* Align items in the center horizontally */
+}
+/* Styles pour les titres des sections */
+.profile-containers h2 {
+	width: 100%; /* Assure que les titres prennent toute la largeur */
+	text-align: center; /* Centre le texte */
+	margin-bottom: 20px; /* Espacement sous le titre */
+	padding: 10px; /* Espacement interne */
+	background-color: #031927; /* Couleur d'arrière-plan pour le titre */
+	color: white; /* Couleur du texte */
+	border-radius: 5px; /* Bords arrondis pour le titre */
+}
+#details-container{
+	width: 100%; /* Set width to maximum */
+}
+#password-container{
+	width: 100%; /* Set width to maximum */
+}
+#adresses-container{
+	width: 100%; /* Set width to maximum */
+}
+#payment-container{
+	width: 100%; /* Set width to maximum */
+}
+
+.user-info p {
+	margin: 0;
+	color: #fff;
+	font-weight: bold;
+	text-align: center;
+}
+
+.navigation-menu {
+	list-style: none;
+	padding: 0;
+	margin-top: 20px;
+}
+
+.navigation-menu a {
+	text-decoration: none;
+	color: #fff;
+	padding: 10px;
+	display: block;
+	border-radius: 4px; 
+}
+
+.navigation-menu a.active,
+.navigation-menu a:hover {
+	background-color: #007bff;
+	color: white;
+}
+
+.logout-button {
+	margin-top: 20px;
+	display: flex;
+	background-color: #ff4d4d;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.logout-button  {
+	text-align: center;
+}
+
+.profile-picture {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px;
+	cursor: pointer;
+}
+
+.circle-plus {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	border: 2px solid #007bff;
+	background-color: #fff;
+}
+
+.plus-vertical, .plus-horizontal {
+	background-color: #007bff;
+	position: absolute;
+	border-radius: 2px;
+}
+
+.plus-vertical {
+	height: 40px;
+	width: 4px;
+}
+
+.plus-horizontal {
+	width: 40px;
+	height: 4px;
+}
+
+.profile-picture img {
+	border-radius: 50%;
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	display: none;
+}
+
+.progress-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.progress-ring {
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	background: conic-gradient(#4d5bf9 var(--percentage-value, 0%), #cadcff var(--percentage-value, 0%));
+}
+
+.progress-ring .percentage {
+	position: absolute;
+	width: 90px;
+	height: 90px;
+	background: white;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1em;
+	color: black;
+	z-index: 1;
+}
+.content-button {
+	display: inline-block;
+	background-color: #007bff;
+	color: white;
+	padding: 10px 20px;
+	margin-top: 10px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 1em;
+}
+
+.content-button:hover {
+	background-color: #cadcff; /* Couleur de fond au survol */
+}
+
+.centered-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+
+.image-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+	
+}
+
+.imageColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.imageContainer {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.imageContainer img {
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+}
+
+.imageContainer .overlay {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	transition: height 0.3s ease;
+	color: #fff;
+	text-align: center;
+	line-height: 30px;
+}
+
+.imageContainer:hover .overlay {
+	height: 30px;
+}
+/* Styles pour les boutons de pagination */
+.pagination-container button {
+	padding: 8px 12px;
+	margin: 0 4px;
+	border: 1px solid #555; /* Bordure plus foncée pour contraste */
+	background-color: #333; /* Fond plus sombre */
+	color: #ddd; /* Texte plus clair pour contraste */
+	cursor: pointer;
+	transition: background-color 0.3s, color 0.3s; /* Effet de transition doux */
+}
+
+/* Survol des boutons de pagination */
+.pagination-container button:hover {
+	background-color: #444; /* Légèrement plus clair au survol pour un effet visuel */
+	border-color: #666;
+}
+
+/* Style pour le bouton de la page active */
+.pagination-container button.active {
+	background-color: #007bff; /* Couleur primaire plus vive pour la page active */
+	color: white; /* Texte blanc pour le contraste */
+	border-color: #0056b3; /* Bordure un peu plus foncée que le fond */
+}
+.order-id {
+	color: #004488; /* Un bleu plus sombre */
+	cursor: pointer;
+	text-decoration: underline;
+	transition: color 0.2s ease-in-out; /* Transition douce pour le changement de couleur */
+}
+
+.order-id:hover {
+	color: #000000; /* Une teinte encore plus sombre au survol */
+}
+.product-image {
+	max-height: 50px !important; /* ou toute autre taille appropriée */
+	height: auto; /* pour maintenir le ratio aspect */
+}
+.tracking-link {
+	color: #004488; /* Choisissez une couleur qui contraste bien avec #5A7D9A, comme l'or */
+	text-decoration: underline !important; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
+}
+.tracking-link:hover {
+	color: #000000; /* Choisissez une couleur qui contraste bien avec #5A7D9A, comme l'or */
+}
+/* Utilise les mêmes styles pour les deux formulaires */
+.form-container {
+	max-width: 80%; /* La largeur maximale que tu préfères */
+	margin: auto;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.form-row {
+	display: flex;
+	flex-wrap: wrap; /* Permet aux éléments de passer à la ligne si nécessaire */
+	justify-content: space-between;
+	gap: 10px; /* Espacement entre les champs */
+	margin-bottom: 20px;
+}
+
+.form-group {
+	flex: 1; /* Les éléments prennent de l'espace disponible */
+	min-width: 250px; /* Largeur minimale pour empêcher les champs de devenir trop petits */
+	flex-direction: column;
+}
+
+.form-group.full-width {
+	flex-basis: 100%; /* Prend toute la largeur */
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.form-group input {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	width: 100%; /* Assure que l'input prend toute la largeur du form-group */
+}
+
+button {
+	padding: 10px 20px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #0056b3;
+}
+/* Style pour le Modal */
+.add-payment-modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1000; /* Sit on top */
+	align-items: center; /* Centre verticalement */
+	justify-content: center; /* Centre horizontalement */
+	overflow: auto; /* Enable scroll if needed */
+}
+
+.modal-content {
+	background-color: #fefefe;
+	width: 100%; /* Adjust width as needed */
+	height: 100%;
+	position: relative; /* Needed for positioning the close button absolutely */
+	background-color: #ffffff; /* Black w/ opacity for the background */
+}
+
+.close-button {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+	position: absolute;
+	right: 10px;
+	top: 0;
+}
+
+.close-button:hover,
+.close-button:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+/* Styles du modal */
+.modal {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 420px;
+	background-color: #0B1F3B; /* ✅ même ton que la page */
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+	z-index: 1050;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	color: #ffffff; /* ✅ texte clair */
+}
+
+
+
+.image-placeholder {
+	width: 100%;
+	min-height: 180px;
+	background-color: #1A2A48; /* ✅ bleu foncé/gris */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+}
+
+
+/* En-tête du modal */
+.modal-header {
+	text-align: center; /* Centre le texte de l'en-tête */
+}
+
+.modal-header h2 {
+	color: #ffffff;
+	font-size: 22px;
+	font-weight: 500;
+	margin: 0;
+}
+
+
+/* Contenu du modal */
+.modal-body {
+	text-align: center; /* Centre tout dans le body, y compris l'image */
+	flex-grow: 1; /* Permet au body de prendre l'espace disponible */
+}
+
+/* Pied de page du modal avec les boutons */
+.modal-footer {
+	display: flex;       /* Utilise Flexbox pour la mise en page */
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;          /* Ajoute un peu de padding pour l'espacement */
+}
+
+/* Styles des boutons */
+.modal-footer button {
+	padding: 10px 20px;      /* Padding confortable pour les boutons */
+	margin: 0 10px;          /* Espacement horizontal entre les boutons */
+	background-color: #007bff;   /* Couleur de fond des boutons */
+	color: white;            /* Couleur du texte */
+	border: none;            /* Pas de bordure */
+	border-radius: 5px;      /* Bordures arrondies */
+	cursor: pointer;         /* Curseur pointer pour indiquer l'interactivité */
+	outline: none;           /* Supprime le contour lors de la sélection */
+}
+
+.modal-footer button:hover {
+	background-color: #0056b3; /* Couleur au survol */
+}
+.top-buttons {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	width: 100%; /* Pour s'étendre sur toute la largeur */
+}
+
+.top-buttons button {
+	flex: 1; /* 👈 Chaque bouton prend 50% de l'espace */
+	max-width: 200px; /* Limite la taille pour éviter que ce soit trop large */
+}
+
+
+.bottom-button {
+	display: flex;
+	margin-top: 10px;
+	justify-content: center;
+	width: 100%;
+}
+
+.bottom-button button {
+	width: 60%; /* ou 100% selon le style voulu */
+}
+/* Prévisualisation de l'image avec fond gris */
+#imagePreview {
+	max-width: 100%; /* Assure que l'image ne dépasse pas la largeur du modal */
+	height: auto; /* Garde le ratio de l'image */
+	display: block; /* Assure que le background est visible même sans image */
+	min-height: 150px; /* Hauteur minimale pour maintenir la zone visible */
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>');
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+#header {
+	background-color: #0A0A23 !important; /* Bleu foncé */
+}
+td:last-child {
+	text-align: center;         /* centrer horizontalement */
+	vertical-align: middle;     /* centrer verticalement */
+}
+
+.invoice-icon {
+	display: inline-block;
+	font-size: 1.3em;
+	color: #ffffff;
+	text-decoration: none;
+	line-height: 1;
+	padding: 4px;
+}
+
+.invoice-icon:hover {
+	color: #ffcc00;
+	cursor: pointer;
+}
+td.tracking-cell, td.invoice-cell {
+        text-align: center;
+        vertical-align: middle;
+        padding: 4px;
+}
+
+.no-tracking-icon {
+	font-size: 1.2em;
+	line-height: 1;
+	color: #ccc;
+}
+
+#toast-notification, #password-toast-notification {
+	background-color: #28a745; /* vert par défaut */
+	color: white;
+	padding: 10px 15px;
+	margin-top: 10px;
+	border-radius: 4px;
+	font-size: 14px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: opacity 0.3s ease;
+	opacity: 0;
+	display: block;
+}
+#toast-notification.show, #password-toast-notification.show {
+	opacity: 1;
+}
+.strength-meter {
+	margin-top: 5px;
+	font-size: 14px;
+	font-weight: bold;
+	height: 20px;
+	line-height: 20px;
+	color: white;
+	padding: 0 10px;
+	border-radius: 4px;
+	transition: background-color 0.3s ease;
+}
+
+.strength-weak {
+	background-color: #dc3545; /* Rouge */
+}
+
+.strength-medium {
+	background-color: #ffc107; /* Jaune */
+	color: #212529;
+}
+
+.strength-strong {
+	background-color: #28a745; /* Vert */
+}
+.password-rules {
+	list-style: none;
+	padding-left: 0;
+	font-size: 14px;
+	margin-top: 10px;
+}
+
+.password-rules li {
+	margin: 5px 0;
+}
+
+.password-rules li.valid::before {
+	content: "✅ ";
+	color: #28a745;
+}
+
+.password-rules li.invalid::before {
+	content: "❌ ";
+	color: #dc3545;
+}

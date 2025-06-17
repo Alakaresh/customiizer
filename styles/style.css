@@ -1,0 +1,41 @@
+#site-content {
+	display: flex;
+	margin: auto;
+}
+
+.site-content {
+    /* Use the dynamic viewport unit to avoid layout jumps */
+    min-height: calc(100dvh - 215px);
+    max-width: 1250px;
+    flex-direction: column;
+}
+
+.full-content {
+    /* Adjust for pages without footer */
+    min-height: calc(100dvh - 65px);
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  background-color: #030F32;
+}
+
+h2.title {
+	font-size: 24px;
+	}
+
+a {
+  color: #5C6BC0;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #5C6BC0;
+  text-decoration: none;
+}
+
+/* Surcharge des styles de WooCommerce pour les images dans le panier */
+.woocommerce img, .woocommerce-page img {
+    max-width: 200px;
+}
