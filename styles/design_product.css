@@ -582,3 +582,27 @@ h4 {
     max-width: 400px;      /* or another small value */
     padding: 20px;         /* keep content readable */
 }
+
+/* Extension latérale de la sidebar pour la sélection produit/variant */
+#sidebarExtension {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    background-color: #2a2a2a;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+}
+
+#sidebarExtension .close-extension {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 20px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
