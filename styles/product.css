@@ -63,8 +63,18 @@ body {
     color: white;
 }
 
-/* Conteneur des images dans la barre du bas */
+/* Conteneur principal dans la barre du bas */
 .bottom-bar .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    position: relative;
+    flex: 1;
+}
+
+/* Conteneur des images dans la barre du bas */
+.bottom-bar .bottom-images {
     display: flex; /* Permet d'afficher les images sur une seule ligne */
     flex: 1;
     flex-direction: row; /* Par défaut, mais explicité pour clarté */
@@ -109,7 +119,7 @@ body {
 }
 
 /* Images de la barre du bas */
-.bottom-bar .content .thumbnail {
+.bottom-bar .bottom-images .thumbnail {
     flex-shrink: 0; /* Empêche les images de rétrécir */
     width: 80px;
     height: 80px;
@@ -120,7 +130,7 @@ body {
     transition: border-color 0.3s ease;
 }
 
-.bottom-bar .content .thumbnail:hover {
+.bottom-bar .bottom-images .thumbnail:hover {
     border-color: #ddd;
 }
 

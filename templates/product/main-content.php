@@ -81,9 +81,11 @@
 				<div class="band band-right"></div>
 			</div>
                         <div class="bottom-bar">
-                                <button class="bottom-prev" aria-label="Previous images">&#9664;</button>
-                                <div class="content"></div>
-                                <button class="bottom-next" aria-label="Next images">&#9654;</button>
+                                <div class="content">
+                                        <button class="bottom-prev" aria-label="Previous images">&#9664;</button>
+                                        <div class="bottom-images"></div>
+                                        <button class="bottom-next" aria-label="Next images">&#9654;</button>
+                                </div>
                         </div>
 
 		</div>
