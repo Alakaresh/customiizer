@@ -32,6 +32,8 @@
                                         <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
                                         <button id="alignMiddleButton" class="align-button"><i class="fas fa-arrows-alt-v"></i></button>
                                         <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                                        <button id="flipXButton" class="align-button"><i class="fas fa-exchange-alt"></i></button>
+                                        <button id="flipYButton" class="align-button"><i class="fas fa-exchange-alt fa-rotate-90"></i></button>
                                         <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
                                         <button id="bringForwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
                                         <button id="sendBackwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
