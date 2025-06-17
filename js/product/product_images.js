@@ -1,5 +1,9 @@
 let productData = null;
 
+const BOTTOM_IMAGES_PER_PAGE = 12;
+let bottomBarImages = [];
+let bottomBarPage = 0;
+
 // Création de l'info-bulle globale
 const tooltip = document.createElement("div");
 tooltip.classList.add("dynamic-tooltip");
@@ -8,19 +12,57 @@ document.body.appendChild(tooltip);
 
 // Affichage des images et ajout du clic pour générer un mockup
 function displayImagesInBottomBar(images) {
-	const contentDiv = document.querySelector(".bottom-bar .content");
-	if (!contentDiv) {
-		console.error("❌ Erreur : Impossible de trouver .bottom-bar .content");
-		return;
-	}
+        const contentDiv = document.querySelector(".bottom-bar .content");
+        const prevBtn = document.querySelector(".bottom-bar .bottom-prev");
+        const nextBtn = document.querySelector(".bottom-bar .bottom-next");
 
-	contentDiv.innerHTML = ""; // Vider avant d'afficher les nouvelles images
+        if (!contentDiv) {
+                console.error("❌ Erreur : Impossible de trouver .bottom-bar .content");
+                return;
+        }
 
-	images.forEach(image => {
-		const imgElement = document.createElement("img");
-		imgElement.src = image.image_url;
-		imgElement.alt = image.prompt || "Image générée";
-		imgElement.classList.add("thumbnail");
+        bottomBarImages = images || [];
+        bottomBarPage = 0;
+
+        if (prevBtn && nextBtn) {
+                prevBtn.onclick = () => {
+                        if (bottomBarPage > 0) {
+                                bottomBarPage--;
+                                renderBottomBarPage();
+                        }
+                };
+
+                nextBtn.onclick = () => {
+                        if ((bottomBarPage + 1) * BOTTOM_IMAGES_PER_PAGE < bottomBarImages.length) {
+                                bottomBarPage++;
+                                renderBottomBarPage();
+                        }
+                };
+        }
+
+        renderBottomBarPage();
+}
+
+function renderBottomBarPage() {
+        const contentDiv = document.querySelector(".bottom-bar .content");
+        const prevBtn = document.querySelector(".bottom-bar .bottom-prev");
+        const nextBtn = document.querySelector(".bottom-bar .bottom-next");
+
+        if (!contentDiv) {
+                console.error("❌ Erreur : Impossible de trouver .bottom-bar .content");
+                return;
+        }
+
+        contentDiv.innerHTML = "";
+
+        const start = bottomBarPage * BOTTOM_IMAGES_PER_PAGE;
+        const pageImages = bottomBarImages.slice(start, start + BOTTOM_IMAGES_PER_PAGE);
+
+        pageImages.forEach(image => {
+                const imgElement = document.createElement("img");
+                imgElement.src = image.image_url;
+                imgElement.alt = image.prompt || "Image générée";
+                imgElement.classList.add("thumbnail");
 
 		// ✅ Événements pour afficher l'info-bulle au bon endroit
 		imgElement.addEventListener("mouseenter", (event) => {
@@ -59,7 +101,10 @@ function displayImagesInBottomBar(images) {
 	});
 
 	// Ajoute un petit effet de défilement pour montrer que la barre est scrollable
-	contentDiv.scrollLeft = 0;
+        contentDiv.scrollLeft = 0;
+
+        if (prevBtn) prevBtn.disabled = bottomBarPage === 0;
+        if (nextBtn) nextBtn.disabled = (bottomBarPage + 1) * BOTTOM_IMAGES_PER_PAGE >= bottomBarImages.length;
 }
 
 
