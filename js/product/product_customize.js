@@ -124,6 +124,7 @@ jQuery(document).ready(function ($) {
         const alignTopButton = $('#alignTopButton');
         const alignMiddleButton = $('#alignMiddleButton');
         const alignBottomButton = $('#alignBottomButton');
+        const mirrorImageButton = $('#mirrorImageButton');
         const bringForwardButton = $('#bringForwardButton');
         const sendBackwardButton = $('#sendBackwardButton');
         const removeImageButton = $('#removeImageButton');
@@ -513,6 +514,9 @@ jQuery(document).ready(function ($) {
         });
         alignBottomButton.on('click', function () {
                 CanvasManager.alignImage('bottom');
+        });
+        mirrorImageButton.on('click', function () {
+                CanvasManager.mirrorImage();
         });
         bringForwardButton.on('click', function () {
                 CanvasManager.bringImageForward();
