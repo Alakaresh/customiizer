@@ -62,31 +62,49 @@ jQuery(document).ready(function ($) {
 
 
 
-	// Charger les détails d'un produit
-	function loadProductDetails(productId) {
-		console.log("productId :", productId);
-		fetch(`${apiBaseURL}/${productId}`)
-			.then(response => {
-			if (!response.ok) {
-				throw new Error(`Erreur serveur: ${response.status}`);
-			}
-			return response.json();
-		})
-			.then(productData => {
-			currentVariants = productData.variants;
-			$('.description-content').html(productData.product_description || "<p>Description non disponible</p>");
-			updateProductDisplay(currentVariants);
-			console.group("🎨 Variantes disponibles (couleurs & tailles)");
-			currentVariants.forEach(v => {
-				console.log(`- ID: ${v.variant_id} | Couleur: ${v.color || '(aucune)'} | Taille: ${v.size || '(aucune)'} | Stock: ${v.stock}`);
-			});
-			console.groupEnd();
+        function persistCache() {
+                const tmp = { ...window.customizerCache, models: {} };
+                sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+        }
 
-		})
-			.catch(error => {
-			console.error("Erreur lors de la récupération du produit :", error);
-		});
-	}
+        function processProductData(productData) {
+                currentVariants = productData.variants;
+                $('.description-content').html(productData.product_description || "<p>Description non disponible</p>");
+                updateProductDisplay(currentVariants);
+                console.group("🎨 Variantes disponibles (couleurs & tailles)");
+                currentVariants.forEach(v => {
+                        console.log(`- ID: ${v.variant_id} | Couleur: ${v.color || '(aucune)'} | Taille: ${v.size || '(aucune)'} | Stock: ${v.stock}`);
+                });
+                console.groupEnd();
+        }
+
+        // Charger les détails d'un produit
+        function loadProductDetails(productId) {
+                console.log("productId :", productId);
+
+                const cached = window.customizerCache.variants[productId];
+                if (cached) {
+                        console.log('[Cache] Utilisation des données préchargées pour', productId);
+                        processProductData(cached);
+                        return;
+                }
+
+                fetch(`${apiBaseURL}/${productId}`)
+                        .then(response => {
+                        if (!response.ok) {
+                                throw new Error(`Erreur serveur: ${response.status}`);
+                        }
+                        return response.json();
+                })
+                        .then(productData => {
+                        window.customizerCache.variants[productId] = productData;
+                        persistCache();
+                        processProductData(productData);
+                })
+                        .catch(error => {
+                        console.error("Erreur lors de la récupération du produit :", error);
+                });
+        }
 
 	function updateProductDisplay(variants) {
 		const urlParams = new URLSearchParams(window.location.search);
