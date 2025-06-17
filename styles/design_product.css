@@ -58,6 +58,7 @@
 #customizeModal .modal-body {
     flex-direction: row;
     padding: 0;
+    flex: 1;
 }
 
 /* Narrow sidebar on the left of the visual zone */
