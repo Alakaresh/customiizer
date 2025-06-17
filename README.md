@@ -19,5 +19,7 @@ Enable the checkbox "Activer l'éditeur de position" in the **Custom Produits** 
 
 The editor shows two range sliders controlling the top and left position (in %). Values range from -200 to 200. Each slider also has a numeric field for manual entry so you can input precise percentages. These numeric fields are now wider (80&nbsp;px) for easier editing. When enabled, the sliders allow changes down to a tenth of a percent for fine tuning. The slider values now update to match whichever mockup thumbnail is selected, letting you edit positions individually. After tweaking the values, press **Save** to send them to `/variant/<id>/mockup-position` with the selected `mockup_id`.
 
+The panel also displays the current `product_id`, `variant_id` and `mockup_id` so you can verify which item you are editing.
+
 
 The floating panel uses a grayscale theme so it stays visually distinct from the product page. The **Save** button now appears in black for higher contrast.

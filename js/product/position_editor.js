@@ -4,6 +4,8 @@ jQuery(function ($) {
 
 
     const panel = $('<div id="position-editor" style="position:fixed;top:20px;right:20px;background:#f0f0f0;border:1px solid #666;padding:10px;color:#333;z-index:10000;filter:grayscale(100%);"></div>');
+    const info = $('<div id="position-info" style="font-size:12px;margin-bottom:5px;"></div>');
+    panel.append(info);
     panel.append('<div><label>Top: <input type="range" id="pos-top" min="-200" max="200" step="0.1"> <input type="number" id="pos-top-num" min="-200" max="200" step="0.1" style="width:80px;margin-left:5px;">%</label></div>');
     panel.append('<div><label>Left: <input type="range" id="pos-left" min="-200" max="200" step="0.1"> <input type="number" id="pos-left-num" min="-200" max="200" step="0.1" style="width:80px;margin-left:5px;">%</label></div>');
 
@@ -30,6 +32,9 @@ jQuery(function ($) {
 
         topNum.val(m.position_top);
         leftNum.val(m.position_left);
+
+        const pid = typeof currentProductId !== 'undefined' ? currentProductId : (variant.product_id || '');
+        info.text(`product_id: ${pid} | variant_id: ${variant.variant_id} | mockup_id: ${currentMockup.mockup_id}`);
 
         mainImg.css({ top: m.position_top + '%', left: m.position_left + '%' });
     }
