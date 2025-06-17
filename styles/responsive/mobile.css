@@ -395,20 +395,22 @@
 		width: 100%;
 	}
 
-	.bottom-bar {
-		height: auto;
-		padding: 10px;
-	}
+        .bottom-bar {
+                height: auto;
+                padding: 10px;
+        }
 
         .bottom-bar {
                 display: flex;
                 align-items: center;
+                position: relative;
         }
 
         .bottom-bar .content {
                 flex: 1;
                 justify-content: flex-start;
                 overflow-x: auto;
+                margin: 0 30px;
         }
 
         .bottom-bar .bottom-prev,
@@ -418,6 +420,22 @@
                 color: white;
                 font-size: 1.5rem;
                 padding: 0 5px;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+        }
+
+        .bottom-bar .bottom-prev {
+                left: 5px;
+        }
+
+        .bottom-bar .bottom-next {
+                right: 5px;
+        }
+
+        .bottom-bar .bottom-prev:disabled,
+        .bottom-bar .bottom-next:disabled {
+                display: none;
         }
 	/*==========COMMUNITY==========*/
 	.image-container {

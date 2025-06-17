@@ -59,6 +59,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     color: white;
 }
 
@@ -73,6 +74,7 @@ body {
     overflow-x: auto; /* Défilement horizontal activé */
     overflow-y: hidden; /* Supprime le défilement vertical */
     padding: 10px; /* Ajoute de l'espace autour des images */
+    margin: 0 40px; /* Laisse de la place aux flèches */
     height: 100%; /* Assure que le contenu remplit la hauteur du conteneur */
     scrollbar-width: thin; /* Style plus fin pour les barres de défilement */
     scrollbar-color: #888 #444; /* Couleurs pour les navigateurs supportés */
@@ -86,13 +88,24 @@ body {
     color: white;
     font-size: 2rem;
     cursor: pointer;
-    padding: 0 10px;
+    padding: 0 5px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.bottom-bar .bottom-prev {
+    left: 5px;
+}
+
+.bottom-bar .bottom-next {
+    right: 5px;
 }
 
 .bottom-bar .bottom-prev:disabled,
 .bottom-bar .bottom-next:disabled {
-    opacity: 0.3;
-    cursor: default;
+    display: none;
 }
 
 /* Images de la barre du bas */
