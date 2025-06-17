@@ -157,7 +157,7 @@ function get_product_variants($request) {
     LEFT JOIN {$prefix}variant_mockup AS vm ON vm.variant_id = v.variant_id
     LEFT JOIN {$prefix}products AS p ON p.product_id = v.product_id
     WHERE v.product_id = %d
-    ORDER BY v.variant_id ASC, vm.mockup_id DESC
+    ORDER BY v.variant_id ASC, vm.mockup_id ASC
 ", $product_id);
 
 

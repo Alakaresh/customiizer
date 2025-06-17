@@ -25,7 +25,7 @@ function product($request) {
     LEFT JOIN {$prefix}products AS p ON p.product_id = v.product_id
     LEFT JOIN {$prefix}variant_stock AS st ON st.variant_id = v.variant_id AND st.region = %s
     WHERE v.product_id = %d
-    ORDER BY vm.mockup_id DESC
+    ORDER BY vm.mockup_id ASC
 ", 'france', $product_id);
 
 
