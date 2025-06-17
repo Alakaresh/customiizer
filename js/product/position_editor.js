@@ -4,10 +4,10 @@ jQuery(function ($) {
 
 
     const panel = $('<div id="position-editor" style="position:fixed;top:20px;right:20px;background:#f0f0f0;border:1px solid #666;padding:10px;color:#333;z-index:10000;filter:grayscale(100%);"></div>');
-    panel.append('<div><label>Top: <input type="range" id="pos-top" min="-200" max="200" step="0.1"> <input type="number" id="pos-top-num" min="-200" max="200" step="0.1" style="width:60px;margin-left:5px;">%</label></div>');
-    panel.append('<div><label>Left: <input type="range" id="pos-left" min="-200" max="200" step="0.1"> <input type="number" id="pos-left-num" min="-200" max="200" step="0.1" style="width:60px;margin-left:5px;">%</label></div>');
+    panel.append('<div><label>Top: <input type="range" id="pos-top" min="-200" max="200" step="0.1"> <input type="number" id="pos-top-num" min="-200" max="200" step="0.1" style="width:80px;margin-left:5px;">%</label></div>');
+    panel.append('<div><label>Left: <input type="range" id="pos-left" min="-200" max="200" step="0.1"> <input type="number" id="pos-left-num" min="-200" max="200" step="0.1" style="width:80px;margin-left:5px;">%</label></div>');
 
-    panel.append('<button id="pos-save" class="button">Save</button>');
+    panel.append('<button id="pos-save" class="button" style="background:#000;color:#fff;">Save</button>');
     $('body').append(panel);
 
     const topInput = $('#pos-top');
