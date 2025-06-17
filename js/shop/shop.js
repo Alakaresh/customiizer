@@ -109,6 +109,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                     const res = await fetch(`/wp-json/api/v1/products/${p.product_id}`);
                     const data = await res.json();
                     window.customizerCache.variants[p.product_id] = data;
+                    // Sauvegarder immédiatement les données préchargées
+                    persistCache();
                 } catch (e) {
                     console.error('Erreur chargement variantes', p.product_id, e);
                     continue;
