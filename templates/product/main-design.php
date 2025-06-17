@@ -34,6 +34,8 @@
                                         <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
                                         <button id="flipXButton" class="align-button"><i class="fas fa-exchange-alt"></i></button>
                                         <button id="flipYButton" class="align-button"><i class="fas fa-exchange-alt fa-rotate-90"></i></button>
+                                        <button id="rotateLeftButton" class="align-button"><i class="fas fa-undo-alt"></i></button>
+                                        <button id="rotateRightButton" class="align-button"><i class="fas fa-redo-alt"></i></button>
                                         <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
                                         <button id="bringForwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
                                         <button id="sendBackwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
