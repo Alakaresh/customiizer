@@ -23,6 +23,10 @@
                                         <span>Image</span>
                                 </button>
                         </div>
+                        <div id="sidebarExtension" class="sidebar-extension" style="display:none;">
+                                <button id="closeSidebarExtension" class="close-extension">&times;</button>
+                                <div class="extension-content"></div>
+                        </div>
                         <div class="visual-zone">
                         <div class="visual-header">
                                 <div class="image-controls">

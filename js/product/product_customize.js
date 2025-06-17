@@ -135,6 +135,10 @@ jQuery(document).ready(function ($) {
         const visualHeader = $('.visual-header');
         const sidebarChangeProductButton = $('#sidebarChangeProductButton');
         const sidebarAddImageButton = $('#sidebarAddImageButton');
+        const sidebarExtension = $('#sidebarExtension');
+        const sidebarExtensionContent = $('#sidebarExtension .extension-content');
+        const closeSidebarExtension = $('#closeSidebarExtension');
+        let movedElements = null;
         let threeDInitialized = false;
 
         currentRatio = selectedVariant?.ratio_image || '';
@@ -250,6 +254,7 @@ jQuery(document).ready(function ($) {
                         trapFocus(unsavedChangesModal);
                         return;
                 }
+                closeSidebarExt();
                 customizeModal.hide();
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
@@ -259,6 +264,7 @@ jQuery(document).ready(function ($) {
                 unsavedChangesModal.hide();
                 customizeModal.hide();
                 releaseFocus(unsavedChangesModal);
+                closeSidebarExt();
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
         });
@@ -307,10 +313,25 @@ jQuery(document).ready(function ($) {
                 trapFocus(imageSourceModal);
         });
 
+        function closeSidebarExt() {
+                sidebarExtension.hide();
+                if (movedElements) {
+                        $('.product-info').prepend(movedElements);
+                        movedElements = null;
+                }
+        }
+
         sidebarChangeProductButton.on('click', function () {
-                closeButtonMain.click();
-                $('.dropdown-icon').trigger('click');
+                if (sidebarExtension.is(':visible')) {
+                        closeSidebarExt();
+                } else {
+                        movedElements = $('.product-info .product-selector, .product-info .product-colors, .product-info .product-sizes').detach();
+                        sidebarExtensionContent.append(movedElements);
+                        sidebarExtension.show();
+                }
         });
+
+        closeSidebarExtension.on('click', closeSidebarExt);
 
 	// 5) Fermer le sélecteur d’image
         closeButtonImageModal.on('click', function () {
@@ -428,6 +449,8 @@ jQuery(document).ready(function ($) {
                         } else if (imageSourceModal.is(':visible')) {
                                 imageSourceModal.hide();
                                 releaseFocus(imageSourceModal);
+                        } else if (sidebarExtension.is(':visible')) {
+                                closeSidebarExt();
                         } else if (customizeModal.is(':visible')) {
                                 closeButtonMain.trigger('click');
                         }
