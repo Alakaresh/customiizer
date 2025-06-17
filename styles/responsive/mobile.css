@@ -407,10 +407,19 @@
         }
 
         .bottom-bar .content {
+                display: flex;
+                align-items: center;
+                position: relative;
+                flex: 1;
+        }
+
+        .bottom-bar .bottom-images {
                 flex: 1;
                 justify-content: flex-start;
                 overflow-x: auto;
                 margin: 0 15px; /* Décalage de 10px des flèches par rapport aux images */
+                display: flex;
+                align-items: center;
         }
 
         .bottom-bar .bottom-prev,

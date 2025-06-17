@@ -12,12 +12,12 @@ document.body.appendChild(tooltip);
 
 // Affichage des images et ajout du clic pour générer un mockup
 function displayImagesInBottomBar(images) {
-        const contentDiv = document.querySelector(".bottom-bar .content");
+        const contentDiv = document.querySelector(".bottom-bar .bottom-images");
         const prevBtn = document.querySelector(".bottom-bar .bottom-prev");
         const nextBtn = document.querySelector(".bottom-bar .bottom-next");
 
         if (!contentDiv) {
-                console.error("❌ Erreur : Impossible de trouver .bottom-bar .content");
+                console.error("❌ Erreur : Impossible de trouver .bottom-bar .bottom-images");
                 return;
         }
 
@@ -44,12 +44,12 @@ function displayImagesInBottomBar(images) {
 }
 
 function renderBottomBarPage() {
-        const contentDiv = document.querySelector(".bottom-bar .content");
+        const contentDiv = document.querySelector(".bottom-bar .bottom-images");
         const prevBtn = document.querySelector(".bottom-bar .bottom-prev");
         const nextBtn = document.querySelector(".bottom-bar .bottom-next");
 
         if (!contentDiv) {
-                console.error("❌ Erreur : Impossible de trouver .bottom-bar .content");
+                console.error("❌ Erreur : Impossible de trouver .bottom-bar .bottom-images");
                 return;
         }
 
