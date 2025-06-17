@@ -231,6 +231,22 @@ const CanvasManager = {
                 CanvasManager.syncTo3D();
         },
 
+        flipImageX: function () {
+                const img = canvas.getObjects().find(obj => obj.type === 'image');
+                if (!img) return;
+                img.set('flipX', !img.flipX);
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
+        flipImageY: function () {
+                const img = canvas.getObjects().find(obj => obj.type === 'image');
+                if (!img) return;
+                img.set('flipY', !img.flipY);
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
        removeImage: function () {
                const img = canvas.getObjects().find(obj => obj.type === 'image');
                if (!img) return;

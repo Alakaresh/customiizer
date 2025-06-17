@@ -124,6 +124,8 @@ jQuery(document).ready(function ($) {
         const alignTopButton = $('#alignTopButton');
         const alignMiddleButton = $('#alignMiddleButton');
         const alignBottomButton = $('#alignBottomButton');
+        const flipXButton = $('#flipXButton');
+        const flipYButton = $('#flipYButton');
         const bringForwardButton = $('#bringForwardButton');
         const sendBackwardButton = $('#sendBackwardButton');
         const removeImageButton = $('#removeImageButton');
@@ -392,6 +394,12 @@ jQuery(document).ready(function ($) {
         });
         alignBottomButton.on('click', function () {
                 CanvasManager.alignImage('bottom');
+        });
+        flipXButton.on('click', function () {
+                CanvasManager.flipImageX();
+        });
+        flipYButton.on('click', function () {
+                CanvasManager.flipImageY();
         });
         bringForwardButton.on('click', function () {
                 CanvasManager.bringImageForward();
