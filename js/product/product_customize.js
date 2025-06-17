@@ -128,6 +128,8 @@ jQuery(document).ready(function ($) {
         const flipYButton = $('#flipYButton');
         const bringForwardButton = $('#bringForwardButton');
         const sendBackwardButton = $('#sendBackwardButton');
+        const rotateLeftButton = $('#rotateLeftButton');
+        const rotateRightButton = $('#rotateRightButton');
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
         const visualHeader = $('.visual-header');
@@ -406,6 +408,12 @@ jQuery(document).ready(function ($) {
         });
         sendBackwardButton.on('click', function () {
                 CanvasManager.sendImageBackward();
+        });
+        rotateLeftButton.on('click', function () {
+                CanvasManager.rotateImageLeft();
+        });
+        rotateRightButton.on('click', function () {
+                CanvasManager.rotateImageRight();
         });
 
         removeImageButton.on('click', function () {

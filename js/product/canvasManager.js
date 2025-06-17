@@ -247,6 +247,24 @@ const CanvasManager = {
                 CanvasManager.syncTo3D();
         },
 
+        rotateImageLeft: function () {
+                const img = canvas.getObjects().find(obj => obj.type === 'image');
+                if (!img) return;
+                img.rotate(img.angle - 90);
+                img.setCoords();
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
+        rotateImageRight: function () {
+                const img = canvas.getObjects().find(obj => obj.type === 'image');
+                if (!img) return;
+                img.rotate(img.angle + 90);
+                img.setCoords();
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
        removeImage: function () {
                const img = canvas.getObjects().find(obj => obj.type === 'image');
                if (!img) return;
