@@ -223,6 +223,15 @@ const CanvasManager = {
                 CanvasManager.syncTo3D();
         },
 
+        mirrorImage: function () {
+                const img = canvas.getActiveObject();
+                if (!img) return;
+                img.flipX = !img.flipX;
+                img.setCoords();
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
        removeImage: function () {
                const img = canvas.getObjects().find(obj => obj.type === 'image');
                if (!img) return;
