@@ -105,11 +105,11 @@ body {
 }
 
 .bottom-bar .bottom-prev {
-    left: 15px;
+    left: -25px;
 }
 
 .bottom-bar .bottom-next {
-    right: 15px;
+    right: -25px;
 }
 
 .bottom-bar .bottom-prev:disabled,
