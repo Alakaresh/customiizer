@@ -70,7 +70,6 @@ body {
     justify-content: center;
     height: 100%;
     position: relative;
-    flex: 1;
 }
 
 /* Conteneur des images dans la barre du bas */
