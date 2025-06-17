@@ -296,11 +296,11 @@ body {
 
 /* Style pour l'image du produit */
 .product-image {
-	position: absolute;
-	bottom: 18%;
-	left: 48%;
-	transform: translateX(-50%);
-	width: 40%;
+        position: absolute;
+        top: 18%;
+        left: 48%;
+        transform: translateX(-50%);
+        width: 40%;
 }
 
 /* Position et style des bulles d'images */
