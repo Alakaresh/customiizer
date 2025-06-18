@@ -8,8 +8,14 @@ register_rest_route('api/v1/products', '/list', [
 ]);
 
 function products_list( WP_REST_Request $request ) {
-	global $wpdb;
-	$prefix = 'WPC_';
+        // Try to return cached results first
+        $cached = get_transient('customiizer_products_list');
+        if ( false !== $cached ) {
+                return new WP_REST_Response( $cached, 200 );
+        }
+
+        global $wpdb;
+        $prefix = 'WPC_';
 
 	// Lire le paramètre GET ?include_inactive=1
 	$includeInactive = $request->get_param('include_inactive') === '1';
@@ -43,16 +49,18 @@ function products_list( WP_REST_Request $request ) {
 		return new WP_REST_Response('Aucun produit trouvé', 404);
 	}
 
-	$products = array_map(function($row) {
-		return [
-			'product_id'   => (int) $row['product_id'],
-			'name'         => $row['name'],
-			'image'        => $row['image'],
-			'lowest_price' => (float) $row['lowest_price'],
-			'is_active'    => (int) $row['is_active'],
-		];
-	}, $results);
+        $products = array_map(function($row) {
+                return [
+                        'product_id'   => (int) $row['product_id'],
+                        'name'         => $row['name'],
+                        'image'        => $row['image'],
+                        'lowest_price' => (float) $row['lowest_price'],
+                        'is_active'    => (int) $row['is_active'],
+                ];
+        }, $results);
 
-	return new WP_REST_Response($products, 200);
+        set_transient('customiizer_products_list', $products, HOUR_IN_SECONDS);
+
+        return new WP_REST_Response($products, 200);
 }
 
