@@ -11,7 +11,7 @@ if (!defined('MIDJOURNEY_API_KEY')) {
 $apiKey = MIDJOURNEY_API_KEY;
 
 function customiizer_log($message, $level = 'INFO') {
-    $logFile = 'logfile.log';
+    $logFile = __DIR__ . '/logfile.log';
     $currentTime = date('Y-m-d H:i:s');
     file_put_contents($logFile, "[$currentTime] [$level] $message" . PHP_EOL, FILE_APPEND);
 }
