@@ -8,6 +8,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+file_put_contents('/tmp/generate_debug.log', "Script appelé à " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+
 // Codes d'erreur pour faciliter le diagnostic depuis le frontend
 const ERROR_MISSING_API_KEY        = 1000;
 const ERROR_INVALID_JSON_INPUT     = 1001;
