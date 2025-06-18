@@ -48,7 +48,13 @@ function db_err( string $label ): void {
 function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 	/* ---------- constantes / config ----------------------------- */
-	define( 'PRINTFUL_SUPPLIER_ID', 1 );               // id du fournisseur « Printful »
+        define( 'PRINTFUL_SUPPLIER_ID', 1 );               // id du fournisseur « Printful »
+        if (!defined('PRINTFUL_MOCKUP_PAUSE_EVERY')) {
+                define('PRINTFUL_MOCKUP_PAUSE_EVERY', 2);
+        }
+        if (!defined('PRINTFUL_MOCKUP_PAUSE_SECONDS')) {
+                define('PRINTFUL_MOCKUP_PAUSE_SECONDS', 65);
+        }
 	global $wpdb;
 	$wpdb->show_errors();
 
@@ -439,11 +445,19 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 							}
 						}
 
-						$mockup_generated_count++;
-						if ($mockup_generated_count % 2 === 0) {
-							product_log("⏳ Quota atteint — pause 60s après $mockup_generated_count mockups", 'mockup');
-							sleep(65);
-						}
+                                                $mockup_generated_count++;
+
+                                                if (
+                                                        defined('PRINTFUL_MOCKUP_PAUSE_EVERY') &&
+                                                        defined('PRINTFUL_MOCKUP_PAUSE_SECONDS') &&
+                                                        PRINTFUL_MOCKUP_PAUSE_EVERY > 0 &&
+                                                        PRINTFUL_MOCKUP_PAUSE_SECONDS > 0 &&
+                                                        $mockup_generated_count % PRINTFUL_MOCKUP_PAUSE_EVERY === 0
+                                                ) {
+                                                        $pause = PRINTFUL_MOCKUP_PAUSE_SECONDS;
+                                                        product_log("⏳ Quota atteint — pause {$pause}s après $mockup_generated_count mockups", 'mockup');
+                                                        sleep($pause);
+                                                }
 
 						$success = true;
 						break;
