@@ -31,8 +31,8 @@ file_put_contents(__DIR__ . '/generate_debug.log', "▶ Script appelé à " . da
 
 // Charger les constantes depuis WordPress
 file_put_contents(__DIR__ . '/generate_debug.log', "📥 Chargement wp-config...\n", FILE_APPEND);
-define('SHORTINIT', true);
-require_once __DIR__ . '/../../../../../../wp-config.php';
+define('MIDJOURNEY_API_KEY', '28e69054-9d20-453b-bdc9-79c2f86c027d');
+define('MIDJOURNEY_API_URL', 'https://api.userapi.ai/midjourney/v2/imagine');
 
 
 // Vérification WordPress
