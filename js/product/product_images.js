@@ -201,6 +201,7 @@ function generateMockup(mockupData) {
         Promise.all(mockupPromises).then(() => {
                 const durationSeconds = ((performance.now() - (mockupGenerationStart || performance.now())) / 1000).toFixed(2);
                 console.log(`✅ Tous les mockups sont terminés en ${durationSeconds}s.`);
+
                 document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
                 mainProductImage?.classList.remove("loading");
                 loadingOverlay?.remove();
@@ -237,6 +238,7 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         if (mockupGenerationStart) {
                 const elapsedSeconds = ((performance.now() - mockupGenerationStart) / 1000).toFixed(2);
                 console.log(`⏱️ Thumbnail style ${styleId} affiché après ${elapsedSeconds}s`);
+
         }
 
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
