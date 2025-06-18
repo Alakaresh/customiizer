@@ -4,8 +4,11 @@ $apiUrl = defined('MIDJOURNEY_API_URL')
     ? MIDJOURNEY_API_URL
     : 'https://api.userapi.ai/midjourney/v2/upscale';
 if (!defined('MIDJOURNEY_API_KEY')) {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'MIDJOURNEY_API_KEY not set']);
+        http_response_code(400);
+        echo json_encode([
+                'status' => 'error',
+                'message' => 'The constant MIDJOURNEY_API_KEY is undefined.'
+        ]);
         exit;
 }
 $apiKey = MIDJOURNEY_API_KEY;
