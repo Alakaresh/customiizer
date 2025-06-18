@@ -86,15 +86,16 @@ jQuery(document).ready(function($) {
 				starIcon.addClass('disabled');
 			}
 
-			const img = $('<img/>', {
-				src: image.image_url,
-				alt: 'Generated Image',
-				class: 'preview-enlarge',
-				'data-user-id': userId || '',    // Ajouté
-				'data-display_name': image.display_name || '',  // Ajouté
-				'data-format-image': image.format || '', // Ajouté
-				'data-prompt': image.prompt || '' // Ajouté
-			});
+        const img = $('<img/>', {
+                src: image.image_url,
+                alt: 'Generated Image',
+                class: 'preview-enlarge',
+                'data-user-id': userId || '',    // Ajouté
+                'data-display_name': image.display_name || '',  // Ajouté
+                'data-format-image': image.format || '', // Ajouté
+                'data-prompt': image.prompt || '', // Ajouté
+                loading: 'lazy'
+        });
 
 
 			const overlayDiv = $('<div/>', { class: 'overlay', style: 'display: none;' });
