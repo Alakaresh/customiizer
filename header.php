@@ -133,12 +133,13 @@ $display_name = $current_user->display_name;
 		<script>
 			var ajaxurl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
 			var userIsLoggedIn = <?php echo $user_logged_in ? 'true' : 'false'; ?>;
-			var currentUser = {
-				ID: <?php echo $user_id; ?>,
-				user_nicename: "<?php echo esc_js($user_nicename); ?>",
-				display_name: "<?php echo esc_js($display_name); ?>"
-			};
-		</script>
+                        var currentUser = {
+                                ID: <?php echo $user_id; ?>,
+                                user_nicename: "<?php echo esc_js($user_nicename); ?>",
+                                display_name: "<?php echo esc_js($display_name); ?>"
+                        };
+                        var decrementCreditsNonce = '<?php echo wp_create_nonce("decrement_credits_nonce"); ?>';
+                </script>
 		<script>
 			jQuery(document).ready(function ($) {
 				$('.mobile-menu-toggle').on('click', function () {

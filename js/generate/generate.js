@@ -352,13 +352,13 @@ jQuery(function($) {
 	};
 	async function updateCreditsInDB(userId) {
 		try {
-			const response = await fetch(ajaxurl, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: `action=decrement_credits&user_id=${encodeURIComponent(userId)}`
-			});
+                        const response = await fetch(ajaxurl, {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `action=decrement_credits&user_id=${encodeURIComponent(userId)}&nonce=${encodeURIComponent(decrementCreditsNonce)}`
+                        });
 			if (!response.ok) throw new Error('Échec de décrémentation côté serveur');
 			console.log("✅ Crédits décrémentés côté serveur");
 		} catch (error) {
@@ -669,13 +669,13 @@ jQuery(function($) {
 
 	async function updateCredits() {
 		try {
-			const response = await fetch(ajaxurl, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: `action=decrement_credits&user_id=${encodeURIComponent(currentUser.ID)}`
-			});
+                        const response = await fetch(ajaxurl, {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `action=decrement_credits&user_id=${encodeURIComponent(currentUser.ID)}&nonce=${encodeURIComponent(decrementCreditsNonce)}`
+                        });
 			if (!response.ok) {
 				throw new Error('Échec de la mise à jour des crédits dans la base de données.');
 			}
