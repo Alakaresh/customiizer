@@ -114,7 +114,6 @@ add_action( 'init', function() {
 		'/includes/get_user_orders.php',
 		//'/includes/webhook.php',
 		'/includes/get_all_images.php',
-		'/includes/get_generated_images.php',
 		'/includes/get_user_details.php',
 		'/includes/generate_mockup.php',
 		'/includes/signin.php',
