@@ -1,33 +1,56 @@
 const userId = currentUser.ID; // Utiliser ton objet PHP existant
 const cacheKey = `community_images_${userId || 'guest'}`;
+const INITIAL_LIMIT = 20;
 let allImages = [];
 
 jQuery(document).ready(function($) {
 	const startTime = performance.now();
-	const cachedImages = sessionStorage.getItem(cacheKey);
-	if (cachedImages) {
-		allImages = JSON.parse(cachedImages);
-		displayImages(allImages);
-	} else {
-		fetchImagesFromAPI();
-	}
-	function fetchImagesFromAPI() {
-		fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}`)
-			.then(response => response.json())
-			.then(data => {
-			if (data.success) {
-				allImages = data.images;
-				sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
-				displayImages(allImages);
-				const endTime = performance.now();
-			} else {
-				console.error('[AJAX] ❌ Aucune image trouvée.');
-			}
-		})
-			.catch(error => {
-			console.error('[AJAX] ❌ Erreur de récupération des images:', error);
-		});
-	}
+       const cachedImages = sessionStorage.getItem(cacheKey);
+       if (cachedImages) {
+               allImages = JSON.parse(cachedImages);
+               displayImages(allImages);
+       } else {
+               fetchInitialImages();
+       }
+
+       function fetchInitialImages() {
+               fetchImagesFromAPI(INITIAL_LIMIT, 0).then(count => {
+                       if (count === INITIAL_LIMIT) {
+                               fetchImagesFromAPI(1000, INITIAL_LIMIT, true);
+                       }
+               });
+       }
+
+       function fetchImagesFromAPI(limit = null, offset = 0, append = false) {
+               const url = new URL(`${baseUrl}/wp-json/api/v1/images/load`, window.location.origin);
+               url.searchParams.append('user_id', userId);
+               if (limit !== null) {
+                       url.searchParams.append('limit', limit);
+                       url.searchParams.append('offset', offset);
+               }
+
+               return fetch(url)
+                       .then(response => response.json())
+                       .then(data => {
+                               if (data.success) {
+                                       if (append) {
+                                               allImages = allImages.concat(data.images);
+                                       } else {
+                                               allImages = data.images;
+                                       }
+                                       sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
+                                       displayImages(allImages);
+                                       return data.images.length;
+                               } else {
+                                       console.error('[AJAX] ❌ Aucune image trouvée.');
+                                       return 0;
+                               }
+                       })
+                       .catch(error => {
+                               console.error('[AJAX] ❌ Erreur de récupération des images:', error);
+                               return 0;
+                       });
+       }
 
 	function shuffleArray(array) {
 		for (let i = array.length - 1; i > 0; i--) {
