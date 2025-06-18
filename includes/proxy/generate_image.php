@@ -7,30 +7,36 @@ error_reporting(E_ALL);
 // Log simple
 file_put_contents(__DIR__ . '/generate_debug.log', "Script appelé à " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
 
-// Charger WordPress uniquement si non chargé
-if (!defined('ABSPATH')) {
-    $wpLoad = dirname(__DIR__, 5) . '/wp-load.php';
-    if (file_exists($wpLoad)) {
-        require_once $wpLoad;
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Impossible de charger WordPress (wp-load.php non trouvé)',
-        ]);
-        exit;
-    }
-}
+$wpLoad = dirname(__DIR__, 5) . '/wp-load.php';
+file_put_contents(__DIR__ . '/generate_debug.log', "Chemin wp-load.php : $wpLoad\n", FILE_APPEND);
 
-// Re-vérifie que WordPress est bien chargé
-if (!defined('ABSPATH')) {
+if (file_exists($wpLoad)) {
+    require_once $wpLoad;
+    file_put_contents(__DIR__ . '/generate_debug.log', "wp-load.php chargé\n", FILE_APPEND);
+} else {
+    file_put_contents(__DIR__ . '/generate_debug.log', "wp-load.php NON trouvé\n", FILE_APPEND);
     http_response_code(500);
     echo json_encode([
         'status' => 'error',
-        'message' => 'WordPress non chargé après inclusion.',
+        'message' => 'wp-load.php non trouvé',
     ]);
     exit;
 }
+
+
+// Re-vérifie que WordPress est bien chargé
+if (!defined('ABSPATH')) {
+    file_put_contents(__DIR__ . '/generate_debug.log', "WordPress NON chargé (ABSPATH non défini)\n", FILE_APPEND);
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'WordPress non chargé',
+    ]);
+    exit;
+} else {
+    file_put_contents(__DIR__ . '/generate_debug.log', "WordPress chargé OK ✅\n", FILE_APPEND);
+}
+
 
 // Constantes d'erreur
 const ERROR_MISSING_API_KEY      = 1000;
