@@ -90,6 +90,7 @@ jQuery(document).ready(function($) {
 				src: image.image_url,
 				alt: 'Generated Image',
 				class: 'preview-enlarge',
+                                loading: 'lazy',
 				'data-user-id': userId || '',    // Ajouté
 				'data-display_name': image.display_name || '',  // Ajouté
 				'data-format-image': image.format || '', // Ajouté
