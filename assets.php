@@ -26,9 +26,10 @@ function customiizer_enqueue_customize_assets() {
 	// ===============================
 	// SCRIPTS GLOBAUX
 	// ===============================
-	wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', array(), null, true);
-	wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', array('jquery'), null, true);
-	wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', array('jquery'), null, true);
+        wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', array(), null, true);
+        wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', array('jquery'), null, true);
+        wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', array('jquery'), null, true);
+        wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/global/preload_products.js', array(), null, true);
 
 	// Localiser les scripts avec leurs NONCES
 	wp_localize_script('signin-script', 'signin_object', array('nonce' => $signin_nonce));

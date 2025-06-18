@@ -1,5 +1,12 @@
 jQuery(document).ready(function ($) {
-	const apiURL = '/wp-json/api/v1/products/list';
+        const apiURL = '/wp-json/api/v1/products/list';
+        try {
+                const saved = sessionStorage.getItem('customizerCache');
+                window.customizerCache = saved ? JSON.parse(saved) : {};
+        } catch (e) {
+                window.customizerCache = {};
+        }
+        window.customizerCache.products = window.customizerCache.products || [];
 	const productOptionsContainer = $('#product-options');
 	const selectedProductName = $('.product-name');
 	const selectedProductImage = $('#dropdown-image');
@@ -39,32 +46,44 @@ jQuery(document).ready(function ($) {
 		}
 	});
 
-	// Charger la liste des produits
-	fetch(apiURL)
-		.then(response => {
-		if (!response.ok) {
-			throw new Error(`Erreur serveur: ${response.status}`);
-		}
-		return response.json();
-	})
-		.then(products => {
-		if (products.length > 0) {
-			populateDropdown(products);
+        // Charger la liste des produits
+        const cachedProducts = window.customizerCache.products;
+        if (cachedProducts && cachedProducts.length > 0) {
+                populateDropdown(cachedProducts);
+                if (initialProductId) {
+                        const selectedProduct = cachedProducts.find(p => p.product_id == initialProductId);
+                        if (selectedProduct) {
+                                updateSelectedProduct(selectedProduct);
+                        }
+                }
+        } else {
+                fetch(apiURL)
+                        .then(response => {
+                        if (!response.ok) {
+                                throw new Error(`Erreur serveur: ${response.status}`);
+                        }
+                        return response.json();
+                })
+                        .then(products => {
+                        if (products.length > 0) {
+                                window.customizerCache.products = products;
+                                populateDropdown(products);
 
-			// Si URL contient un ID au chargement
-			if (initialProductId) {
-				const selectedProduct = products.find(p => p.product_id == initialProductId);
-				if (selectedProduct) {
-					updateSelectedProduct(selectedProduct);
-				}
-			}
-		} else {
-			console.warn("Aucun produit trouvé dans la liste.");
-		}
-	})
-		.catch(error => {
-		console.error("Erreur lors de la récupération des produits :", error);
-	});
+                                if (initialProductId) {
+                                        const selectedProduct = products.find(p => p.product_id == initialProductId);
+                                        if (selectedProduct) {
+                                                updateSelectedProduct(selectedProduct);
+                                        }
+                                }
+                                sessionStorage.setItem('customizerCache', JSON.stringify({ ...window.customizerCache, models: {} }));
+                        } else {
+                                console.warn("Aucun produit trouvé dans la liste.");
+                        }
+                })
+                        .catch(error => {
+                        console.error("Erreur lors de la récupération des produits :", error);
+                });
+        }
 
 	// Remplir le dropdown
 	function populateDropdown(products) {
