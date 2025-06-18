@@ -49,13 +49,13 @@ function save_user_image() {
             // Format de l'URL à enregistrer dans la base de données
             $image_url = home_url('wp-sauvegarde/user/' . $user_id . '/user' . $user_id . '_logo.png');
 			
-			// Avant la requête de mise à jour
-			var_dump($image_url); // Vérifier l'URL de l'image
+                        // Avant la requête de mise à jour
+                        // var_dump($image_url); // Vérifier l'URL de l'image
             
 			// Requête de mise à jour pour mettre à jour la colonne user_logo
             $wpdb->update('WPC_client', ['user_logo' => $image_url], ['customer_id' => $user_id]);
            
-            var_dump($result); // Vérifier le résultat de la requête de mise à jour
+            // var_dump($result); // Vérifier le résultat de la requête de mise à jour
 
             if ($result !== false) {
                 echo 'Image enregistrée avec succès !';
