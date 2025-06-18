@@ -6,9 +6,16 @@ register_rest_route('api/v1/products', '/(?P<id>\d+)', [
 ]);
 
 function product($request) {
-	global $wpdb;
-	$product_id = intval($request['id']);
-	$prefix = 'WPC_';  // Préfixe personnalisé
+        global $wpdb;
+        $product_id = intval($request['id']);
+        $prefix = 'WPC_';  // Préfixe personnalisé
+
+        // Try to return cached product details first
+        $cache_key = 'customiizer_product_' . $product_id;
+        $cached = get_transient($cache_key);
+        if (false !== $cached) {
+                return new WP_REST_Response($cached, 200);
+        }
 
 	$query = $wpdb->prepare("
     SELECT 
@@ -74,9 +81,14 @@ function product($request) {
 		}
 	}
 
-	return new WP_REST_Response([
-		'product_description' => $productDescription,
-		'variants' => array_values($variants)
-	], 200);
+        $response = [
+                'product_description' => $productDescription,
+                'variants' => array_values($variants)
+        ];
+
+        // Cache the response for quicker subsequent requests
+        set_transient($cache_key, $response, HOUR_IN_SECONDS);
+
+        return new WP_REST_Response($response, 200);
 }
 ?>
