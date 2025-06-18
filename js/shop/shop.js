@@ -103,30 +103,41 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // ---------- Préchargement des variantes et modèles 3D ----------
     async function preloadVariants(products) {
+        const fetchPromises = [];
+
+        // Collect promises to fetch all product details concurrently
         for (const p of products) {
             if (!window.customizerCache.variants[p.product_id]) {
-                try {
-                    const res = await fetch(`/wp-json/api/v1/products/${p.product_id}`);
-                    const data = await res.json();
-                    window.customizerCache.variants[p.product_id] = data;
-                    // Sauvegarder immédiatement les données préchargées
-                    persistCache();
-                } catch (e) {
-                    console.error('Erreur chargement variantes', p.product_id, e);
-                    continue;
-                }
+                const fetchPromise = fetch(`/wp-json/api/v1/products/${p.product_id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        window.customizerCache.variants[p.product_id] = data;
+                    })
+                    .catch(e => {
+                        console.error('Erreur chargement variantes', p.product_id, e);
+                    });
+                fetchPromises.push(fetchPromise);
             }
+        }
 
+        // Wait for all product fetches to complete
+        await Promise.all(fetchPromises);
+
+        const loader = new THREE.GLTFLoader();
+
+        // Load 3D models using a single loader instance
+        products.forEach(p => {
             const productVariants = window.customizerCache.variants[p.product_id]?.variants || [];
             productVariants.forEach(v => {
                 if (v.url_3d && !window.customizerCache.models[v.url_3d]) {
-                    const loader = new THREE.GLTFLoader();
                     loader.load(v.url_3d, gltf => {
                         window.customizerCache.models[v.url_3d] = gltf;
                     });
                 }
             });
-        }
+        });
+
+        // Persist cache once all fetches and loads have been queued
         persistCache();
     }
 });
