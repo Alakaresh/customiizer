@@ -27,14 +27,16 @@ get_header();
 			<button id="search-button"><i class="fas fa-search"></i></button>
 		</div>
 	</div>
-	<div class="content-container" id="image-container" style="width: 100%; height: auto">
-		<div class="image-column" id="image-container1"></div>
-	</div>
-	<div id="imageModal" class="modal">
-		<img class="modal-content" id="modalImage">
-		<div id="caption"></div>
-	</div>
+        <div class="content-container" id="image-container" style="width: 100%; height: auto">
+                <div class="image-column" id="image-container1"></div>
+        </div>
+        <div id="loading-indicator" class="loading-indicator" style="display: none;">Chargement d'images...</div>
+        <div id="imageModal" class="modal">
+                <img class="modal-content" id="modalImage">
+                <div id="caption"></div>
+        </div>
 </main>
 <script src="/wp-content/themes/customiizer/js/community/show_images.js"></script>
 </body>
 </html>
+

@@ -37,9 +37,10 @@ jQuery(document).ready(function($) {
                 return columns;
         }
 
-        function fetchImagesFromAPI(append = false) {
-                if (isLoading) return;
+       function fetchImagesFromAPI(append = false) {
+               if (isLoading) return;
                 isLoading = true;
+                $('#loading-indicator').show();
 
                 fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerPage}&offset=${offset}`)
                         .then(response => response.json())
@@ -63,6 +64,7 @@ jQuery(document).ready(function($) {
                 })
                 .finally(() => {
                         isLoading = false;
+                        $('#loading-indicator').hide();
                 });
 
 	}

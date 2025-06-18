@@ -12,9 +12,11 @@
 	</div>
 </div>
 <div class="content-container" id="image-container" style="width: 100%; height: auto">
-	<div class="image-column" id="image-container1"></div>
+        <div class="image-column" id="image-container1"></div>
 </div>
+<div id="loading-indicator" class="loading-indicator" style="display: none;">Chargement d'images...</div>
 <div id="imageModal" class="modal">
-	<img class="modal-content" id="modalImage">
-	<div id="caption"></div>
+        <img class="modal-content" id="modalImage">
+        <div id="caption"></div>
 </div>
+

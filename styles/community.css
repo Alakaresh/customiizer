@@ -249,3 +249,10 @@ body {
     margin: 0;
     color: #fff;
 }
+
+.loading-indicator {
+    text-align: center;
+    padding: 10px;
+    color: #fff;
+    font-size: 14px;
+}
