@@ -138,9 +138,9 @@ const CanvasManager = {
 				originY: 'top',
 				selectable: true,
 				hasControls: true,
-				lockRotation: true,
+				lockRotation: false,
 				lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
-				rotatingPoint: false,
+				rotatingPoint: true,
 				//borderColor: 'green',
 				//cornerColor: 'blue'
 			});
@@ -154,7 +154,7 @@ const CanvasManager = {
 				mb: false,
 				ml: false,
 				mr: false,
-				mtr: false  // rotation désactivée
+				mtr: true  // rotation activée
 			});
 
 
