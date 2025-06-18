@@ -73,10 +73,11 @@ jQuery(document).ready(function ($) {
 
 
 
-        function persistCache() {
-                const tmp = { ...window.customizerCache, models: {} };
-                cacheStorage.setItem('customizerCache', JSON.stringify(tmp));
-        }
+       function persistCache() {
+               const tmp = { ...window.customizerCache, models: {} };
+               cacheStorage.setItem('customizerCache', JSON.stringify(tmp));
+       }
+       window.persistCustomizerCache = persistCache;
 
         function processProductData(productData) {
                 currentVariants = productData.variants;

@@ -245,32 +245,59 @@ function updateMockupThumbnail(styleId, mockupUrl) {
 		return;
 	}
 
-	let thumbnailToUpdate = document.querySelector(`.thumbnail[data-style-id="${styleId}"]`);
+        let thumbnailToUpdate = document.querySelector(`.thumbnail[data-style-id="${styleId}"]`);
 
-	if (thumbnailToUpdate) {
-		// ✅ Met à jour l'image du thumbnail existant
-		thumbnailToUpdate.src = mockupUrl;
-		thumbnailToUpdate.classList.remove("processing");
-		console.log(`✅ Thumbnail mis à jour pour style ${styleId}`);
+        if (thumbnailToUpdate) {
+                // ✅ Met à jour l'image du thumbnail existant
+                thumbnailToUpdate.src = mockupUrl;
+                thumbnailToUpdate.classList.remove("processing");
+                console.log(`✅ Thumbnail mis à jour pour style ${styleId}`);
 
-	} else {
-		console.warn(`⚠️ Aucun thumbnail trouvé pour le style ${styleId}, ajout en cours...`);
+        } else {
+                console.warn(`⚠️ Aucun thumbnail trouvé pour le style ${styleId}, ajout en cours...`);
 
-		// ✅ Création d'un nouveau thumbnail si aucun existant
-		thumbnailToUpdate = document.createElement("img");
-		thumbnailToUpdate.src = mockupUrl;
-		thumbnailToUpdate.alt = `Mockup Style ${styleId}`;
-		thumbnailToUpdate.classList.add("thumbnail");
-		thumbnailToUpdate.dataset.styleId = styleId;
+                // ✅ Création d'un nouveau thumbnail si aucun existant
+                thumbnailToUpdate = document.createElement("img");
+                thumbnailToUpdate.src = mockupUrl;
+                thumbnailToUpdate.alt = `Mockup Style ${styleId}`;
+                thumbnailToUpdate.classList.add("thumbnail");
+                thumbnailToUpdate.dataset.styleId = styleId;
 
-		thumbnailsContainer.appendChild(thumbnailToUpdate);
-		console.log(`✅ Nouveau thumbnail ajouté pour style ${styleId}`);
-	}
+                thumbnailsContainer.appendChild(thumbnailToUpdate);
+                console.log(`✅ Nouveau thumbnail ajouté pour style ${styleId}`);
+        }
 
-	// ✅ Simuler un clic pour mettre à jour l'image principale
-	console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
-	if (styleId === selectedVariant.mockups[0]?.mockup_id) {
-		console.log(`🔄 Activation automatique du thumbnail principal (style ${styleId})`);
+       // 🔄 Met à jour les données du variant pour conserver le thumbnail
+       if (selectedVariant && Array.isArray(selectedVariant.mockups)) {
+               const existing = selectedVariant.mockups.find(m => m.mockup_id == styleId);
+               if (existing) {
+                       existing.mockup_image = mockupUrl;
+               } else {
+                       selectedVariant.mockups.push({ mockup_id: styleId, mockup_image: mockupUrl });
+               }
+
+               if (currentProductId && window.customizerCache?.variants?.[currentProductId]?.variants) {
+                       const productVariants = window.customizerCache.variants[currentProductId].variants;
+                       const cachedVar = productVariants.find(v => v.variant_id == selectedVariant.variant_id);
+                       if (cachedVar) {
+                               cachedVar.mockups = selectedVariant.mockups;
+                               if (typeof window.persistCustomizerCache === 'function') {
+                                       window.persistCustomizerCache();
+                               } else {
+                                       try {
+                                               const storage = window.localStorage || window.sessionStorage;
+                                               const tmp = { ...window.customizerCache, models: {} };
+                                               storage.setItem('customizerCache', JSON.stringify(tmp));
+                                       } catch (e) {}
+                               }
+                       }
+               }
+       }
+
+        // ✅ Simuler un clic pour mettre à jour l'image principale
+        console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
+        if (styleId === selectedVariant.mockups[0]?.mockup_id) {
+                console.log(`🔄 Activation automatique du thumbnail principal (style ${styleId})`);
 		thumbnailToUpdate.click();
 	}
 }
