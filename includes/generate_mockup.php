@@ -36,26 +36,36 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
 	customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
-	$ch = curl_init($url);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, [
-		'Content-Type: application/json',
-		"Authorization: Bearer $api_key"
-	]);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_POST, true);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $ch = curl_init($url);
+        $respHeaders = [];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                "Authorization: Bearer $api_key"
+        ]);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
+                $len = strlen($header);
+                $parts = explode(':', $header, 2);
+                if (count($parts) == 2) {
+                        $respHeaders[strtolower(trim($parts[0]))] = trim($parts[1]);
+                }
+                return $len;
+        });
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-	$result = curl_exec($ch);
-	$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        if (curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                customiizer_log("Erreur cURL : {$error_msg}");
+                curl_close($ch);
+                return ['success' => false, 'error' => $error_msg];
+        }
 
-	if (curl_errno($ch)) {
-		$error_msg = curl_error($ch);
-		customiizer_log("Erreur cURL : {$error_msg}");
-		curl_close($ch);
-		return ['success' => false, 'error' => $error_msg];
-	}
-
-	curl_close($ch);
+        curl_close($ch);
+        printful_apply_rate_limit($respHeaders);
 
 	customiizer_log("API Printful HTTP Code: {$httpCode}");
 	customiizer_log("Réponse Printful: {$result}");
@@ -240,25 +250,36 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 	$url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
 	$elapsed_time = 0;
 
-	while ($elapsed_time < $timeout) {
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, [
-			'Content-Type: application/json',
-			"Authorization: Bearer $api_key"
-		]);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        while ($elapsed_time < $timeout) {
+                $ch = curl_init($url);
+                $respHeaders = [];
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        "Authorization: Bearer $api_key"
+                ]);
+                curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
+                        $len = strlen($header);
+                        $parts = explode(':', $header, 2);
+                        if (count($parts) == 2) {
+                                $respHeaders[strtolower(trim($parts[0]))] = trim($parts[1]);
+                        }
+                        return $len;
+                });
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-		$result = curl_exec($ch);
-		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $result = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-		if (curl_errno($ch)) {
-			$error_msg = curl_error($ch);
-			customiizer_log("Erreur cURL lors de la vérification : {$error_msg}");
-			curl_close($ch);
-			return ['success' => false, 'error' => $error_msg];
-		}
+                if (curl_errno($ch)) {
+                        $error_msg = curl_error($ch);
+                        customiizer_log("Erreur cURL lors de la vérification : {$error_msg}");
+                        curl_close($ch);
+                        printful_apply_rate_limit($respHeaders);
+                        return ['success' => false, 'error' => $error_msg];
+                }
 
-		curl_close($ch);
+                curl_close($ch);
+                printful_apply_rate_limit($respHeaders);
 
 		// Analyse de la réponse
 		if ($httpCode !== 200) {
