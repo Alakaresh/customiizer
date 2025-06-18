@@ -4,6 +4,10 @@ $apiUrl = defined('MIDJOURNEY_API_URL')
     ? MIDJOURNEY_API_URL
     : 'https://api.userapi.ai/midjourney/v2/imagine';
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Codes d'erreur pour faciliter le diagnostic depuis le frontend
 const ERROR_MISSING_API_KEY        = 1000;
 const ERROR_INVALID_JSON_INPUT     = 1001;
