@@ -1,33 +1,52 @@
 const userId = currentUser.ID; // Utiliser ton objet PHP existant
 const cacheKey = `community_images_${userId || 'guest'}`;
 let allImages = [];
+const limit = 20;
+let offset = 0;
+let columns = [];
+let columnIndex = 0;
+let isLoading = false;
 
 jQuery(document).ready(function($) {
-	const startTime = performance.now();
-	const cachedImages = sessionStorage.getItem(cacheKey);
-	if (cachedImages) {
-		allImages = JSON.parse(cachedImages);
-		displayImages(allImages);
-	} else {
-		fetchImagesFromAPI();
-	}
-	function fetchImagesFromAPI() {
-		fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}`)
-			.then(response => response.json())
-			.then(data => {
-			if (data.success) {
-				allImages = data.images;
-				sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
-				displayImages(allImages);
-				const endTime = performance.now();
-			} else {
-				console.error('[AJAX] ❌ Aucune image trouvée.');
-			}
-		})
-			.catch(error => {
-			console.error('[AJAX] ❌ Erreur de récupération des images:', error);
-		});
-	}
+        const startTime = performance.now();
+
+        setupColumns();
+        const cachedImages = sessionStorage.getItem(cacheKey);
+        if (cachedImages) {
+                allImages = JSON.parse(cachedImages);
+                offset = allImages.length;
+                displayImages(allImages);
+        } else {
+                fetchImagesFromAPI();
+        }
+
+        setupInfiniteScroll();
+        function fetchImagesFromAPI() {
+                if (isLoading) return;
+                isLoading = true;
+                const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${limit}&offset=${offset}`;
+                fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                        if (data.success) {
+                                offset += data.images.length;
+                                allImages = allImages.concat(data.images);
+                                sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
+                                if (offset === data.images.length) {
+                                        displayImages(allImages);
+                                } else {
+                                        appendImages(data.images);
+                                }
+                        } else {
+                                console.error('[AJAX] ❌ Aucune image trouvée.');
+                        }
+                        isLoading = false;
+                })
+                        .catch(error => {
+                        console.error('[AJAX] ❌ Erreur de récupération des images:', error);
+                        isLoading = false;
+                });
+        }
 
 	function shuffleArray(array) {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -41,34 +60,49 @@ jQuery(document).ready(function($) {
 		return urlParams.get(param);
 	}
 
-	function initializeColumns() {
-		const columns = [];
-		for (let i = 0; i < 5; i++) {
-			columns.push($('<div/>', { class: 'image-column' }));
-		}
-		return columns;
-	}
+        function initializeColumns() {
+                const cols = [];
+                for (let i = 0; i < 5; i++) {
+                        cols.push($('<div/>', { class: 'image-column' }));
+                }
+                return cols;
+        }
 
-	function displayImages(images) {
+        function setupColumns() {
+                columns = initializeColumns();
+                const container = $('<div/>', { class: 'image-container' });
+                columns.forEach(function(column) { container.append(column); });
+                $('#image-container').html(container);
+        }
 
-		// ✨ Travailler sur une copie des images
-		const imagesToDisplay = [...images];
-		const userFilter = getQueryParam('user');
-		let filteredImages = images;
+        function displayImages(images) {
 
-		if (userFilter) {
-			filteredImages = images.filter(image => image.display_name === userFilter);
-		}
+                const userFilter = getQueryParam('user');
+                let filteredImages = images;
 
-		const columns = initializeColumns();
-		let columnIndex = 0;
+                if (userFilter) {
+                        filteredImages = images.filter(image => image.display_name === userFilter);
+                }
 
-		filteredImages.forEach(function(image) {
-			const imageDiv = $('<div/>', {
-				class: 'imageContainer',
-				'data-image-id': image.image_number,
-				'data-prompt': (image.prompt || '').toLowerCase()
-			});
+                columns.forEach(col => col.empty());
+                columnIndex = 0;
+
+                appendImages(filteredImages);
+        }
+
+        function appendImages(images) {
+                const userFilter = getQueryParam('user');
+                let filteredImages = images;
+                if (userFilter) {
+                        filteredImages = images.filter(image => image.display_name === userFilter);
+                }
+
+                filteredImages.forEach(function(image) {
+                        const imageDiv = $('<div/>', {
+                                class: 'imageContainer',
+                                'data-image-id': image.image_number,
+                                'data-prompt': (image.prompt || '').toLowerCase()
+                        });
 
 			const likeIcon = $('<i/>', {
 				class: image.liked_by_user === true ? 'fas fa-heart like-icon liked' : 'far fa-heart like-icon',
@@ -125,18 +159,14 @@ jQuery(document).ready(function($) {
 						});
 					}
 				);
-				columnIndex = (columnIndex + 1) % 5;
-			});
+                                columnIndex = (columnIndex + 1) % columns.length;
+                        });
 
 
 		});
 
-		const container = $('<div/>', { class: 'image-container' });
-		columns.forEach(function(column) { container.append(column); });
-		$('#image-container').html(container);
-
-		enableImageEnlargement();
-	}
+                enableImageEnlargement();
+        }
 
 
 	// Événements sur les icônes
@@ -261,11 +291,11 @@ jQuery(document).ready(function($) {
 		return dp[m][n];
 	}
 
-	$(document).on('input', '#search-input', function () {
-		const rawSearch = $(this).val();
-		const searchWords = normalizeText(rawSearch)
-		.split(/\s+/)
-		.map(w => w.replace(/[^a-z0-9]/gi, ''));
+        $(document).on('input', '#search-input', function () {
+                const rawSearch = $(this).val();
+                const searchWords = normalizeText(rawSearch)
+                .split(/\s+/)
+                .map(w => w.replace(/[^a-z0-9]/gi, ''));
 
 		const maxDistance = 2;
 
@@ -286,9 +316,26 @@ jQuery(document).ready(function($) {
 				});
 			});
 
-			$(this).toggle(allMatched);
-		});
-	});
+                $(this).toggle(allMatched);
+                });
+        });
+
+        function setupInfiniteScroll() {
+                const triggerId = 'load-more-trigger';
+                let trigger = $('#' + triggerId);
+                if (!trigger.length) {
+                        trigger = $('<div/>', { id: triggerId });
+                        $('#image-container').after(trigger);
+                }
+                const observer = new IntersectionObserver(entries => {
+                        entries.forEach(entry => {
+                                if (entry.isIntersecting && !isLoading) {
+                                        fetchImagesFromAPI();
+                                }
+                        });
+                }, { rootMargin: '200px' });
+                observer.observe(trigger[0]);
+        }
 
 });
 
