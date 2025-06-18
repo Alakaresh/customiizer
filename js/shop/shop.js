@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     window.customizerCache.models = window.customizerCache.models || {};
     window.customizerCache.variants = window.customizerCache.variants || {};
+    window.customizerCache.products = window.customizerCache.products || [];
 
     function persistCache() {
         const tmp = { ...window.customizerCache, models: {} };
@@ -54,29 +55,36 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     console.log("Chargement des produits...");
 
-    // Appel API pour récupérer les produits
-    fetch('/wp-json/api/v1/products/list')
-        .then(response => {
-            if (!response.ok) {
-                console.error("Réponse serveur invalide:", response.status);
-                throw new Error('Erreur de réponse du serveur');
-            }
-            return response.json();
-        })
-        .then(async products => {
-            if (products && products.length > 0) {
-                console.log("Produits récupérés:", products);
-                displayProducts(products);
-                await preloadVariants(products);
-            } else {
-                console.warn("Aucun produit trouvé.");
-                document.querySelector('.product-list').innerHTML = '<p>Aucun produit trouvé.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Erreur lors de la récupération des produits:', error);
-            document.querySelector('.product-list').innerHTML = '<p>Erreur lors de la récupération des produits.</p>';
-        });
+    const cachedProducts = window.customizerCache.products || [];
+    if (cachedProducts.length > 0) {
+        displayProducts(cachedProducts);
+        await preloadVariants(cachedProducts);
+    } else {
+        fetch('/wp-json/api/v1/products/list')
+            .then(response => {
+                if (!response.ok) {
+                    console.error("Réponse serveur invalide:", response.status);
+                    throw new Error('Erreur de réponse du serveur');
+                }
+                return response.json();
+            })
+            .then(async products => {
+                if (products && products.length > 0) {
+                    window.customizerCache.products = products;
+                    console.log("Produits récupérés:", products);
+                    displayProducts(products);
+                    await preloadVariants(products);
+                    persistCache();
+                } else {
+                    console.warn("Aucun produit trouvé.");
+                    document.querySelector('.product-list').innerHTML = '<p>Aucun produit trouvé.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des produits:', error);
+                document.querySelector('.product-list').innerHTML = '<p>Erreur lors de la récupération des produits.</p>';
+            });
+    }
 
     // Fonction pour afficher les produits
     function displayProducts(products) {
