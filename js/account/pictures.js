@@ -1,19 +1,34 @@
 var ImageLoader = (function() {
-	const IMAGES_PER_BATCH = 16;
-	let currentPage = 1;
-	let allImages = []; // Il manquait la déclaration dans ton script
+        const IMAGES_PER_BATCH = 16;
+        // Keep only the latest batch of images cached in sessionStorage
+        const SESSION_CACHE_LIMIT = IMAGES_PER_BATCH;
+        let currentPage = 1;
+        let allImages = []; // Il manquait la déclaration dans ton script
+
+        // Store at most SESSION_CACHE_LIMIT images in sessionStorage.
+        // Older entries are discarded to prevent unlimited growth.
+        // Helper to write a pruned image array back to sessionStorage
+        function updateImageCache() {
+                const limited = allImages.slice(0, SESSION_CACHE_LIMIT);
+                sessionStorage.setItem('userGeneratedImages', JSON.stringify(limited));
+        }
 
 	function loadUserGeneratedImages() {
 
 		// Vérifier si on a déjà en session
-		const storedImages = sessionStorage.getItem('userGeneratedImages');
+                const storedImages = sessionStorage.getItem('userGeneratedImages');
 
-		if (storedImages) {
-			allImages = JSON.parse(storedImages);
-			renderImages();
-			enableImageEnlargement();
-			return;
-		}
+                if (storedImages) {
+                        allImages = JSON.parse(storedImages);
+                        if (allImages.length > SESSION_CACHE_LIMIT) {
+                                allImages = allImages.slice(0, SESSION_CACHE_LIMIT);
+                                // prune older entries if needed
+                                updateImageCache();
+                        }
+                        renderImages();
+                        enableImageEnlargement();
+                        return;
+                }
 
 		// Sinon, on fetch normalement
 		const apiUrl = `/wp-json/api/v1/images/load/${currentUser.ID}?limit=1000`;
@@ -24,8 +39,8 @@ var ImageLoader = (function() {
 			if (data.success && Array.isArray(data.images)) {
 				allImages = data.images;
 
-				// Stocker dans sessionStorage
-				sessionStorage.setItem('userGeneratedImages', JSON.stringify(allImages));
+                                // Stocker dans sessionStorage
+                                updateImageCache();
 
 				renderImages();
 				enableImageEnlargement();
