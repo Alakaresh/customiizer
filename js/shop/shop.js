@@ -1,4 +1,5 @@
-const { preloadAllProducts, persistCache } = window.preloadUtils;
+(() => {
+    const { preloadAllProducts, persistCache } = window.preloadUtils;
 
 document.addEventListener('DOMContentLoaded', async function() {
     const THEME_BASE = '/wp-content/themes/customiizer';
@@ -114,3 +115,5 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
 });
+
+})();
