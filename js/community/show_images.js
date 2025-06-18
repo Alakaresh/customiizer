@@ -8,6 +8,7 @@ let allImages = [];
 
 // Helper to fetch query parameters from the URL
 function getQueryParam(param) {
+
     var urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
 }
@@ -135,10 +136,6 @@ jQuery(document).ready(function($) {
 
                 overlayDiv.append(userLoginLink);
                 overlayDiv.data('prompt', image.prompt);
-
-                img.on('load', function() {
-                        overlayDiv.fadeIn();
-                });
 
                 imageDiv.append(img, iconOverlayDiv, overlayDiv);
 
