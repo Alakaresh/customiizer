@@ -4,8 +4,17 @@ let communityImages = [];
 let currentProductId = null;
 
 // 🌐 Cache global pour les templates et modèles 3D préchargés
+let cacheStorage = window.localStorage;
 try {
-    const saved = sessionStorage.getItem('customizerCache');
+    const testKey = '__cache_test__';
+    cacheStorage.setItem(testKey, testKey);
+    cacheStorage.removeItem(testKey);
+} catch (e) {
+    cacheStorage = window.sessionStorage;
+}
+
+try {
+    const saved = cacheStorage.getItem('customizerCache');
     window.customizerCache = saved ? JSON.parse(saved) : {};
 } catch (e) {
     window.customizerCache = {};
@@ -64,7 +73,7 @@ jQuery(document).ready(function ($) {
 
         function persistCache() {
                 const tmp = { ...window.customizerCache, models: {} };
-                sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+                cacheStorage.setItem('customizerCache', JSON.stringify(tmp));
         }
 
         function processProductData(productData) {
