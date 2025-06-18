@@ -50,6 +50,8 @@ jQuery(document).ready(function($) {
                         isLoading = false;
                 });
 
+	}
+
         function displayImages(images) {
                 const userFilter = getQueryParam('user');
                 let filteredImages = images;
