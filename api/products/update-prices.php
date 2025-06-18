@@ -3,7 +3,7 @@
 register_rest_route('api/v1/products/update', '/prices', [
 	'methods'  => 'POST',
 	'callback' => 'customiizer_update_purchase_prices',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 function customiizer_update_purchase_prices() {
 	global $wpdb;

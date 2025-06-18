@@ -4,18 +4,18 @@ add_action('rest_api_init', function() {
 	register_rest_route('custom-api/v1', '/products-summary/', array(
 		'methods' => 'GET',
 		'callback' => 'get_products_summary',
-		 'permission_callback' => '__return_true',
+		 'permission_callback' => 'customiizer_api_permissions',
 	));
 
 	register_rest_route('custom-api/v1', '/products/', array(
 		'methods' => 'GET',
 		'callback' => 'get_products_with_images_only',
-		 'permission_callback' => '__return_true',
+		 'permission_callback' => 'customiizer_api_permissions',
 	));
 	register_rest_route('custom-api/v1', '/product-variants/(?P<id>\d+)', [
 		'methods' => 'GET',
 		'callback' => 'get_product_variants',
-		'permission_callback' => '__return_true'
+		'permission_callback' => 'customiizer_api_permissions'
 	]);
 });
 

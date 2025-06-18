@@ -2,7 +2,7 @@
 register_rest_route('api/v1/user', '/update', [
 	'methods'  => 'POST',
 	'callback' => 'customiizer_update_existing_user',
-	'permission_callback' => '__return_true'
+	'permission_callback' => 'customiizer_api_permissions'
 
 ]);
 function customiizer_update_existing_user($request) {

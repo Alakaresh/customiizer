@@ -2,7 +2,7 @@
 register_rest_route('api/v1/images', '/load/(?P<user_id>\d+)', [
 	'methods' => 'GET',
 	'callback' => 'load_user_images',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 function load_user_images(WP_REST_Request $request) {
 	global $wpdb;

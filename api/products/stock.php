@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/update/stocks', [
 	'methods' => 'POST',
 	'callback' => 'customiizer_update_all_variant_stocks',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 
 function customiizer_update_all_variant_stocks() {

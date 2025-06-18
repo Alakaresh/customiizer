@@ -73,7 +73,9 @@ add_filter('woocommerce_shipping_methods', function ($methods) {
 
 add_action('rest_api_init', function () {
 
-	$api_dir = get_stylesheet_directory() . '/api';
+        require_once get_stylesheet_directory() . '/includes/auth.php';
+
+        $api_dir = get_stylesheet_directory() . '/api';
 
 	// Parcours récursif : /api/*.php  et  /api/**/**/*.php
 	$iterator = new RecursiveIteratorIterator(

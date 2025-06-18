@@ -4,13 +4,13 @@ add_action('rest_api_init', function () {
 	register_rest_route('customiizer/v1', '/upload-image/', [
 		'methods' => 'POST',
 		'callback' => 'customiizer_upload_image',
-		'permission_callback' => '__return_true',
+		'permission_callback' => 'customiizer_api_permissions',
 	]);
 
 	register_rest_route('customiizer/v1', '/user-images/', [
 		'methods' => 'GET',
 		'callback' => 'customiizer_get_user_images',
-		'permission_callback' => '__return_true',
+		'permission_callback' => 'customiizer_api_permissions',
 	]);
 });
 

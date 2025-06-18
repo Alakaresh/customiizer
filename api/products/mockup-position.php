@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/variant/(?P<variant_id>\d+)/mockup-position', [
     'methods'  => 'POST',
     'callback' => 'customiizer_update_mockup_position',
-    'permission_callback' => '__return_true',
+    'permission_callback' => 'customiizer_api_permissions',
 ]);
 
 function customiizer_update_mockup_position(WP_REST_Request $req) {

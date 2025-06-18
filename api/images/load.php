@@ -2,7 +2,7 @@
 register_rest_route('api/v1/images', '/load', [
 	'methods' => 'GET',
 	'callback' => 'load_community_images',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 function load_community_images(WP_REST_Request $request) {
 	global $wpdb;

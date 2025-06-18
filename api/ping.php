@@ -6,7 +6,7 @@
 register_rest_route('api/v1', '/ping', [
 	'methods' => 'GET',
 	'callback' => 'customiizer_api_ping',
-	'permission_callback' => '__return_true'
+	'permission_callback' => 'customiizer_api_permissions'
 ]);
 
 function customiizer_api_ping() {

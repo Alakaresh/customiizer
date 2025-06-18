@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/variant/(?P<variant_id>\d+)/margin', [
 	'methods' => 'POST',
 	'callback' => 'set_custom_variant_margin',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 
 function set_custom_variant_margin(WP_REST_Request $req) {
