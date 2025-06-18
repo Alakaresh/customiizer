@@ -20,13 +20,22 @@ jQuery(document).ready(function($) {
                 displayImages(allImages);
         }
 
-        fetchImagesFromAPI(allImages.length > 0);
+                fetchImagesFromAPI(allImages.length > 0);
 
         $(window).on('scroll', function() {
                 if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
                         fetchImagesFromAPI(true);
                 }
         });
+
+        function initializeColumns(numColumns = 5) {
+                const columns = [];
+                for (let i = 0; i < numColumns; i++) {
+                        const column = $('<div/>', { class: 'image-column' });
+                        columns.push(column);
+                }
+                return columns;
+        }
 
         function fetchImagesFromAPI(append = false) {
                 if (isLoading) return;
