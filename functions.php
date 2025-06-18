@@ -98,7 +98,8 @@ add_action( 'init', function() {
 		'/admin/products/admin-products.php',
 		'/utilities.php',
 		'/assets.php',
-		'/includes/azure.php',
+                '/includes/azure.php',
+                '/includes/printful_throttle.php',
 
 		// ===============================
 		// WEBHOOKS

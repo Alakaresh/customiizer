@@ -86,17 +86,26 @@ function confirm_printful_order($orderId, PrintfulWebhookLogger $logger): array
 		'design is still processing',
 	];
 
-	for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-		$ch = curl_init($url);
-		curl_setopt_array($ch, [
-			CURLOPT_CUSTOMREQUEST => "POST",
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_HTTPHEADER => $headers,
-		]);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                        CURLOPT_CUSTOMREQUEST => "POST",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HEADER         => true,
+                        CURLOPT_HTTPHEADER => $headers,
+                ]);
 
-		$response = curl_exec($ch);
-		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
+                printful_throttle();
+                $raw = curl_exec($ch);
+                $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+                $headersStr = substr($raw, 0, $headerSize);
+                $response = substr($raw, $headerSize);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if (preg_match('/X-Ratelimit-Remaining:\s*(\d+)/i', $headersStr, $m)) {
+                        printful_adjust_tokens((int)$m[1]);
+                }
 
 		$decoded = json_decode($response, true);
 		$message = $decoded['error']['message'] ?? 'Réponse : ' . $response;

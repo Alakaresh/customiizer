@@ -26,10 +26,10 @@ function customiizer_update_purchase_prices() {
 		foreach ($regions as $region) {
 			$url = "$base/catalog-variants/{$vid}/prices?currency=EUR&selling_region_name=" . urlencode($region);
 
-			$response = wp_remote_get($url, [
-				'headers' => $headers,
-				'timeout' => 15,
-			]);
+                        $response = printful_wp_get($url, [
+                                'headers' => $headers,
+                                'timeout' => 15,
+                        ]);
 
 			if (is_wp_error($response)) {
 				$errors[] = "Erreur WP pour $vid-$region : " . $response->get_error_message();

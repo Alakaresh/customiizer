@@ -36,17 +36,26 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
 	customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
-	$ch = curl_init($url);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, [
-		'Content-Type: application/json',
-		"Authorization: Bearer $api_key"
-	]);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_POST, true);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                "Authorization: Bearer $api_key"
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-	$result = curl_exec($ch);
-	$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        printful_throttle();
+        $raw = curl_exec($ch);
+        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $headersStr = substr($raw, 0, $headerSize);
+        $result = substr($raw, $headerSize);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (preg_match('/X-Ratelimit-Remaining:\s*(\d+)/i', $headersStr, $m)) {
+                printful_adjust_tokens((int)$m[1]);
+        }
 
 	if (curl_errno($ch)) {
 		$error_msg = curl_error($ch);
@@ -241,15 +250,24 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 	$elapsed_time = 0;
 
 	while ($elapsed_time < $timeout) {
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, [
-			'Content-Type: application/json',
-			"Authorization: Bearer $api_key"
-		]);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        "Authorization: Bearer $api_key"
+                ]);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HEADER, true);
 
-		$result = curl_exec($ch);
-		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                printful_throttle();
+                $raw = curl_exec($ch);
+                $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+                $headersStr = substr($raw, 0, $headerSize);
+                $result = substr($raw, $headerSize);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                if (preg_match('/X-Ratelimit-Remaining:\s*(\d+)/i', $headersStr, $m)) {
+                        printful_adjust_tokens((int)$m[1]);
+                }
 
 		if (curl_errno($ch)) {
 			$error_msg = curl_error($ch);

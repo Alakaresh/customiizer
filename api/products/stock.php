@@ -26,10 +26,10 @@ function customiizer_update_all_variant_stocks() {
 		foreach ($regions as $region) {
 			$stock_url = "$base/catalog-variants/$vid/availability?selling_region_name=" . urlencode($region);
 
-			$response = wp_remote_get($stock_url, [
-				'headers' => $hdr,
-				'timeout' => 10,
-			]);
+                        $response = printful_wp_get($stock_url, [
+                                'headers' => $hdr,
+                                'timeout' => 10,
+                        ]);
 
 			if (is_wp_error($response)) {
 				$errors[] = "Erreur WP pour $vid-$region : " . $response->get_error_message();
