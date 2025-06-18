@@ -188,14 +188,14 @@ function generateMockup(mockupData) {
 	// Envoi avec délai + promesse par style
 	const mockupPromises = [];
 
-	styleIds.forEach((styleId, index) => {
-		const promise = new Promise(resolve => {
-			setTimeout(() => {
-				sendWithRetry(styleId).then(resolve);
-			}, index * 1000); // 1s d'écart
-		});
-		mockupPromises.push(promise);
-	});
+        styleIds.forEach((styleId, index) => {
+                const promise = new Promise(resolve => {
+                        setTimeout(() => {
+                                sendWithRetry(styleId).then(resolve);
+                        }, index * 500); // 500ms d'écart
+                });
+                mockupPromises.push(promise);
+        });
 
 	// Nettoyage une fois toutes les promesses terminées
         Promise.all(mockupPromises).then(() => {
