@@ -1,5 +1,20 @@
 <?php
 
+// When this file is accessed directly, WordPress isn't loaded and core
+// functions like add_action() are undefined. Load wp-load.php manually so
+// the REST route registration works both inside and outside WordPress.
+if (!function_exists('add_action')) {
+    define('WP_USE_THEMES', false);
+    $wpLoad = dirname(__FILE__, 4) . '/wp-load.php';
+    if (file_exists($wpLoad)) {
+        require_once $wpLoad;
+    } else {
+        error_log("wp-load.php introuvable à $wpLoad");
+        http_response_code(500);
+        exit;
+    }
+}
+
 add_action('rest_api_init', function () {
     register_rest_route('customiizer/v1', '/webhook/', array(
         'methods' => 'POST',
