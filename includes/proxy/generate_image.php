@@ -4,24 +4,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Log simple
 file_put_contents(__DIR__ . '/generate_debug.log', "Script appelé à " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
 
-$wpLoad = dirname(__DIR__, 5) . '/wp-load.php';
-file_put_contents(__DIR__ . '/generate_debug.log', "Chemin wp-load.php : $wpLoad\n", FILE_APPEND);
-
-if (file_exists($wpLoad)) {
-    require_once $wpLoad;
-    file_put_contents(__DIR__ . '/generate_debug.log', "wp-load.php chargé\n", FILE_APPEND);
-} else {
-    file_put_contents(__DIR__ . '/generate_debug.log', "wp-load.php NON trouvé\n", FILE_APPEND);
-    http_response_code(500);
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'wp-load.php non trouvé',
-    ]);
-    exit;
-}
+// Vérifie que la constante MIDJOURNEY_API_KEY existe
+require_once __DIR__ . '/../../../../../../wp-config.php';
 
 
 // Re-vérifie que WordPress est bien chargé
@@ -51,11 +37,11 @@ if (!defined('MIDJOURNEY_API_KEY')) {
     http_response_code(400);
     echo json_encode([
         'status'  => 'error',
-        'message' => 'La constante MIDJOURNEY_API_KEY est manquante.',
-        'code'    => ERROR_MISSING_API_KEY
+        'message' => 'La constante MIDJOURNEY_API_KEY est absente.',
     ]);
     exit;
 }
+
 $apiKey = MIDJOURNEY_API_KEY;
 
 // URL par défaut
