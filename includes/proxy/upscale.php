@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__DIR__, 5) . '/wp-load.php';
+define('MIDJOURNEY_API_KEY', '28e69054-9d20-453b-bdc9-79c2f86c027d');
+define('MIDJOURNEY_API_URL', 'https://api.userapi.ai/midjourney/v2/upscale');
 // Paramètres API
 $apiUrl = defined('MIDJOURNEY_API_URL')
     ? MIDJOURNEY_API_URL
