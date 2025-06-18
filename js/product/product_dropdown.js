@@ -1,4 +1,7 @@
+import { preloadAllProducts } from '../utils/preload.js';
+
 jQuery(document).ready(function ($) {
+        preloadAllProducts();
 	const apiURL = '/wp-json/api/v1/products/list';
 	const productOptionsContainer = $('#product-options');
 	const selectedProductName = $('.product-name');
