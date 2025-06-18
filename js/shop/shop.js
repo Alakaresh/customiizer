@@ -1,6 +1,24 @@
 document.addEventListener('DOMContentLoaded', async function() {
     const THEME_BASE = '/wp-content/themes/customiizer';
 
+    // ---------- Loading indicator ----------
+    const productListContainer = document.querySelector('.product-list');
+    let loadingOverlay;
+
+    function showLoading() {
+        if (!productListContainer) return;
+        loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay';
+        loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
+        productListContainer.appendChild(loadingOverlay);
+    }
+
+    function hideLoading() {
+        if (loadingOverlay) loadingOverlay.remove();
+    }
+
+    showLoading();
+
     // ---------- Chargement dynamique de Three.js et GLTFLoader ----------
     async function loadScript(src) {
         return new Promise((resolve, reject) => {
@@ -76,15 +94,18 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (products && products.length > 0) {
                 console.log("Produits récupérés:", products);
                 displayProducts(products);
+                hideLoading();
                 await preloadVariants(products);
             } else {
                 console.warn("Aucun produit trouvé.");
                 document.querySelector('.product-list').innerHTML = '<p>Aucun produit trouvé.</p>';
+                hideLoading();
             }
         })
         .catch(error => {
             console.error('Erreur lors de la récupération des produits:', error);
             document.querySelector('.product-list').innerHTML = '<p>Erreur lors de la récupération des produits.</p>';
+            hideLoading();
         });
 
     // Fonction pour afficher les produits
