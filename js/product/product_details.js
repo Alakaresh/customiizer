@@ -283,9 +283,12 @@ jQuery(document).ready(function ($) {
 
                 const displayed = new Set();
                 let first = true;
+                const urlParams = new URLSearchParams(window.location.search);
+                const showAll = urlParams.get('mockup') === '1';
 
                 variants.forEach(variant => {
-                        variant.mockups.forEach(mockup => {
+                        variant.mockups.forEach((mockup, index) => {
+                                if (!showAll && (currentProductId == 382 || currentProductId == 585) && index > 0) return;
                                 if (displayed.has(mockup.mockup_image)) return;
                                 displayed.add(mockup.mockup_image);
 
