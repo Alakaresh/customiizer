@@ -1,3 +1,20 @@
 node_modules/
 .DS_Store
 *.log
+
+# Ignore generated image directories
+**/generated_images/
+**/generated/
+**/images/generated/
+
+# Ignore archives and heavy binary assets
+*.zip
+*.glb
+*.ai
+*.psd
+*.blend
+*.fbx
+*.stl
+*.obj
+*.bin
+
