@@ -1,6 +1,7 @@
-const { preloadAllProducts } = window.preloadUtils;
+(() => {
+    const { preloadAllProducts } = window.preloadUtils;
 
-jQuery(document).ready(function ($) {
+    jQuery(document).ready(function ($) {
         preloadAllProducts();
 	const apiURL = '/wp-json/api/v1/products/list';
 	const productOptionsContainer = $('#product-options');
@@ -106,12 +107,14 @@ jQuery(document).ready(function ($) {
 
 
 	// Au clic sur un produit dans la liste
-	productOptionsContainer.on('click', 'li', function () {
-		const productId = $(this).data('id');
-		const productName = $(this).data('name');
-		const productImage = $(this).data('image');
+        productOptionsContainer.on('click', 'li', function () {
+                const productId = $(this).data('id');
+                const productName = $(this).data('name');
+                const productImage = $(this).data('image');
 
 		updateSelectedProduct({ product_id: productId, name: productName, image: productImage });
 		productOptionsContainer.hide();
-	});
+        });
 });
+
+})();

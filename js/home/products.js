@@ -1,6 +1,7 @@
-const { preloadAllProducts } = window.preloadUtils;
+(() => {
+    const { preloadAllProducts } = window.preloadUtils;
 
-jQuery(document).ready(function($) {
+    jQuery(document).ready(function($) {
         preloadAllProducts();
 	var visibleItems = 5; // Nombre d'éléments visibles dans le carrousel
 	var itemWidth; // Initialisation de la variable pour la largeur des éléments
@@ -111,7 +112,9 @@ jQuery(document).ready(function($) {
 
 	// Initialisation et gestion du redimensionnement pour recalculer les largeurs
 	initCarousel();
-	jQuery(window).resize(function() {
-		initCarousel();
-	});
+        jQuery(window).resize(function() {
+                initCarousel();
+        });
 });
+
+})();
