@@ -4,7 +4,7 @@
 register_rest_route('api/v1/products', '/list', [
 	'methods' => 'GET',
 	'callback' => 'products_list',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 
 function products_list( WP_REST_Request $request ) {

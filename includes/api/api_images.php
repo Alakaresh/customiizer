@@ -4,7 +4,7 @@ add_action('rest_api_init', function() {
     register_rest_route('custom-api/v1', '/generated-images/', array(
         'methods' => 'GET',
         'callback' => 'get_generated_images',
-        'permission_callback' => '__return_true' // API ouverte à tous, peut être restreinte
+        'permission_callback' => 'customiizer_api_permissions' // API ouverte à tous, peut être restreinte
     ));
 });
 

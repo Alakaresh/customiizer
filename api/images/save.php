@@ -2,7 +2,7 @@
 register_rest_route('api/v1/images', '/save', [
 	'methods' => 'POST',
 	'callback' => 'save_generated_image',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 function save_generated_image(WP_REST_Request $request) {
 	global $wpdb;

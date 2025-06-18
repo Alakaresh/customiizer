@@ -2,7 +2,7 @@
 register_rest_route('api/v1/images', '/like', [
 	'methods' => 'POST',
 	'callback' => 'toggle_image_like',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 function toggle_image_like(WP_REST_Request $request) {
 	global $wpdb;

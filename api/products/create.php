@@ -20,7 +20,7 @@ register_rest_route(
 	[
 		'methods'             => 'POST',
 		'callback'            => 'create_product',
-		'permission_callback' => '__return_true',    // ➜ sécuriser plus tard
+		'permission_callback' => 'customiizer_api_permissions',    // ➜ sécuriser plus tard
 	]
 );
 

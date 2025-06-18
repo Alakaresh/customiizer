@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/(?P<id>\d+)', [
 	'methods' => 'GET',
 	'callback' => 'product',
-	'permission_callback' => '__return_true',
+	'permission_callback' => 'customiizer_api_permissions',
 ]);
 
 function product($request) {

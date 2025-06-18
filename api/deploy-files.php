@@ -8,7 +8,7 @@ register_rest_route('api/v1', '/deploy-files', [
 	'callback' => function () {
 		return customiizer_list_files_with_hash();
 	},
-	'permission_callback' => '__return_true'
+	'permission_callback' => 'customiizer_api_permissions'
 ]);
 
 function customiizer_list_files_with_hash($dir = '', $base = null) {

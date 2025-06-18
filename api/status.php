@@ -2,7 +2,7 @@
 register_rest_route('api/v1/monitoring', '/status', [
 	'methods' => 'GET',
 	'callback' => 'api_get_system_status',
-	'permission_callback' => '__return_true'
+	'permission_callback' => 'customiizer_api_permissions'
 ]);
 function api_get_system_status() {
 	$status = [];
