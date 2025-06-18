@@ -1,4 +1,4 @@
-import { preloadAllProducts, persistCache } from '../utils/preload.js';
+const { preloadAllProducts, persistCache } = window.preloadUtils;
 
 document.addEventListener('DOMContentLoaded', async function() {
     const THEME_BASE = '/wp-content/themes/customiizer';
