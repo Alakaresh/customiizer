@@ -199,8 +199,9 @@ function generateMockup(mockupData) {
 
 	// Nettoyage une fois toutes les promesses terminées
         Promise.all(mockupPromises).then(() => {
-                const duration = Math.round(performance.now() - (mockupGenerationStart || performance.now()));
-                console.log(`✅ Tous les mockups sont terminés en ${duration} ms.`);
+                const durationSeconds = ((performance.now() - (mockupGenerationStart || performance.now())) / 1000).toFixed(2);
+                console.log(`✅ Tous les mockups sont terminés en ${durationSeconds}s.`);
+
                 document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
                 mainProductImage?.classList.remove("loading");
                 loadingOverlay?.remove();
@@ -235,8 +236,9 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
 
         if (mockupGenerationStart) {
-                const elapsed = Math.round(performance.now() - mockupGenerationStart);
-                console.log(`⏱️ Thumbnail style ${styleId} affiché après ${elapsed} ms`);
+                const elapsedSeconds = ((performance.now() - mockupGenerationStart) / 1000).toFixed(2);
+                console.log(`⏱️ Thumbnail style ${styleId} affiché après ${elapsedSeconds}s`);
+
         }
 
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
