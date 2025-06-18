@@ -1,25 +1,38 @@
 const userId = currentUser.ID; // Utiliser ton objet PHP existant
 const cacheKey = `community_images_${userId || 'guest'}`;
+// Limit the number of cached images to avoid large sessionStorage entries
+const SESSION_CACHE_LIMIT = 50;
 let allImages = [];
+
+// Helper to store a pruned list of images in sessionStorage
+function updateCommunityCache() {
+    const limited = allImages.slice(0, SESSION_CACHE_LIMIT);
+    sessionStorage.setItem(cacheKey, JSON.stringify(limited));
+}
 
 jQuery(document).ready(function($) {
 	const startTime = performance.now();
-	const cachedImages = sessionStorage.getItem(cacheKey);
-	if (cachedImages) {
-		allImages = JSON.parse(cachedImages);
-		displayImages(allImages);
-	} else {
+        const cachedImages = sessionStorage.getItem(cacheKey);
+        if (cachedImages) {
+                allImages = JSON.parse(cachedImages);
+                if (allImages.length > SESSION_CACHE_LIMIT) {
+                        allImages = allImages.slice(0, SESSION_CACHE_LIMIT);
+                        // prune older entries
+                        updateCommunityCache();
+                }
+                displayImages(allImages);
+        } else {
 		fetchImagesFromAPI();
 	}
 	function fetchImagesFromAPI() {
 		fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}`)
 			.then(response => response.json())
 			.then(data => {
-			if (data.success) {
-				allImages = data.images;
-				sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
-				displayImages(allImages);
-				const endTime = performance.now();
+                        if (data.success) {
+                                allImages = data.images;
+                                updateCommunityCache();
+                                displayImages(allImages);
+                                const endTime = performance.now();
 			} else {
 				console.error('[AJAX] ❌ Aucune image trouvée.');
 			}
@@ -173,7 +186,7 @@ jQuery(document).ready(function($) {
 				const imageToUpdate = allImages.find(img => String(img.image_number) === String(imageId));
 				if (imageToUpdate) {
 					imageToUpdate.liked_by_user = !imageToUpdate.liked_by_user;
-					sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
+                                        updateCommunityCache();
 				} else {
 					console.warn("[Update] Aucune image trouvée pour mettre à jour le like.");
 				}
@@ -203,7 +216,7 @@ jQuery(document).ready(function($) {
 				const imageToUpdate = allImages.find(img => String(img.image_number) === String(imageId));
 				if (imageToUpdate) {
 					imageToUpdate.favorited_by_user = !imageToUpdate.favorited_by_user;
-					sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
+                                        updateCommunityCache();
 				} else {
 					console.warn("[Update] Aucune image trouvée pour mettre à jour le favori.");
 				}
