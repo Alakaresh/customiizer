@@ -147,10 +147,11 @@ jQuery(document).ready(function($) {
 
 		const container = $('<div/>', { class: 'image-container' });
 		columns.forEach(function(column) { container.append(column); });
-		$('#image-container').html(container);
+                $('#image-container').html(container);
 
-		enableImageEnlargement();
-	}
+                enableImageEnlargement();
+                jQuery('#community-loading').remove();
+        }
 
 
 	// Événements sur les icônes

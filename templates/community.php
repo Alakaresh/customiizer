@@ -16,8 +16,11 @@ get_header();
 </head>
 <body>
 <main id="site-content" class="site-content">
+        <div id="community-loading" class="loading-overlay" style="display:flex;">
+                <div class="loading-spinner"></div>
+        </div>
 <!-- IMAGES -->
-	<div class="search-and-sort-container">
+        <div class="search-and-sort-container">
 		<div class="sorting-container">
 			<button id="sort-explore">Explore</button>
 			<button id="sort-likes">Likes</button>
