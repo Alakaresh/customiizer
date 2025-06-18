@@ -172,9 +172,52 @@ jQuery(document).ready(function ($) {
                 first.focus();
         }
 
-        function releaseFocus(modal) {
-                modal.off('keydown.trapFocus');
-        }
+       function releaseFocus(modal) {
+               modal.off('keydown.trapFocus');
+       }
+
+       async function refreshCustomizationView(variant) {
+               if (!variant) return;
+               threeDInitialized = false;
+
+               const productImageSrc = jQuery("#product-main-image").attr("src");
+               jQuery("#footerProductImage").attr("src", productImageSrc);
+               const productName = jQuery(".product-name").text().trim();
+               jQuery("#customizeModalTitle").text(productName);
+               jQuery(".summary-name").text(productName);
+               const productPrice = jQuery(".price-value span").text().trim();
+               jQuery(".summary-price").text(productPrice);
+
+               try {
+                       let template = window.customizerCache.templates[variant.variant_id];
+                       if (!template) {
+                               const res = await fetch(`/wp-json/custom-api/v1/variant-template/${variant.variant_id}`);
+                               const data = await res.json();
+
+                               if (!data.success || !data.template) {
+                                       console.error("[UI] ❌ Template introuvable pour la variante", variant.variant_id);
+                                       jQuery('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
+                                       return;
+                               }
+
+                               template = data.template;
+                               window.customizerCache.templates[variant.variant_id] = template;
+                       }
+
+                       CanvasManager.init(template, 'product2DContainer');
+                       updateAddImageButtonVisibility();
+
+                       if (variant.url_3d && toggle3D.is(':checked')) {
+                               jQuery('#product3DContainer').show();
+                               init3DScene('product3DContainer', variant.url_3d, variant.color);
+                               threeDInitialized = true;
+                       } else {
+                               jQuery('#product3DContainer').hide();
+                       }
+               } catch (error) {
+                       console.error("[UI] ❌ Erreur de rafraîchissement variant:", error);
+               }
+       }
 
        function updateAddImageButtonVisibility() {
                if (CanvasManager.hasImage()) {
@@ -300,6 +343,10 @@ jQuery(document).ready(function ($) {
 
                 const isCommunity = imageToggle.is(':checked');
                 filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
+
+                if (customizeModal.is(':visible')) {
+                        refreshCustomizationView(variant);
+                }
         });
 
 	// 4) Ouvrir le sélecteur d’image
