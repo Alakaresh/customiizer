@@ -312,6 +312,7 @@ jQuery(document).ready(function ($) {
                                         mainProductImage.attr('src', $(this).attr('src'));
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
+                                        $(document).trigger('mockupSelected', [mockup]);
                                 });
 
                                 thumbnailsContainer.append(imgElement);
