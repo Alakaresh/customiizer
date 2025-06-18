@@ -1,7 +1,14 @@
 <?php
-// Constantes pour les valeurs fixes
-define('API_URL', 'https://api.userapi.ai/midjourney/v2/upscale');
-define('API_KEY', '28e69054-9d20-453b-bdc9-79c2f86c027d');
+// Paramètres API
+$apiUrl = defined('MIDJOURNEY_API_URL')
+    ? MIDJOURNEY_API_URL
+    : 'https://api.userapi.ai/midjourney/v2/upscale';
+if (!defined('MIDJOURNEY_API_KEY')) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'MIDJOURNEY_API_KEY not set']);
+        exit;
+}
+$apiKey = MIDJOURNEY_API_KEY;
 
 // Fonction pour enregistrer les logs
 function customiizer_log($message) {
@@ -40,13 +47,13 @@ $data = [
 ];
 
 // Initialiser une session cURL
-$ch = curl_init(API_URL);
+$ch = curl_init($apiUrl);
 
 // Configurer les options de cURL pour la requête POST
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
 	'Content-Type: application/json',
-	'api-key: ' . API_KEY
+        'api-key: ' . $apiKey
 ]);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
