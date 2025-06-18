@@ -1,3 +1,6 @@
+window.customizerCache = window.customizerCache || {};
+window.customizerCache.templates = window.customizerCache.templates || {};
+
 function displayGeneratedImages(images) {
         const siteFilesList = jQuery('#siteFilesList');
         console.log("siteFilesList :",siteFilesList);

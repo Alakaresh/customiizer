@@ -1,9 +1,9 @@
 (function(){
     try {
         const saved = sessionStorage.getItem('customizerCache');
-        window.customizerCache = saved ? JSON.parse(saved) : {};
+        window.customizerCache = { ...(window.customizerCache || {}), ...(saved ? JSON.parse(saved) : {}) };
     } catch(e) {
-        window.customizerCache = {};
+        window.customizerCache = window.customizerCache || {};
     }
     window.customizerCache.products = window.customizerCache.products || [];
     window.customizerCache.variants = window.customizerCache.variants || {};

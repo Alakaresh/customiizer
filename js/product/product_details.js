@@ -3,6 +3,9 @@ let myGeneratedImages = [];
 let communityImages = [];
 let currentProductId = null;
 
+window.customizerCache = window.customizerCache || {};
+window.customizerCache.templates = window.customizerCache.templates || {};
+
 // 🌐 Cache global pour les templates et modèles 3D préchargés
 try {
     const saved = sessionStorage.getItem('customizerCache');
