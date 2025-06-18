@@ -1,4 +1,7 @@
+import { preloadAllProducts } from '../utils/preload.js';
+
 jQuery(document).ready(function($) {
+        preloadAllProducts();
 	var visibleItems = 5; // Nombre d'éléments visibles dans le carrousel
 	var itemWidth; // Initialisation de la variable pour la largeur des éléments
 

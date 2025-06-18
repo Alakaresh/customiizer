@@ -1,5 +1,10 @@
+import { preloadAllProducts, persistCache } from '../utils/preload.js';
+
 document.addEventListener('DOMContentLoaded', async function() {
     const THEME_BASE = '/wp-content/themes/customiizer';
+
+    // Lancement du préchargement global des produits
+    preloadAllProducts();
 
     // ---------- Loading indicator ----------
     const productListContainer = document.querySelector('.product-list');
@@ -37,29 +42,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadScript(`${THEME_BASE}/assets/GLTFLoader.js`);
     }
 
-    // ---------- Mise en place du cache global ----------
-    let cacheStorage = window.localStorage;
-    try {
-        const testKey = '__cache_test__';
-        cacheStorage.setItem(testKey, testKey);
-        cacheStorage.removeItem(testKey);
-    } catch (e) {
-        cacheStorage = window.sessionStorage;
-    }
-
-    try {
-        const saved = cacheStorage.getItem('customizerCache');
-        window.customizerCache = saved ? JSON.parse(saved) : {};
-    } catch (e) {
-        window.customizerCache = {};
-    }
-    window.customizerCache.models = window.customizerCache.models || {};
-    window.customizerCache.variants = window.customizerCache.variants || {};
-
-    function persistCache() {
-        const tmp = { ...window.customizerCache, models: {} };
-        cacheStorage.setItem('customizerCache', JSON.stringify(tmp));
-    }
+    // Le cache global est désormais géré dans utils/preload.js
 
     // Fonction pour rediriger vers la page produit
     window.goToProductPage = function(product) {
@@ -95,7 +78,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.log("Produits récupérés:", products);
                 displayProducts(products);
                 hideLoading();
-                await preloadVariants(products);
             } else {
                 console.warn("Aucun produit trouvé.");
                 document.querySelector('.product-list').innerHTML = '<p>Aucun produit trouvé.</p>';
@@ -131,43 +113,4 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // ---------- Préchargement des variantes et modèles 3D ----------
-    async function preloadVariants(products) {
-        const fetchPromises = [];
-
-        // Collect promises to fetch all product details concurrently
-        for (const p of products) {
-            if (!window.customizerCache.variants[p.product_id]) {
-                const fetchPromise = fetch(`/wp-json/api/v1/products/${p.product_id}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        window.customizerCache.variants[p.product_id] = data;
-                    })
-                    .catch(e => {
-                        console.error('Erreur chargement variantes', p.product_id, e);
-                    });
-                fetchPromises.push(fetchPromise);
-            }
-        }
-
-        // Wait for all product fetches to complete
-        await Promise.all(fetchPromises);
-
-        const loader = new THREE.GLTFLoader();
-
-        // Load 3D models using a single loader instance
-        products.forEach(p => {
-            const productVariants = window.customizerCache.variants[p.product_id]?.variants || [];
-            productVariants.forEach(v => {
-                if (v.url_3d && !window.customizerCache.models[v.url_3d]) {
-                    loader.load(v.url_3d, gltf => {
-                        window.customizerCache.models[v.url_3d] = gltf;
-                    });
-                }
-            });
-        });
-
-        // Persist cache once all fetches and loads have been queued
-        persistCache();
-    }
 });
