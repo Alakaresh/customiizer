@@ -25,5 +25,14 @@ function customiizer_update_mockup_position(WP_REST_Request $req) {
         'mockup_id'  => $mockup_id,
     ]);
 
+    // 🔄 Clear cached product data so new position is reflected
+    $pid = $wpdb->get_var($wpdb->prepare(
+        "SELECT product_id FROM WPC_variants WHERE variant_id = %d",
+        $vid
+    ));
+    if ($pid) {
+        delete_transient('customiizer_product_' . $pid);
+    }
+
     return new WP_REST_Response(['success' => (bool)$updated], $updated === false ? 500 : 200);
 }
