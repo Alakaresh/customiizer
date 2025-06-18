@@ -65,7 +65,7 @@ if (isset($input['prompt']) && !empty($input['prompt'])) {
     if ($response === false) {
         $error = curl_error($ch);
         customiizer_log("Erreur cURL: $error", 'ERROR');
-        http_response_code(500);
+        http_response_code(501);
         echo json_encode([
             'status'  => 'error',
             'message' => 'Erreur de connexion à l\'API.',
@@ -82,7 +82,7 @@ if (isset($input['prompt']) && !empty($input['prompt'])) {
     if (json_last_error() !== JSON_ERROR_NONE) {
         $jsonError = json_last_error_msg();
         customiizer_log("Erreur JSON API: " . $jsonError, 'ERROR');
-        http_response_code(500);
+        http_response_code(502);
         echo json_encode([
             'status'  => 'error',
             'message' => 'Réponse API invalide.',
@@ -94,7 +94,7 @@ if (isset($input['prompt']) && !empty($input['prompt'])) {
 
     if (isset($responseData['error'])) {
         customiizer_log("Erreur API: " . $responseData['error'], 'ERROR');
-        http_response_code(500);
+        http_response_code(503);
         echo json_encode([
             'status'  => 'error',
             'message' => 'Erreur depuis l\'API.',
