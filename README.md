@@ -35,3 +35,7 @@ define('DIRECTUS_API_URL',   'http://customiizer.info:8055');
 
 These constants allow the theme to contact Printful for mockups, Midjourney for AI images and the Directus backend for image status.
 If `MIDJOURNEY_API_KEY` is missing, the proxy endpoints return a 400 JSON error.
+
+The proxy scripts under `includes/proxy` load WordPress via `wp-load.php` to
+access these constants. Define your API keys in `wp-config.php` so they are
+available when the proxies run.

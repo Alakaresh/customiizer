@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__, 5) . '/wp-load.php';
 // Paramètres API
 $apiUrl = defined('MIDJOURNEY_API_URL')
     ? MIDJOURNEY_API_URL
