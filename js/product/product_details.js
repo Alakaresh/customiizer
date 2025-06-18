@@ -41,6 +41,7 @@ jQuery(document).ready(function ($) {
                                 if (data.success && data.template) {
                                         window.customizerCache.templates[vid] = data.template;
                                         console.log('[Cache] Template préchargé pour', vid);
+                                        persistCache();
                                 }
                         } catch (e) {
                                 console.error('[Cache] Erreur préchargement template:', e);
@@ -53,6 +54,7 @@ jQuery(document).ready(function ($) {
                         loader.load(modelUrl, (gltf) => {
                                 window.customizerCache.models[modelUrl] = gltf;
                                 console.log('[Cache] Modèle 3D préchargé pour', modelUrl);
+                                persistCache();
                         }, undefined, (err) => {
                                 console.error('[Cache] Erreur préchargement modèle 3D:', err);
                         });
