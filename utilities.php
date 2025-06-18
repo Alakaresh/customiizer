@@ -19,3 +19,26 @@ function customiizer_log($message) {
         $line = "[$date] $message\n";
         file_put_contents($log_file, $line, FILE_APPEND);
 }
+
+function printful_apply_rate_limit(array $headers): void {
+        $lower = [];
+        foreach ($headers as $k => $v) {
+                $lower[strtolower($k)] = is_array($v) ? implode(',', $v) : $v;
+        }
+
+        $remaining = isset($lower['x-ratelimit-remaining'])
+                ? (int) $lower['x-ratelimit-remaining']
+                : null;
+        $reset = isset($lower['x-ratelimit-reset'])
+                ? (int) $lower['x-ratelimit-reset']
+                : null;
+
+        if ($remaining !== null || $reset !== null) {
+                customiizer_log("🪙 RateLimit remaining={$remaining} reset={$reset}");
+        }
+
+        if ($remaining !== null && $reset !== null && $remaining <= 1) {
+                customiizer_log("⏳ Waiting {$reset}s due to Printful rate limit");
+                sleep($reset);
+        }
+}
