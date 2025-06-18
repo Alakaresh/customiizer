@@ -1,10 +1,6 @@
 <?php
 // Affiche les erreurs côté serveur pour le debug
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-file_put_contents(__DIR__ . '/generate_debug.log', "Script appelé à " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+header('Content-Type: application/json');
 
 // Vérifie que la constante MIDJOURNEY_API_KEY existe
 require_once __DIR__ . '/../../../../../../wp-config.php';
