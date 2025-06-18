@@ -4,6 +4,9 @@ const BOTTOM_IMAGES_PER_PAGE = 12;
 let bottomBarImages = [];
 let bottomBarPage = 0;
 
+// Timestamp de début de génération des mockups
+let mockupGenerationStart = null;
+
 // Création de l'info-bulle globale
 const tooltip = document.createElement("div");
 tooltip.classList.add("dynamic-tooltip");
@@ -109,16 +112,19 @@ function renderBottomBarPage() {
 
 
 function generateMockup(mockupData) {
-	if (!mockupData || !selectedVariant?.mockups?.length) {
-		console.error("❌ Données insuffisantes pour générer un mockup.");
-		alert("Impossible de générer le mockup. Données manquantes.");
-		return;
-	}
+        if (!mockupData || !selectedVariant?.mockups?.length) {
+                console.error("❌ Données insuffisantes pour générer un mockup.");
+                alert("Impossible de générer le mockup. Données manquantes.");
+                return;
+        }
 
 	const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
 	const primaryStyleId = styleIds[0];
 	let productDataCreated = false;
-	const mainProductImage = document.getElementById("product-main-image");
+        const mainProductImage = document.getElementById("product-main-image");
+
+        // Démarre le chronomètre pour mesurer l'affichage des mockups
+        mockupGenerationStart = performance.now();
 
 	// Préparation UI
 	document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
@@ -192,12 +198,13 @@ function generateMockup(mockupData) {
 	});
 
 	// Nettoyage une fois toutes les promesses terminées
-	Promise.all(mockupPromises).then(() => {
-		console.log("✅ Tous les mockups sont terminés.");
-		document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
-		mainProductImage?.classList.remove("loading");
-		loadingOverlay?.remove();
-	});
+        Promise.all(mockupPromises).then(() => {
+                const durationSeconds = ((performance.now() - (mockupGenerationStart || performance.now())) / 1000).toFixed(2);
+                console.log(`✅ Tous les mockups sont terminés en ${durationSeconds}s.`);
+                document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
+                mainProductImage?.classList.remove("loading");
+                loadingOverlay?.remove();
+        });
 }
 
 function buildProductData(mockupData) {
@@ -225,7 +232,12 @@ function buildProductData(mockupData) {
 
 
 function updateMockupThumbnail(styleId, mockupUrl) {
-	console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
+        console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
+
+        if (mockupGenerationStart) {
+                const elapsedSeconds = ((performance.now() - mockupGenerationStart) / 1000).toFixed(2);
+                console.log(`⏱️ Thumbnail style ${styleId} affiché après ${elapsedSeconds}s`);
+        }
 
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
 	if (!thumbnailsContainer) {
