@@ -6,6 +6,12 @@ let isLoading = false;
 let nextColumnIndex = 0;
 let allImages = [];
 
+// Helper to fetch query parameters from the URL
+function getQueryParam(param) {
+    var urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
 jQuery(document).ready(function($) {
         const cachedImages = sessionStorage.getItem(cacheKey);
         if (cachedImages) {
