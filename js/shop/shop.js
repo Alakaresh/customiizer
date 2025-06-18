@@ -20,8 +20,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // ---------- Mise en place du cache global ----------
+    let cacheStorage = window.localStorage;
     try {
-        const saved = sessionStorage.getItem('customizerCache');
+        const testKey = '__cache_test__';
+        cacheStorage.setItem(testKey, testKey);
+        cacheStorage.removeItem(testKey);
+    } catch (e) {
+        cacheStorage = window.sessionStorage;
+    }
+
+    try {
+        const saved = cacheStorage.getItem('customizerCache');
         window.customizerCache = saved ? JSON.parse(saved) : {};
     } catch (e) {
         window.customizerCache = {};
@@ -31,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     function persistCache() {
         const tmp = { ...window.customizerCache, models: {} };
-        sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+        cacheStorage.setItem('customizerCache', JSON.stringify(tmp));
     }
 
     // Fonction pour rediriger vers la page produit
