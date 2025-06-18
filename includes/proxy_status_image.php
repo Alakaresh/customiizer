@@ -4,10 +4,16 @@ header('Access-Control-Allow-Origin: *');
 
 if (isset($_GET['id'])) {
     $idImage = $_GET['id'];
-    $url = "http://customiizer.info:8055/items/images/$idImage";
+    $baseUrl = defined('DIRECTUS_API_URL') ? DIRECTUS_API_URL : 'http://customiizer.info:8055';
+    $url = "$baseUrl/items/images/$idImage";
+    if (!defined('DIRECTUS_API_TOKEN')) {
+        http_response_code(500);
+        echo json_encode(['error' => 'DIRECTUS_API_TOKEN not set']);
+        exit;
+    }
     $headers = [
         'Content-Type: application/json',
-        'Authorization: Bearer DTO_UHUFlyZLczANUTIDxW95JpGak_Mp'
+        'Authorization: Bearer ' . DIRECTUS_API_TOKEN
     ];
 
     $ch = curl_init($url);

@@ -18,3 +18,19 @@ Images larger than this value are downscaled before saving. The default is `1500
 Enable the checkbox "Activer l'éditeur de position" in the **Custom Produits** admin page to adjust the mockup position on product pages. When enabled, `js/product/position_editor.js` is enqueued automatically.
 
 The editor shows two range sliders controlling the top and left position (in pixels). Values range from -200 to 200 and move in 0.1% increments. Each slider now includes a number field so you can type the percentage manually for precise adjustments. After tweaking the values, press **Save** to send them to `/variant/<id>/mockup-position` with the selected `mockup_id`.
+
+## API keys
+
+Several features rely on external services. Define the following constants in your `wp-config.php` file:
+
+```php
+define('PRINTFUL_API_KEY',    'your-printful-key');
+define('MIDJOURNEY_API_KEY',  'your-midjourney-key');
+define('DIRECTUS_API_TOKEN',  'your-directus-token');
+
+// Optionally override the API URLs
+define('MIDJOURNEY_API_URL', 'https://api.userapi.ai/midjourney/v2/imagine');
+define('DIRECTUS_API_URL',   'http://customiizer.info:8055');
+```
+
+These constants allow the theme to contact Printful for mockups, Midjourney for AI images and the Directus backend for image status.

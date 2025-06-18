@@ -8,7 +8,8 @@ if(isset($input['prompt'])) {
     $promptText = $input['prompt'];
 
     // L'URL à laquelle nous allons envoyer la requête POST
-    $url = 'http://customiizer.info:8055/items/images';
+    $baseUrl = defined('DIRECTUS_API_URL') ? DIRECTUS_API_URL : 'http://customiizer.info:8055';
+    $url = "$baseUrl/items/images";
 
     // Les données à envoyer
     $data = ['prompt' => $promptText];
@@ -18,9 +19,14 @@ if(isset($input['prompt'])) {
 
     // Configurer les options de cURL pour la requête POST
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    if (!defined('DIRECTUS_API_TOKEN')) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'DIRECTUS_API_TOKEN not set']);
+        exit;
+    }
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
-        'Authorization: Bearer DTO_UHUFlyZLczANUTIDxW95JpGak_Mp'
+        'Authorization: Bearer ' . DIRECTUS_API_TOKEN
     ]);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
