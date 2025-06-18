@@ -278,6 +278,7 @@ jQuery(document).ready(function ($) {
 	}
 
 
+<<<<<<< wj0cnq-codex/masquer-doublons-visuels-des-thumbnails
        function updateThumbnails(variants) {
                const thumbnailsContainer = $('.image-thumbnails').empty();
 
@@ -316,6 +317,38 @@ jQuery(document).ready(function ($) {
                        });
                });
        }
+=======
+        function updateThumbnails(variants) {
+                const thumbnailsContainer = $('.image-thumbnails').empty();
+
+                const displayed = new Set();
+                let first = true;
+
+                variants.forEach(variant => {
+                        variant.mockups.forEach(mockup => {
+                                if (displayed.has(mockup.mockup_image)) return;
+                                displayed.add(mockup.mockup_image);
+
+                                const imgElement = $('<img>')
+                                .addClass('thumbnail')
+                                .attr('src', mockup.mockup_image)
+                                .attr('data-style-id', mockup.mockup_id)
+                                .on('click', function () {
+                                        mainProductImage.attr('src', $(this).attr('src'));
+                                        $('.image-thumbnails .thumbnail').removeClass('selected');
+                                        $(this).addClass('selected');
+                                });
+
+                                thumbnailsContainer.append(imgElement);
+
+                                if (first) {
+                                        imgElement.addClass('selected');
+                                        first = false;
+                                }
+                        });
+                });
+        }
+>>>>>>> main
 
 	// 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
 	$(document).on('productSelected', function (event, productId) {
