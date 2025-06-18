@@ -23,12 +23,17 @@ function customiizer_enqueue_customize_assets() {
 	wp_enqueue_style('header-style', get_stylesheet_directory_uri() . '/styles/header.css');
 	wp_enqueue_style('footer-style', get_stylesheet_directory_uri() . '/styles/footer.css');
 
-	// ===============================
-	// SCRIPTS GLOBAUX
-	// ===============================
-	wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', array(), null, true);
-	wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', array('jquery'), null, true);
-	wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', array('jquery'), null, true);
+        // ===============================
+        // SCRIPTS GLOBAUX
+        // ===============================
+        // Utiliser la copie locale de jQuery
+        wp_deregister_script('jquery');
+        wp_register_script('jquery', get_stylesheet_directory_uri() . '/js/jquery-3.6.1.min.js', [], null, true);
+        wp_enqueue_script('jquery');
+
+        wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', array(), null, true);
+        wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', array('jquery'), null, true);
+        wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', array('jquery'), null, true);
 
 	// Localiser les scripts avec leurs NONCES
 	wp_localize_script('signin-script', 'signin_object', array('nonce' => $signin_nonce));
