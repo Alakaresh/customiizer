@@ -24,7 +24,7 @@
                                 </button>
                         </div>
                         <div id="sidebarExtension" class="sidebar-extension" style="display:none;">
-                                <button id="closeSidebarExtension" class="close-extension"><i class="fas fa-arrow-right"></i></button>
+                                <button id="closeSidebarExtension" class="close-extension"><i class="fas fa-arrow-left"></i></button>
                                 <div class="extension-content"></div>
                         </div>
                         <div class="visual-zone">
