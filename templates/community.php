@@ -11,7 +11,7 @@ get_header();
   <link rel="stylesheet" type="text/css" href="wp-content/themes/customiizer/styles/community.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="<?php echo get_stylesheet_directory_uri(); ?>/js/jquery-3.6.1.min.js"></script>
 <meta charset="UTF-8">
 </head>
 <body>

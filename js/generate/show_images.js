@@ -44,10 +44,11 @@ function displayImages() {
 	if (filteredImages.length === 0) {
 		console.log('[displayImages] Aucune image trouvée, affichage des images d\'attente.');
 		for (var i = 0; i < 4; i++) {
-			var imgElement = jQuery('<img>')
-			.attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
-			.attr('alt', 'Image d\'attente ' + i)
-			.addClass(i < 2 ? 'top' : 'bottom');
+                        var imgElement = jQuery('<img>')
+                        .attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
+                        .attr('alt', 'Image d\'attente ' + i)
+                        .attr('loading', 'lazy')
+                        .addClass(i < 2 ? 'top' : 'bottom');
 			var imgContainer = jQuery('<div>').addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
 			.append(imgElement);
 			container.append(imgContainer);
@@ -58,10 +59,11 @@ function displayImages() {
 
 		filteredImages.slice(0, 4).forEach(function(image, index) {
 			console.log("[displayImages] image :", image);
-			var imgElement = jQuery('<img>')
-			.attr('src', image.image_url)
-			.attr('alt', 'Image ' + image.image_number)
-			.attr('data-display_name', image.display_name || '')
+                        var imgElement = jQuery('<img>')
+                        .attr('src', image.image_url)
+                        .attr('alt', 'Image ' + image.image_number)
+                        .attr('loading', 'lazy')
+                        .attr('data-display_name', image.display_name || '')
 			.attr('data-user-logo', image.user_logo || '')
 			.attr('data-user-id', image.user_id || '')
 			.attr('data-format-image', image.format || '')
@@ -103,10 +105,11 @@ function displayImagesForCurrentUser() {
 	} else {
 		// Ajouter les images directement à mainContent
 		currentUserImages.forEach(function(image) {
-			var imgElement = jQuery('<img>')
-			.attr('src', image.image_url)
-			.attr('alt', 'Image ' + image.image_number)
-			.attr('data-display_name', image.display_name || '')
+                        var imgElement = jQuery('<img>')
+                        .attr('src', image.image_url)
+                        .attr('alt', 'Image ' + image.image_number)
+                        .attr('loading', 'lazy')
+                        .attr('data-display_name', image.display_name || '')
 			.attr('data-user-logo', image.user_logo || '')
 			.attr('data-user-id', image.user_id || '')
 			.attr('data-format-image', image.format || '')

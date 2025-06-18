@@ -24,7 +24,8 @@ jQuery(document).ready(function($) {
             var imgElement = $('<img>', {
                 src: baseUrl + image.image_url, // Concaténation de l'URL de base si nécessaire
                 alt: 'Loaded image',
-                class: 'dynamic-image'
+                class: 'dynamic-image',
+                loading: 'lazy'
             });
             imageDiv.append(imgElement);
 
