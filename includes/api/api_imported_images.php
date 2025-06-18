@@ -110,12 +110,12 @@ function customiizer_upload_image(WP_REST_Request $request) {
 
 	customiizer_log("✅ Image enregistrée en base de données pour UserID: $user_id");
 
-	return new WP_REST_Response([
-		'success' => true, // ✅ ajouter ça
-		'message' => 'Image téléchargée avec succès.',
-		'blob_path' => $blob_path,
-		'db_status' => 'Enregistré en base de données.'
-	], 200);
+        return new WP_REST_Response([
+                'success' => true, // ✅ ajouter ça
+                'message' => 'Image téléchargée avec succès.',
+                'blob_path' => $blobFullUrl,
+                'db_status' => 'Enregistré en base de données.'
+        ], 200);
 
 }
 
