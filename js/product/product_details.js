@@ -278,36 +278,44 @@ jQuery(document).ready(function ($) {
 	}
 
 
-        function updateThumbnails(variants) {
-                const thumbnailsContainer = $('.image-thumbnails').empty();
+       function updateThumbnails(variants) {
+               const thumbnailsContainer = $('.image-thumbnails').empty();
 
-                const displayed = new Set();
-                let first = true;
+               const displayed = new Set();
+               let first = true;
 
-                variants.forEach(variant => {
-                        variant.mockups.forEach(mockup => {
-                                if (displayed.has(mockup.mockup_image)) return;
-                                displayed.add(mockup.mockup_image);
+               variants.forEach(variant => {
+                       let mockups = variant.mockups || [];
 
-                                const imgElement = $('<img>')
-                                .addClass('thumbnail')
-                                .attr('src', mockup.mockup_image)
-                                .attr('data-style-id', mockup.mockup_id)
-                                .on('click', function () {
-                                        mainProductImage.attr('src', $(this).attr('src'));
-                                        $('.image-thumbnails .thumbnail').removeClass('selected');
-                                        $(this).addClass('selected');
-                                });
+                       // Si toutes les images proviennent du répertoire par défaut
+                       // on n'affiche qu'un seul thumbnail (les orientations sont identiques)
+                       if (mockups.length > 1 && mockups.every(m => m.mockup_image.includes('/images/mockups/'))) {
+                               mockups = [mockups[0]];
+                       }
 
-                                thumbnailsContainer.append(imgElement);
+                       mockups.forEach(mockup => {
+                               if (displayed.has(mockup.mockup_image)) return;
+                               displayed.add(mockup.mockup_image);
 
-                                if (first) {
-                                        imgElement.addClass('selected');
-                                        first = false;
-                                }
-                        });
-                });
-        }
+                               const imgElement = $('<img>')
+                               .addClass('thumbnail')
+                               .attr('src', mockup.mockup_image)
+                               .attr('data-style-id', mockup.mockup_id)
+                               .on('click', function () {
+                                       mainProductImage.attr('src', $(this).attr('src'));
+                                       $('.image-thumbnails .thumbnail').removeClass('selected');
+                                       $(this).addClass('selected');
+                               });
+
+                               thumbnailsContainer.append(imgElement);
+
+                               if (first) {
+                                       imgElement.addClass('selected');
+                                       first = false;
+                               }
+                       });
+               });
+       }
 
 	// 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
 	$(document).on('productSelected', function (event, productId) {
