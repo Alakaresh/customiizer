@@ -39,3 +39,18 @@ If `MIDJOURNEY_API_KEY` is missing, the proxy endpoints return a 400 JSON error.
 The proxy scripts under `includes/proxy` load WordPress via `wp-load.php` to
 access these constants. Define your API keys in `wp-config.php` so they are
 available when the proxies run.
+
+## Proxy error codes
+
+`includes/proxy/generate_image.php` now returns a numeric `code` field when an
+error occurs. This helps the frontend display more specific messages.
+
+| Code | Meaning                             |
+| ---- | ----------------------------------- |
+|1000 | Missing `MIDJOURNEY_API_KEY`        |
+|1001 | Invalid JSON payload                |
+|1002 | cURL connection failure             |
+|1003 | Invalid JSON returned by the API    |
+|1004 | Error reported by the remote API    |
+|1005 | Prompt value missing                |
+
