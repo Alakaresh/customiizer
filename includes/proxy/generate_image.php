@@ -34,16 +34,6 @@ file_put_contents(__DIR__ . '/generate_debug.log', "📥 Chargement wp-config...
 define('MIDJOURNEY_API_KEY', '28e69054-9d20-453b-bdc9-79c2f86c027d');
 define('MIDJOURNEY_API_URL', 'https://api.userapi.ai/midjourney/v2/imagine');
 
-
-// Vérification WordPress
-if (!defined('ABSPATH')) {
-    file_put_contents(__DIR__ . '/generate_debug.log', "❌ WordPress NON chargé\n", FILE_APPEND);
-    http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'WordPress non chargé']);
-    exit;
-}
-file_put_contents(__DIR__ . '/generate_debug.log', "✅ WordPress chargé\n", FILE_APPEND);
-
 // Vérification constante
 if (!defined('MIDJOURNEY_API_KEY')) {
     file_put_contents(__DIR__ . '/generate_debug.log', "❌ Clé API manquante\n", FILE_APPEND);
