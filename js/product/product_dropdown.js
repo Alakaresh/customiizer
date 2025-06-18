@@ -1,4 +1,4 @@
-import { preloadAllProducts } from '../utils/preload.js';
+const { preloadAllProducts } = window.preloadUtils;
 
 jQuery(document).ready(function ($) {
         preloadAllProducts();

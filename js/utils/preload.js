@@ -20,12 +20,12 @@ try {
 window.customizerCache.models = window.customizerCache.models || {};
 window.customizerCache.variants = window.customizerCache.variants || {};
 
-export function persistCache() {
+function persistCache() {
     const tmp = { ...window.customizerCache, models: {} };
     cacheStorage.setItem('customizerCache', JSON.stringify(tmp));
 }
 
-export async function preloadVariants(products) {
+async function preloadVariants(products) {
     const fetchPromises = [];
     for (const p of products) {
         if (!window.customizerCache.variants[p.product_id]) {
@@ -55,7 +55,7 @@ export async function preloadVariants(products) {
     persistCache();
 }
 
-export async function preloadAllProducts() {
+async function preloadAllProducts() {
     try {
         const res = await fetch('/wp-json/api/v1/products/list');
         const products = await res.json();
