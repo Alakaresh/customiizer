@@ -31,7 +31,9 @@ file_put_contents(__DIR__ . '/generate_debug.log', "▶ Script appelé à " . da
 
 // Charger les constantes depuis WordPress
 file_put_contents(__DIR__ . '/generate_debug.log', "📥 Chargement wp-config...\n", FILE_APPEND);
+define('SHORTINIT', true);
 require_once __DIR__ . '/../../../../../../wp-config.php';
+
 
 // Vérification WordPress
 if (!defined('ABSPATH')) {
