@@ -12,9 +12,9 @@ $apiKey = MIDJOURNEY_API_KEY;
 
 // Fonction pour enregistrer les logs
 function customiizer_log($message) {
-	$logFile = 'logfile.log'; // Remplace par le chemin de ton fichier de log
-	$currentTime = date('Y-m-d H:i:s');
-	file_put_contents($logFile, "[$currentTime] $message" . PHP_EOL, FILE_APPEND);
+        $logFile = __DIR__ . '/logfile.log'; // Remplace par le chemin de ton fichier de log
+        $currentTime = date('Y-m-d H:i:s');
+        file_put_contents($logFile, "[$currentTime] $message" . PHP_EOL, FILE_APPEND);
 }
 
 // Lire le corps de la requête JSON
