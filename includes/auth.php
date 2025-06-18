@@ -4,15 +4,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function customiizer_api_permissions( WP_REST_Request $request ) {
-    error_log('Is user logged in? ' . (is_user_logged_in() ? 'YES' : 'NO'));
-    error_log('User capabilities: ' . print_r(wp_get_current_user()->allcaps, true));
+    $token = $request->get_header('X-Customiizer-Token');
 
-    $token = $request->get_header( 'X-Customiizer-Token' );
-
-    if ( $token && defined( 'CUSTOMIIZER_API_TOKEN' ) && hash_equals( CUSTOMIIZER_API_TOKEN, $token ) ) {
+    // Autoriser si le token est présent et valide
+    if ($token && defined('CUSTOMIIZER_API_TOKEN') && hash_equals(CUSTOMIIZER_API_TOKEN, $token)) {
         return true;
     }
 
-    return current_user_can( 'read' );
-}
+    // Autoriser si la requête vient du même site (navigateur)
+    $referer = $request->get_header('referer');
+    $origin = $request->get_header('origin');
+    $site_url = get_site_url();
 
+    if (
+        ($referer && strpos($referer, $site_url) === 0) ||
+        ($origin && strpos($origin, $site_url) === 0)
+    ) {
+        return true;
+    }
+
+    // Sinon, bloqué
+    return false;
+}
