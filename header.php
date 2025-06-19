@@ -108,6 +108,8 @@ $display_name = $current_user->display_name;
 					$custom_image_full_path = $_SERVER['DOCUMENT_ROOT'] . $custom_image_path;
 					$custom_image_url = $base_url . $custom_image_path;
 					$profile_image_url = file_exists($custom_image_full_path) ? $custom_image_url : get_avatar_url($user_id);
+        global $wpdb;
+        $image_credits = intval($wpdb->get_var($wpdb->prepare("SELECT image_credits FROM WPC_users WHERE user_id = %d", $user_id)));
 					?>
 					<div class="profile-container">
 						<a id="profileLink" class="icon-button">
@@ -147,6 +149,23 @@ $display_name = $current_user->display_name;
 			});
 
 		</script>
+                <script>
+<?php if ($user_logged_in): ?>
+                        (function(){
+                                const essentials = {
+                                        user_id: <?php echo intval($user_id); ?>,
+                                        display_name: <?php echo json_encode($display_name); ?>,
+                                        image_credits: <?php echo intval($image_credits); ?>,
+                                        user_logo: <?php echo json_encode($profile_image_url); ?>
+                                };
+                                sessionStorage.setItem("USER_ESSENTIALS", JSON.stringify(essentials));
+                                document.addEventListener("DOMContentLoaded", function(){
+                                        const creditsEl = document.getElementById("userCredits");
+                                        if (creditsEl) creditsEl.textContent = essentials.image_credits;
+                                });
+                        })();
+<?php endif; ?>
+                </script>
 		<script>
 			jQuery(document).ready(function($) {
 				const myCreationsLink = $('#myCreationsLink');
@@ -201,38 +220,44 @@ $display_name = $current_user->display_name;
 				const logoEl = document.getElementById('userLogo');
 
 				// Vérifie si les éléments existent avant de continuer
-				if (!creditsEl) {
-					console.warn("⚠️ Élément #userCredits introuvable.");
-				} else {
-					const cached = sessionStorage.getItem('USER_ESSENTIALS');
-					if (cached) {
-						const data = JSON.parse(cached);
-						if (data.user_id === userId) {
-							creditsEl.textContent = data.image_credits;
-						}
-					}
+                                if (!creditsEl) {
+                                        console.warn("⚠️ Élément #userCredits introuvable.");
+                                } else {
+                                        const cached = sessionStorage.getItem('USER_ESSENTIALS');
+                                        let fromCache = false;
+                                        if (cached) {
+                                                const data = JSON.parse(cached);
+                                                if (data.user_id === userId) {
+                                                        creditsEl.textContent = data.image_credits;
+                                                        if (nameEl) nameEl.textContent = data.display_name;
+                                                        if (logoEl && data.user_logo) logoEl.src = data.user_logo;
+                                                        fromCache = true;
+                                                }
+                                        }
 
-					// Récupère depuis l’API si pas trouvé dans le cache
-					fetch(`/wp-json/api/v1/user/load?user_id=${userId}&include=display_name,image_credits,user_logo`, {
-						credentials: 'include'
-					})
-						.then(res => res.json())
-						.then(data => {
-						if (data.success && data.data) {
-							const essentials = {
-								user_id: userId,
-								display_name: data.data.display_name,
-								image_credits: data.data.image_credits,
-								user_logo: data.data.user_logo
-							};
-							sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(essentials));
+                                        if (!fromCache) {
+                                                // Récupère depuis l’API si pas trouvé dans le cache
+                                                fetch(`/wp-json/api/v1/user/load?user_id=${userId}&include=display_name,image_credits,user_logo`, {
+                                                        credentials: 'include'
+                                                })
+                                                        .then(res => res.json())
+                                                        .then(data => {
+                                                        if (data.success && data.data) {
+                                                                const essentials = {
+                                                                        user_id: userId,
+                                                                        display_name: data.data.display_name,
+                                                                        image_credits: data.data.image_credits,
+                                                                        user_logo: data.data.user_logo
+                                                                };
+                                                                sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(essentials));
 
-							if (creditsEl) creditsEl.textContent = data.data.image_credits;
-							if (nameEl) nameEl.textContent = data.data.display_name;
-							if (logoEl && data.data.user_logo) logoEl.src = data.data.user_logo;
-						}
-					});
-				}
+                                                                if (creditsEl) creditsEl.textContent = data.data.image_credits;
+                                                                if (nameEl) nameEl.textContent = data.data.display_name;
+                                                                if (logoEl && data.data.user_logo) logoEl.src = data.data.user_logo;
+                                                        }
+                                                });
+                                        }
+                                }
 			});
 		</script>
 	</body>
