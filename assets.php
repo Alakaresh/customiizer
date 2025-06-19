@@ -31,6 +31,15 @@ function customiizer_enqueue_customize_assets() {
         wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', array('jquery'), null, true);
         wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/preload_products.js', array(), null, true);
 
+        // Mark the preload-products script as async on all pages except the shop
+        add_filter('script_loader_tag', function($tag, $handle) {
+                $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+                if ('preload-products' === $handle && strpos($request_uri, '/boutique') === false) {
+                        return str_replace(' src', ' async src', $tag);
+                }
+                return $tag;
+        }, 10, 2);
+
 	// Localiser les scripts avec leurs NONCES
 	wp_localize_script('signin-script', 'signin_object', array('nonce' => $signin_nonce));
 	wp_localize_script('signup-script', 'signup_object', array('nonce' => $signup_nonce));
