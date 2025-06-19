@@ -239,7 +239,7 @@ function updateMockupThumbnail(styleId, mockupUrl) {
 		return;
 	}
 
-	let thumbnailToUpdate = document.querySelector(`.thumbnail[data-style-id="${styleId}"]`);
+        let thumbnailToUpdate = document.querySelector(`.thumbnail[data-style-id="${styleId}"]`);
 
         if (thumbnailToUpdate) {
                 // ✅ Met à jour l'image du thumbnail existant
@@ -250,12 +250,25 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         } else {
 		console.warn(`⚠️ Aucun thumbnail trouvé pour le style ${styleId}, ajout en cours...`);
 
-		// ✅ Création d'un nouveau thumbnail si aucun existant
-		thumbnailToUpdate = document.createElement("img");
-		thumbnailToUpdate.src = mockupUrl;
-		thumbnailToUpdate.alt = `Mockup Style ${styleId}`;
-		thumbnailToUpdate.classList.add("thumbnail");
-		thumbnailToUpdate.dataset.styleId = styleId;
+                // ✅ Création d'un nouveau thumbnail si aucun existant
+                thumbnailToUpdate = document.createElement("img");
+                thumbnailToUpdate.src = mockupUrl;
+                thumbnailToUpdate.alt = `Mockup Style ${styleId}`;
+                thumbnailToUpdate.classList.add("thumbnail");
+                thumbnailToUpdate.dataset.styleId = styleId;
+
+                // ⚡ Ajoute le gestionnaire de clic comme dans updateThumbnails
+                thumbnailToUpdate.addEventListener('click', function () {
+                        const mainProductImage = document.getElementById('product-main-image');
+                        if (!mainProductImage) return;
+                        const mockup = { mockup_id: styleId, mockup_image: this.src, position_top: 0, position_left: 0 };
+                        if (typeof currentMockup !== 'undefined') currentMockup = mockup;
+                        window.currentMockup = mockup;
+                        mainProductImage.src = this.src;
+                        document.querySelectorAll('.image-thumbnails .thumbnail').forEach(el => el.classList.remove('selected'));
+                        this.classList.add('selected');
+                        if (window.jQuery) jQuery(document).trigger('mockupSelected', [typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant, mockup]);
+                });
 
                 thumbnailsContainer.appendChild(thumbnailToUpdate);
                 console.log(`✅ Nouveau thumbnail ajouté pour style ${styleId}`);
