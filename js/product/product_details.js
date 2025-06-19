@@ -12,9 +12,13 @@ function getLatestMockup(variant) {
 // 🌐 Cache global pour les templates et modèles 3D préchargés
 try {
     const saved = sessionStorage.getItem('customizerCache');
-    window.customizerCache = saved ? JSON.parse(saved) : {};
+    const savedData = saved ? JSON.parse(saved) : {};
+    window.customizerCache = {
+        ...(savedData || {}),
+        ...(window.customizerCache || {})
+    };
 } catch (e) {
-    window.customizerCache = {};
+    window.customizerCache = window.customizerCache || {};
 }
 window.customizerCache.templates = window.customizerCache.templates || {};
 window.customizerCache.models = window.customizerCache.models || {};
