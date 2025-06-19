@@ -85,7 +85,6 @@ function fetchImagesFromAPI(initial = false) {
                                 }
                                 offset += data.images.length;
                                 sessionStorage.setItem(cacheKey, JSON.stringify({ images: allImages, offset }));
-                                console.log('[API] Exemple image reçue', data.images[0]);
                                 if (initial) displayImages(allImages);
                                 return data.images;
                         } else {
@@ -160,7 +159,6 @@ function appendImage(image, columns, columnIndex) {
 		console.warn('[Debug] URL image invalide :', image);
 		return;
 	}
-	console.log('[Debug] URL finale utilisée', imageUrl);
 
 	const imageDiv = $('<div/>', {
 		class: 'imageContainer',
