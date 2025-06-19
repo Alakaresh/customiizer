@@ -20,7 +20,7 @@ function dedupeMockups(mockups) {
     });
 }
 
-function getLatestMockup(variant) {
+function getFirstMockup(variant) {
     if (!variant.mockups || !variant.mockups.length) return null;
     const unique = dedupeMockups(variant.mockups);
     return unique[0];
@@ -195,7 +195,7 @@ jQuery(document).ready(function ($) {
 
         function updateMainImage(variant) {
                 if (variant.mockups.length > 0) {
-                        currentMockup = getLatestMockup(variant);
+                        currentMockup = getFirstMockup(variant);
                         mainProductImage.attr('src', currentMockup.mockup_image).css({
                                 'position': 'absolute',
                                 'top': `${currentMockup.position_top}%`,
