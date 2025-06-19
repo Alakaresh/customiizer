@@ -4,9 +4,19 @@ let communityImages = [];
 window.currentProductId = window.currentProductId || null;
 let currentMockup = null;
 
+function dedupeMockups(mockups) {
+    const seen = new Set();
+    return mockups.filter(m => {
+        if (seen.has(m.mockup_image)) return false;
+        seen.add(m.mockup_image);
+        return true;
+    });
+}
+
 function getLatestMockup(variant) {
     if (!variant.mockups || !variant.mockups.length) return null;
-    return variant.mockups[0];
+    const unique = dedupeMockups(variant.mockups);
+    return unique[0];
 }
 
 // 🌐 Cache global pour les templates et modèles 3D préchargés
@@ -138,6 +148,7 @@ jQuery(document).ready(function ($) {
         function updateProductDisplay(variants) {
                 variants.forEach(v => {
                         v.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
+                        v.mockups = dedupeMockups(v.mockups);
                 });
                 const urlParams = new URLSearchParams(window.location.search);
 		const variantParam = urlParams.get('variant');
@@ -329,7 +340,8 @@ jQuery(document).ready(function ($) {
 
                 variants.forEach(variant => {
                         variant.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
-                        variant.mockups.forEach((mockup, index) => {
+                        const uniqueMockups = dedupeMockups(variant.mockups);
+                        uniqueMockups.forEach((mockup, index) => {
                                 const imgElement = $('<img>')
                                 .addClass('thumbnail')
                                 .attr('src', mockup.mockup_image)
@@ -345,12 +357,12 @@ jQuery(document).ready(function ($) {
                                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
                                 });
 
-				thumbnailsContainer.append(imgElement);
+                                thumbnailsContainer.append(imgElement);
 
-				if (index === 0) imgElement.addClass('selected');
-			});
-		});
-	}
+                                if (index === 0) imgElement.addClass('selected');
+                        });
+                });
+        }
 
         // 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
         $(document).on('productSelected', function (event, productId) {
