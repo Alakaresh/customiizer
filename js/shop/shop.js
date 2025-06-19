@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     window.customizerCache.models = window.customizerCache.models || {};
     window.customizerCache.variants = window.customizerCache.variants || {};
+    window.customizerCache.products = window.customizerCache.products || [];
 
     function persistCache() {
         const tmp = { ...window.customizerCache, models: {} };
@@ -54,15 +55,29 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     console.log("Chargement des produits...");
 
-    // Appel API pour récupérer les produits
-    fetch('/wp-json/api/v1/products/list')
-        .then(response => {
-            if (!response.ok) {
-                console.error("Réponse serveur invalide:", response.status);
-                throw new Error('Erreur de réponse du serveur');
-            }
-            return response.json();
-        })
+    let productsPromise;
+    if (window.customizerCache.products && window.customizerCache.products.length > 0) {
+        console.log('[Cache] Liste produits chargée depuis le cache');
+        productsPromise = Promise.resolve(window.customizerCache.products);
+    } else {
+        productsPromise = fetch('/wp-json/api/v1/products/list')
+            .then(response => {
+                if (!response.ok) {
+                    console.error("Réponse serveur invalide:", response.status);
+                    throw new Error('Erreur de réponse du serveur');
+                }
+                return response.json();
+            })
+            .then(products => {
+                if (Array.isArray(products)) {
+                    window.customizerCache.products = products;
+                    persistCache();
+                }
+                return products;
+            });
+    }
+
+    productsPromise
         .then(async products => {
             if (products && products.length > 0) {
                 console.log("Produits récupérés:", products);
