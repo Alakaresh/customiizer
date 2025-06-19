@@ -399,8 +399,7 @@
                 padding: 10px;
         }
 
-        .bottom-bar .content {
-                justify-content: flex-start;
+        .bottom-bar .image-wrapper {
                 overflow-x: auto;
         }
 	/*==========COMMUNITY==========*/
