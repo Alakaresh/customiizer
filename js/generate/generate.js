@@ -1,5 +1,7 @@
 // Initialisation
-const baseUrl = window.location.origin;
+if (typeof baseUrl === 'undefined') {
+    var baseUrl = window.location.origin;
+}
 const customTextInput = document.getElementById('custom-text');
 const validateButton = document.getElementById('validate-button');
 let loadingToggled = false;
