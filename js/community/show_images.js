@@ -1,6 +1,7 @@
 const userId = currentUser.ID;
 const cacheKey = `community_images_${userId || 'guest'}`;
 const imagesPerLoad = 20;
+let offset = 0;
 
 // In the WordPress environment jQuery operates in no-conflict mode, so
 // the global `$` alias is not defined. Define it here to reuse jQuery
@@ -12,13 +13,22 @@ let filteredImages = [];
 let currentIndex = 0;
 
 jQuery(document).ready(function ($) {
-	const cached = sessionStorage.getItem(cacheKey);
-	if (cached) {
-		allImages = JSON.parse(cached);
-		displayImages(allImages);
-	} else {
-		fetchImagesFromAPI();
-	}
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+                try {
+                        const parsed = JSON.parse(cached);
+                        allImages = parsed.images || [];
+                        offset = parsed.offset || allImages.length;
+                } catch (e) {
+                        allImages = [];
+                }
+        }
+
+        if (allImages.length) {
+                displayImages(allImages);
+        } else {
+                fetchImagesFromAPI(true);
+        }
 
 	$('#sort-explore').on('click', function () {
 		$(this).addClass('active');
@@ -62,20 +72,31 @@ jQuery(document).ready(function ($) {
 
 // --- Fonctions principales ---
 
-function fetchImagesFromAPI() {
-	fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}`)
-		.then(res => res.json())
-		.then(data => {
-			if (data.success) {
-				allImages = data.images;
-				sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
-				console.log('[API] Exemple image reçue', allImages[0]);
-				displayImages(allImages);
-			} else {
-				console.error('[AJAX] ❌ Aucune image trouvée.');
-			}
-		})
-		.catch(error => console.error('[AJAX] ❌ Erreur de récupération des images:', error));
+function fetchImagesFromAPI(initial = false) {
+        const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerLoad}&offset=${offset}`;
+        return fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                        if (data.success) {
+                                if (initial) {
+                                        allImages = data.images;
+                                } else {
+                                        allImages = allImages.concat(data.images);
+                                }
+                                offset += data.images.length;
+                                sessionStorage.setItem(cacheKey, JSON.stringify({ images: allImages, offset }));
+                                console.log('[API] Exemple image reçue', data.images[0]);
+                                if (initial) displayImages(allImages);
+                                return data.images;
+                        } else {
+                                console.error('[AJAX] ❌ Aucune image trouvée.');
+                                return [];
+                        }
+                })
+                .catch(error => {
+                        console.error('[AJAX] ❌ Erreur de récupération des images:', error);
+                        return [];
+                });
 }
 
 function displayImages(images) {
@@ -100,20 +121,28 @@ function displayImages(images) {
 }
 
 function loadMoreImages(columns) {
-	let colIndex = currentIndex % columns.length;
-	$('#scroll-message').show();
+        let colIndex = currentIndex % columns.length;
+        $('#scroll-message').show();
 
-	for (let i = 0; i < imagesPerLoad && currentIndex < filteredImages.length; i++) {
-		appendImage(filteredImages[currentIndex], columns, colIndex);
-		colIndex = (colIndex + 1) % columns.length;
-		currentIndex++;
-	}
+        for (let i = 0; i < imagesPerLoad && currentIndex < filteredImages.length; i++) {
+                appendImage(filteredImages[currentIndex], columns, colIndex);
+                colIndex = (colIndex + 1) % columns.length;
+                currentIndex++;
+        }
 
-	if (currentIndex >= filteredImages.length) {
-		$('#scroll-message').text('Vous avez atteint la fin.');
-	} else {
-		$('#scroll-message').hide();
-	}
+        if (currentIndex >= filteredImages.length) {
+                fetchImagesFromAPI().then(newImages => {
+                        const userFilter = getQueryParam('user');
+                        filteredImages = userFilter ? allImages.filter(i => i.display_name === userFilter) : allImages;
+                        if (newImages.length) {
+                                loadMoreImages(columns);
+                        } else {
+                                $('#scroll-message').text('Vous avez atteint la fin.');
+                        }
+                });
+        } else {
+                $('#scroll-message').hide();
+        }
 }
 
 // --- Affichage image ---
