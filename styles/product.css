@@ -63,20 +63,6 @@ body {
     color: white;
 }
 
-.bottom-bar-prev,
-.bottom-bar-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0,0,0,0.4);
-    border: none;
-    color: #fff;
-    padding: 6px;
-    cursor: pointer;
-    z-index: 5;
-}
-.bottom-bar-prev { left: 5px; }
-.bottom-bar-next { right: 5px; }
 
 /* Conteneur des images dans la barre du bas */
 .bottom-bar .content {

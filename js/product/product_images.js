@@ -18,24 +18,12 @@ function displayImagesInBottomBar(images) {
                 return;
         }
 
-        // Détermine combien de miniatures peuvent tenir dans la barre
-        const gap = parseInt(getComputedStyle(contentDiv).gap) || 10;
-        let containerWidth = contentDiv.clientWidth;
-        if (!containerWidth) {
-                const parent = contentDiv.closest('.bottom-bar');
-                containerWidth = parent ? parent.clientWidth : window.innerWidth;
-        }
-        const maxThumbs = Math.max(1, Math.floor(containerWidth / (80 + gap)));
-
-        const imagesToShow = images.slice(0, maxThumbs);
-
         contentDiv.innerHTML = ""; // Vider avant d'afficher les nouvelles images
-
-        imagesToShow.forEach(image => {
-		const imgElement = document.createElement("img");
-		imgElement.src = image.image_url;
-		imgElement.alt = image.prompt || "Image générée";
-		imgElement.classList.add("thumbnail");
+        images.forEach(image => {
+                const imgElement = document.createElement("img");
+                imgElement.src = image.image_url;
+                imgElement.alt = image.prompt || "Image générée";
+                imgElement.classList.add("thumbnail");
 
 		// ✅ Événements pour afficher l'info-bulle au bon endroit
 		imgElement.addEventListener("mouseenter", (event) => {
@@ -75,30 +63,6 @@ function displayImagesInBottomBar(images) {
 
         // Ajoute un petit effet de défilement pour montrer que la barre est scrollable
         contentDiv.scrollLeft = 0;
-
-        const prevBtn = document.querySelector('.bottom-bar-prev');
-        const nextBtn = document.querySelector('.bottom-bar-next');
-
-        const updateNavVisibility = () => {
-                const overflow = contentDiv.scrollWidth > contentDiv.clientWidth;
-                if (prevBtn) prevBtn.style.display = overflow ? 'block' : 'none';
-                if (nextBtn) nextBtn.style.display = overflow ? 'block' : 'none';
-        };
-
-        updateNavVisibility();
-        window.addEventListener('resize', updateNavVisibility);
-
-        if (prevBtn && nextBtn) {
-                const showNav = images.length > imagesToShow.length;
-                prevBtn.style.display = showNav ? 'block' : 'none';
-                nextBtn.style.display = showNav ? 'block' : 'none';
-                prevBtn.addEventListener('click', () => {
-                        contentDiv.scrollBy({left: -contentDiv.clientWidth, behavior: 'smooth'});
-                });
-                nextBtn.addEventListener('click', () => {
-                        contentDiv.scrollBy({left: contentDiv.clientWidth, behavior: 'smooth'});
-                });
-        }
 }
 
 
