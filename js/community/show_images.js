@@ -53,10 +53,14 @@ jQuery(document).ready(function($) {
 	}
 
 function appendImage(image, columns, columnIndex) {
+    const promptText = typeof image.prompt === 'object'
+        ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+        : (image.prompt || '');
+
     const imageDiv = $('<div/>', {
         class: 'imageContainer',
         'data-image-id': image.image_number,
-        'data-prompt': (image.prompt || '').toLowerCase()
+        'data-prompt': promptText.toLowerCase()
     });
 
     const likeIcon = $('<i/>', {
@@ -81,7 +85,7 @@ function appendImage(image, columns, columnIndex) {
         'data-user-id': userId || '',
         'data-display_name': image.display_name || '',
         'data-format-image': image.format || '',
-        'data-prompt': image.prompt || ''
+        'data-prompt': promptText
     });
 
     const overlayDiv = $('<div/>', { class: 'overlay', style: 'display: none;' });

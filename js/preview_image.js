@@ -32,11 +32,23 @@ function handleImageClick(event) {
 	}
 
 	// Mode normal : ouvrir l'overlay
-	const src = image.getAttribute('src');
-	const username = image.getAttribute('data-display_name') || 'Inconnu';
-	const userId = image.getAttribute('data-user-id') || 'Inconnu';
-	const formatImage = image.getAttribute('data-format-image') || 'Inconnu';
-	const prompt = image.getAttribute('data-prompt') || 'Aucun prompt disponible';
+        const src = image.getAttribute('src');
+        const username = image.getAttribute('data-display_name') || 'Inconnu';
+        const userId = image.getAttribute('data-user-id') || 'Inconnu';
+        const formatImage = image.getAttribute('data-format-image') || 'Inconnu';
+        let rawPrompt = image.getAttribute('data-prompt');
+        if (rawPrompt) {
+                try {
+                        const obj = JSON.parse(rawPrompt);
+                        rawPrompt = obj.text || obj.prompt || rawPrompt;
+                } catch (e) {
+                        // keep rawPrompt as is
+                }
+        } else {
+                rawPrompt = 'Aucun prompt disponible';
+        }
+
+        const prompt = rawPrompt;
 
 	openImageOverlay(src, userId, username, formatImage, prompt);
 }

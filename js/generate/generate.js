@@ -205,15 +205,19 @@ jQuery(function($) {
 				if (url && statusData.progress > 0) {
 					console.log('[🖼️] Insertion de la nouvelle image générée');
 
-					const $newImage = $('<img>')
-					.attr('src', displayedUrl)
-					.attr('alt', 'Generated Image')
-					.attr('data-display_name', currentUser.display_name || '')
-					.attr('data-user-logo', currentUser.user_logo || '')
-					.attr('data-user-id', currentUser.ID || '')
-					.attr('data-format-image', selectedRatio || '')
-					.attr('data-prompt', prompt || '')
-					.addClass('centered-image preview-enlarge');
+                                        const promptText = typeof prompt === 'object'
+                                            ? (prompt.text || prompt.prompt || JSON.stringify(prompt))
+                                            : (prompt || '');
+
+                                        const $newImage = $('<img>')
+                                        .attr('src', displayedUrl)
+                                        .attr('alt', 'Generated Image')
+                                        .attr('data-display_name', currentUser.display_name || '')
+                                        .attr('data-user-logo', currentUser.user_logo || '')
+                                        .attr('data-user-id', currentUser.ID || '')
+                                        .attr('data-format-image', selectedRatio || '')
+                                        .attr('data-prompt', promptText)
+                                        .addClass('centered-image preview-enlarge');
 
 					$container.append($newImage);
 					console.log('[✅] Image insérée avec attributs :');
@@ -443,8 +447,11 @@ jQuery(function($) {
 				imgElement.setAttribute('data-display_name', currentUser.display_name || '');
 				imgElement.setAttribute('data-user-logo', currentUser.user_logo || '');
 				imgElement.setAttribute('data-user-id', currentUser.ID || '');
-				imgElement.setAttribute('data-format-image', selectedRatio || '');
-				imgElement.setAttribute('data-prompt', prompt || '');
+                                imgElement.setAttribute('data-format-image', selectedRatio || '');
+                                const promptTextUpdate = typeof prompt === 'object'
+                                    ? (prompt.text || prompt.prompt || JSON.stringify(prompt))
+                                    : (prompt || '');
+                                imgElement.setAttribute('data-prompt', promptTextUpdate);
 			}
 		}
 	}

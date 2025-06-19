@@ -58,16 +58,20 @@ function displayImages() {
 
 		filteredImages.slice(0, 4).forEach(function(image, index) {
 			console.log("[displayImages] image :", image);
-			var imgElement = jQuery('<img>')
-			.attr('src', image.image_url)
-			.attr('alt', 'Image ' + image.image_number)
-			.attr('data-display_name', image.display_name || '')
-			.attr('data-user-logo', image.user_logo || '')
-			.attr('data-user-id', image.user_id || '')
-			.attr('data-format-image', image.format || '')
-			.attr('data-prompt', image.prompt || '')
-			.addClass('preview-enlarge')
-			.addClass(index < 2 ? 'top' : 'bottom');
+                        const promptText = typeof image.prompt === 'object'
+                            ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+                            : (image.prompt || '');
+
+                        var imgElement = jQuery('<img>')
+                        .attr('src', image.image_url)
+                        .attr('alt', 'Image ' + image.image_number)
+                        .attr('data-display_name', image.display_name || '')
+                        .attr('data-user-logo', image.user_logo || '')
+                        .attr('data-user-id', image.user_id || '')
+                        .attr('data-format-image', image.format || '')
+                        .attr('data-prompt', promptText)
+                        .addClass('preview-enlarge')
+                        .addClass(index < 2 ? 'top' : 'bottom');
 
 			var imgContainer = jQuery('<div>').addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
 			.append(imgElement);
@@ -102,16 +106,20 @@ function displayImagesForCurrentUser() {
 		});
 	} else {
 		// Ajouter les images directement à mainContent
-		currentUserImages.forEach(function(image) {
-			var imgElement = jQuery('<img>')
-			.attr('src', image.image_url)
-			.attr('alt', 'Image ' + image.image_number)
-			.attr('data-display_name', image.display_name || '')
-			.attr('data-user-logo', image.user_logo || '')
-			.attr('data-user-id', image.user_id || '')
-			.attr('data-format-image', image.format || '')
-			.attr('data-prompt', image.prompt || '')
-			.addClass('preview-enlarge');
+                currentUserImages.forEach(function(image) {
+                        const promptText = typeof image.prompt === 'object'
+                            ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+                            : (image.prompt || '');
+
+                        var imgElement = jQuery('<img>')
+                        .attr('src', image.image_url)
+                        .attr('alt', 'Image ' + image.image_number)
+                        .attr('data-display_name', image.display_name || '')
+                        .attr('data-user-logo', image.user_logo || '')
+                        .attr('data-user-id', image.user_id || '')
+                        .attr('data-format-image', image.format || '')
+                        .attr('data-prompt', promptText)
+                        .addClass('preview-enlarge');
 
 			mainContent.append(imgElement);
 		});
