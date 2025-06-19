@@ -4,6 +4,11 @@ let communityImages = [];
 let currentProductId = null;
 let currentMockup = null;
 
+function getLatestMockup(variant) {
+    if (!variant.mockups || !variant.mockups.length) return null;
+    return variant.mockups[0];
+}
+
 // 🌐 Cache global pour les templates et modèles 3D préchargés
 try {
     const saved = sessionStorage.getItem('customizerCache');
@@ -126,8 +131,11 @@ jQuery(document).ready(function ($) {
                 });
         }
 
-	function updateProductDisplay(variants) {
-		const urlParams = new URLSearchParams(window.location.search);
+        function updateProductDisplay(variants) {
+                variants.forEach(v => {
+                        v.mockups.sort((a, b) => b.mockup_id - a.mockup_id);
+                });
+                const urlParams = new URLSearchParams(window.location.search);
 		const variantParam = urlParams.get('variant');
                 selectedVariant = variants[0];
 
@@ -165,8 +173,7 @@ jQuery(document).ready(function ($) {
 
         function updateMainImage(variant) {
                 if (variant.mockups.length > 0) {
-
-                        currentMockup = variant.mockups[0];
+                        currentMockup = getLatestMockup(variant);
                         mainProductImage.attr('src', currentMockup.mockup_image).css({
                                 'position': 'absolute',
                                 'top': `${currentMockup.position_top}%`,
@@ -313,11 +320,12 @@ jQuery(document).ready(function ($) {
 	}
 
 
-	function updateThumbnails(variants) {
-		const thumbnailsContainer = $('.image-thumbnails').empty();
+        function updateThumbnails(variants) {
+                const thumbnailsContainer = $('.image-thumbnails').empty();
 
-		variants.forEach(variant => {
-			variant.mockups.forEach((mockup, index) => {
+                variants.forEach(variant => {
+                        variant.mockups.sort((a, b) => b.mockup_id - a.mockup_id);
+                        variant.mockups.forEach((mockup, index) => {
                                 const imgElement = $('<img>')
                                 .addClass('thumbnail')
                                 .attr('src', mockup.mockup_image)
