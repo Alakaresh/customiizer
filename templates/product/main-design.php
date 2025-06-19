@@ -46,6 +46,8 @@
                                         <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
                                         <button id="alignMiddleButton" class="align-button"><i class="fas fa-arrows-alt-v"></i></button>
                                         <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
+                                        <button id="rotateLeftButton" class="align-button"><i class="fas fa-undo"></i></button>
+                                        <button id="rotateRightButton" class="align-button"><i class="fas fa-redo"></i></button>
                                         <button id="mirrorImageButton" class="align-button"><i class="fas fa-retweet"></i></button>
                                         <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
                                         <button id="bringForwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
