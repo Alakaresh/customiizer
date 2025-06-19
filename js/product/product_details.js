@@ -86,13 +86,27 @@ jQuery(document).ready(function ($) {
         // On transmet l'ID utilisateur pour récupérer correctement
         // l'état des favoris depuis l'API
         preloadCommunityImages({ user_id: currentUser.ID }).then(() => {
-		const images = getAllCommunityImages();
-		myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
-		communityImages = images.filter(img => img.user_id !== currentUser.ID);
+                const images = getAllCommunityImages();
+                myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
+                communityImages = images.filter(img => img.user_id !== currentUser.ID);
 
-		console.log("myGeneratedImages :", myGeneratedImages);
-		displayGeneratedImages(myGeneratedImages);
-	});
+                console.log("myGeneratedImages :", myGeneratedImages);
+                displayGeneratedImages(myGeneratedImages);
+
+                // Si une variante est déjà sélectionnée, met à jour la bottom-bar
+                if (selectedVariant) {
+                        const filtered = images.filter(img => img.format === selectedVariant.ratio_image);
+                        displayImagesInBottomBar(filtered);
+                }
+        });
+
+        // Met à jour la bottom-bar dès que les images communautaires sont chargées
+        document.addEventListener('communityImagesLoaded', () => {
+                if (!selectedVariant) return;
+                const images = getAllCommunityImages();
+                const filtered = images.filter(img => img.format === selectedVariant.ratio_image);
+                displayImagesInBottomBar(filtered);
+        });
 
 
         // Gestion de l'overlay de chargement
