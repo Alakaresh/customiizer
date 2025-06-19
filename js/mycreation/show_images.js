@@ -39,7 +39,7 @@ jQuery(document).ready(function($) {
             container.append(column);
         });
 
-        $('#image-container').html(container); // Assurez-vous que l'ID correspond à votre HTML
+        $('#image-container').empty().append(container); // Assurez-vous que l'ID correspond à votre HTML
     }
 
     $.ajax({

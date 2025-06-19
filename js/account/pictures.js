@@ -83,9 +83,9 @@ var ImageLoader = (function() {
 			columns[index % 4].append(imageDiv);
 		});
 
-		jQuery('#image-container').html(container);
-		checkPagination();
-	}
+                jQuery('#image-container').empty().append(container);
+                checkPagination();
+        }
 
 	function checkPagination() {
 		var pagination = jQuery('<div/>', { class: 'pagination', css: { 'text-align': 'center', 'margin-top': '20px' } });
