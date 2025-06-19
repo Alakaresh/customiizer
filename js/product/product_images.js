@@ -130,13 +130,45 @@ function generateMockup(mockupData) {
 	document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
 	mainProductImage?.classList.add("loading");
 
-	let loadingOverlay = document.querySelector(".loading-overlay");
-	if (!loadingOverlay) {
-		loadingOverlay = document.createElement("div");
-		loadingOverlay.classList.add("loading-overlay");
-		loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">📦 Préparation...</div>`;
-		mainProductImage?.parentNode.appendChild(loadingOverlay);
-	}
+        let loadingOverlay = document.querySelector(".loading-overlay");
+        if (!loadingOverlay) {
+                loadingOverlay = document.createElement("div");
+                loadingOverlay.classList.add("loading-overlay");
+                loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">📦 Préparation...</div>`;
+                mainProductImage?.parentNode.appendChild(loadingOverlay);
+        }
+
+        // Fonction de polling du statut des mockups
+        async function pollMockupStatus(taskId, styleId, attempt = 0) {
+                try {
+                        const res = await fetch(`/wp-json/api/v1/mockups/status/${taskId}`);
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        const data = await res.json();
+                        if (data.status === 'completed' && data.mockup_url) {
+                                console.log(`✅ Mockup terminé pour style ${styleId}`);
+                                updateMockupThumbnail(styleId, data.mockup_url);
+
+                                if (styleId === primaryStyleId && !productDataCreated) {
+                                        productData = buildProductData({
+                                                ...mockupData,
+                                                generated_mockup_url: data.mockup_url
+                                        });
+                                        productDataCreated = true;
+                                }
+                                return;
+                        }
+                        if (data.status === 'failed') {
+                                console.error(`❌ Tâche ${taskId} échouée :`, data.error);
+                                return;
+                        }
+                } catch (err) {
+                        console.error(`❌ Polling erreur tâche ${taskId} :`, err.message);
+                }
+
+                if (attempt < 60) {
+                        setTimeout(() => pollMockupStatus(taskId, styleId, attempt + 1), 2000);
+                }
+        }
 
 	// Fonction d'envoi avec retry
 	const sendWithRetry = async (styleId, attempt = 0) => {
@@ -296,33 +328,3 @@ function updateMockupThumbnail(styleId, mockupUrl) {
 	}
 }
 
-async function pollMockupStatus(taskId, styleId, attempt = 0) {
-        try {
-                const res = await fetch(`/wp-json/api/v1/mockups/status/${taskId}`);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                if (data.status === 'completed' && data.mockup_url) {
-                        console.log(`✅ Mockup terminé pour style ${styleId}`);
-                        updateMockupThumbnail(styleId, data.mockup_url);
-
-                        if (styleId === primaryStyleId && !productDataCreated) {
-                                productData = buildProductData({
-                                        ...mockupData,
-                                        generated_mockup_url: data.mockup_url
-                                });
-                                productDataCreated = true;
-                        }
-                        return;
-                }
-                if (data.status === 'failed') {
-                        console.error(`❌ Tâche ${taskId} échouée :`, data.error);
-                        return;
-                }
-        } catch (err) {
-                console.error(`❌ Polling erreur tâche ${taskId} :`, err.message);
-        }
-
-        if (attempt < 60) {
-                setTimeout(() => pollMockupStatus(taskId, styleId, attempt + 1), 2000);
-        }
-}
