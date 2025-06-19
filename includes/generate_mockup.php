@@ -323,11 +323,25 @@ function customiizer_process_mockup_task($task_id) {
                 }
                 $task_data['status'] = 'failed';
                 $task_data['error'] = 'URL manquante';
+                if (!empty($task_data['file_path'])) {
+                        if (!unlink($task_data['file_path'])) {
+                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire {$task_data['file_path']}");
+                        } else {
+                                customiizer_log("🗑️ Fichier temporaire supprimé : {$task_data['file_path']}");
+                        }
+                }
                 set_transient('mockup_task_' . $task_id, $task_data, HOUR_IN_SECONDS);
                 return;
         }
 
         $task_data['status'] = 'failed';
         $task_data['error'] = $mockup_status['error'] ?? 'Erreur inconnue';
+        if (!empty($task_data['file_path'])) {
+                if (!unlink($task_data['file_path'])) {
+                        customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire {$task_data['file_path']}");
+                } else {
+                        customiizer_log("🗑️ Fichier temporaire supprimé : {$task_data['file_path']}");
+                }
+        }
         set_transient('mockup_task_' . $task_id, $task_data, HOUR_IN_SECONDS);
 }
