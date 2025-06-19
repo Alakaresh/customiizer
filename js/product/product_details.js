@@ -82,8 +82,10 @@ jQuery(document).ready(function ($) {
                 }
         }
 
-	// Dès le chargement général de la page
-	preloadCommunityImages().then(() => {
+        // Dès le chargement général de la page
+        // On transmet l'ID utilisateur pour récupérer correctement
+        // l'état des favoris depuis l'API
+        preloadCommunityImages({ user_id: currentUser.ID }).then(() => {
 		const images = getAllCommunityImages();
 		myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
 		communityImages = images.filter(img => img.user_id !== currentUser.ID);
