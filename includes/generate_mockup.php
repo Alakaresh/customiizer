@@ -5,8 +5,15 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
                 customiizer_log('❌ PRINTFUL_API_KEY non définie.');
                 return ['success' => false, 'error' => 'Clé API manquante'];
         }
-        $api_key = PRINTFUL_API_KEY;
-	$url = 'https://api.printful.com/v2/mockup-tasks';
+
+        if (!defined('PRINTFUL_STORE_ID')) {
+                customiizer_log('❌ PRINTFUL_STORE_ID non définie.');
+                return ['success' => false, 'error' => 'store_id manquant'];
+        }
+
+        $api_key  = PRINTFUL_API_KEY;
+        $store_id = PRINTFUL_STORE_ID;
+        $url = 'https://api.printful.com/v2/mockup-tasks';
 
 	$data = [
 		"format" => "png",
@@ -47,7 +54,8 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
                 $respHeaders = [];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
-                        "Authorization: Bearer $api_key"
+                        "Authorization: Bearer $api_key",
+                        "X-PF-Store-Id: $store_id"
                 ]);
                 curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
                         $len = strlen($header);
@@ -278,16 +286,22 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
                 customiizer_log('❌ PRINTFUL_API_KEY non définie.');
                 return ['success' => false, 'error' => 'Clé API manquante'];
         }
-        $api_key = PRINTFUL_API_KEY;
-	$url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
-	$elapsed_time = 0;
+        if (!defined('PRINTFUL_STORE_ID')) {
+                customiizer_log('❌ PRINTFUL_STORE_ID non définie.');
+                return ['success' => false, 'error' => 'store_id manquant'];
+        }
+        $api_key  = PRINTFUL_API_KEY;
+        $store_id = PRINTFUL_STORE_ID;
+        $url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
+        $elapsed_time = 0;
 
         while ($elapsed_time < $timeout) {
                 $ch = curl_init($url);
                 $respHeaders = [];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, [
                         'Content-Type: application/json',
-                        "Authorization: Bearer $api_key"
+                        "Authorization: Bearer $api_key",
+                        "X-PF-Store-Id: $store_id"
                 ]);
                 curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
                         $len = strlen($header);
