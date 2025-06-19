@@ -81,13 +81,7 @@
 				<div class="band band-right"></div>
 			</div>
                         <div class="bottom-bar">
-                                <button class="bottom-bar-prev" aria-label="Pr\xC3\xA9c\xC3\xA9dent">
-                                        <span class="fas fa-chevron-left"></span>
-                                </button>
                                 <div class="content"></div>
-                                <button class="bottom-bar-next" aria-label="Suivant">
-                                        <span class="fas fa-chevron-right"></span>
-                                </button>
                         </div>
 
 		</div>
