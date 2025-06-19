@@ -356,6 +356,24 @@ body {
     border: 2px solid #ddd; /* Bordure autour de l'image */
 }
 
+/* Loader affiché lors du changement d'image dans le dropdown */
+.dropdown-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown-loader .loading-spinner {
+    width: 25px;
+    height: 25px;
+    border-width: 4px;
+}
+
 /* Icône de menu déroulant */
 .dropdown-icon {
     width: 30px;
