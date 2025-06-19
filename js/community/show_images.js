@@ -2,6 +2,11 @@ const userId = currentUser.ID;
 const cacheKey = `community_images_${userId || 'guest'}`;
 const imagesPerLoad = 20;
 
+// In the WordPress environment jQuery operates in no-conflict mode, so
+// the global `$` alias is not defined. Define it here to reuse jQuery
+// across helper functions declared outside the ready callback.
+const $ = jQuery;
+
 let allImages = [];
 let filteredImages = [];
 let currentIndex = 0;
