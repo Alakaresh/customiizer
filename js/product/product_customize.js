@@ -58,6 +58,10 @@ jQuery(document).ready(function ($) {
 
                 jQuery('#customizeModal').hide();
 
+                if (typeof window.showLoadingOverlay === 'function') {
+                        window.showLoadingOverlay();
+                }
+
                 const base64 = CanvasManager.exportPrintAreaPNG();
                 uploadBase64ToServer(base64).then(response => {
                         if (!response.success) {
