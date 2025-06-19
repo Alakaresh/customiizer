@@ -260,22 +260,24 @@ jQuery(document).ready(function ($) {
 
 
 
-	function updateSizes(variants) {
-		const sizesContainer = $('.sizes-container').empty();
-		const sizeMap = {};
+        function updateSizes(variants) {
+                const sizesContainer = $('.sizes-container').empty();
+                const seenSizes = new Set();
+                const orderedSizes = [];
 
-		variants.forEach(v => {
-			if (v.size && !sizeMap[v.size]) {
-				sizeMap[v.size] = v.stock;
-			}
-		});
+                variants.forEach(v => {
+                        if (v.size && !seenSizes.has(v.size)) {
+                                seenSizes.add(v.size);
+                                orderedSizes.push({ size: v.size, stock: v.stock });
+                        }
+                });
 
-		Object.entries(sizeMap).forEach(([size, stock], index) => {
-			const sizeOption = $('<div>')
-			.addClass('size-option')
-			.text(size)
-			.attr('data-size', size)
-			.toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
+                orderedSizes.forEach(({ size, stock }, index) => {
+                        const sizeOption = $('<div>')
+                        .addClass('size-option')
+                        .text(size)
+                        .attr('data-size', size)
+                        .toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
 			.on('click', function () {
 				if ($(this).hasClass('disabled')) return;
 				$('.size-option').removeClass('selected');

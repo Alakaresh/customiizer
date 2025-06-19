@@ -220,9 +220,15 @@ jQuery(document).ready(function ($) {
                        if (shouldSelect && !disabled) opt.addClass('selected');
                });
 
-               const sizeMap = {};
-               variants.forEach(v => { if (v.size && !sizeMap[v.size]) sizeMap[v.size] = v.stock; });
-               Object.entries(sizeMap).forEach(([size, stock], idx) => {
+               const seenSizes = new Set();
+               const orderedSizes = [];
+               variants.forEach(v => {
+                       if (v.size && !seenSizes.has(v.size)) {
+                               seenSizes.add(v.size);
+                               orderedSizes.push({ size: v.size, stock: v.stock });
+                       }
+               });
+               orderedSizes.forEach(({ size, stock }, idx) => {
                        const opt = $('<div>').addClass('size-option')
                                .text(size)
                                .attr('data-size', size)
