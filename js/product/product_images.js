@@ -192,13 +192,42 @@ function buildProductData(mockupData) {
 		technique: mockupData.technique
 	};
 
-	console.log("✅ productData construit :", productData);
-	return productData;
+        console.log("✅ productData construit :", productData);
+        return productData;
+}
+
+function cacheUpdatedMockup(styleId, mockupUrl) {
+        if (!selectedVariant) return;
+
+        let mockup = selectedVariant.mockups.find(m => m.mockup_id == styleId);
+        if (mockup) {
+                mockup.mockup_image = mockupUrl;
+        } else {
+                mockup = { mockup_id: styleId, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
+                selectedVariant.mockups.push(mockup);
+        }
+
+        const cache = window.customizerCache?.variants?.[window.currentProductId];
+        if (cache && Array.isArray(cache.variants)) {
+                const v = cache.variants.find(v => v.variant_id == selectedVariant.variant_id);
+                if (v) {
+                        let cachedMockup = v.mockups.find(m => m.mockup_id == styleId);
+                        if (cachedMockup) {
+                                cachedMockup.mockup_image = mockupUrl;
+                        } else {
+                                cachedMockup = { mockup_id: styleId, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
+                                v.mockups.push(cachedMockup);
+                        }
+                        if (typeof persistCache === 'function') {
+                                persistCache();
+                        }
+                }
+        }
 }
 
 
 function updateMockupThumbnail(styleId, mockupUrl) {
-	console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
+        console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
 
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
 	if (!thumbnailsContainer) {
@@ -208,13 +237,13 @@ function updateMockupThumbnail(styleId, mockupUrl) {
 
 	let thumbnailToUpdate = document.querySelector(`.thumbnail[data-style-id="${styleId}"]`);
 
-	if (thumbnailToUpdate) {
-		// ✅ Met à jour l'image du thumbnail existant
-		thumbnailToUpdate.src = mockupUrl;
-		thumbnailToUpdate.classList.remove("processing");
-		console.log(`✅ Thumbnail mis à jour pour style ${styleId}`);
+        if (thumbnailToUpdate) {
+                // ✅ Met à jour l'image du thumbnail existant
+                thumbnailToUpdate.src = mockupUrl;
+                thumbnailToUpdate.classList.remove("processing");
+                console.log(`✅ Thumbnail mis à jour pour style ${styleId}`);
 
-	} else {
+        } else {
 		console.warn(`⚠️ Aucun thumbnail trouvé pour le style ${styleId}, ajout en cours...`);
 
 		// ✅ Création d'un nouveau thumbnail si aucun existant
@@ -224,9 +253,11 @@ function updateMockupThumbnail(styleId, mockupUrl) {
 		thumbnailToUpdate.classList.add("thumbnail");
 		thumbnailToUpdate.dataset.styleId = styleId;
 
-		thumbnailsContainer.appendChild(thumbnailToUpdate);
-		console.log(`✅ Nouveau thumbnail ajouté pour style ${styleId}`);
-	}
+                thumbnailsContainer.appendChild(thumbnailToUpdate);
+                console.log(`✅ Nouveau thumbnail ajouté pour style ${styleId}`);
+        }
+
+        cacheUpdatedMockup(styleId, mockupUrl);
 
 	// ✅ Simuler un clic pour mettre à jour l'image principale
 	console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
