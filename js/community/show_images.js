@@ -14,23 +14,24 @@ jQuery(document).ready(function($) {
 	} else {
 		fetchImagesFromAPI();
 	}
-	function fetchImagesFromAPI() {
-		fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}`)
-			.then(response => response.json())
-			.then(data => {
-			if (data.success) {
-				allImages = data.images;
-				sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
-				displayImages(allImages);
-				const endTime = performance.now();
-			} else {
-				console.error('[AJAX] ❌ Aucune image trouvée.');
-			}
-		})
-			.catch(error => {
-			console.error('[AJAX] ❌ Erreur de récupération des images:', error);
-		});
-	}
+        function fetchImagesFromAPI() {
+                fetch(`${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                        if (data.success) {
+                                allImages = data.images;
+                                console.log('[API] Exemple image reçue', allImages[0]);
+                                sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
+                                displayImages(allImages);
+                                const endTime = performance.now();
+                        } else {
+                                console.error('[AJAX] ❌ Aucune image trouvée.');
+                        }
+                })
+                        .catch(error => {
+                        console.error('[AJAX] ❌ Erreur de récupération des images:', error);
+                });
+        }
 
 	function shuffleArray(array) {
 		for (let i = array.length - 1; i > 0; i--) {
@@ -53,12 +54,25 @@ jQuery(document).ready(function($) {
 	}
 
 function appendImage(image, columns, columnIndex) {
-    const promptText = typeof image.prompt === 'object'
-        ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
-        : (image.prompt || '');
-    const imageUrl = typeof image.image_url === 'object'
-        ? (image.image_url.url || image.image_url.src || image.image_url.path || '')
-        : image.image_url;
+    let promptText = '';
+    if (typeof image.prompt === 'object') {
+        console.log('[Debug] prompt object trouvé', image.prompt);
+        promptText = image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt);
+    } else {
+        promptText = image.prompt || '';
+    }
+
+    let imageUrl = '';
+    if (typeof image.image_url === 'object') {
+        console.log('[Debug] image_url objet trouvé', image.image_url);
+        imageUrl = image.image_url.url || image.image_url.src || image.image_url.path || '';
+        if (!imageUrl) {
+            console.warn('[Debug] Aucun champ image_url utilisable pour', image);
+        }
+    } else {
+        imageUrl = image.image_url;
+    }
+    console.log('[Debug] URL finale utilisée', imageUrl);
 
     const imageDiv = $('<div/>', {
         class: 'imageContainer',
