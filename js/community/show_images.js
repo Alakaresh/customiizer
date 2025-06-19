@@ -163,7 +163,7 @@ function displayImages(images) {
     const columns = initializeColumns();
     const container = $('<div/>', { class: 'image-container' });
     columns.forEach(function(column) { container.append(column); });
-    $('#image-container').html(container);
+    $('#image-container').empty().append(container);
 
     currentIndex = 0;
     loadMoreImages();
