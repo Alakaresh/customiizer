@@ -87,23 +87,8 @@ jQuery(document).ready(function ($) {
         function updateSelectedProduct(product) {
                 selectedProductName.text(product.name);
 
-                // Affiche un loader pendant le chargement de la nouvelle image
-                $('.selected-item .dropdown-loader').remove();
-                const loader = $('<div class="dropdown-loader"><div class="loading-spinner"></div></div>');
-                $('.selected-item').append(loader);
-                selectedProductImage.hide();
-
-                const img = new Image();
-                img.onload = function() {
-                        selectedProductImage.attr('src', product.image || 'default-image-url.jpg');
-                        loader.remove();
-                        selectedProductImage.show();
-                };
-                img.onerror = function() {
-                        loader.remove();
-                        selectedProductImage.show();
-                };
-                img.src = product.image || 'default-image-url.jpg';
+                // Met à jour immédiatement l'image du dropdown
+                selectedProductImage.attr('src', product.image || 'default-image-url.jpg');
 
 		const nom = product.name.toLowerCase()
 		.normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlève les accents
