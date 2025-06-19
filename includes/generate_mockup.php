@@ -138,50 +138,20 @@ function handle_generate_mockup() {
     );
 
         if (isset($response['data'][0]['id'])) {
-		$task_id = $response['data'][0]['id'];
+                $task_id = $response['data'][0]['id'];
 
-		$mockup_status = wait_for_mockup_completion($task_id);
+                $task_data = [
+                        'status'    => 'pending',
+                        'file_path' => $file_path,
+                        'post_id'   => intval($_POST['post_id'] ?? 0)
+                ];
+                set_transient('mockup_task_' . $task_id, $task_data, HOUR_IN_SECONDS);
 
-		if ($mockup_status['success']) {
-			$mockups = $mockup_status['data']['catalog_variant_mockups'] ?? [];
-
-			if (!empty($mockups)) {
-				$mockup_url = $mockups[0]['mockups'][0]['mockup_url'] ?? null;
-
-                                if ($mockup_url) {
-                                        if (!unlink($file_path)) {
-                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                                        } else {
-                                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
-                                        }
-                                        wp_send_json_success(['mockup_url' => $mockup_url]);
-                                } else {
-                                        customiizer_log("❌ Aucun mockup_url trouvé");
-                                        if (!unlink($file_path)) {
-                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                                        } else {
-                                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
-                                        }
-                                        wp_send_json_error(['message' => 'URL du mockup introuvable.']);
-                                }
-                        } else {
-                                customiizer_log("❌ Aucun mockup généré.");
-                                if (!unlink($file_path)) {
-                                        customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                                } else {
-                                        customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
-                                }
-                                wp_send_json_error(['message' => 'Aucun mockup généré.']);
-                        }
-                } else {
-                        customiizer_log("❌ Erreur de statut : " . $mockup_status['error']);
-                        if (!unlink($file_path)) {
-                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                        } else {
-                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
-                        }
-                        wp_send_json_error(['message' => $mockup_status['error']]);
+                if (!wp_next_scheduled('customiizer_process_mockup_task', [$task_id])) {
+                        wp_schedule_single_event(time(), 'customiizer_process_mockup_task', [$task_id]);
                 }
+
+                wp_send_json_success(['task_id' => $task_id]);
         } else {
                 customiizer_log("❌ Erreur API : " . ($response['error'] ?? 'Non spécifiée'));
                 if (!unlink($file_path)) {
@@ -318,5 +288,46 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 
 	// Timeout atteint
 	customiizer_log("Timeout atteint pour la tâche {$task_id} après {$timeout} secondes.");
-	return ['success' => false, 'error' => 'Timeout atteint'];
+        return ['success' => false, 'error' => 'Timeout atteint'];
+}
+
+add_action('customiizer_process_mockup_task', 'customiizer_process_mockup_task');
+function customiizer_process_mockup_task($task_id) {
+        $task_data = get_transient('mockup_task_' . $task_id);
+        if (!$task_data || ($task_data['status'] ?? '') !== 'pending') {
+                return;
+        }
+
+        $mockup_status = wait_for_mockup_completion($task_id);
+
+        if ($mockup_status['success']) {
+                $mockups = $mockup_status['data']['catalog_variant_mockups'] ?? [];
+                if (!empty($mockups)) {
+                        $mockup_url = $mockups[0]['mockups'][0]['mockup_url'] ?? null;
+                        if ($mockup_url) {
+                                if (!empty($task_data['file_path'])) {
+                                        if (!unlink($task_data['file_path'])) {
+                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire {$task_data['file_path']}");
+                                        } else {
+                                                customiizer_log("🗑️ Fichier temporaire supprimé : {$task_data['file_path']}");
+                                        }
+                                }
+                                if (!empty($task_data['post_id'])) {
+                                        update_post_meta($task_data['post_id'], 'mockup_url', $mockup_url);
+                                }
+                                $task_data['status'] = 'completed';
+                                $task_data['mockup_url'] = $mockup_url;
+                                set_transient('mockup_task_' . $task_id, $task_data, HOUR_IN_SECONDS);
+                                return;
+                        }
+                }
+                $task_data['status'] = 'failed';
+                $task_data['error'] = 'URL manquante';
+                set_transient('mockup_task_' . $task_id, $task_data, HOUR_IN_SECONDS);
+                return;
+        }
+
+        $task_data['status'] = 'failed';
+        $task_data['error'] = $mockup_status['error'] ?? 'Erreur inconnue';
+        set_transient('mockup_task_' . $task_id, $task_data, HOUR_IN_SECONDS);
 }
