@@ -133,7 +133,7 @@ jQuery(document).ready(function ($) {
 
         function updateProductDisplay(variants) {
                 variants.forEach(v => {
-                        v.mockups.sort((a, b) => b.mockup_id - a.mockup_id);
+                        v.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
                 });
                 const urlParams = new URLSearchParams(window.location.search);
 		const variantParam = urlParams.get('variant');
@@ -324,7 +324,7 @@ jQuery(document).ready(function ($) {
                 const thumbnailsContainer = $('.image-thumbnails').empty();
 
                 variants.forEach(variant => {
-                        variant.mockups.sort((a, b) => b.mockup_id - a.mockup_id);
+                        variant.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
                         variant.mockups.forEach((mockup, index) => {
                                 const imgElement = $('<img>')
                                 .addClass('thumbnail')
