@@ -181,21 +181,23 @@ const CanvasManager = {
                const areaTop = template.print_area_top;
                const areaWidth = template.print_area_width;
                const areaHeight = template.print_area_height;
-               const imgWidth = img.width * img.scaleX;
-               const imgHeight = img.height * img.scaleY;
+
+               const bounds = img.getBoundingRect(true);
+               const offsetX = img.left - bounds.left;
+               const offsetY = img.top - bounds.top;
 
                if (position === 'left') {
-                       img.set({ left: areaLeft });
+                       img.set({ left: areaLeft + offsetX });
                } else if (position === 'right') {
-                       img.set({ left: areaLeft + areaWidth - imgWidth });
+                       img.set({ left: areaLeft + areaWidth - bounds.width + offsetX });
                } else if (position === 'center') {
-                       img.set({ left: areaLeft + (areaWidth - imgWidth) / 2 });
+                       img.set({ left: areaLeft + (areaWidth - bounds.width) / 2 + offsetX });
                } else if (position === 'top') {
-                       img.set({ top: areaTop });
+                       img.set({ top: areaTop + offsetY });
                } else if (position === 'bottom') {
-                       img.set({ top: areaTop + areaHeight - imgHeight });
+                       img.set({ top: areaTop + areaHeight - bounds.height + offsetY });
                } else if (position === 'middle') {
-                       img.set({ top: areaTop + (areaHeight - imgHeight) / 2 });
+                       img.set({ top: areaTop + (areaHeight - bounds.height) / 2 + offsetY });
                }
 
                 img.setCoords();
