@@ -56,6 +56,9 @@ function appendImage(image, columns, columnIndex) {
     const promptText = typeof image.prompt === 'object'
         ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
         : (image.prompt || '');
+    const imageUrl = typeof image.image_url === 'object'
+        ? (image.image_url.url || image.image_url.src || image.image_url.path || '')
+        : image.image_url;
 
     const imageDiv = $('<div/>', {
         class: 'imageContainer',
@@ -79,7 +82,7 @@ function appendImage(image, columns, columnIndex) {
     }
 
     const img = $('<img/>', {
-        src: image.image_url,
+        src: imageUrl,
         alt: 'Generated Image',
         class: 'preview-enlarge',
         'data-user-id': userId || '',
