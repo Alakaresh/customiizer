@@ -154,21 +154,37 @@ function generateMockup(mockupData) {
 		form.append("top", mockupData.top);
 
 		try {
-			const res = await fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form });
-			if (res.status === 429) {
-				if (attempt < 3) {
-					const wait = 1500 + attempt * 1000;
-					console.warn(`⏳ 429 reçu pour style ${styleId} — retry dans ${wait}ms`);
-					await new Promise(r => setTimeout(r, wait));
-					return sendWithRetry(styleId, attempt + 1);
-				}
-				throw new Error("Trop de requêtes (429). Abandon.");
-			}
+                const res = await fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form });
+                        if (res.status === 429) {
+                                if (attempt < 3) {
+                                        const wait = 1500 + attempt * 1000;
+                                        console.warn(`⏳ 429 reçu pour style ${styleId} — retry dans ${wait}ms`);
+                                        await new Promise(r => setTimeout(r, wait));
+                                        return sendWithRetry(styleId, attempt + 1);
+                                }
+                                throw new Error("Trop de requêtes (429). Abandon.");
+                        }
 
-			const data = await res.json();
-			if (data.success && data.data?.mockup_url) {
-				console.log(`✅ Mockup reçu pour style ${styleId}`);
-				updateMockupThumbnail(styleId, data.data.mockup_url);
+                        if (!res.ok) {
+                                if ([502, 503, 504].includes(res.status) && attempt < 2) {
+                                        const wait = 2000 + attempt * 1000;
+                                        console.warn(`⏳ ${res.status} reçu pour style ${styleId} — retry dans ${wait}ms`);
+                                        await new Promise(r => setTimeout(r, wait));
+                                        return sendWithRetry(styleId, attempt + 1);
+                                }
+                                throw new Error(`HTTP ${res.status}`);
+                        }
+
+                        const raw = await res.text();
+                        let data;
+                        try {
+                                data = JSON.parse(raw);
+                        } catch (e) {
+                                throw new Error('Invalid JSON');
+                        }
+                        if (data.success && data.data?.mockup_url) {
+                                console.log(`✅ Mockup reçu pour style ${styleId}`);
+                                updateMockupThumbnail(styleId, data.data.mockup_url);
 
 				if (styleId === primaryStyleId && !productDataCreated) {
 					productData = buildProductData({
