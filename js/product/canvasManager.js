@@ -122,11 +122,11 @@ const CanvasManager = {
 				scaleY: scale,
 				originX: 'left',
 				originY: 'top',
-				selectable: true,
-				hasControls: true,
-				lockRotation: true,
-				lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
-				rotatingPoint: false,
+                                selectable: true,
+                                hasControls: true,
+                                lockRotation: false,
+                                lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
+                                hasRotatingPoint: true,
 				//borderColor: 'green',
 				//cornerColor: 'blue'
 			});
@@ -138,9 +138,9 @@ const CanvasManager = {
 				br: true,  // coin bas droit
 				mt: false,
 				mb: false,
-				ml: false,
-				mr: false,
-				mtr: false  // rotation désactivée
+                                ml: false,
+                                mr: false,
+                                mtr: true  // rotation activée
 			});
 
 
@@ -219,6 +219,16 @@ const CanvasManager = {
                 canvas.sendBackwards(obj);
                 canvas.bringToFront(productOverlay);
                 canvas.bringToFront(guideGroup);
+                canvas.renderAll();
+                CanvasManager.syncTo3D();
+        },
+
+        rotateImage: function(angle) {
+                const img = canvas.getActiveObject();
+                if (!img) return;
+                const current = img.angle || 0;
+                img.rotate(current + angle);
+                img.setCoords();
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
