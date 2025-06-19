@@ -1,8 +1,9 @@
 <?php
 
 function generate_mockup_printful($image_url, $product_id, $variant_id, $style_id, $placement, $technique, $width, $height, $top, $left) {
-	$api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
-	$url = 'https://api.printful.com/v2/mockup-tasks';
+        $api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
+        $url = 'https://api.printful.com/v2/mockup-tasks';
+        $start = microtime(true);
 
 	$data = [
 		"format" => "png",
@@ -57,14 +58,18 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
 	curl_close($ch);
 
-	customiizer_log("API Printful HTTP Code: {$httpCode}");
-	customiizer_log("Réponse Printful: {$result}");
+        customiizer_log("API Printful HTTP Code: {$httpCode}");
+        customiizer_log("Réponse Printful: {$result}");
 
-	if ($httpCode !== 200) {
-		return ['success' => false, 'error' => "Erreur HTTP {$httpCode}", 'printful_response' => $result];
-	}
+        if ($httpCode !== 200) {
+                $duration = round(microtime(true) - $start, 3);
+                customiizer_log("⏲️ Appel API Printful terminé en {$duration}s (HTTP {$httpCode})");
+                return ['success' => false, 'error' => "Erreur HTTP {$httpCode}", 'printful_response' => $result];
+        }
 
-	return json_decode($result, true);
+        $duration = round(microtime(true) - $start, 3);
+        customiizer_log("⏲️ Appel API Printful terminé en {$duration}s");
+        return json_decode($result, true);
 }
 
 
@@ -72,8 +77,11 @@ add_action('wp_ajax_generate_mockup', 'handle_generate_mockup');
 add_action('wp_ajax_nopriv_generate_mockup', 'handle_generate_mockup');
 
 function handle_generate_mockup() {
+    $overall_start = microtime(true);
     if (!isset($_POST['image_url'])) {
         customiizer_log("❌ image_url manquant !");
+        $total = round(microtime(true) - $overall_start, 3);
+        customiizer_log("⏱️ Génération échouée en {$total}s");
         wp_send_json_error(['message' => 'URL de l\'image manquante.']);
     }
 
@@ -94,14 +102,21 @@ function handle_generate_mockup() {
     $top_in    = floatval($_POST['top']);
 
     if ($width_in < 0.3 || $height_in < 0.3) {
+        $total = round(microtime(true) - $overall_start, 3);
+        customiizer_log("⏱️ Génération échouée en {$total}s");
         wp_send_json_error(['message' => 'La largeur et la hauteur doivent être ≥ 0.3 pouce.']);
     }
 
     customiizer_log("📐 Dimensions en pouces reçues : width={$width_in}, height={$height_in}, top={$top_in}, left={$left_in}");
 
     // 🔁 Conversion de l’image WebP en PNG
+    $step_start = microtime(true);
     $conversion_result = convert_webp_to_png_server($webp_url);
+    $elapsed = round(microtime(true) - $step_start, 3);
+    customiizer_log("⏲️ Conversion WebP->PNG : {$elapsed}s");
     if (!$conversion_result['success']) {
+        $total = round(microtime(true) - $overall_start, 3);
+        customiizer_log("⏱️ Génération échouée en {$total}s");
         wp_send_json_error(['message' => $conversion_result['message']]);
     }
     $png_url   = $conversion_result['png_url'];
@@ -126,7 +141,10 @@ function handle_generate_mockup() {
         if (isset($response['data'][0]['id'])) {
 		$task_id = $response['data'][0]['id'];
 
-		$mockup_status = wait_for_mockup_completion($task_id);
+                $step_start = microtime(true);
+                $mockup_status = wait_for_mockup_completion($task_id);
+                $elapsed_wait = round(microtime(true) - $step_start, 3);
+                customiizer_log("⏲️ Attente du mockup : {$elapsed_wait}s");
 
 		if ($mockup_status['success']) {
 			$mockups = $mockup_status['data']['catalog_variant_mockups'] ?? [];
@@ -140,6 +158,8 @@ function handle_generate_mockup() {
                                         } else {
                                                 customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                         }
+                                        $total = round(microtime(true) - $overall_start, 3);
+                                        customiizer_log("⏱️ Génération terminée en {$total}s");
                                         wp_send_json_success(['mockup_url' => $mockup_url]);
                                 } else {
                                         customiizer_log("❌ Aucun mockup_url trouvé");
@@ -148,6 +168,8 @@ function handle_generate_mockup() {
                                         } else {
                                                 customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                         }
+                                        $total = round(microtime(true) - $overall_start, 3);
+                                        customiizer_log("⏱️ Génération échouée en {$total}s");
                                         wp_send_json_error(['message' => 'URL du mockup introuvable.']);
                                 }
                         } else {
@@ -157,6 +179,8 @@ function handle_generate_mockup() {
                                 } else {
                                         customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                 }
+                                $total = round(microtime(true) - $overall_start, 3);
+                                customiizer_log("⏱️ Génération échouée en {$total}s");
                                 wp_send_json_error(['message' => 'Aucun mockup généré.']);
                         }
                 } else {
@@ -166,6 +190,8 @@ function handle_generate_mockup() {
                         } else {
                                 customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                         }
+                        $total = round(microtime(true) - $overall_start, 3);
+                        customiizer_log("⏱️ Génération échouée en {$total}s");
                         wp_send_json_error(['message' => $mockup_status['error']]);
                 }
         } else {
@@ -175,6 +201,8 @@ function handle_generate_mockup() {
                 } else {
                         customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                 }
+                $total = round(microtime(true) - $overall_start, 3);
+                customiizer_log("⏱️ Génération échouée en {$total}s");
                 wp_send_json_error(['message' => $response['error'] ?? 'Erreur inconnue']);
         }
 }
@@ -236,9 +264,10 @@ function convert_webp_to_png_server($image_url) {
         ];
 }
 function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
-	$api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
-	$url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
-	$elapsed_time = 0;
+        $api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
+        $url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
+        $elapsed_time = 0;
+        $start = microtime(true);
 
 	while ($elapsed_time < $timeout) {
 		$ch = curl_init($url);
@@ -272,11 +301,15 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 			$status = $response['data'][0]['status'];
 
 			if ($status === 'completed') {
-				return ['success' => true, 'data' => $response['data'][0]];
+                                $duration = round(microtime(true) - $start, 3);
+                                customiizer_log("⏲️ Tâche {$task_id} terminée en {$duration}s");
+                                return ['success' => true, 'data' => $response['data'][0]];
 			} elseif ($status === 'failed') {
 				$failure_reasons = $response['data'][0]['failure_reasons'] ?? 'Non spécifié';
-				customiizer_log("Tâche {$task_id} échouée. Raison : " . json_encode($failure_reasons));
-				return ['success' => false, 'error' => 'Tâche échouée', 'reasons' => $failure_reasons];
+                                customiizer_log("Tâche {$task_id} échouée. Raison : " . json_encode($failure_reasons));
+                                $duration = round(microtime(true) - $start, 3);
+                                customiizer_log("⏲️ Tâche {$task_id} échouée en {$duration}s");
+                                return ['success' => false, 'error' => 'Tâche échouée', 'reasons' => $failure_reasons];
 			}
 		}
 
@@ -288,6 +321,8 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 	}
 
 	// Timeout atteint
-	customiizer_log("Timeout atteint pour la tâche {$task_id} après {$timeout} secondes.");
-	return ['success' => false, 'error' => 'Timeout atteint'];
+        customiizer_log("Timeout atteint pour la tâche {$task_id} après {$timeout} secondes.");
+        $duration = round(microtime(true) - $start, 3);
+        customiizer_log("⏲️ Tâche {$task_id} terminée en {$duration}s (timeout)");
+        return ['success' => false, 'error' => 'Timeout atteint'];
 }
