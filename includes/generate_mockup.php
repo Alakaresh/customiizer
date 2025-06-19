@@ -40,36 +40,60 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
 	customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
-        $ch = curl_init($url);
-        $respHeaders = [];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Content-Type: application/json',
-                "Authorization: Bearer $api_key"
-        ]);
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
-                $len = strlen($header);
-                $parts = explode(':', $header, 2);
-                if (count($parts) == 2) {
-                        $respHeaders[strtolower(trim($parts[0]))] = trim($parts[1]);
-                }
-                return $len;
-        });
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $result = null;
+        $httpCode = 0;
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+                $ch = curl_init($url);
+                $respHeaders = [];
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        "Authorization: Bearer $api_key"
+                ]);
+                curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
+                        $len = strlen($header);
+                        $parts = explode(':', $header, 2);
+                        if (count($parts) == 2) {
+                                $respHeaders[strtolower(trim($parts[0]))] = trim($parts[1]);
+                        }
+                        return $len;
+                });
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-        $result = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-        if (curl_errno($ch)) {
-                $error_msg = curl_error($ch);
-                customiizer_log("Erreur cURL : {$error_msg}");
+                $result = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                if (curl_errno($ch)) {
+                        $error_msg = curl_error($ch);
+                        customiizer_log("Erreur cURL : {$error_msg}");
+                        curl_close($ch);
+                        return ['success' => false, 'error' => $error_msg];
+                }
+
                 curl_close($ch);
-                return ['success' => false, 'error' => $error_msg];
+                printful_apply_rate_limit($respHeaders);
+
+                if ($httpCode != 429) {
+                        break;
+                }
+
+                $wait = 60;
+                if (isset($respHeaders['retry-after'])) {
+                        $wait = (int)$respHeaders['retry-after'];
+                } elseif (isset($respHeaders['x-ratelimit-reset'])) {
+                        $reset = (int)$respHeaders['x-ratelimit-reset'];
+                        $wait = ($reset > time()) ? $reset - time() : $reset;
+                }
+                customiizer_log("⏳ 429 reçu, pause de {$wait}s (tentative {$attempt}/3)");
+                if ($attempt < 3) {
+                        sleep($wait);
+                }
         }
 
-        curl_close($ch);
-        printful_apply_rate_limit($respHeaders);
+        if ($httpCode == 429) {
+                return ['success' => false, 'error' => 'Trop de requêtes (429)'];
+        }
 
 	customiizer_log("API Printful HTTP Code: {$httpCode}");
 	customiizer_log("Réponse Printful: {$result}");
