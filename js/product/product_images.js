@@ -10,6 +10,10 @@ function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
 }
 
+function getFirstMockup(variant) {
+    return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id)[0];
+}
+
 // Création de l'info-bulle globale
 const tooltip = document.createElement("div");
 tooltip.classList.add("dynamic-tooltip");
@@ -260,9 +264,9 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         cacheUpdatedMockup(styleId, mockupUrl);
 
 	// ✅ Simuler un clic pour mettre à jour l'image principale
-	console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
-        if (styleId === getLatestMockup(selectedVariant)?.mockup_id) {
-                console.log(`🔄 Activation automatique du thumbnail principal (style ${styleId})`);
+        console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
+        if (styleId === getFirstMockup(selectedVariant)?.mockup_id) {
+                console.log(`🔄 Activation automatique du premier thumbnail (style ${styleId})`);
                 thumbnailToUpdate.click();
         }
 }
