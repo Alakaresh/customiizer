@@ -92,6 +92,10 @@ jQuery(document).ready(function ($) {
                 console.log("productId :", productId);
                 showLoadingOverlay();
 
+                // Assure la présence du cache et du sous-objet 'variants'
+                window.customizerCache = window.customizerCache || {};
+                window.customizerCache.variants = window.customizerCache.variants || {};
+
                 const cached = window.customizerCache.variants[productId];
                 const fetchPromise = cached ? Promise.resolve(cached) : fetch(`${apiBaseURL}/${productId}`)
                         .then(response => {
