@@ -87,8 +87,10 @@ function displayImages(images) {
 	columns.forEach(c => container.append(c));
 	$('#image-container').empty().append(container);
 
-	currentIndex = 0;
-	loadMoreImages(columns);
+        currentIndex = 0;
+        loadMoreImages(columns);
+        // Enable click-to-preview after rendering the initial batch
+        enableImageEnlargement();
 
 	$(window).off('scroll').on('scroll', function () {
 		if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
