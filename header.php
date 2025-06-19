@@ -158,6 +158,17 @@ $display_name = $current_user->display_name;
                                         image_credits: <?php echo intval($image_credits); ?>,
                                         user_logo: <?php echo json_encode($profile_image_url); ?>
                                 };
+
+                                const cachedStr = sessionStorage.getItem("USER_ESSENTIALS");
+                                if (cachedStr) {
+                                        try {
+                                                const cached = JSON.parse(cachedStr);
+                                                if (cached.user_id === essentials.user_id) {
+                                                        essentials.image_credits = cached.image_credits;
+                                                }
+                                        } catch(e) {}
+                                }
+
                                 sessionStorage.setItem("USER_ESSENTIALS", JSON.stringify(essentials));
                                 document.addEventListener("DOMContentLoaded", function(){
                                         const creditsEl = document.getElementById("userCredits");
