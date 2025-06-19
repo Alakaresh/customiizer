@@ -1,7 +1,5 @@
 const userId = currentUser.ID;
-const cacheKey = `community_images_${userId || 'guest'}`;
 const imagesPerLoad = 20;
-let offset = 0;
 
 // In the WordPress environment jQuery operates in no-conflict mode, so
 // the global `$` alias is not defined. Define it here to reuse jQuery
@@ -10,25 +8,9 @@ const $ = jQuery;
 
 let allImages = [];
 let filteredImages = [];
-let currentIndex = 0;
 
 jQuery(document).ready(function ($) {
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-                try {
-                        const parsed = JSON.parse(cached);
-                        allImages = parsed.images || [];
-                        offset = parsed.offset || allImages.length;
-                } catch (e) {
-                        allImages = [];
-                }
-        }
-
-        if (allImages.length) {
-                displayImages(allImages);
-        } else {
-                fetchImagesFromAPI(true);
-        }
+        fetchImagesFromAPI();
 
 	$('#sort-explore').on('click', function () {
 		$(this).addClass('active');
@@ -72,20 +54,14 @@ jQuery(document).ready(function ($) {
 
 // --- Fonctions principales ---
 
-function fetchImagesFromAPI(initial = false) {
-        const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerLoad}&offset=${offset}`;
+function fetchImagesFromAPI() {
+        const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerLoad}`;
         return fetch(url)
                 .then(res => res.json())
                 .then(data => {
                         if (data.success) {
-                                if (initial) {
-                                        allImages = data.images;
-                                } else {
-                                        allImages = allImages.concat(data.images);
-                                }
-                                offset += data.images.length;
-                                sessionStorage.setItem(cacheKey, JSON.stringify({ images: allImages, offset }));
-                                if (initial) displayImages(allImages);
+                                allImages = data.images;
+                                displayImages(allImages);
                                 return data.images;
                         } else {
                                 console.error('[AJAX] ❌ Aucune image trouvée.');
@@ -102,46 +78,16 @@ function displayImages(images) {
 	const userFilter = getQueryParam('user');
 	filteredImages = userFilter ? images.filter(i => i.display_name === userFilter) : images;
 
-	const columns = initializeColumns();
-	const container = $('<div/>', { class: 'image-container' });
-	columns.forEach(c => container.append(c));
-	$('#image-container').empty().append(container);
+        const columns = initializeColumns();
+        const container = $('<div/>', { class: 'image-container' });
+        columns.forEach(c => container.append(c));
+        $('#image-container').empty().append(container);
 
-        currentIndex = 0;
-        loadMoreImages(columns);
-        // Enable click-to-preview after rendering the initial batch
+        filteredImages.forEach((img, idx) => {
+                appendImage(img, columns, idx % columns.length);
+        });
+
         enableImageEnlargement();
-
-	$(window).off('scroll').on('scroll', function () {
-		if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-			loadMoreImages(columns);
-		}
-	});
-}
-
-function loadMoreImages(columns) {
-        let colIndex = currentIndex % columns.length;
-        $('#scroll-message').show();
-
-        for (let i = 0; i < imagesPerLoad && currentIndex < filteredImages.length; i++) {
-                appendImage(filteredImages[currentIndex], columns, colIndex);
-                colIndex = (colIndex + 1) % columns.length;
-                currentIndex++;
-        }
-
-        if (currentIndex >= filteredImages.length) {
-                fetchImagesFromAPI().then(newImages => {
-                        const userFilter = getQueryParam('user');
-                        filteredImages = userFilter ? allImages.filter(i => i.display_name === userFilter) : allImages;
-                        if (newImages.length) {
-                                loadMoreImages(columns);
-                        } else {
-                                $('#scroll-message').text('Vous avez atteint la fin.');
-                        }
-                });
-        } else {
-                $('#scroll-message').hide();
-        }
 }
 
 // --- Affichage image ---
@@ -254,11 +200,10 @@ function toggleFavorite(imageId, iconElement) {
 }
 
 function updateImageMeta(imageId, key) {
-	const image = allImages.find(img => String(img.image_number) === String(imageId));
-	if (image) {
-		image[key] = !image[key];
-		sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
-	}
+        const image = allImages.find(img => String(img.image_number) === String(imageId));
+        if (image) {
+                image[key] = !image[key];
+        }
 }
 
 // --- Recherche floue ---
