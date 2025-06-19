@@ -14,6 +14,11 @@ try {
 window.customizerCache.templates = window.customizerCache.templates || {};
 window.customizerCache.models = window.customizerCache.models || {};
 window.customizerCache.variants = window.customizerCache.variants || {};
+
+function persistCache() {
+    const tmp = { ...window.customizerCache, models: {} };
+    sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+}
 jQuery(document).ready(function ($) {
         const apiBaseURL = '/wp-json/api/v1/products';
         const mainProductImage = $('#product-main-image');
@@ -97,7 +102,7 @@ jQuery(document).ready(function ($) {
                         })
                         .then(productData => {
                                 window.customizerCache.variants[productId] = productData;
-                                sessionStorage.setItem('customizerCache', JSON.stringify(window.customizerCache));
+                                persistCache();
                                 return productData;
                         });
 
