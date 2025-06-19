@@ -1,7 +1,7 @@
 let selectedVariant = null;
 let myGeneratedImages = [];
 let communityImages = [];
-let currentProductId = null;
+window.currentProductId = window.currentProductId || null;
 let currentMockup = null;
 
 function getLatestMockup(variant) {
@@ -364,11 +364,11 @@ jQuery(document).ready(function ($) {
 
 
 	// 🔥 Charge le produit si un ID est présent au démarrage
-	const urlParams = new URLSearchParams(window.location.search);
-	currentProductId = urlParams.get('id');
-	if (currentProductId) {
-		loadProductDetails(currentProductId);
-	}
+        const urlParams = new URLSearchParams(window.location.search);
+        window.currentProductId = urlParams.get('id');
+        if (window.currentProductId) {
+                loadProductDetails(window.currentProductId);
+        }
 	// 🔄 Auto-génération du mockup si mockup=1
 	if (urlParams.get("mockup") === "1") {
 		const imageUrl = urlParams.get("image_url");
@@ -379,10 +379,10 @@ jQuery(document).ready(function ($) {
 			if (selectedVariant && selectedVariant.variant_id == variantId) {
 				clearInterval(checkReady);
 
-				const mockupData = {
-					image_url: imageUrl,
-					product_id: currentProductId,
-					variant_id: selectedVariant.variant_id,
+                                const mockupData = {
+                                        image_url: imageUrl,
+                                        product_id: window.currentProductId,
+                                        variant_id: selectedVariant.variant_id,
 					placement: selectedVariant.placement,
 					technique: selectedVariant.technique,
 					width: selectedVariant.print_area_width,

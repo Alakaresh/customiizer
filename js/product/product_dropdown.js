@@ -6,7 +6,7 @@ jQuery(document).ready(function ($) {
         const dropdownIcon = $('.dropdown-icon');
         const selectedItem = $('.selected-item');
 
-        let currentProductId = null; // ID du produit actuellement sélectionné
+        window.currentProductId = window.currentProductId || null; // ID du produit actuellement sélectionné
 
         const urlParams = new URLSearchParams(window.location.search);
 	const initialProductId = urlParams.get('id');
@@ -110,9 +110,9 @@ jQuery(document).ready(function ($) {
 		.replace(/\s+/g, '-')  // Espaces → tirets
 		.replace(/[^a-z0-9-]/g, ''); // Supprime caractères spéciaux
 
-		currentProductId = product.product_id;
-		console.log("currentProductId :",currentProductId);
-		console.log("product :",product);
+                window.currentProductId = product.product_id;
+                console.log("currentProductId :", window.currentProductId);
+                console.log("product :",product);
                const newUrl = `/configurateur?nom=${encodeURIComponent(nom)}&id=${product.product_id}&url=${image_url}&mockup=${mockup}`;
                history.pushState(null, null, newUrl);
 
