@@ -1,4 +1,5 @@
 jQuery(function ($) {
+    window.currentProductId = window.currentProductId || null;
     const mainImg = $('#product-main-image');
     if (!mainImg.length) return;
 
@@ -33,7 +34,7 @@ jQuery(function ($) {
         topNum.val(m.position_top);
         leftNum.val(m.position_left);
 
-        const pid = typeof currentProductId !== 'undefined' ? currentProductId : (variant.product_id || '');
+        const pid = typeof window.currentProductId !== 'undefined' ? window.currentProductId : (variant.product_id || '');
         info.text(`product_id: ${pid} | variant_id: ${variant.variant_id} | mockup_id: ${currentMockup.mockup_id}`);
 
         mainImg.css({ top: m.position_top + '%', left: m.position_left + '%' });

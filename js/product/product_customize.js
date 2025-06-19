@@ -1,3 +1,4 @@
+window.currentProductId = window.currentProductId || null;
 function displayGeneratedImages(images) {
         const siteFilesList = jQuery('#siteFilesList');
         console.log("siteFilesList :",siteFilesList);
@@ -72,7 +73,7 @@ jQuery(document).ready(function ($) {
                         const publicImageUrl = response.data.image_url + '?v=' + Date.now();
                         const mockupData = {
                                 image_url: publicImageUrl,
-                                product_id: currentProductId || null,
+                                product_id: window.currentProductId || null,
                                 variant_id: selectedVariant?.variant_id || null,
                                 placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
                                 technique: selectedVariant?.technique || null,
@@ -417,13 +418,13 @@ jQuery(document).ready(function ($) {
         async function openProductSidebar() {
                 try {
                         let data;
-                        if (window.customizerCache?.variants?.[currentProductId]) {
-                                data = window.customizerCache.variants[currentProductId];
+                        if (window.customizerCache?.variants?.[window.currentProductId]) {
+                                data = window.customizerCache.variants[window.currentProductId];
                         } else {
-                                const res = await fetch(`/wp-json/api/v1/products/${currentProductId}`);
+                                const res = await fetch(`/wp-json/api/v1/products/${window.currentProductId}`);
                                 data = await res.json();
                                 if (window.customizerCache) {
-                                        window.customizerCache.variants[currentProductId] = data;
+                                        window.customizerCache.variants[window.currentProductId] = data;
                                 }
                         }
                         sidebarVariants = Array.isArray(data.variants) ? data.variants : [];

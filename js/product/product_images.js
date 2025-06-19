@@ -1,4 +1,5 @@
 let productData = null;
+window.currentProductId = window.currentProductId || null;
 
 // Gestion des groupes d'images de la bottom-bar
 const IMAGES_PER_GROUP = 12;
@@ -59,7 +60,7 @@ function renderCurrentGroup() {
 		imgElement.addEventListener("click", function () {
 			const mockupData = {
 				image_url: image.image_url,
-				product_id: currentProductId || null,
+                                product_id: window.currentProductId || null,
 				variant_id: selectedVariant?.variant_id || null,
 				placement: selectedVariant?.placement || null,
 				technique: selectedVariant?.technique || null,
