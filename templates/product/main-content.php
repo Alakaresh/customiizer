@@ -81,7 +81,11 @@
 				<div class="band band-right"></div>
 			</div>
                         <div class="bottom-bar">
-                                <div class="content"></div>
+                                <button class="bottom-arrow left">&#10094;</button>
+                                <div class="image-wrapper">
+                                        <div class="content"></div>
+                                </div>
+                                <button class="bottom-arrow right">&#10095;</button>
                         </div>
 
 		</div>

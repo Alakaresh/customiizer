@@ -1,5 +1,10 @@
 let productData = null;
 
+// Gestion des groupes d'images de la bottom-bar
+const IMAGES_PER_GROUP = 12;
+let bottomBarImages = [];
+let currentGroupIndex = 0;
+
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
 }
@@ -12,14 +17,23 @@ document.body.appendChild(tooltip);
 
 // Affichage des images et ajout du clic pour générer un mockup
 function displayImagesInBottomBar(images) {
+        bottomBarImages = images || [];
+        currentGroupIndex = 0;
+        renderCurrentGroup();
+        updateArrows();
+}
+
+function renderCurrentGroup() {
         const contentDiv = document.querySelector(".bottom-bar .content");
         if (!contentDiv) {
                 console.error("❌ Erreur : Impossible de trouver .bottom-bar .content");
                 return;
         }
 
-        contentDiv.innerHTML = ""; // Vider avant d'afficher les nouvelles images
-        images.forEach(image => {
+        contentDiv.innerHTML = "";
+        const start = currentGroupIndex * IMAGES_PER_GROUP;
+        const groupImages = bottomBarImages.slice(start, start + IMAGES_PER_GROUP);
+        groupImages.forEach(image => {
                 const imgElement = document.createElement("img");
                 imgElement.src = image.image_url;
                 imgElement.alt = image.prompt || "Image générée";
@@ -220,3 +234,31 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 thumbnailToUpdate.click();
         }
 }
+
+function showNextGroup() {
+        if ((currentGroupIndex + 1) * IMAGES_PER_GROUP >= bottomBarImages.length) return;
+        currentGroupIndex++;
+        renderCurrentGroup();
+        updateArrows();
+}
+
+function showPreviousGroup() {
+        if (currentGroupIndex === 0) return;
+        currentGroupIndex--;
+        renderCurrentGroup();
+        updateArrows();
+}
+
+function updateArrows() {
+        const left = document.querySelector('.bottom-bar .bottom-arrow.left');
+        const right = document.querySelector('.bottom-bar .bottom-arrow.right');
+        if (left) left.style.visibility = currentGroupIndex === 0 ? 'hidden' : 'visible';
+        if (right) right.style.visibility = (currentGroupIndex + 1) * IMAGES_PER_GROUP >= bottomBarImages.length ? 'hidden' : 'visible';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+        const left = document.querySelector('.bottom-bar .bottom-arrow.left');
+        const right = document.querySelector('.bottom-bar .bottom-arrow.right');
+        left?.addEventListener('click', showPreviousGroup);
+        right?.addEventListener('click', showNextGroup);
+});
