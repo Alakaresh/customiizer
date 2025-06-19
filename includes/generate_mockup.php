@@ -5,8 +5,14 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
                 customiizer_log('❌ PRINTFUL_API_KEY non définie.');
                 return ['success' => false, 'error' => 'Clé API manquante'];
         }
-        $api_key = PRINTFUL_API_KEY;
-	$url = 'https://api.printful.com/v2/mockup-tasks';
+        $api_key  = PRINTFUL_API_KEY;
+        $store_id = defined('PRINTFUL_STORE_ID') ? PRINTFUL_STORE_ID : null;
+        if ($store_id) {
+                customiizer_log("🏪 Utilisation du store ID: $store_id");
+        } else {
+                customiizer_log("🏪 Aucun store ID défini");
+        }
+        $url      = 'https://api.printful.com/v2/mockup-tasks';
 
 	$data = [
 		"format" => "png",
@@ -42,10 +48,14 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
         $ch = curl_init($url);
         $respHeaders = [];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $headers = [
                 'Content-Type: application/json',
                 "Authorization: Bearer $api_key"
-        ]);
+        ];
+        if ($store_id) {
+                $headers[] = 'X-PF-Store-Id: ' . $store_id;
+        }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
                 $len = strlen($header);
                 $parts = explode(':', $header, 2);
