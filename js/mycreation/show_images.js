@@ -1,4 +1,6 @@
-const baseUrl = window.location.origin;
+if (typeof baseUrl === 'undefined') {
+    var baseUrl = window.location.origin;
+}
 
 jQuery(document).ready(function($) {
     function initializeColumns(numColumns) {
