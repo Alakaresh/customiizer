@@ -81,9 +81,11 @@ function afficherImage(indexGroup) {
 				'data-display_name': image.display_name || '',
 				'data-user-logo': image.user_logo || '',
 				'data-user-id': image.user_id || '',
-				'data-format-image': image.format || '',
-				'data-prompt': image.prompt || ''
-			});
+                                'data-format-image': image.format || '',
+                                'data-prompt': (typeof image.prompt === 'object'
+                                    ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+                                    : (image.prompt || ''))
+                        });
 
 			newImages.append(imageElem); // Ajouter les nouvelles images au conteneur temporaire
 		}
