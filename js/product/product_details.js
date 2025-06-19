@@ -4,6 +4,13 @@ let communityImages = [];
 window.currentProductId = window.currentProductId || null;
 let currentMockup = null;
 
+// Certains produits n'ont qu'un seul mockup initial pertinent
+const SINGLE_MOCKUP_PRODUCTS = [382, 585];
+
+function shouldShowSingleMockup() {
+    return SINGLE_MOCKUP_PRODUCTS.includes(parseInt(window.currentProductId));
+}
+
 function dedupeMockups(mockups) {
     const seen = new Set();
     return mockups.filter(m => {
@@ -338,10 +345,13 @@ jQuery(document).ready(function ($) {
         function updateThumbnails(variants) {
                 const thumbnailsContainer = $('.image-thumbnails').empty();
 
+                const hideExtra = shouldShowSingleMockup();
+
                 variants.forEach(variant => {
                         variant.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
                         const uniqueMockups = dedupeMockups(variant.mockups);
-                        uniqueMockups.forEach((mockup, index) => {
+                        const displayMockups = hideExtra ? uniqueMockups.slice(0, 1) : uniqueMockups;
+                        displayMockups.forEach((mockup, index) => {
                                 const imgElement = $('<img>')
                                 .addClass('thumbnail')
                                 .attr('src', mockup.mockup_image)
