@@ -1,9 +1,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     try {
         const saved = sessionStorage.getItem('customizerCache');
-        window.customizerCache = saved ? JSON.parse(saved) : {};
+        const savedData = saved ? JSON.parse(saved) : {};
+        window.customizerCache = {
+            ...(savedData || {}),
+            ...(window.customizerCache || {})
+        };
     } catch (e) {
-        window.customizerCache = {};
+        window.customizerCache = window.customizerCache || {};
     }
     window.customizerCache.products = window.customizerCache.products || [];
 
