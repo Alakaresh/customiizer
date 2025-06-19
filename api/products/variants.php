@@ -41,7 +41,7 @@ function get_product_variants_full($request) {
 		LEFT JOIN {$prefix}variant_templates vt ON vt.variant_id = v.variant_id
                 LEFT JOIN {$prefix}variant_print vprint ON vprint.variant_id = v.variant_id
                 WHERE v.product_id = %d
-                ORDER BY v.variant_id ASC, vm.mockup_id DESC
+                ORDER BY v.variant_id ASC, vm.mockup_id ASC
         ";
 
 	$results = $wpdb->get_results($wpdb->prepare($query, $product_id), ARRAY_A);
