@@ -4,10 +4,14 @@ window.CommunityImagesCache = {
 };
 
 async function preloadCommunityImages(params = {}) {
-	if (window.CommunityImagesCache.isLoaded) {
-		console.log("[ImageManager] 📦 Images déjà chargées (cache)");
-		return;
-	}
+        if (window.CommunityImagesCache.isLoaded) {
+                console.log("[ImageManager] 📦 Images déjà chargées (cache)");
+                // Notifie immédiatement les écouteurs que les images sont prêtes
+                document.dispatchEvent(new CustomEvent('communityImagesLoaded', {
+                        detail: { images: window.CommunityImagesCache.images }
+                }));
+                return;
+        }
 
 	console.log("[ImageManager] 🔥 Chargement des images depuis API...");
 
@@ -18,19 +22,23 @@ async function preloadCommunityImages(params = {}) {
 		}
 	});
 
-	try {
-		const response = await fetch(apiUrl);
-		const data = await response.json();
+        try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
 
-		if (data.success && Array.isArray(data.images)) {
-			window.CommunityImagesCache.images = data.images;
-			window.CommunityImagesCache.isLoaded = true;
-			console.log("[ImageManager] ✅ Images préchargées :", data.images.length);
-		} else {
-			console.warn("[ImageManager] ⚠️ Pas d'images trouvées.");
-		}
-	} catch (error) {
-		console.error("[ImageManager] ❌ Erreur API :", error);
+                if (data.success && Array.isArray(data.images)) {
+                        window.CommunityImagesCache.images = data.images;
+                        window.CommunityImagesCache.isLoaded = true;
+                        console.log("[ImageManager] ✅ Images préchargées :", data.images.length);
+                        // Informe les autres scripts que les images sont disponibles
+                        document.dispatchEvent(new CustomEvent('communityImagesLoaded', {
+                                detail: { images: data.images }
+                        }));
+                } else {
+                        console.warn("[ImageManager] ⚠️ Pas d'images trouvées.");
+                }
+        } catch (error) {
+                console.error("[ImageManager] ❌ Erreur API :", error);
 	}
 }
 
