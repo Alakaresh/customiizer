@@ -1,6 +1,9 @@
 const userId = currentUser.ID; // Utiliser ton objet PHP existant
 const cacheKey = `community_images_${userId || 'guest'}`;
 let allImages = [];
+let filteredImages = [];
+const imagesPerLoad = 20;
+let currentIndex = 0;
 
 jQuery(document).ready(function($) {
 	const startTime = performance.now();
@@ -49,94 +52,107 @@ jQuery(document).ready(function($) {
 		return columns;
 	}
 
-	function displayImages(images) {
+function appendImage(image, columns, columnIndex) {
+    const imageDiv = $('<div/>', {
+        class: 'imageContainer',
+        'data-image-id': image.image_number,
+        'data-prompt': (image.prompt || '').toLowerCase()
+    });
 
-		// ✨ Travailler sur une copie des images
-		const imagesToDisplay = [...images];
-		const userFilter = getQueryParam('user');
-		let filteredImages = images;
+    const likeIcon = $('<i/>', {
+        class: image.liked_by_user === true ? 'fas fa-heart like-icon liked' : 'far fa-heart like-icon',
+        title: 'Like'
+    });
 
-		if (userFilter) {
-			filteredImages = images.filter(image => image.display_name === userFilter);
-		}
+    const starIcon = $('<i/>', {
+        class: image.favorited_by_user === true ? 'fas fa-star star-icon favorited' : 'far fa-star star-icon',
+        title: 'Favori'
+    });
 
-		const columns = initializeColumns();
-		let columnIndex = 0;
+    if (!userId || userId === 0) {
+        likeIcon.addClass('disabled');
+        starIcon.addClass('disabled');
+    }
 
-		filteredImages.forEach(function(image) {
-			const imageDiv = $('<div/>', {
-				class: 'imageContainer',
-				'data-image-id': image.image_number,
-				'data-prompt': (image.prompt || '').toLowerCase()
-			});
+    const img = $('<img/>', {
+        src: image.image_url,
+        alt: 'Generated Image',
+        class: 'preview-enlarge',
+        'data-user-id': userId || '',
+        'data-display_name': image.display_name || '',
+        'data-format-image': image.format || '',
+        'data-prompt': image.prompt || ''
+    });
 
-			const likeIcon = $('<i/>', {
-				class: image.liked_by_user === true ? 'fas fa-heart like-icon liked' : 'far fa-heart like-icon',
-				title: 'Like'
-			});
+    const overlayDiv = $('<div/>', { class: 'overlay', style: 'display: none;' });
+    const userLoginLink = $('<a/>', {
+        href: window.location.pathname + '?user=' + image.display_name,
+        text: image.display_name,
+        class: 'user-login-link'
+    });
+    const iconOverlayDiv = $('<div/>', { class: 'icon-overlay', style: 'display: none;' });
+    iconOverlayDiv.append(likeIcon, starIcon);
 
-			const starIcon = $('<i/>', {
-				class: image.favorited_by_user === true ? 'fas fa-star star-icon favorited' : 'far fa-star star-icon',
-				title: 'Favori'
-			});
+    overlayDiv.append(userLoginLink);
+    overlayDiv.data('prompt', image.prompt);
 
+    img.on('load', function() {
+        overlayDiv.fadeIn();
+        imageDiv.append(img, iconOverlayDiv, overlayDiv);
+        columns[columnIndex].append(imageDiv);
+        $('.imageContainer').hover(
+            function() {
+                $(this).find('.overlay').fadeIn();
+                $(this).find('.icon-overlay').css('display', 'flex').fadeIn();
+            }, function() {
+                $(this).find('.overlay').fadeOut();
+                $(this).find('.icon-overlay').fadeOut(function() {
+                    $(this).css('display', 'none');
+                });
+            }
+        );
+    });
+}
 
-			if (!userId || userId === 0) {
-				likeIcon.addClass('disabled');
-				starIcon.addClass('disabled');
-			}
+function loadMoreImages() {
+    const columns = $('#image-container .image-column');
+    let columnIndex = currentIndex % columns.length;
+    $('#scroll-message').show();
+    for (let i = 0; i < imagesPerLoad && currentIndex < filteredImages.length; i++) {
+        const image = filteredImages[currentIndex];
+        appendImage(image, columns, columnIndex);
+        columnIndex = (columnIndex + 1) % columns.length;
+        currentIndex++;
+    }
+    enableImageEnlargement();
+    if (currentIndex >= filteredImages.length) {
+        $('#scroll-message').text('Vous avez atteint la fin.');
+    } else {
+        $('#scroll-message').hide();
+    }
+}
 
-			const img = $('<img/>', {
-				src: image.image_url,
-				alt: 'Generated Image',
-				class: 'preview-enlarge',
-				'data-user-id': userId || '',    // Ajouté
-				'data-display_name': image.display_name || '',  // Ajouté
-				'data-format-image': image.format || '', // Ajouté
-				'data-prompt': image.prompt || '' // Ajouté
-			});
+function displayImages(images) {
+    const userFilter = getQueryParam('user');
+    filteredImages = images;
+    if (userFilter) {
+        filteredImages = images.filter(image => image.display_name === userFilter);
+    }
 
+    const columns = initializeColumns();
+    const container = $('<div/>', { class: 'image-container' });
+    columns.forEach(function(column) { container.append(column); });
+    $('#image-container').html(container);
 
-			const overlayDiv = $('<div/>', { class: 'overlay', style: 'display: none;' });
-			const userLoginLink = $('<a/>', {
-				href: window.location.pathname + '?user=' + image.display_name,
-				text: image.display_name,
-				class: 'user-login-link'
-			});
+    currentIndex = 0;
+    loadMoreImages();
 
-			const iconOverlayDiv = $('<div/>', { class: 'icon-overlay', style: 'display: none;' });
-			iconOverlayDiv.append(likeIcon, starIcon);
-
-			overlayDiv.append(userLoginLink);
-			overlayDiv.data('prompt', image.prompt);
-
-			img.on('load', function() {
-				overlayDiv.fadeIn(); // Facultatif : pour plus de fluidité
-				imageDiv.append(img, iconOverlayDiv, overlayDiv);
-				columns[columnIndex].append(imageDiv);
-				$('.imageContainer').hover(
-					function() {
-						$(this).find('.overlay').fadeIn();
-						$(this).find('.icon-overlay').css('display', 'flex').fadeIn();
-					}, function() {
-						$(this).find('.overlay').fadeOut();
-						$(this).find('.icon-overlay').fadeOut(function() {
-							$(this).css('display', 'none');
-						});
-					}
-				);
-				columnIndex = (columnIndex + 1) % 5;
-			});
-
-
-		});
-
-		const container = $('<div/>', { class: 'image-container' });
-		columns.forEach(function(column) { container.append(column); });
-		$('#image-container').html(container);
-
-		enableImageEnlargement();
-	}
+    $(window).on('scroll', function() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+            loadMoreImages();
+        }
+    });
+}
 
 
 	// Événements sur les icônes
