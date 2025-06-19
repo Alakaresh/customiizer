@@ -1,6 +1,7 @@
 <?php
 
 function generate_mockup_printful($image_url, $product_id, $variant_id, $style_id, $placement, $technique, $width, $height, $top, $left) {
+    customiizer_log("📨 Paramètres : image_url={$image_url}, product_id={$product_id}, variant_id={$variant_id}, style_id={$style_id}, placement={$placement}, technique={$technique}, width={$width}, height={$height}, top={$top}, left={$left}");
         if (!defined('PRINTFUL_API_KEY')) {
                 customiizer_log('❌ PRINTFUL_API_KEY non définie.');
                 return ['success' => false, 'error' => 'Clé API manquante'];
@@ -69,9 +70,13 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+                customiizer_log("Tentative {$attempt}/3 d'envoi à Printful");
                 $result = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+                $decoded = json_decode($result, true);
+                $task_id = isset($decoded["data"][0]["id"]) ? $decoded["data"][0]["id"] : null;
+                customiizer_log("Tentative {$attempt} – HTTP {$httpCode}" . ($task_id ? " – ID {$task_id}" : ""));
                 if (curl_errno($ch)) {
                         $error_msg = curl_error($ch);
                         customiizer_log("Erreur cURL : {$error_msg}");
@@ -186,6 +191,7 @@ function handle_generate_mockup() {
                                         } else {
                                                 customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
                                         }
+                                        customiizer_log("✅ Mockup généré : {$mockup_url}");
                                         wp_send_json_success(['mockup_url' => $mockup_url]);
                                 } else {
                                         customiizer_log("❌ Aucun mockup_url trouvé");
@@ -294,6 +300,7 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
         $store_id = PRINTFUL_STORE_ID;
         $url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
         $elapsed_time = 0;
+        customiizer_log("Vérification du statut du mockup {$task_id}");
 
         while ($elapsed_time < $timeout) {
                 $ch = curl_init($url);
@@ -337,6 +344,7 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 
 		if (isset($response['data'][0]['status'])) {
 			$status = $response['data'][0]['status'];
+                        customiizer_log("Statut reçu : {$status} (après {$elapsed_time}s)");
 
 			if ($status === 'completed') {
 				return ['success' => true, 'data' => $response['data'][0]];
