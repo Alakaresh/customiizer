@@ -227,7 +227,9 @@ const CanvasManager = {
                 const img = canvas.getActiveObject();
                 if (!img) return;
                 const current = img.angle || 0;
-                img.rotate(current + angle);
+                let target = current + angle;
+                target = Math.round(target / 90) * 90;
+                img.rotate(target);
                 img.setCoords();
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
