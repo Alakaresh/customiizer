@@ -13,6 +13,22 @@ if (!defined('MOCKUP_MAX_DIMENSION')) {
     define('MOCKUP_MAX_DIMENSION', 1500);
 }
 
+// Hosts allowed for remote image downloads performed by convert_webp_to_png_server().
+// Only images from these domains will be retrieved.
+if (!defined('ALLOWED_IMAGE_HOSTS')) {
+    define('ALLOWED_IMAGE_HOSTS', ['customiizer.blob.core.windows.net']);
+}
+
+// Timeout for remote image downloads in seconds.
+if (!defined('REMOTE_IMAGE_TIMEOUT')) {
+    define('REMOTE_IMAGE_TIMEOUT', 10);
+}
+
+// Maximum bytes allowed for a downloaded image (5 MB by default).
+if (!defined('REMOTE_IMAGE_MAX_BYTES')) {
+    define('REMOTE_IMAGE_MAX_BYTES', 5 * 1024 * 1024);
+}
+
 function customiizer_log($message) {
         $log_file = __DIR__ . '/customiizer.log';
         $date = date('Y-m-d H:i:s');

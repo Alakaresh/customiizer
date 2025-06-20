@@ -10,8 +10,13 @@ Adjust `PNG_COMPRESSION_LEVEL` if you need smaller mockup files or faster image 
 
 The default value is set to `8` for near-maximum compression.
 
-`MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.  
+`MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.
 Images larger than this value are downscaled before saving. The default is `1500` pixels.
+
+`ALLOWED_IMAGE_HOSTS`, `REMOTE_IMAGE_TIMEOUT` and `REMOTE_IMAGE_MAX_BYTES` also live in
+`utilities.php`. These constants secure remote WebP downloads performed by
+`convert_webp_to_png_server()` by restricting which hosts are allowed and by
+limiting request size and timeout.
 
 ## Position editor
 
@@ -23,6 +28,7 @@ The panel also displays the current `product_id`, `variant_id` and `mockup_id` s
 
 
 The floating panel uses a grayscale theme so it stays visually distinct from the product page. The **Save** button now appears in black for higher contrast.
+
 
 ## Batch mockup generation
 
@@ -44,3 +50,14 @@ Use the `/wp-json/api/v1/mockups/batch` endpoint to submit several mockup tasks 
 ```
 
 Printful processes the batch asynchronously. When each task finishes, the theme receives a `mockup_task_finished` webhook. Set this webhook URL in your Printful dashboard so generated images are saved automatically.
+
+## Printful API key
+
+Several scripts require access to your Printful account. Define the constant `PRINTFUL_API_KEY` in `wp-config.php` so sensitive credentials never appear in the theme files:
+
+```php
+define('PRINTFUL_API_KEY', 'your-secret-key');
+```
+
+If the constant is missing, functions like `generate_mockup_printful()` return an error and log a message instead of sending unauthenticated requests.
+
