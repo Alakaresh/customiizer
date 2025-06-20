@@ -311,3 +311,53 @@ add_action('wp_head', function() {
         echo '<link rel="shortcut icon" href="' . esc_url(get_site_icon_url()) . '" type="image/png">' . "\n";
     }
 });
+
+add_action('rest_api_init', function () {
+    register_rest_route('customiizer/v1', '/create-mockup', [
+        'methods' => 'POST',
+        'callback' => 'customiizer_create_mockup',
+        'permission_callback' => '__return_true'
+    ]);
+});
+
+function customiizer_create_mockup($request) {
+    $body = [
+        "format" => "png",
+        "products" => [[
+            "source" => "catalog",
+            "catalog_product_id" => 19,
+            "catalog_variant_ids" => [1320],
+            "mockup_style_ids" => [10421, 10422, 10423, 10471],
+            "placements" => [[
+                "placement" => "default",
+                "technique" => "sublimation",
+                "print_area_type" => "simple",
+                "layers" => [[
+                    "type" => "file",
+                    "url" => "https://customiizer.blob.core.windows.net/mockup/empty_500x500.png",
+                    "position" => [
+                        "width" => 3.5,
+                        "height" => 3.5,
+                        "top" => 0,
+                        "left" => 0
+                    ]
+                ]]
+            ]]
+        ]]
+    ];
+
+    $response = wp_remote_post('https://api.printful.com/v2/mockup-tasks', [
+        'headers' => [
+            'Authorization' => 'Bearer lvHxcivasQxu7sogliZuCy38Bq9CYcMzvHA59qqz',
+            'X-PF-Store-Id' => '15816776',
+            'Content-Type' => 'application/json'
+        ],
+        'body' => json_encode($body)
+    ]);
+
+    if (is_wp_error($response)) {
+        return new WP_Error('mockup_error', 'Erreur lors de la création du mockup.', ['status' => 500]);
+    }
+
+    return rest_ensure_response(json_decode(wp_remote_retrieve_body($response), true));
+}
