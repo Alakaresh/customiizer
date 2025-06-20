@@ -8,6 +8,7 @@ if (!file_exists($wpLoadPath)) {
 	exit(1);
 }
 require_once $wpLoadPath;
+require_once __DIR__ . '/../printful_rate_limit.php';
 
 foreach (['PRINTFUL_API_KEY', 'PRINTFUL_STORE_ID', 'PRINTFUL_API_BASE', 'RABBIT_HOST', 'QUEUE_NAME'] as $const) {
     if (!defined($const)) {
@@ -112,10 +113,11 @@ $callback = function(AMQPMessage &$msg) {
 
 // ——— Envoi du payload à Printful ———
 function envoyer_commande_printful(array $payload): bool {
-	customiizer_log("📤 Envoi à Printful");
-	customiizer_log("   Payload: " . json_encode($payload));
+        customiizer_log("📤 Envoi à Printful");
+        customiizer_log("   Payload: " . json_encode($payload));
 
-	$ch = curl_init(PRINTFUL_API_BASE . '/orders');
+        printful_rate_limit();
+        $ch = curl_init(PRINTFUL_API_BASE . '/orders');
 	curl_setopt_array($ch, [
 		CURLOPT_RETURNTRANSFER => true,
 		CURLOPT_POST           => true,

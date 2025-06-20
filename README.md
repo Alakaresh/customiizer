@@ -25,6 +25,12 @@ define('PRINTFUL_API_BASE', 'https://api.printful.com/v2'); // optional
 
 `PRINTFUL_API_BASE` is optional and defaults to the public Printful URL. `PRINTFUL_API_KEY` is required by `includes/generate_mockup.php` and webhook handlers.
 
+The helper `includes/printful_rate_limit.php` keeps track of recent
+calls to avoid exceeding Printful's quota. Scripts that interact with
+the API require this file and call `printful_rate_limit()` immediately
+before each HTTP request. The default settings enforce a one second gap
+and no more than 55 requests during any rolling 60&nbsp;s window.
+
 Design images are converted from WebP to PNG during mockup generation. The order
 webhook only performs this conversion if a legacy WebP URL is still stored.
 
