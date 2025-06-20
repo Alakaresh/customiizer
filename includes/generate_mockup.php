@@ -3,7 +3,6 @@ require_once __DIR__ . '/printful_rate_limit.php';
 
 function generate_mockup_printful($image_url, $product_id, $variant_id, $style_id, $placement, $technique, $width, $height, $top, $left) {
         if (!defined('PRINTFUL_API_KEY')) {
-                customiizer_log('❌ PRINTFUL_API_KEY non définie');
                 return ['success' => false, 'error' => 'Missing PRINTFUL_API_KEY'];
         }
 
@@ -60,17 +59,15 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
         list($result, $httpCode) = printful_curl_exec($ch);
 
-	if (curl_errno($ch)) {
-		$error_msg = curl_error($ch);
-		customiizer_log("Erreur cURL : {$error_msg}");
-		curl_close($ch);
-		return ['success' => false, 'error' => $error_msg];
-	}
+        if (curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                curl_close($ch);
+                return ['success' => false, 'error' => $error_msg];
+        }
 
 	curl_close($ch);
 
         customiizer_log("API Printful HTTP Code: {$httpCode}");
-        customiizer_log("Réponse Printful: {$result}");
 
         if ($httpCode !== 200) {
                 $duration = round(microtime(true) - $start, 3);
@@ -90,7 +87,6 @@ add_action('wp_ajax_nopriv_generate_mockup', 'handle_generate_mockup');
 function handle_generate_mockup() {
     $overall_start = microtime(true);
     if (!isset($_POST['image_url'])) {
-        customiizer_log("❌ image_url manquant !");
         $total = round(microtime(true) - $overall_start, 3);
         customiizer_log("⏱️ Génération échouée en {$total}s");
         wp_send_json_error(['message' => 'URL de l\'image manquante.']);
@@ -118,7 +114,6 @@ function handle_generate_mockup() {
         wp_send_json_error(['message' => 'La largeur et la hauteur doivent être ≥ 0.3 pouce.']);
     }
 
-    customiizer_log("📐 Dimensions en pouces reçues : width={$width_in}, height={$height_in}, top={$top_in}, left={$left_in}");
 
     // 🔁 Conversion de l’image WebP en PNG
     $step_start = microtime(true);
@@ -133,7 +128,6 @@ function handle_generate_mockup() {
     $png_url   = $conversion_result['png_url'];
     $file_path = $conversion_result['file_path'];
 
-    customiizer_log("🖼️ Image combinée locale : $file_path");
 
     // 🎯 Appel API Printful avec les pouces tels quels
     $response = generate_mockup_printful(
@@ -163,54 +157,40 @@ function handle_generate_mockup() {
 			if (!empty($mockups)) {
 				$mockup_url = $mockups[0]['mockups'][0]['mockup_url'] ?? null;
 
-                                if ($mockup_url) {
+                if ($mockup_url) {
                                         if (!unlink($file_path)) {
-                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                                        } else {
-                                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
+                                                // unable to delete temporary file
                                         }
                                         $total = round(microtime(true) - $overall_start, 3);
                                         customiizer_log("⏱️ Génération terminée en {$total}s");
                                         wp_send_json_success(['mockup_url' => $mockup_url]);
                                 } else {
-                                        customiizer_log("❌ Aucun mockup_url trouvé");
                                         if (!unlink($file_path)) {
-                                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                                        } else {
-                                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
+                                                // unable to delete temporary file
                                         }
                                         $total = round(microtime(true) - $overall_start, 3);
                                         customiizer_log("⏱️ Génération échouée en {$total}s");
                                         wp_send_json_error(['message' => 'URL du mockup introuvable.']);
                                 }
                         } else {
-                                customiizer_log("❌ Aucun mockup généré.");
                                 if (!unlink($file_path)) {
-                                        customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                                } else {
-                                        customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
+                                        // unable to delete temporary file
                                 }
                                 $total = round(microtime(true) - $overall_start, 3);
                                 customiizer_log("⏱️ Génération échouée en {$total}s");
                                 wp_send_json_error(['message' => 'Aucun mockup généré.']);
                         }
                 } else {
-                        customiizer_log("❌ Erreur de statut : " . $mockup_status['error']);
                         if (!unlink($file_path)) {
-                                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                        } else {
-                                customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
+                                // unable to delete temporary file
                         }
                         $total = round(microtime(true) - $overall_start, 3);
                         customiizer_log("⏱️ Génération échouée en {$total}s");
                         wp_send_json_error(['message' => $mockup_status['error']]);
                 }
         } else {
-                customiizer_log("❌ Erreur API : " . ($response['error'] ?? 'Non spécifiée'));
                 if (!unlink($file_path)) {
-                        customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-                } else {
-                        customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
+                        // unable to delete temporary file
                 }
                 $total = round(microtime(true) - $overall_start, 3);
                 customiizer_log("⏱️ Génération échouée en {$total}s");
@@ -222,7 +202,6 @@ function convert_webp_to_png_server($image_url) {
 
         $downloaded = file_get_contents($image_url);
         if ($downloaded === false) {
-                customiizer_log("❌ Impossible de télécharger l'image : $image_url");
                 return ['success' => false, 'message' => "Échec du téléchargement de l'image."];
         }
 
@@ -233,13 +212,11 @@ function convert_webp_to_png_server($image_url) {
 
         if ($ext === 'png') {
                 if (file_put_contents($output_path, $downloaded) === false) {
-                        customiizer_log("❌ Échec de la copie PNG : $output_path");
                         return ['success' => false, 'message' => 'Erreur lors de la copie PNG.'];
                 }
         } else {
                 $image = imagecreatefromstring($downloaded);
                 if (!$image) {
-                        customiizer_log("❌ Échec de création GD à partir du fichier téléchargé.");
                         return ['success' => false, 'message' => 'Conversion vers image GD échouée.'];
                 }
 
@@ -260,7 +237,6 @@ function convert_webp_to_png_server($image_url) {
 
                 if (!imagepng($image, $output_path, PNG_COMPRESSION_LEVEL)) {
                         imagedestroy($image);
-                        customiizer_log("❌ Échec de conversion en PNG : $output_path");
                         return ['success' => false, 'message' => "Erreur lors de l'enregistrement PNG."];
                 }
                 imagedestroy($image);
@@ -276,7 +252,6 @@ function convert_webp_to_png_server($image_url) {
 }
 function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
         if (!defined('PRINTFUL_API_KEY')) {
-                customiizer_log('❌ PRINTFUL_API_KEY non définie');
                 return ['success' => false, 'error' => 'Missing PRINTFUL_API_KEY'];
         }
 
@@ -300,12 +275,11 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 
                 list($result, $httpCode) = printful_curl_exec($ch);
 
-		if (curl_errno($ch)) {
-			$error_msg = curl_error($ch);
-			customiizer_log("Erreur cURL lors de la vérification : {$error_msg}");
-			curl_close($ch);
-			return ['success' => false, 'error' => $error_msg];
-		}
+                if (curl_errno($ch)) {
+                        $error_msg = curl_error($ch);
+                        curl_close($ch);
+                        return ['success' => false, 'error' => $error_msg];
+                }
 
 		curl_close($ch);
 
@@ -325,8 +299,7 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
                                 customiizer_log("⏲️ Tâche {$task_id} terminée en {$duration}s");
                                 return ['success' => true, 'data' => $response['data'][0]];
 			} elseif ($status === 'failed') {
-				$failure_reasons = $response['data'][0]['failure_reasons'] ?? 'Non spécifié';
-                                customiizer_log("Tâche {$task_id} échouée. Raison : " . json_encode($failure_reasons));
+                                $failure_reasons = $response['data'][0]['failure_reasons'] ?? 'Non spécifié';
                                 $duration = round(microtime(true) - $start, 3);
                                 customiizer_log("⏲️ Tâche {$task_id} échouée en {$duration}s");
                                 return ['success' => false, 'error' => 'Tâche échouée', 'reasons' => $failure_reasons];

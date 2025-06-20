@@ -56,7 +56,6 @@ function printful_request(callable $callback) {
 
     try {
         $start = microtime(true);
-        customiizer_log('\xE2\x9E\xA1\xEF\xB8\x8F Calling Printful API');
         $result = $callback();
         $elapsed = round(microtime(true) - $start, 3);
         customiizer_log("\xE2\xAC\x85\xEF\xB8\x8F Printful API finished in {$elapsed}s");
