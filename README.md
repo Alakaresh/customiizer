@@ -43,6 +43,11 @@ timestamp list is stored in a temporary file so limits apply across all
 PHP processes. Override the defaults by defining `PRINTFUL_DELAY_SEC` and
 `PRINTFUL_MAX_PER_MINUTE` in `wp-config.php`.
 
+If the API responds with **HTTP&nbsp;429**, `printful_request` now waits
+for the duration specified by the `Retry-After` header (or the message
+body) and retries the call once automatically. The wait and retry are
+logged to `customiizer.log` for visibility.
+
 Design images are converted from WebP to PNG during mockup generation. The order
 webhook only performs this conversion if a legacy WebP URL is still stored.
 
