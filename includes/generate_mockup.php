@@ -78,7 +78,12 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 }
 
 function generate_mockups_printful($image_url, $product_id, $variant_id, array $style_ids, $placement, $technique, $width, $height, $top, $left) {
-        $api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
+        if (!defined('PRINTFUL_API_KEY')) {
+                customiizer_log('❌ Constante PRINTFUL_API_KEY non définie.');
+                return ['success' => false, 'error' => 'PRINTFUL_API_KEY undefined'];
+        }
+
+        $api_key = PRINTFUL_API_KEY;
         $url = 'https://api.printful.com/v2/mockup-tasks';
         $start = microtime(true);
 
