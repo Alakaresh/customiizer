@@ -1,6 +1,0 @@
-[2025-05-30 17:01:00] [INFO] Commande #4532 envoyée à Printful
-[2025-05-30 17:02:15] [WARNING] Délai de traitement inhabituel
-[2025-05-30 17:03:41] [ERROR] Connexion à Printful échouée : timeout
-[2025-05-30 17:05:12] [INFO] Tentative de reconnexion
-[2025-05-30 17:06:45] [INFO] Reconnexion réussie
-[2025-05-30 17:07:33] [ERROR] Format d'image non pris en charge

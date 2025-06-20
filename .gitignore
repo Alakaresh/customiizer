@@ -1,1 +1,8 @@
 includes/webhook/printful/printful_webhook_received.log
+
+# Ignore log files
+customiizer.log
+admin/logs/logs-data/*.log
+api/products/logs/*.log
+includes/proxy/logfile.log
+includes/webhook/created_order.log
