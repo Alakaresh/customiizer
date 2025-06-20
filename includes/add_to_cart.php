@@ -28,66 +28,35 @@ function custom_add_to_cart() {
 	customiizer_log("   Design URL: " . ($design_image_url?:'aucune'));
 	customiizer_log("   Position design: w={$design_width_in}, h={$design_height_in}, left={$design_left_in}, top={$design_top_in}");
 
-	// Création du produit WooCommerce temporaire
-	$post_id = wp_insert_post([
-		'post_title'   => $product_name,
-		'post_type'    => 'product',
-		'post_status'  => 'publish',
-		'meta_input'   => [
-			'_virtual'        => 'yes',
-			'_regular_price'  => $price,
-			'_price'          => $price,
-			'_visibility'     => 'hidden',
-			'_stock_status'   => 'instock',
-			'_manage_stock'   => 'no',
-		],
-	]);
-	if (is_wp_error($post_id) || ! $post_id) {
-		customiizer_log("❌ Échec création du produit.");
-		wp_send_json_error('Échec de création du produit.');
-	}
-	customiizer_log("✅ Produit créé ID={$post_id}");
+        // Utilisation d'un produit modèle existant
+        $post_id = isset($_POST['template_product_id'])
+                ? intval($_POST['template_product_id'])
+                : (defined('CUSTOM_TEMPLATE_PRODUCT_ID') ? (int)CUSTOM_TEMPLATE_PRODUCT_ID : 0);
+        if (!$post_id) {
+                customiizer_log("❌ ID produit modèle manquant");
+                wp_send_json_error('Produit modèle introuvable.');
+        }
+        customiizer_log("✅ Produit modèle ID={$post_id}");
 
-	// Attacher l'image mockup comme vignette si fournie
-	if ($mockup_image_url) {
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		require_once ABSPATH . 'wp-admin/includes/media.php';
-		require_once ABSPATH . 'wp-admin/includes/image.php';
+        // Pas de récupération d'image, le mockup est stocké via cart_item_data
 
-		$tmp_file = download_url($mockup_image_url);
-		if (!is_wp_error($tmp_file)) {
-			$file_array = [
-				'name'     => basename($mockup_image_url),
-				'tmp_name' => $tmp_file,
-			];
-			$attach_id = media_handle_sideload($file_array, $post_id);
-			if (!is_wp_error($attach_id)) {
-				set_post_thumbnail($post_id, $attach_id);
-				customiizer_log("✅ Mockup attaché comme thumbnail ID={$attach_id}");
-			} else {
-				customiizer_log("⚠️ Erreur sideload mockup: " . $attach_id->get_error_message());
-				@unlink($tmp_file);
-			}
-		} else {
-			customiizer_log("⚠️ Erreur download mockup: " . $tmp_file->get_error_message());
-		}
-	}
-
-	// Préparation des métadonnées de design (image & position)
-	$cart_item_data = [];
-	if ($design_image_url) {
-		$cart_item_data = [
-			'variant_id'       => $variant_id,
-			'design_image_url' => $design_image_url,
-			'design_width'     => $design_width_in,
-			'design_height'    => $design_height_in,
-			'design_left'      => $design_left_in,
-			'design_top'       => $design_top_in,
-			'placement'        => $placement,
-			'technique'        => $technique
-		];
-		customiizer_log("🛒 Metadata design pour add_to_cart: " . json_encode($cart_item_data));
-	}
+        // Préparation des métadonnées de personnalisation
+        $cart_item_data = [
+                'mockup_image_url' => $mockup_image_url,
+                'variant_id'       => $variant_id,
+                'placement'        => $placement,
+                'technique'        => $technique,
+        ];
+        if ($design_image_url) {
+                $cart_item_data += [
+                        'design_image_url' => $design_image_url,
+                        'design_width'     => $design_width_in,
+                        'design_height'    => $design_height_in,
+                        'design_left'      => $design_left_in,
+                        'design_top'       => $design_top_in,
+                ];
+        }
+        customiizer_log("🛒 Metadata design pour add_to_cart: " . json_encode($cart_item_data));
 
 	// Ajout au panier du produit temporaire avec metas si existantes
 	$cart_item_key = WC()->cart->add_to_cart($post_id, $quantity, 0, [], $cart_item_data);
@@ -106,16 +75,17 @@ add_action('wp_ajax_nopriv_custom_add_to_cart', 'custom_add_to_cart');
 add_action('wp_ajax_custom_add_to_cart',    'custom_add_to_cart');
 
 function customiizer_transfer_cart_item_meta($item, $cart_item_key, $values, $order) {
-	$meta_keys = [
-		'variant_id',
-		'design_image_url',
-		'design_width',
-		'design_height',
-		'design_left',
-		'design_top',
-		'placement',
-		'technique'
-	];
+        $meta_keys = [
+                'mockup_image_url',
+                'variant_id',
+                'design_image_url',
+                'design_width',
+                'design_height',
+                'design_left',
+                'design_top',
+                'placement',
+                'technique'
+        ];
 
 	foreach ($meta_keys as $key) {
 		if (isset($values[$key])) {
