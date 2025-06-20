@@ -19,6 +19,7 @@ Define the credentials below in `wp-config.php` or your server environment so th
 
 ```
 define('PRINTFUL_API_KEY', 'your-secret-key');
+define('PRINTFUL_STORE_ID', 'your-store-id');
 define('PRINTFUL_API_BASE', 'https://api.printful.com/v2'); // optional
 ```
 
