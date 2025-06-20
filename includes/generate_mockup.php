@@ -207,11 +207,32 @@ function handle_generate_mockup() {
         }
 }
 function convert_webp_to_png_server($image_url) {
-        $ext = strtolower(pathinfo(parse_url($image_url, PHP_URL_PATH), PATHINFO_EXTENSION));
+        $parts = wp_parse_url($image_url);
+        $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
 
-        $downloaded = file_get_contents($image_url);
-        if ($downloaded === false) {
-                customiizer_log("❌ Impossible de télécharger l'image : $image_url");
+        if (!$parts || !in_array($parts['scheme'] ?? '', ['http', 'https'], true)) {
+                customiizer_log("❌ URL invalide : $image_url");
+                return ['success' => false, 'message' => "URL d'image invalide."];
+        }
+
+        if (defined('ALLOWED_IMAGE_HOSTS') && !in_array($parts['host'], ALLOWED_IMAGE_HOSTS, true)) {
+                customiizer_log("❌ Hôte non autorisé : {$parts['host']}");
+                return ['success' => false, 'message' => 'Hôte non autorisé.'];
+        }
+
+        $response = wp_remote_get($image_url, [
+                'timeout' => REMOTE_IMAGE_TIMEOUT,
+                'limit_response_size' => REMOTE_IMAGE_MAX_BYTES,
+        ]);
+
+        if (is_wp_error($response)) {
+                customiizer_log("❌ Erreur HTTP lors du téléchargement : " . $response->get_error_message());
+                return ['success' => false, 'message' => "Téléchargement échoué."];
+        }
+
+        $downloaded = wp_remote_retrieve_body($response);
+        if (!$downloaded) {
+                customiizer_log("❌ Corps vide pour l'image téléchargée : $image_url");
                 return ['success' => false, 'message' => "Échec du téléchargement de l'image."];
         }
 

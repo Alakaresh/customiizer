@@ -10,8 +10,13 @@ Adjust `PNG_COMPRESSION_LEVEL` if you need smaller mockup files or faster image 
 
 The default value is set to `8` for near-maximum compression.
 
-`MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.  
+`MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.
 Images larger than this value are downscaled before saving. The default is `1500` pixels.
+
+`ALLOWED_IMAGE_HOSTS`, `REMOTE_IMAGE_TIMEOUT` and `REMOTE_IMAGE_MAX_BYTES` also live in
+`utilities.php`. These constants secure remote WebP downloads performed by
+`convert_webp_to_png_server()` by restricting which hosts are allowed and by
+limiting request size and timeout.
 
 ## Position editor
 
