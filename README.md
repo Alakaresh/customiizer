@@ -25,31 +25,6 @@ define('PRINTFUL_API_BASE', 'https://api.printful.com/v2'); // optional
 
 `PRINTFUL_API_BASE` is optional and defaults to the public Printful URL. `PRINTFUL_API_KEY` is required by `includes/generate_mockup.php` and webhook handlers.
 
-The helper `includes/printful_rate_limit.php` defines `printful_request()`
-to handle Printful's quota limits. Existing scripts should wrap their API
-requests in this function instead of calling `printful_rate_limit()`
-directly:
-
-```php
-printful_request(function () {
-    // your cURL request here
-});
-```
-
-`printful_request` keeps its lock for the entire duration of the HTTP
-request. This guarantees at least `PRINTFUL_DELAY_SEC` between calls and
-no more than `PRINTFUL_MAX_PER_MINUTE` during any 60&nbsp;s window. The
-timestamp list is stored in a temporary file so limits apply across all
-PHP processes. Override the defaults by defining `PRINTFUL_DELAY_SEC` and
-`PRINTFUL_MAX_PER_MINUTE` in `wp-config.php`.
-
-If the API responds with **HTTP&nbsp;429**, `printful_request` now waits
-for the duration specified by the `Retry-After` header (or the message
-body) and retries the call once automatically. The wait and retry are
-logged to `customiizer.log` for visibility. Each response now also records the
-current Printful bucket status (`X-Ratelimit-Remaining` and
-`X-Ratelimit-Reset`) so you can monitor how many requests are left before the
-bucket refills.
 
 Design images are converted from WebP to PNG during mockup generation. The order
 webhook only performs this conversion if a legacy WebP URL is still stored.

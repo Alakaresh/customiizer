@@ -8,8 +8,7 @@ if (!file_exists($wpLoadPath)) {
 	exit(1);
 }
 require_once $wpLoadPath;
-require_once __DIR__ . '/../printful_rate_limit.php';
-
+// Previously enforced Printful API rate limits
 foreach (['PRINTFUL_API_KEY', 'PRINTFUL_STORE_ID', 'PRINTFUL_API_BASE', 'RABBIT_HOST', 'QUEUE_NAME'] as $const) {
     if (!defined($const)) {
         die("❌ Constante manquante : $const\n");
@@ -128,7 +127,8 @@ function envoyer_commande_printful(array $payload): bool {
                 CURLOPT_POSTFIELDS     => json_encode($payload),
         ]);
 
-        list($resp, $code) = printful_curl_exec($ch);
+        $resp = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
 	customiizer_log("📬 HTTP $code, réponse: $resp");

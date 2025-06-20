@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../printful_rate_limit.php';
+// Previously enforced Printful API rate limits
 
 function handle_order_created(array $data, PrintfulWebhookLogger $logger)
 {
@@ -95,7 +95,8 @@ function confirm_printful_order($orderId, PrintfulWebhookLogger $logger): array
                         CURLOPT_HTTPHEADER => $headers,
                 ]);
 
-                list($response, $httpCode) = printful_curl_exec($ch);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 curl_close($ch);
 
 		$decoded = json_decode($response, true);

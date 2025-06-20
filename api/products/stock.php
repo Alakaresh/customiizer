@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../includes/printful_rate_limit.php';
+// Previously enforced Printful API rate limits
 register_rest_route('api/v1/products', '/update/stocks', [
 	'methods' => 'POST',
 	'callback' => 'customiizer_update_all_variant_stocks',
@@ -27,12 +27,10 @@ function customiizer_update_all_variant_stocks() {
                 foreach ($regions as $region) {
                         $stock_url = "$base/catalog-variants/$vid/availability?selling_region_name=" . urlencode($region);
 
-                        $response = printful_request(function () use ($stock_url, $hdr) {
-                                return wp_remote_get($stock_url, [
+                        $response = wp_remote_get($stock_url, [
                                         'headers' => $hdr,
                                         'timeout' => 10,
                                 ]);
-                        });
 
 			if (is_wp_error($response)) {
 				$errors[] = "Erreur WP pour $vid-$region : " . $response->get_error_message();
