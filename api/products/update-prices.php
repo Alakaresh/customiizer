@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../includes/printful_rate_limit.php';
 
 register_rest_route('api/v1/products/update', '/prices', [
 	'methods'  => 'POST',
@@ -23,10 +24,11 @@ function customiizer_update_purchase_prices() {
 	$errors = [];
 
 	foreach ($variant_ids as $vid) {
-		foreach ($regions as $region) {
-			$url = "$base/catalog-variants/{$vid}/prices?currency=EUR&selling_region_name=" . urlencode($region);
+                foreach ($regions as $region) {
+                        $url = "$base/catalog-variants/{$vid}/prices?currency=EUR&selling_region_name=" . urlencode($region);
 
-			$response = wp_remote_get($url, [
+                        printful_rate_limit();
+                        $response = wp_remote_get($url, [
 				'headers' => $headers,
 				'timeout' => 15,
 			]);
