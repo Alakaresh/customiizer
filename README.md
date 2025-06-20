@@ -28,8 +28,10 @@ define('PRINTFUL_API_BASE', 'https://api.printful.com/v2'); // optional
 The helper `includes/printful_rate_limit.php` keeps track of recent
 calls to avoid exceeding Printful's quota. Scripts that interact with
 the API require this file and call `printful_rate_limit()` immediately
-before each HTTP request. The default settings enforce a one second gap
-and no more than 55 requests during any rolling 60&nbsp;s window.
+before each HTTP request. By default the helper enforces a one second
+gap between calls and no more than 55 requests during any rolling
+60&nbsp;s window. Define `PRINTFUL_DELAY_SEC` and
+`PRINTFUL_MAX_PER_MINUTE` in `wp-config.php` to override these limits.
 
 Design images are converted from WebP to PNG during mockup generation. The order
 webhook only performs this conversion if a legacy WebP URL is still stored.
