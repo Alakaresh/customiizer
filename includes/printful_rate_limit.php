@@ -197,3 +197,42 @@ function printful_curl_exec($ch): array {
 
     return [$body, $code];
 }
+
+function printful_rate_limit_status(): array {
+    static $filePath = null;
+    if ($filePath === null) {
+        $filePath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR . 'printful_rate_limit.json';
+    }
+
+    $now = microtime(true);
+    $fp = fopen($filePath, 'c+');
+    if ($fp === false) {
+        $timestamps = [];
+    } else {
+        flock($fp, LOCK_EX);
+        $contents = stream_get_contents($fp);
+        $timestamps = json_decode($contents, true);
+        if (!is_array($timestamps)) {
+            $timestamps = [];
+        }
+        flock($fp, LOCK_UN);
+        fclose($fp);
+    }
+
+    $timestamps = array_values(array_filter($timestamps, function($t) use ($now) {
+        return ($now - $t) < 60;
+    }));
+
+    $remaining = PRINTFUL_MAX_PER_MINUTE - count($timestamps);
+    if ($remaining < 0) {
+        $remaining = 0;
+    }
+    $reset = 60;
+    if (!empty($timestamps)) {
+        $oldest = reset($timestamps);
+        $reset = max(0, (int) ceil(60 - ($now - $oldest)));
+    }
+
+    return ['remaining' => $remaining, 'reset' => $reset];
+}

@@ -57,6 +57,11 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+        $quota = printful_rate_limit_status();
+        $remain = $quota['remaining'];
+        $reset  = $quota['reset'];
+        customiizer_log("\xE2\x9E\xA1\xEF\xB8\x8F Appel API Printful pour la t\xC3\xA2che de mockup (reste {$remain}, r\xC3\xA9init dans {$reset}s)");
+
         list($result, $httpCode) = printful_curl_exec($ch);
 
         if (curl_errno($ch)) {
@@ -263,6 +268,10 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
 
         while ($elapsed_time < $timeout) {
                 $ch = curl_init($url);
+                $quota = printful_rate_limit_status();
+                $remain = $quota['remaining'];
+                $reset  = $quota['reset'];
+                customiizer_log("\xE2\x9E\xA1\xEF\xB8\x8F Vérification du statut de la tâche {$task_id} (reste {$remain}, r\xC3\xA9init dans {$reset}s)");
                 $headers = [
                         'Content-Type: application/json',
                         "Authorization: Bearer $api_key"
