@@ -1,8 +1,14 @@
 <?php
 
 function generate_mockup_printful($image_url, $product_id, $variant_id, $style_id, $placement, $technique, $width, $height, $top, $left) {
-        $api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
-        $url = 'https://api.printful.com/v2/mockup-tasks';
+        if (!defined('PRINTFUL_API_KEY')) {
+                customiizer_log('❌ PRINTFUL_API_KEY non définie');
+                return ['success' => false, 'error' => 'Missing PRINTFUL_API_KEY'];
+        }
+
+        $api_key  = PRINTFUL_API_KEY;
+        $base_url = defined('PRINTFUL_API_BASE') ? PRINTFUL_API_BASE : 'https://api.printful.com/v2';
+        $url      = $base_url . '/mockup-tasks';
         $start = microtime(true);
 
 	$data = [
@@ -264,8 +270,14 @@ function convert_webp_to_png_server($image_url) {
         ];
 }
 function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
-        $api_key = '4Pyo1mdQ4nDwOSH2WTBaSgFzhgBRYOhd2LRIYsMl';
-        $url = "https://api.printful.com/v2/mockup-tasks?id={$task_id}";
+        if (!defined('PRINTFUL_API_KEY')) {
+                customiizer_log('❌ PRINTFUL_API_KEY non définie');
+                return ['success' => false, 'error' => 'Missing PRINTFUL_API_KEY'];
+        }
+
+        $api_key  = PRINTFUL_API_KEY;
+        $base_url = defined('PRINTFUL_API_BASE') ? PRINTFUL_API_BASE : 'https://api.printful.com/v2';
+        $url      = "$base_url/mockup-tasks?id={$task_id}";
         $elapsed_time = 0;
         $start = microtime(true);
 
