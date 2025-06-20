@@ -318,7 +318,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 			);
 			db_err("variant_print $vid");
 		}
-		static $mockup_generated_count = 0; // compteur global
 
 		/* ------ 4) mockups (image + position) ------------------------------ */
 		$mockup_index = []; // compteur par variant_id
