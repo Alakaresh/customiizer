@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../utilities.php';
 if (!defined('PRINTFUL_DELAY_SEC')) {
     define('PRINTFUL_DELAY_SEC', 1);
 }
@@ -33,6 +34,8 @@ function printful_request(callable $callback) {
         $last = end($timestamps);
         $sinceLast = $now - $last;
         if ($sinceLast < PRINTFUL_DELAY_SEC) {
+            $delay = round(PRINTFUL_DELAY_SEC - $sinceLast, 3);
+            customiizer_log("\xE2\x8C\x9B Waiting {$delay}s before next Printful request");
             usleep((int)((PRINTFUL_DELAY_SEC - $sinceLast) * 1e6));
             $now = microtime(true);
         }
@@ -42,6 +45,7 @@ function printful_request(callable $callback) {
         $oldest = reset($timestamps);
         $sleep = 60 - ($now - $oldest) + 0.001;
         if ($sleep > 0) {
+            customiizer_log("\xE2\x8F\xB3 Rate limit hit, sleeping {$sleep}s");
             usleep((int)($sleep * 1e6));
         }
         $now = microtime(true);
@@ -51,7 +55,11 @@ function printful_request(callable $callback) {
     }
 
     try {
+        $start = microtime(true);
+        customiizer_log('\xE2\x9E\xA1\xEF\xB8\x8F Calling Printful API');
         $result = $callback();
+        $elapsed = round(microtime(true) - $start, 3);
+        customiizer_log("\xE2\xAC\x85\xEF\xB8\x8F Printful API finished in {$elapsed}s");
     } finally {
         $timestamps[] = microtime(true);
 
