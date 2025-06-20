@@ -190,5 +190,11 @@ function printful_curl_exec($ch): array {
         $perform();
     }
 
+    if (isset($headers['x-ratelimit-remaining']) || isset($headers['x-ratelimit-reset'])) {
+        $remaining = $headers['x-ratelimit-remaining'] ?? '?';
+        $reset     = $headers['x-ratelimit-reset'] ?? '?';
+        customiizer_log("\xF0\x9F\xAA\xA3 Reste {$remaining} requ\xC3\xAAtes, r\xC3\xA9initialisation dans {$reset}s");
+    }
+
     return [$body, $code];
 }
