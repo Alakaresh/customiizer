@@ -58,12 +58,7 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-        $result = null;
-        $httpCode = null;
-        printful_request(function () use ($ch, &$result, &$httpCode) {
-                $result = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        });
+        list($result, $httpCode) = printful_curl_exec($ch);
 
 	if (curl_errno($ch)) {
 		$error_msg = curl_error($ch);
@@ -303,12 +298,7 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-                $result = null;
-                $httpCode = null;
-                printful_request(function () use ($ch, &$result, &$httpCode) {
-                        $result = curl_exec($ch);
-                        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                });
+                list($result, $httpCode) = printful_curl_exec($ch);
 
 		if (curl_errno($ch)) {
 			$error_msg = curl_error($ch);

@@ -95,12 +95,7 @@ function confirm_printful_order($orderId, PrintfulWebhookLogger $logger): array
                         CURLOPT_HTTPHEADER => $headers,
                 ]);
 
-                $response = null;
-                $httpCode = null;
-                printful_request(function () use ($ch, &$response, &$httpCode) {
-                        $response = curl_exec($ch);
-                        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                });
+                list($response, $httpCode) = printful_curl_exec($ch);
                 curl_close($ch);
 
 		$decoded = json_decode($response, true);

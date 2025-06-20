@@ -128,12 +128,7 @@ function envoyer_commande_printful(array $payload): bool {
                 CURLOPT_POSTFIELDS     => json_encode($payload),
         ]);
 
-        $resp = null;
-        $code = null;
-        printful_request(function () use ($ch, &$resp, &$code) {
-                $resp = curl_exec($ch);
-                $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        });
+        list($resp, $code) = printful_curl_exec($ch);
         curl_close($ch);
 
 	customiizer_log("📬 HTTP $code, réponse: $resp");

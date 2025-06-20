@@ -142,3 +142,53 @@ function printful_rate_limit(): void {
         fclose($fp);
     }
 }
+
+/**
+ * Execute a cURL request while respecting Printful rate limits.
+ * If the first call returns HTTP 429, the function waits for the
+ * duration indicated by the Retry-After header or error message
+ * then retries once.
+ *
+ * @param resource $ch Initialized cURL handle
+ * @return array [$body, $httpCode]
+ */
+function printful_curl_exec($ch): array {
+    $perform = function() use ($ch, &$body, &$code, &$headers) {
+        $headers = [];
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($curl, $header) use (&$headers) {
+            $len = strlen($header);
+            $parts = explode(':', $header, 2);
+            if (count($parts) == 2) {
+                $headers[strtolower(trim($parts[0]))] = trim($parts[1]);
+            }
+            return $len;
+        });
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        printful_request(function () use ($ch, &$body, &$code) {
+            $body = curl_exec($ch);
+            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        });
+    };
+
+    $perform();
+
+    if ($code === 429) {
+        $wait = 0;
+        if (isset($headers['retry-after'])) {
+            $wait = (int) ceil($headers['retry-after']);
+        } elseif (preg_match('/(\d+(?:\.\d+)?)\s*sec/i', $body, $m)) {
+            $wait = (int) ceil($m[1]);
+        }
+        if ($wait < 1) {
+            $wait = 1;
+        }
+        customiizer_log("\xE2\x8F\xB3 HTTP 429, sleeping {$wait}s before retry");
+        sleep($wait);
+        customiizer_log("\x21A9\xFE0F Retrying Printful request");
+        $perform();
+    }
+
+    return [$body, $code];
+}
