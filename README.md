@@ -32,7 +32,7 @@ The floating panel uses a grayscale theme so it stays visually distinct from the
 
 ## Batch mockup generation
 
-Use the `/wp-json/api/v1/mockups/batch` endpoint to submit several mockup tasks at once. The request body must contain a `tasks` array with one object per mockup job:
+Use the `/wp-json/api/v1/mockups/batch` endpoint to submit several mockup tasks at once. Send a JSON body with a `tasks` array containing one object per job. Each task mirrors the payload required by Printful's `mockup-tasks` API:
 
 ```json
 {
@@ -43,9 +43,22 @@ Use the `/wp-json/api/v1/mockups/batch` endpoint to submit several mockup tasks 
       "mockup_style_ids": [1],
       "image_url": "https://example.com/mockup.png",
       "placement": "front",
-      "technique": "DTG"
+      "technique": "DTG",
+      "width": 12.0,
+      "height": 16.0,
+      "top": 0,
+      "left": 0
     }
   ]
+}
+```
+
+A successful call returns the created Printful task IDs:
+
+```json
+{
+  "success": true,
+  "task_ids": [1234567, 1234568]
 }
 ```
 
