@@ -8,7 +8,7 @@ Only mockup images converted from WebP to PNG use the `PNG_COMPRESSION_LEVEL` co
 
 Adjust `PNG_COMPRESSION_LEVEL` if you need smaller mockup files or faster image generation.
 
-The default value is set to `8` for near-maximum compression.
+The default value is set to `6`, trading some compression for noticeably faster file saves.
 
 `MOCKUP_MAX_DIMENSION` controls the maximum width or height of PNG mockup images.
 Images larger than this value are downscaled before saving. The default is `1500` pixels.
