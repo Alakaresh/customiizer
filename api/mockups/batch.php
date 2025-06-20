@@ -52,11 +52,16 @@ function customiizer_mockups_batch(WP_REST_Request $req) {
             ],
         ];
 
+        $headers = [
+            'Authorization' => "Bearer $token",
+            'Content-Type'  => 'application/json',
+        ];
+        if (defined('PRINTFUL_STORE_ID')) {
+            $headers['X-PF-Store-Id'] = PRINTFUL_STORE_ID;
+        }
+
         $response = wp_remote_post($url, [
-            'headers' => [
-                'Authorization' => "Bearer $token",
-                'Content-Type'  => 'application/json',
-            ],
+            'headers' => $headers,
             'body'    => wp_json_encode($body),
             'timeout' => 20,
         ]);

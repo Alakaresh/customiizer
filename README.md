@@ -74,3 +74,7 @@ define('PRINTFUL_API_KEY', 'your-secret-key');
 
 If the constant is missing, functions like `generate_mockup_printful()` return an error and log a message instead of sending unauthenticated requests.
 
+## Printful store ID
+
+Some API calls target a specific Printful store. Define the constant `PRINTFUL_STORE_ID` in `wp-config.php` to automatically add the `X-PF-Store-Id` header when communicating with Printful. When not defined, the header is omitted and your default store is used.
+

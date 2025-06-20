@@ -42,11 +42,15 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 
 	customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
-	$ch = curl_init($url);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, [
-		'Content-Type: application/json',
-		"Authorization: Bearer $api_key"
-	]);
+        $ch = curl_init($url);
+        $headers = [
+                'Content-Type: application/json',
+                "Authorization: Bearer $api_key"
+        ];
+        if (defined('PRINTFUL_STORE_ID')) {
+                $headers[] = 'X-PF-Store-Id: ' . PRINTFUL_STORE_ID;
+        }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
@@ -120,10 +124,14 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $headers = [
                 'Content-Type: application/json',
                 "Authorization: Bearer $api_key"
-        ]);
+        ];
+        if (defined('PRINTFUL_STORE_ID')) {
+                $headers[] = 'X-PF-Store-Id: ' . PRINTFUL_STORE_ID;
+        }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
