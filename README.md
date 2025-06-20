@@ -23,3 +23,7 @@ The panel also displays the current `product_id`, `variant_id` and `mockup_id` s
 
 
 The floating panel uses a grayscale theme so it stays visually distinct from the product page. The **Save** button now appears in black for higher contrast.
+
+## Mobile block
+
+A new **Blocage Mobile** section is available in the Dashboard. Use the checkbox to disable access from smartphones. When enabled, visitors on a phone see a placeholder message defined in `header.php`.
