@@ -130,7 +130,6 @@ add_action( 'init', function() {
 		'/includes/api/api_imported_images.php',
 		'/includes/api/api_templates.php',
 		'/includes/add_to_cart.php',
-		//'/includes/webhook/printful-hook.php',
 
 	];
 	foreach ($includes as $file) {
