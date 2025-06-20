@@ -23,3 +23,13 @@ The panel also displays the current `product_id`, `variant_id` and `mockup_id` s
 
 
 The floating panel uses a grayscale theme so it stays visually distinct from the product page. The **Save** button now appears in black for higher contrast.
+
+## Printful API key
+
+Several scripts require access to your Printful account. Define the constant `PRINTFUL_API_KEY` in `wp-config.php` so sensitive credentials never appear in the theme files:
+
+```php
+define('PRINTFUL_API_KEY', 'your-secret-key');
+```
+
+If the constant is missing, functions like `generate_mockup_printful()` return an error and log a message instead of sending unauthenticated requests.
