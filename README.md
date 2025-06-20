@@ -29,6 +29,28 @@ The panel also displays the current `product_id`, `variant_id` and `mockup_id` s
 
 The floating panel uses a grayscale theme so it stays visually distinct from the product page. The **Save** button now appears in black for higher contrast.
 
+
+## Batch mockup generation
+
+Use the `/wp-json/api/v1/mockups/batch` endpoint to submit several mockup tasks at once. The request body must contain a `tasks` array with one object per mockup job:
+
+```json
+{
+  "tasks": [
+    {
+      "catalog_product_id": 123,
+      "catalog_variant_ids": [456],
+      "mockup_style_ids": [1],
+      "image_url": "https://example.com/mockup.png",
+      "placement": "front",
+      "technique": "DTG"
+    }
+  ]
+}
+```
+
+Printful processes the batch asynchronously. When each task finishes, the theme receives a `mockup_task_finished` webhook. Set this webhook URL in your Printful dashboard so generated images are saved automatically.
+
 ## Printful API key
 
 Several scripts require access to your Printful account. Define the constant `PRINTFUL_API_KEY` in `wp-config.php` so sensitive credentials never appear in the theme files:
@@ -38,3 +60,4 @@ define('PRINTFUL_API_KEY', 'your-secret-key');
 ```
 
 If the constant is missing, functions like `generate_mockup_printful()` return an error and log a message instead of sending unauthenticated requests.
+
