@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/printful_rate_limit.php';
 
 function generate_mockup_printful($image_url, $product_id, $variant_id, $style_id, $placement, $technique, $width, $height, $top, $left) {
         if (!defined('PRINTFUL_API_KEY')) {
@@ -41,8 +42,9 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 		]
 	];
 
-	customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
+        customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
+        printful_rate_limit();
         $ch = curl_init($url);
         $headers = [
                 'Content-Type: application/json',
@@ -286,6 +288,7 @@ function wait_for_mockup_completion($task_id, $timeout = 120, $interval = 1) {
         $start = microtime(true);
 
         while ($elapsed_time < $timeout) {
+                printful_rate_limit();
                 $ch = curl_init($url);
                 $headers = [
                         'Content-Type: application/json',

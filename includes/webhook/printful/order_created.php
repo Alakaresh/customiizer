@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../printful_rate_limit.php';
 
 function handle_order_created(array $data, PrintfulWebhookLogger $logger)
 {
@@ -86,8 +87,9 @@ function confirm_printful_order($orderId, PrintfulWebhookLogger $logger): array
 		'design is still processing',
 	];
 
-	for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-		$ch = curl_init($url);
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                printful_rate_limit();
+                $ch = curl_init($url);
 		curl_setopt_array($ch, [
 			CURLOPT_CUSTOMREQUEST => "POST",
 			CURLOPT_RETURNTRANSFER => true,
