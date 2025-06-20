@@ -30,7 +30,8 @@ calls to avoid exceeding Printful's quota. Scripts that interact with
 the API require this file and call `printful_rate_limit()` immediately
 before each HTTP request. By default the helper enforces a one second
 gap between calls and no more than 55 requests during any rolling
-60&nbsp;s window. Define `PRINTFUL_DELAY_SEC` and
+60&nbsp;s window. The timestamp list is persisted in a temporary file so
+limits apply across all PHP requests. Define `PRINTFUL_DELAY_SEC` and
 `PRINTFUL_MAX_PER_MINUTE` in `wp-config.php` to override these limits.
 
 Design images are converted from WebP to PNG during mockup generation. The order

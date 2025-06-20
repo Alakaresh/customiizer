@@ -7,13 +7,33 @@ if (!defined('PRINTFUL_MAX_PER_MINUTE')) {
 }
 
 function printful_rate_limit(): void {
-    static $timestamps = [];
+    static $filePath = null;
+    if ($filePath === null) {
+        $filePath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR . 'printful_rate_limit.json';
+    }
+
     $now = microtime(true);
 
+    $fp = fopen($filePath, 'c+');
+    if ($fp === false) {
+        // If the file cannot be opened, fall back to in-memory timestamps
+        $timestamps = [];
+    } else {
+        // Acquire exclusive lock to avoid race conditions
+        flock($fp, LOCK_EX);
+
+        $contents = stream_get_contents($fp);
+        $timestamps = json_decode($contents, true);
+        if (!is_array($timestamps)) {
+            $timestamps = [];
+        }
+    }
+
     // Remove calls older than 60 seconds
-    $timestamps = array_filter($timestamps, function($t) use ($now) {
+    $timestamps = array_values(array_filter($timestamps, function($t) use ($now) {
         return ($now - $t) < 60;
-    });
+    }));
 
     // Ensure at least PRINTFUL_DELAY_SEC between calls
     if (!empty($timestamps)) {
@@ -33,10 +53,19 @@ function printful_rate_limit(): void {
             usleep((int)($sleep * 1e6));
         }
         $now = microtime(true);
-        $timestamps = array_filter($timestamps, function($t) use ($now) {
+        $timestamps = array_values(array_filter($timestamps, function($t) use ($now) {
             return ($now - $t) < 60;
-        });
+        }));
     }
 
     $timestamps[] = $now;
+
+    if ($fp !== false) {
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, json_encode($timestamps));
+        fflush($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+    }
 }
