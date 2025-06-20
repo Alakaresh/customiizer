@@ -2,14 +2,29 @@
 
 function handle_mockup_task_finished(array $data, PrintfulWebhookLogger $logger)
 {
-    $logger->log('🖼️ Event: mockup_task_finished reçu');
+    $logger->log('📥 Webhook reçu : mockup_task_finished');
 
+    // 🔒 Sécurité : on s'assure que le webhook vient bien de notre boutique
+    if (($data['store_id'] ?? 0) !== 15816776) {
+        $logger->log("❌ Webhook rejeté : store_id non autorisé ({$data['store_id']})");
+        return new WP_REST_Response(['error' => 'invalid_store'], 403);
+    }
+
+    // 📝 Log complet du payload reçu
+    $logger->log("📦 Contenu complet :\n" . print_r($data, true));
+
+    // 📌 Extraction du payload
     $payload = $data['data'] ?? [];
 
-    // Compatibilité avec différentes structures possibles
+    // 📌 Affichage du task_id si dispo
+    $task_id = $payload['id'] ?? ($payload['task']['id'] ?? null);
+    if ($task_id) {
+        $logger->log("🔢 Tâche concernée : task_id = $task_id");
+    }
+
+    // 📦 Récupération des mockups quelle que soit la structure
     if (isset($payload['task'])) {
-        $task = $payload['task'];
-        $catalog_variant_mockups = $task['catalog_variant_mockups'] ?? [];
+        $catalog_variant_mockups = $payload['task']['catalog_variant_mockups'] ?? [];
     } elseif (isset($payload[0]['catalog_variant_mockups'])) {
         $catalog_variant_mockups = $payload[0]['catalog_variant_mockups'];
     } else {
@@ -21,8 +36,7 @@ function handle_mockup_task_finished(array $data, PrintfulWebhookLogger $logger)
         return new WP_REST_Response(['status' => 'no_mockups'], 200);
     }
 
-    global $wpdb;
-
+    // 🔄 Parcours des variantes et mockups associés
     foreach ($catalog_variant_mockups as $variant) {
         $variant_id = $variant['catalog_variant_id'] ?? 0;
         if (!$variant_id) {
@@ -30,32 +44,16 @@ function handle_mockup_task_finished(array $data, PrintfulWebhookLogger $logger)
             continue;
         }
 
-        $logger->log("➡️ Mise à jour du variant $variant_id");
+        $logger->log("🎯 Variant ID : $variant_id");
 
         foreach ($variant['mockups'] ?? [] as $mock) {
-            $mockup_id  = $mock['mockup_id'] ?? 0;
-            $mockup_url = $mock['mockup_url'] ?? '';
+            $mockup_id  = $mock['mockup_id'] ?? 'inconnu';
+            $mockup_url = $mock['mockup_url'] ?? 'url manquante';
+            $style_id   = $mock['style_id'] ?? 'style inconnu';
 
-            if (!$mockup_url) {
-                $logger->log("⚠️ mockup_url manquant pour variant $variant_id");
-                continue;
-            }
-
-            $logger->log("💾 mockup_id=$mockup_id url=$mockup_url");
-
-            $wpdb->replace(
-                'WPC_variant_mockup',
-                [
-                    'variant_id'    => $variant_id,
-                    'mockup_id'     => $mockup_id,
-                    'image'         => $mockup_url,
-                    'position_top'  => 0,
-                    'position_left' => 50,
-                ],
-                ['%d','%d','%s','%d','%d']
-            );
+            $logger->log("🔗 mockup_id = $mockup_id | style_id = $style_id | url = $mockup_url");
         }
     }
 
-    return new WP_REST_Response(['status' => 'mockup_task_finished handled'], 200);
+    return new WP_REST_Response(['status' => 'mockup_task_finished traité (logué uniquement)'], 200);
 }
