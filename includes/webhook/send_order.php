@@ -207,24 +207,35 @@ function convertir_webp_en_png(string $webp_url, string $order_id): ?string {
 // ——— Préparation du payload ———
 function preparer_commande_pour_printful(array $commande): array {
 	$items = [];
-	foreach ($commande['line_items'] as $item) {
-		$product_id = $item['product_id'];
-		$meta = [
-			'design_image_url' => get_post_meta($product_id, 'design_image_url', true),
-			'design_width'     => get_post_meta($product_id, 'design_width', true),
-			'design_height'    => get_post_meta($product_id, 'design_height', true),
-			'design_left'      => get_post_meta($product_id, 'design_left', true),
-			'design_top'       => get_post_meta($product_id, 'design_top', true),
-			'variant_id'       => get_post_meta($product_id, 'variant_id', true),
-			'placement'        => get_post_meta($product_id, 'placement', true),
-			'technique'        => get_post_meta($product_id, 'technique', true)
-		];
+        foreach ($commande['line_items'] as $item) {
+                $product_id = $item['product_id'];
+                $item_id    = $item['id'] ?? 0;
+
+                $meta_keys = [
+                        'design_image_url',
+                        'design_width',
+                        'design_height',
+                        'design_left',
+                        'design_top',
+                        'variant_id',
+                        'placement',
+                        'technique'
+                ];
+
+                $meta = [];
+                foreach ($meta_keys as $key) {
+                        $value = wc_get_order_item_meta($item_id, $key, true);
+                        if ($value === '' || $value === null) {
+                                $value = get_post_meta($product_id, $key, true);
+                        }
+                        $meta[$key] = $value;
+                }
 		customiizer_log("🔍 Produit #$product_id – données meta : " . json_encode($meta));
 
-		if (empty($meta['design_image_url']) || empty($meta['variant_id'])) {
-			customiizer_log("⚠️ Données manquantes pour le produit #$product_id");
-			continue;
-		}
+                if (empty($meta['design_image_url']) || empty($meta['variant_id'])) {
+                        customiizer_log("❌ Métadonnées manquantes pour l'article {$item_id} (produit #$product_id)");
+                        continue;
+                }
 
 		$url_png = convertir_webp_en_png($meta['design_image_url'], $commande['number']);
 		if (!$url_png) {
