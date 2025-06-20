@@ -42,7 +42,8 @@ function generate_mockup_printful($image_url, $product_id, $variant_id, $style_i
 		]
 	];
 
-        customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
+        // Données envoyées à Printful, désactivé pour éviter de surcharger les logs
+        // customiizer_log("🔹 Envoi des données Printful : " . json_encode($data, JSON_PRETTY_PRINT));
 
         $ch = curl_init($url);
         $headers = [
@@ -100,8 +101,8 @@ function handle_generate_mockup() {
         wp_send_json_error(['message' => 'URL de l\'image manquante.']);
     }
 
-    // 🔍 Log brut pour contrôle
-    customiizer_log("📥 Données POST reçues : " . json_encode($_POST, JSON_PRETTY_PRINT));
+    // 🔍 Log brut pour contrôle (désactivé car trop verbeux)
+    // customiizer_log("📥 Données POST reçues : " . json_encode($_POST, JSON_PRETTY_PRINT));
 
     $webp_url   = sanitize_text_field($_POST['image_url']);
     $product_id = intval($_POST['product_id']);
