@@ -86,95 +86,56 @@ function renderCurrentGroup() {
 
 
 function generateMockup(mockupData) {
-	if (!mockupData || !selectedVariant?.mockups?.length) {
-		console.error("❌ Données insuffisantes pour générer un mockup.");
-		alert("Impossible de générer le mockup. Données manquantes.");
-		return;
-	}
+        if (!mockupData || !selectedVariant?.mockups?.length) {
+                console.error("❌ Données insuffisantes pour générer un mockup.");
+                alert("Impossible de générer le mockup. Données manquantes.");
+                return;
+        }
 
         const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
-        const primaryStyleId = styleIds.sort((a,b) => a - b).slice(-1)[0];
-	let productDataCreated = false;
-	const mainProductImage = document.getElementById("product-main-image");
+        const mainProductImage = document.getElementById("product-main-image");
 
-	// Préparation UI
-	document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
-	mainProductImage?.classList.add("loading");
+        document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
+        mainProductImage?.classList.add("loading");
 
-	let loadingOverlay = document.querySelector(".loading-overlay");
-	if (!loadingOverlay) {
-		loadingOverlay = document.createElement("div");
-		loadingOverlay.classList.add("loading-overlay");
-		loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">📦 Préparation...</div>`;
-		mainProductImage?.parentNode.appendChild(loadingOverlay);
-	}
+        let loadingOverlay = document.querySelector(".loading-overlay");
+        if (!loadingOverlay) {
+                loadingOverlay = document.createElement("div");
+                loadingOverlay.classList.add("loading-overlay");
+                loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">📦 Préparation...</div>`;
+                mainProductImage?.parentNode.appendChild(loadingOverlay);
+        }
 
-	// Fonction d'envoi avec retry
-	const sendWithRetry = async (styleId, attempt = 0) => {
-		const form = new FormData();
-		form.append("action", "generate_mockup");
-		form.append("image_url", mockupData.image_url);
-		form.append("product_id", mockupData.product_id);
-		form.append("variant_id", mockupData.variant_id);
-		form.append("style_id", styleId);
-		form.append("placement", mockupData.placement);
-		form.append("technique", mockupData.technique);
-		form.append("width", mockupData.width);
-		form.append("height", mockupData.height);
-		form.append("left", mockupData.left);
-		form.append("top", mockupData.top);
+        const form = new FormData();
+        form.append("action", "generate_mockup");
+        form.append("image_url", mockupData.image_url);
+        form.append("product_id", mockupData.product_id);
+        form.append("variant_id", mockupData.variant_id);
+        form.append("placement", mockupData.placement);
+        form.append("technique", mockupData.technique);
+        form.append("width", mockupData.width);
+        form.append("height", mockupData.height);
+        form.append("left", mockupData.left);
+        form.append("top", mockupData.top);
+        form.append("style_ids", JSON.stringify(styleIds));
 
-		try {
-			const res = await fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form });
-			if (res.status === 429) {
-				if (attempt < 3) {
-					const wait = 1500 + attempt * 1000;
-					console.warn(`⏳ 429 reçu pour style ${styleId} — retry dans ${wait}ms`);
-					await new Promise(r => setTimeout(r, wait));
-					return sendWithRetry(styleId, attempt + 1);
-				}
-				throw new Error("Trop de requêtes (429). Abandon.");
-			}
-
-			const data = await res.json();
-			if (data.success && data.data?.mockup_url) {
-				console.log(`✅ Mockup reçu pour style ${styleId}`);
-				updateMockupThumbnail(styleId, data.data.mockup_url);
-
-				if (styleId === primaryStyleId && !productDataCreated) {
-					productData = buildProductData({
-						...mockupData,
-						generated_mockup_url: data.data.mockup_url
-					});
-					productDataCreated = true;
-				}
-			} else {
-				throw new Error(data.message || "Erreur inconnue");
-			}
-		} catch (err) {
-			console.error(`❌ Échec pour style ${styleId} :`, err.message);
-		}
-	};
-
-	// Envoi avec délai + promesse par style
-	const mockupPromises = [];
-
-	styleIds.forEach((styleId, index) => {
-		const promise = new Promise(resolve => {
-			setTimeout(() => {
-				sendWithRetry(styleId).then(resolve);
-			}, index * 1000); // 1s d'écart
-		});
-		mockupPromises.push(promise);
-	});
-
-	// Nettoyage une fois toutes les promesses terminées
-	Promise.all(mockupPromises).then(() => {
-		console.log("✅ Tous les mockups sont terminés.");
-		document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
-		mainProductImage?.classList.remove("loading");
-		loadingOverlay?.remove();
-	});
+        fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
+                .then(res => res.json())
+                .then(data => {
+                        if (data.success && data.data?.task_id) {
+                                console.log(`✅ Tâche Printful ${data.data.task_id} créée`);
+                        } else {
+                                console.error("❌ Erreur création tâche :", data.message);
+                        }
+                })
+                .catch(err => {
+                        console.error("❌ Erreur réseau :", err.message);
+                })
+                .finally(() => {
+                        document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
+                        mainProductImage?.classList.remove("loading");
+                        loadingOverlay?.remove();
+                });
 }
 
 function buildProductData(mockupData) {
