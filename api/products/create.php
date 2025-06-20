@@ -381,7 +381,7 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 						} else {
 							$wait = 60;
 						}
-						product_log("⏳ 429 — attente $waits sec (mockup_id=$style_id)", 'mockup');
+                                                product_log("⏳ 429 — attente $wait sec (mockup_id=$style_id)", 'mockup');
 						sleep($wait);
 
 						// 💥 revenir au même mockup → décaler l’index
