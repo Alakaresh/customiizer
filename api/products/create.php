@@ -64,8 +64,9 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 	/* ============= 1) infos produit ============================== */
 
         $prod_url = "$base/catalog-products/$catalog_id";
-        printful_rate_limit();
-        $p_resp   = wp_remote_get( $prod_url, [ 'headers' => $hdr, 'timeout' => 15 ] );
+        $p_resp   = printful_request(function () use ($prod_url, $hdr) {
+                return wp_remote_get( $prod_url, [ 'headers' => $hdr, 'timeout' => 15 ] );
+        });
 	$p_data   = json_decode( wp_remote_retrieve_body( $p_resp ), true )['data'] ?? null;
 	if ( ! $p_data ) {
 		product_log( '❌ produit introuvable', 'error' );
@@ -99,8 +100,9 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 	$mock_url = "$base/catalog-products/$catalog_id/mockup-styles";
 	product_log("📥 Requête mockup-styles URL = $mock_url", 'mockup');
 
-        printful_rate_limit();
-        $mock_resp_raw = wp_remote_get($mock_url, [ 'headers'=>$hdr, 'timeout'=>15 ]);
+        $mock_resp_raw = printful_request(function () use ($mock_url, $hdr) {
+                return wp_remote_get($mock_url, [ 'headers'=>$hdr, 'timeout'=>15 ]);
+        });
 	$mock_body = wp_remote_retrieve_body($mock_resp_raw);
 	$mock_json = json_decode($mock_body, true)['data'] ?? [];
 
@@ -161,17 +163,17 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 	/* ============= 3) VARIANTS =================================== */
 	$var_url  = "$base/catalog-products/$catalog_id/catalog-variants";
-        printful_rate_limit();
+        $variants_resp = printful_request(function () use ($var_url, $hdr) {
+                return wp_remote_get( $var_url, [ 'headers'=>$hdr, 'timeout'=>15 ] );
+        });
         $variants = json_decode(
-                wp_remote_retrieve_body(
-                        wp_remote_get( $var_url, [ 'headers'=>$hdr, 'timeout'=>15 ] )
-                ),
+                wp_remote_retrieve_body($variants_resp),
                 true
         )['data'] ?? [];
-        printful_rate_limit();
-        $raw_variant_response = wp_remote_retrieve_body(
-                wp_remote_get( $var_url, [ 'headers'=>$hdr, 'timeout'=>15 ] )
-        );
+        $raw_variant_resp = printful_request(function () use ($var_url, $hdr) {
+                return wp_remote_get( $var_url, [ 'headers'=>$hdr, 'timeout'=>15 ] );
+        });
+        $raw_variant_response = wp_remote_retrieve_body($raw_variant_resp);
 
 	$variants = json_decode($raw_variant_response, true)['data'] ?? [];
 
@@ -220,8 +222,9 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 		/* ------ prix ------------------------------------------------- */
                 $price_url = "$base/catalog-variants/$vid/prices";
-                printful_rate_limit();
-                $price_resp= wp_remote_get( $price_url, [ 'headers'=>$hdr,'timeout'=>10 ] );
+                $price_resp = printful_request(function () use ($price_url, $hdr) {
+                        return wp_remote_get( $price_url, [ 'headers'=>$hdr,'timeout'=>10 ] );
+                });
 		$price_json= json_decode( wp_remote_retrieve_body( $price_resp ), true );
 		$price     = (float) ( $price_json['data']['variant']['techniques'][0]['price'] ?? 0 );
 		$shipping_body = [
@@ -234,15 +237,16 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 			"currency" => "EUR"
 		];
 
-                printful_rate_limit();
-                $shipping_response = wp_remote_post("$base/shipping-rates", [
-			'headers' => array_merge($hdr, [
-				'Content-Type'    => 'application/json',
-				'X-PF-Store-Id'   => PRINTFUL_STORE_ID,
-			]),
-			'body' => json_encode($shipping_body),
-			'timeout' => 10,
-		]);
+                $shipping_response = printful_request(function () use ($base, $hdr, $shipping_body) {
+                        return wp_remote_post("$base/shipping-rates", [
+                                'headers' => array_merge($hdr, [
+                                        'Content-Type'    => 'application/json',
+                                        'X-PF-Store-Id'   => PRINTFUL_STORE_ID,
+                                ]),
+                                'body' => json_encode($shipping_body),
+                                'timeout' => 10,
+                        ]);
+                });
 
 
 		$shipping_data = json_decode(wp_remote_retrieve_body($shipping_response), true);
@@ -256,11 +260,11 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 		/* ------ disponibilité France --------------------------------- */
                 $stock_url = "$base/catalog-variants/$vid/availability?selling_region_name=france";
-                printful_rate_limit();
-                $stock_json= json_decode(
-                        wp_remote_retrieve_body(
-                                wp_remote_get( $stock_url, [ 'headers'=>$hdr,'timeout'=>10 ] )
-                        ),
+                $stock_resp = printful_request(function () use ($stock_url, $hdr) {
+                        return wp_remote_get( $stock_url, [ 'headers'=>$hdr,'timeout'=>10 ] );
+                });
+                $stock_json = json_decode(
+                        wp_remote_retrieve_body($stock_resp),
                         true
                 );
 		$avail     = $stock_json['data']['techniques'][0]['selling_regions'][0]['availability'] ?? 'unknown';
@@ -367,15 +371,16 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 			while ($retry_count < 3 && !$success) {
 				$retry_count++;
 
-                                printful_rate_limit();
-                                $response = wp_remote_post("$base/mockup-tasks", [
-					'headers' => array_merge($hdr, [
-						'Content-Type'   => 'application/json',
-						'X-PF-Store-Id'  => PRINTFUL_STORE_ID,
-					]),
-					'body'    => json_encode($task_body, JSON_UNESCAPED_SLASHES),
-					'timeout' => 20,
-				]);
+                                $response = printful_request(function () use ($base, $hdr, $task_body) {
+                                        return wp_remote_post("$base/mockup-tasks", [
+                                                'headers' => array_merge($hdr, [
+                                                        'Content-Type'   => 'application/json',
+                                                        'X-PF-Store-Id'  => PRINTFUL_STORE_ID,
+                                                ]),
+                                                'body'    => json_encode($task_body, JSON_UNESCAPED_SLASHES),
+                                                'timeout' => 20,
+                                        ]);
+                                });
 
 				$status_code = wp_remote_retrieve_response_code($response);
 				$task_data = json_decode(wp_remote_retrieve_body($response), true);
@@ -403,12 +408,13 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 				// 🔄 récupération
 				for ($j = 0; $j < 5; $j++) {
-					sleep(2);
-                                        printful_rate_limit();
-                                        $check = wp_remote_get("$base/mockup-tasks?id=$task_id", [
-						'headers' => array_merge($hdr, ['X-PF-Store-Id' => PRINTFUL_STORE_ID]),
-						'timeout' => 15,
-					]);
+                                        sleep(2);
+                                        $check = printful_request(function () use ($base, $hdr, $task_id) {
+                                                return wp_remote_get("$base/mockup-tasks?id=$task_id", [
+                                                        'headers' => array_merge($hdr, ['X-PF-Store-Id' => PRINTFUL_STORE_ID]),
+                                                        'timeout' => 15,
+                                                ]);
+                                        });
 
 					$res_data = json_decode(wp_remote_retrieve_body($check), true);
 					$mockups = $res_data['data'][0]['catalog_variant_mockups'][0]['mockups'] ?? [];
@@ -477,8 +483,9 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 	);
 	/* ============= 4) TEMPLATES MOCKUP ============================= */
         $template_url = "$base/catalog-products/$catalog_id/mockup-templates";
-        printful_rate_limit();
-        $template_resp = wp_remote_get($template_url, [ 'headers' => $hdr, 'timeout' => 15 ]);
+        $template_resp = printful_request(function () use ($template_url, $hdr) {
+                return wp_remote_get($template_url, [ 'headers' => $hdr, 'timeout' => 15 ]);
+        });
 	$template_data = json_decode(wp_remote_retrieve_body($template_resp), true)['data'] ?? [];
 
 	foreach ($template_data as $tpl) {

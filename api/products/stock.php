@@ -27,11 +27,12 @@ function customiizer_update_all_variant_stocks() {
                 foreach ($regions as $region) {
                         $stock_url = "$base/catalog-variants/$vid/availability?selling_region_name=" . urlencode($region);
 
-                        printful_rate_limit();
-                        $response = wp_remote_get($stock_url, [
-				'headers' => $hdr,
-				'timeout' => 10,
-			]);
+                        $response = printful_request(function () use ($stock_url, $hdr) {
+                                return wp_remote_get($stock_url, [
+                                        'headers' => $hdr,
+                                        'timeout' => 10,
+                                ]);
+                        });
 
 			if (is_wp_error($response)) {
 				$errors[] = "Erreur WP pour $vid-$region : " . $response->get_error_message();
