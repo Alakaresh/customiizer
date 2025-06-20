@@ -321,6 +321,9 @@ add_action('rest_api_init', function () {
 });
 
 function customiizer_create_mockup($request) {
+    // ⏱️ Heure d'envoi ISO 8601 (UTC)
+    $timestamp = current_datetime()->setTimezone(new DateTimeZone('UTC'))->format(DateTime::ATOM); // => 2025-06-20T23:24:22+00:00
+
     $body = [
         "format" => "png",
         "products" => [[
@@ -346,6 +349,7 @@ function customiizer_create_mockup($request) {
         ]]
     ];
 
+    // Envoi de la requête POST
     $response = wp_remote_post('https://api.printful.com/v2/mockup-tasks', [
         'headers' => [
             'Authorization' => 'Bearer lvHxcivasQxu7sogliZuCy38Bq9CYcMzvHA59qqz',
@@ -355,9 +359,17 @@ function customiizer_create_mockup($request) {
         'body' => json_encode($body)
     ]);
 
+    // En cas d'erreur
     if (is_wp_error($response)) {
         return new WP_Error('mockup_error', 'Erreur lors de la création du mockup.', ['status' => 500]);
     }
 
-    return rest_ensure_response(json_decode(wp_remote_retrieve_body($response), true));
+    // Réponse finale avec horodatage ajouté
+    $api_result = json_decode(wp_remote_retrieve_body($response), true);
+
+    return rest_ensure_response([
+        'sent_at' => $timestamp,
+        'api_response' => $api_result
+    ]);
 }
+
