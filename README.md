@@ -24,6 +24,9 @@ define('PRINTFUL_API_BASE', 'https://api.printful.com/v2'); // optional
 
 `PRINTFUL_API_BASE` is optional and defaults to the public Printful URL. `PRINTFUL_API_KEY` is required by `includes/generate_mockup.php` and webhook handlers.
 
+Design images are converted from WebP to PNG during mockup generation. The order
+webhook only performs this conversion if a legacy WebP URL is still stored.
+
 ## Position editor
 
 Enable the checkbox "Activer l'éditeur de position" in the **Custom Produits** admin page to adjust the mockup position on product pages. When enabled, `js/product/position_editor.js` is enqueued automatically.

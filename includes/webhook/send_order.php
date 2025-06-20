@@ -237,13 +237,18 @@ function preparer_commande_pour_printful(array $commande): array {
                         continue;
                 }
 
-		$url_png = convertir_webp_en_png($meta['design_image_url'], $commande['number']);
-		if (!$url_png) {
-			customiizer_log("❌ Échec de conversion WebP → PNG pour le produit #$product_id");
-			continue;
-		}
-
-		customiizer_log("✅ Image convertie : $url_png");
+                $image_url = $meta['design_image_url'];
+                $ext = strtolower(pathinfo(parse_url($image_url, PHP_URL_PATH), PATHINFO_EXTENSION));
+                if ($ext === 'webp') {
+                        $image_url = convertir_webp_en_png($image_url, $commande['number']);
+                        if (!$image_url) {
+                                customiizer_log("❌ Échec de conversion WebP → PNG pour le produit #$product_id");
+                                continue;
+                        }
+                        customiizer_log("✅ Image convertie : $image_url");
+                } else {
+                        customiizer_log("✅ Image déjà PNG : $image_url");
+                }
 
 		$items[] = [
 			'source'       => 'catalog',
@@ -255,8 +260,8 @@ function preparer_commande_pour_printful(array $commande): array {
 				'technique'      => $meta['technique'] ?? 'digital',
 				'print_area_type'=> 'simple',
 				'layers'         => [[
-					'type'     => 'file',
-					'url'      => $url_png,
+                                'type'     => 'file',
+                                'url'      => $image_url,
 					'position' => [
 						'width'  => floatval($meta['design_width']),
 						'height' => floatval($meta['design_height']),
