@@ -88,17 +88,20 @@ function confirm_printful_order($orderId, PrintfulWebhookLogger $logger): array
 	];
 
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-                printful_rate_limit();
                 $ch = curl_init($url);
-		curl_setopt_array($ch, [
-			CURLOPT_CUSTOMREQUEST => "POST",
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_HTTPHEADER => $headers,
-		]);
+                curl_setopt_array($ch, [
+                        CURLOPT_CUSTOMREQUEST => "POST",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HTTPHEADER => $headers,
+                ]);
 
-		$response = curl_exec($ch);
-		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
+                $response = null;
+                $httpCode = null;
+                printful_request(function () use ($ch, &$response, &$httpCode) {
+                        $response = curl_exec($ch);
+                        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                });
+                curl_close($ch);
 
 		$decoded = json_decode($response, true);
 		$message = $decoded['error']['message'] ?? 'Réponse : ' . $response;

@@ -116,22 +116,25 @@ function envoyer_commande_printful(array $payload): bool {
         customiizer_log("📤 Envoi à Printful");
         customiizer_log("   Payload: " . json_encode($payload));
 
-        printful_rate_limit();
         $ch = curl_init(PRINTFUL_API_BASE . '/orders');
-	curl_setopt_array($ch, [
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_POST           => true,
-		CURLOPT_HTTPHEADER     => [
-			'Content-Type: application/json',
-			'Authorization: Bearer ' . PRINTFUL_API_KEY,
-			'X-PF-Store-Id: ' . PRINTFUL_STORE_ID,
-		],
-		CURLOPT_POSTFIELDS     => json_encode($payload),
-	]);
+        curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => [
+                        'Content-Type: application/json',
+                        'Authorization: Bearer ' . PRINTFUL_API_KEY,
+                        'X-PF-Store-Id: ' . PRINTFUL_STORE_ID,
+                ],
+                CURLOPT_POSTFIELDS     => json_encode($payload),
+        ]);
 
-	$resp = curl_exec($ch);
-	$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-	curl_close($ch);
+        $resp = null;
+        $code = null;
+        printful_request(function () use ($ch, &$resp, &$code) {
+                $resp = curl_exec($ch);
+                $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        });
+        curl_close($ch);
 
 	customiizer_log("📬 HTTP $code, réponse: $resp");
 	return ($code >= 200 && $code < 300);
