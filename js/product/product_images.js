@@ -6,6 +6,7 @@ const IMAGES_PER_GROUP = 12;
 let bottomBarImages = [];
 let currentGroupIndex = 0;
 const mockupStartTimes = {};
+let currentLoadingOverlay = null;
 
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
@@ -106,6 +107,7 @@ function generateMockup(mockupData) {
                 loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">📦 Préparation...</div>`;
                 mainProductImage?.parentNode.appendChild(loadingOverlay);
         }
+        currentLoadingOverlay = loadingOverlay;
 
         const form = new FormData();
         form.append("action", "generate_mockup");
@@ -138,7 +140,6 @@ function generateMockup(mockupData) {
                 .finally(() => {
                         document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
                         mainProductImage?.classList.remove("loading");
-                        loadingOverlay?.remove();
                 });
 }
 
@@ -247,6 +248,11 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 console.log(`🔄 Activation automatique du premier thumbnail (style ${styleId})`);
                 thumbnailToUpdate.click();
         }
+
+        if (currentLoadingOverlay) {
+                currentLoadingOverlay.remove();
+                currentLoadingOverlay = null;
+        }
 }
 
 function pollMockupStatus(taskId, attempts = 0) {
@@ -264,11 +270,21 @@ function pollMockupStatus(taskId, attempts = 0) {
                                 }
                         } else if (attempts < 20) {
                                 setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
+                        } else {
+                                if (currentLoadingOverlay) {
+                                        currentLoadingOverlay.remove();
+                                        currentLoadingOverlay = null;
+                                }
                         }
                 })
                 .catch(() => {
                         if (attempts < 20) {
                                 setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
+                        } else {
+                                if (currentLoadingOverlay) {
+                                        currentLoadingOverlay.remove();
+                                        currentLoadingOverlay = null;
+                                }
                         }
                 });
 }
