@@ -226,13 +226,8 @@ function preparer_commande_pour_printful(array $commande): array {
 			continue;
 		}
 
-		$url_png = convertir_webp_en_png($meta['design_image_url'], $commande['number']);
-		if (!$url_png) {
-			customiizer_log("❌ Échec de conversion WebP → PNG pour le produit #$product_id");
-			continue;
-		}
-
-		customiizer_log("✅ Image convertie : $url_png");
+                $url_png = $meta['design_image_url'];
+                customiizer_log("ℹ️ Image déjà au format PNG : $url_png");
 
 		$items[] = [
 			'source'       => 'catalog',
