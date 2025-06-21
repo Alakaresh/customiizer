@@ -27,28 +27,37 @@ function load_community_images(WP_REST_Request $request) {
 
         $orderBy = ($sort === 'likes') ? 'like_count DESC, g.image_date DESC' : 'g.image_date DESC';
 
-        // Requête principale
+        // Requête principale sans sous-requêtes ligne par ligne
         $query = $wpdb->prepare(
                 "
     SELECT
-        g.image_number, g.image_url, g.format_image, g.prompt, g.image_date,
+        g.image_number,
+        g.image_url,
+        g.format_image,
+        g.prompt,
+        g.image_date,
         g.user_id,
         u.display_name,
-        (
-            SELECT COUNT(*) FROM WPC_image_likes l WHERE l.image_id = g.image_number
-        ) AS like_count,
-        (
-            SELECT COUNT(*) FROM WPC_image_favorites f WHERE f.image_id = g.image_number
-        ) AS favorite_count,
-        (
-            SELECT COUNT(*) FROM WPC_image_likes l WHERE l.image_id = g.image_number AND l.user_id = %d
-        ) AS liked_by_user,
-        (
-            SELECT COUNT(*) FROM WPC_image_favorites f WHERE f.image_id = g.image_number AND f.user_id = %d
-        ) AS favorited_by_user
+        COALESCE(l.like_count, 0) AS like_count,
+        COALESCE(f.favorite_count, 0) AS favorite_count,
+        CASE WHEN ul.user_id IS NULL THEN 0 ELSE 1 END AS liked_by_user,
+        CASE WHEN uf.user_id IS NULL THEN 0 ELSE 1 END AS favorited_by_user
     FROM WPC_generated_image g
     LEFT JOIN {$wpdb->prefix}users u ON g.user_id = u.ID
+    LEFT JOIN (
+        SELECT image_id, COUNT(*) AS like_count
+        FROM WPC_image_likes
+        GROUP BY image_id
+    ) l ON l.image_id = g.image_number
+    LEFT JOIN (
+        SELECT image_id, COUNT(*) AS favorite_count
+        FROM WPC_image_favorites
+        GROUP BY image_id
+    ) f ON f.image_id = g.image_number
+    LEFT JOIN WPC_image_likes ul ON ul.image_id = g.image_number AND ul.user_id = %d
+    LEFT JOIN WPC_image_favorites uf ON uf.image_id = g.image_number AND uf.user_id = %d
     WHERE g.image_url IS NOT NULL{$searchClause}
+    GROUP BY g.image_number
     ORDER BY {$orderBy}
     ",
                 $current_user_id,
