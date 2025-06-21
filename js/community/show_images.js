@@ -12,6 +12,7 @@ let offset = 0;
 let isLoading = false;
 let currentSort = 'explore';
 let currentSearch = '';
+let searchTimeout;
 
 jQuery(document).ready(function ($) {
         fetchImagesFromAPI();
@@ -30,7 +31,17 @@ jQuery(document).ready(function ($) {
                 fetchImagesFromAPI(true);
         });
 
-        $(document).on('input', '#search-input', handleSearchInput);
+        $(document).on('input', '#search-input', debouncedHandleSearchInput);
+
+        $(document).on('keypress', '#search-input', function (e) {
+                if (e.which === 13) {
+                        handleSearchInput.call(this);
+                }
+        });
+
+        $(document).on('click', '#search-button', function () {
+                handleSearchInput.call($('#search-input')[0]);
+        });
 
 	$(document).on('click', '.like-icon', function () {
 		if (!userId || userId === 0) return alert("Vous devez être connecté pour liker.");
@@ -293,4 +304,12 @@ function levenshteinDistance(a, b) {
 function handleSearchInput() {
         currentSearch = $(this).val();
         fetchImagesFromAPI(true);
+}
+
+function debouncedHandleSearchInput() {
+        const context = this;
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function () {
+                handleSearchInput.call(context);
+        }, 300);
 }
