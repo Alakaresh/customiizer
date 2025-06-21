@@ -68,16 +68,12 @@ jQuery(document).ready(function($) {
 	jQuery('.carousel-items').append($carousel);
 
 
-	function initCarousel() {
-		var containerWidth = jQuery('.carousel-inner').width();
-		if (window.innerWidth < 767) {
-			visibleItems = 2;
-		} else {
-			visibleItems = 5;
-		}
+       function initCarousel() {
+               var mq = window.matchMedia('(max-width: 767px)');
+               visibleItems = mq.matches ? 2 : 5;
 
-		var containerWidth = jQuery('.carousel-inner').width();
-		itemWidth = containerWidth / visibleItems - (10 * 2);
+               var containerWidth = jQuery('.carousel-inner').width();
+               itemWidth = containerWidth / visibleItems - (10 * 2);
 		jQuery('.product-item').css('width', itemWidth + 'px');
 
 
