@@ -72,10 +72,19 @@
 		box-sizing: border-box;
 	}
 
-	#sidebar-content {
-		padding: 10px;
-		margin-bottom: 10px;
-		box-sizing: border-box;
-	}
+       #sidebar-content {
+               padding: 10px;
+               margin-bottom: 10px;
+               box-sizing: border-box;
+       }
 
+       /* Adjust generate grid spacing */
+       .image-container {
+               height: auto;
+       }
+
+       .centered-image {
+               height: auto;
+               width: 100%;
+       }
 }
