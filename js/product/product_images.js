@@ -11,6 +11,21 @@ const mockupTimes = window.mockupTimes;
 // Stocke temporairement le dernier clic avant l'appel à generateMockup
 mockupTimes.pending = null;
 let currentLoadingOverlay = null;
+// Suivi du rate limit Printful pour éviter les appels inutiles
+window.printfulRateLimit = window.printfulRateLimit || { remaining: null, reset: null };
+
+function isPrintfulRateLimited() {
+        const info = window.printfulRateLimit || {};
+        if (typeof info.remaining === 'number' && info.remaining <= 0) {
+                const nowSec = Date.now() / 1000;
+                if (typeof info.reset === 'number' && nowSec < info.reset) {
+                        const wait = Math.ceil(info.reset - nowSec);
+                        alert(`Limite Printful atteinte, réessayez dans ${wait} secondes.`);
+                        return true;
+                }
+        }
+        return false;
+}
 
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
@@ -105,6 +120,14 @@ function generateMockup(mockupData) {
                 return;
         }
 
+        if (isPrintfulRateLimited()) {
+                return;
+        }
+
+        if (typeof window.printfulRateLimit.remaining === 'number' && window.printfulRateLimit.remaining > 0) {
+                window.printfulRateLimit.remaining--;
+        }
+
         const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
         const mainProductImage = document.getElementById("product-main-image");
 
@@ -143,6 +166,12 @@ function generateMockup(mockupData) {
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
+                        if (typeof data.data?.ratelimit_remaining !== "undefined") {
+                                window.printfulRateLimit.remaining = data.data.ratelimit_remaining;
+                        }
+                        if (typeof data.data?.ratelimit_reset !== "undefined") {
+                                window.printfulRateLimit.reset = (Date.now() / 1000) + data.data.ratelimit_reset;
+                        }
                         if (data.success && data.data?.task_id) {
                                 const taskId = data.data.task_id;
                                 const now = Date.now();
@@ -157,6 +186,13 @@ function generateMockup(mockupData) {
                                 pollMockupStatus(taskId);
                         } else {
                                 console.error("❌ Erreur création tâche :", data.message);
+                                if (typeof data.retry_after !== "undefined") {
+                                        window.printfulRateLimit.remaining = 0;
+                                        window.printfulRateLimit.reset = (Date.now() / 1000) + data.retry_after;
+                                        alert(`Limite atteinte, réessayez dans ${data.retry_after} secondes.`);
+                                } else {
+                                        alert("Erreur lors de la création du mockup: " + data.message);
+                                }
                         }
                 })
                 .catch(err => {
