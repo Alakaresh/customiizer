@@ -56,6 +56,17 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+        $respHeaders = [];
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$respHeaders) {
+                $parts = explode(':', $header, 2);
+                if (count($parts) === 2) {
+                        $name  = strtolower(trim($parts[0]));
+                        $value = trim($parts[1]);
+                        $respHeaders[$name] = $value;
+                }
+                return strlen($header);
+        });
+
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -71,15 +82,21 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         customiizer_log("API Printful HTTP Code: {$httpCode}");
         customiizer_log("Réponse Printful: {$result}");
 
+        $json = json_decode($result, true);
+        $json['_headers'] = $respHeaders;
+        $json['_http_code'] = $httpCode;
+
         if ($httpCode !== 200) {
                 $duration = round(microtime(true) - $start, 3);
                 customiizer_log("⏲️ Appel API Printful terminé en {$duration}s (HTTP {$httpCode})");
-                return ['success' => false, 'error' => "Erreur HTTP {$httpCode}", 'printful_response' => $result];
+                $json['success'] = false;
+                return $json;
         }
 
         $duration = round(microtime(true) - $start, 3);
         customiizer_log("⏲️ Appel API Printful terminé en {$duration}s");
-        return json_decode($result, true);
+        $json['success'] = true;
+        return $json;
 }
 
 
@@ -152,13 +169,24 @@ function handle_generate_mockup() {
         $left_in
     );
 
+    $headers = $response['_headers'] ?? [];
+    $remaining = isset($headers['x-ratelimit-remaining']) ? intval($headers['x-ratelimit-remaining']) : null;
+    $reset = isset($headers['x-ratelimit-reset']) ? intval($headers['x-ratelimit-reset']) : null;
+
     if (isset($response['data'][0]['id'])) {
         $task_id = $response['data'][0]['id'];
         customiizer_store_mockup_file($task_id, $file_path);
         customiizer_log("📌 Fichier $file_path enregistré pour la tâche $task_id");
         $total = round(microtime(true) - $overall_start, 3);
         customiizer_log("⏱️ Tâche créée en {$total}s");
-        wp_send_json_success(['task_id' => $task_id]);
+        $payload = ['task_id' => $task_id];
+        if ($remaining !== null) {
+            $payload['ratelimit_remaining'] = $remaining;
+        }
+        if ($reset !== null) {
+            $payload['ratelimit_reset'] = $reset;
+        }
+        wp_send_json_success($payload);
     } else {
         customiizer_log("❌ Erreur API : " . ($response['error'] ?? 'Non spécifiée'));
         if (!unlink($file_path)) {
@@ -168,7 +196,11 @@ function handle_generate_mockup() {
         }
         $total = round(microtime(true) - $overall_start, 3);
         customiizer_log("⏱️ Génération échouée en {$total}s");
-        wp_send_json_error(['message' => $response['error'] ?? 'Erreur inconnue']);
+        $error_payload = ['message' => $response['error'] ?? 'Erreur inconnue'];
+        if ($remaining !== null && $remaining <= 0 && $reset !== null) {
+            $error_payload['retry_after'] = $reset;
+        }
+        wp_send_json_error($error_payload);
     }
 }
 function convert_webp_to_png_server($image_url) {
