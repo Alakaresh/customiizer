@@ -72,7 +72,7 @@ Several scripts require access to your Printful account. Define the constant `PR
 define('PRINTFUL_API_KEY', 'your-secret-key');
 ```
 
-If the constant is missing, functions like `generate_mockup_printful()` return an error and log a message instead of sending unauthenticated requests.
+If the constant is missing, functions like `generate_mockups_printful()` return an error and log a message instead of sending unauthenticated requests.
 
 ## Printful store ID
 
