@@ -10,23 +10,25 @@ let allImages = [];
 let filteredImages = [];
 let offset = 0;
 let isLoading = false;
+let currentSort = 'explore';
+let currentSearch = '';
 
 jQuery(document).ready(function ($) {
         fetchImagesFromAPI();
 
-	$('#sort-explore').on('click', function () {
-		$(this).addClass('active');
-		$('#sort-likes').removeClass('active');
-		shuffleArray(allImages);
-		displayImages(allImages);
-	});
+        $('#sort-explore').on('click', function () {
+                $(this).addClass('active');
+                $('#sort-likes').removeClass('active');
+                currentSort = 'explore';
+                applySortAndSearch();
+        });
 
-	$('#sort-likes').on('click', function () {
-		$(this).addClass('active');
-		$('#sort-explore').removeClass('active');
-		allImages.sort((a, b) => b.likes - a.likes);
-		displayImages(allImages);
-	});
+        $('#sort-likes').on('click', function () {
+                $(this).addClass('active');
+                $('#sort-explore').removeClass('active');
+                currentSort = 'likes';
+                applySortAndSearch();
+        });
 
 	$(document).on('input', '#search-input', handleSearchInput);
 
@@ -73,8 +75,8 @@ return fetch(url)
 .then(data => {
 if (data.success) {
 offset += data.images.length;
-allImages = allImages.concat(data.images);
-displayImages(allImages);
+        allImages = allImages.concat(data.images);
+        applySortAndSearch();
 return data.images;
 } else {
 console.error('[AJAX] ❌ Aucune image trouvée.');
@@ -89,6 +91,36 @@ return [];
 isLoading = false;
 $('#scroll-message').hide();
 });
+}
+
+function applySortAndSearch() {
+        let images = [...allImages];
+        if (currentSort === 'likes') {
+                images.sort((a, b) => b.likes - a.likes);
+        } else {
+                shuffleArray(images);
+        }
+        if (currentSearch.trim() !== '') {
+                images = filterImagesBySearch(images, currentSearch);
+        }
+        displayImages(images);
+}
+
+function filterImagesBySearch(images, searchValue) {
+        const searchWords = normalizeText(searchValue).split(/\s+/).map(w => w.replace(/[^a-z0-9]/gi, ''));
+        const maxDistance = 2;
+
+        return images.filter(img => {
+                const prompt = typeof img.prompt === 'object' ? JSON.stringify(img.prompt) : (img.prompt || '');
+                const promptText = normalizeText(prompt);
+                const promptWords = promptText.split(/\s+/).map(w => w.replace(/[^a-z0-9]/gi, ''));
+
+                return searchWords.every(searchWord =>
+                        promptWords.some(promptWord =>
+                                promptWord.includes(searchWord) || levenshteinDistance(promptWord, searchWord) <= maxDistance
+                        )
+                );
+        });
 }
 
 function displayImages(images) {
@@ -246,20 +278,6 @@ function levenshteinDistance(a, b) {
 }
 
 function handleSearchInput() {
-	const rawSearch = $(this).val();
-	const searchWords = normalizeText(rawSearch).split(/\s+/).map(w => w.replace(/[^a-z0-9]/gi, ''));
-	const maxDistance = 2;
-
-	$('.imageContainer').each(function () {
-		const promptText = normalizeText($(this).data('prompt') || '');
-		const promptWords = promptText.split(/\s+/).map(w => w.replace(/[^a-z0-9]/gi, ''));
-
-		const matched = searchWords.every(searchWord =>
-			promptWords.some(promptWord =>
-				promptWord.includes(searchWord) || levenshteinDistance(promptWord, searchWord) <= maxDistance
-			)
-		);
-
-		$(this).toggle(matched);
-	});
+        currentSearch = $(this).val();
+        applySortAndSearch();
 }
