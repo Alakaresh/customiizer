@@ -138,6 +138,8 @@ function handle_generate_mockup() {
 
     customiizer_log("🖼️ Image combinée locale : $file_path");
 
+        usleep(5000000);
+
     $response = generate_mockups_printful(
         $png_url,
         $product_id,
