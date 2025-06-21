@@ -134,6 +134,7 @@ function customiizer_enqueue_customize_assets() {
                 wp_enqueue_style('mobile-customize', get_stylesheet_directory_uri() . '/styles/responsive/mobile/customize.css', [], null, 'all');
         } elseif (strpos($request_uri, '/configurateur') !== false) {
                 wp_enqueue_style('mobile-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/product.css', [], null, 'all');
+                wp_enqueue_style('mobile-design-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/design_product.css', [], null, 'all');
         } elseif (strpos($request_uri, '/communaute') !== false) {
                 wp_enqueue_style('mobile-community', get_stylesheet_directory_uri() . '/styles/responsive/mobile/community.css', [], null, 'all');
         } elseif (strpos($request_uri, '/mycreation') !== false) {
