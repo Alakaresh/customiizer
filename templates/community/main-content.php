@@ -12,8 +12,9 @@
 	</div>
 </div>
 <div class="content-container" id="image-container" style="width: 100%; height: auto">
-	<div class="image-column" id="image-container1"></div>
+        <div class="image-column" id="image-container1"></div>
 </div>
+<div id="scroll-message" style="display:none;text-align:center;margin:10px 0;">Chargement des images suivantes...</div>
 <div id="imageModal" class="modal">
 	<img class="modal-content" id="modalImage">
 	<div id="caption"></div>
