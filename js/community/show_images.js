@@ -8,6 +8,8 @@ const $ = jQuery;
 
 let allImages = [];
 let filteredImages = [];
+let offset = 0;
+let isLoading = false;
 
 jQuery(document).ready(function ($) {
         fetchImagesFromAPI();
@@ -50,28 +52,43 @@ jQuery(document).ready(function ($) {
 			$(this).css('display', 'none');
 		});
 	});
+
+	$(window).on('scroll', function () {
+		const nearBottom = $(window).scrollTop() + $(window).height() > $(document).height() - 200;
+		if (nearBottom && !isLoading) {
+			fetchImagesFromAPI();
+		}
+	});
 });
 
 // --- Fonctions principales ---
 
 function fetchImagesFromAPI() {
-        const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerLoad}`;
-        return fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                        if (data.success) {
-                                allImages = data.images;
-                                displayImages(allImages);
-                                return data.images;
-                        } else {
-                                console.error('[AJAX] ❌ Aucune image trouvée.');
-                                return [];
-                        }
-                })
-                .catch(error => {
-                        console.error('[AJAX] ❌ Erreur de récupération des images:', error);
-                        return [];
-                });
+if (isLoading) return Promise.resolve([]);
+isLoading = true;
+$('#scroll-message').show();
+const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerLoad}&offset=${offset}`;
+return fetch(url)
+.then(res => res.json())
+.then(data => {
+if (data.success) {
+offset += data.images.length;
+allImages = allImages.concat(data.images);
+displayImages(allImages);
+return data.images;
+} else {
+console.error('[AJAX] ❌ Aucune image trouvée.');
+return [];
+}
+})
+.catch(error => {
+console.error('[AJAX] ❌ Erreur de récupération des images:', error);
+return [];
+})
+.finally(() => {
+isLoading = false;
+$('#scroll-message').hide();
+});
 }
 
 function displayImages(images) {
