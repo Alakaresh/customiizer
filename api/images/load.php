@@ -7,9 +7,11 @@ register_rest_route('api/v1/images', '/load', [
 function load_community_images(WP_REST_Request $request) {
 	global $wpdb;
 
-	$limit = intval($request->get_param('limit')) ?: 0;
-	$offset = intval($request->get_param('offset')) ?: 0;
-	$current_user_id = intval($request->get_param('user_id')) ?: 0;
+        $limit = intval($request->get_param('limit')) ?: 0;
+        $offset = intval($request->get_param('offset')) ?: 0;
+        $current_user_id = intval($request->get_param('user_id')) ?: 0;
+        $sort = sanitize_text_field($request->get_param('sort')) ?: 'date';
+        $search = sanitize_text_field($request->get_param('search')) ?: '';
 
 	// 🔥 Construction dynamique de la clause LIMIT/OFFSET
 	$limitClause = '';
@@ -17,12 +19,20 @@ function load_community_images(WP_REST_Request $request) {
 		$limitClause = $wpdb->prepare('LIMIT %d OFFSET %d', $limit, $offset);
 	}
 
-	// Requête principale
-	$query = $wpdb->prepare(
-		"
-    SELECT 
+        // --- Dynamic clauses ---
+        $searchClause = '';
+        if ($search !== '') {
+                $searchClause = $wpdb->prepare(' AND g.prompt LIKE %s', '%' . $wpdb->esc_like($search) . '%');
+        }
+
+        $orderBy = ($sort === 'likes') ? 'like_count DESC, g.image_date DESC' : 'g.image_date DESC';
+
+        // Requête principale
+        $query = $wpdb->prepare(
+                "
+    SELECT
         g.image_number, g.image_url, g.format_image, g.prompt, g.image_date,
-        g.user_id, -- ✅ ICI
+        g.user_id,
         u.display_name,
         (
             SELECT COUNT(*) FROM WPC_image_likes l WHERE l.image_id = g.image_number
@@ -38,12 +48,12 @@ function load_community_images(WP_REST_Request $request) {
         ) AS favorited_by_user
     FROM WPC_generated_image g
     LEFT JOIN {$wpdb->prefix}users u ON g.user_id = u.ID
-    WHERE g.image_url IS NOT NULL
-    ORDER BY g.image_date DESC
+    WHERE g.image_url IS NOT NULL{$searchClause}
+    ORDER BY {$orderBy}
     ",
-		$current_user_id,
-		$current_user_id
-	);
+                $current_user_id,
+                $current_user_id
+        );
 
 
 	// Ajouter dynamiquement le LIMIT si besoin

@@ -20,17 +20,17 @@ jQuery(document).ready(function ($) {
                 $(this).addClass('active');
                 $('#sort-likes').removeClass('active');
                 currentSort = 'explore';
-                applySortAndSearch();
+                fetchImagesFromAPI(true);
         });
 
         $('#sort-likes').on('click', function () {
                 $(this).addClass('active');
                 $('#sort-explore').removeClass('active');
                 currentSort = 'likes';
-                applySortAndSearch();
+                fetchImagesFromAPI(true);
         });
 
-	$(document).on('input', '#search-input', handleSearchInput);
+        $(document).on('input', '#search-input', handleSearchInput);
 
 	$(document).on('click', '.like-icon', function () {
 		if (!userId || userId === 0) return alert("Vous devez être connecté pour liker.");
@@ -65,12 +65,30 @@ jQuery(document).ready(function ($) {
 
 // --- Fonctions principales ---
 
-function fetchImagesFromAPI() {
-if (isLoading) return Promise.resolve([]);
-isLoading = true;
-$('#scroll-message').show();
-const url = `${baseUrl}/wp-json/api/v1/images/load?user_id=${userId}&limit=${imagesPerLoad}&offset=${offset}`;
-return fetch(url)
+function fetchImagesFromAPI(reset = false) {
+        if (isLoading) return Promise.resolve([]);
+        if (reset) {
+                offset = 0;
+                allImages = [];
+        }
+        isLoading = true;
+        $('#scroll-message').show();
+
+        const params = new URLSearchParams({
+                user_id: userId,
+                limit: imagesPerLoad,
+                offset: offset
+        });
+        if (currentSort === 'likes') {
+                params.append('sort', 'likes');
+        }
+        if (currentSearch.trim() !== '') {
+                params.append('search', currentSearch.trim());
+        }
+
+        const url = `${baseUrl}/wp-json/api/v1/images/load?${params.toString()}`;
+
+        return fetch(url)
 .then(res => res.json())
 .then(data => {
 if (data.success) {
@@ -95,13 +113,8 @@ $('#scroll-message').hide();
 
 function applySortAndSearch() {
         let images = [...allImages];
-        if (currentSort === 'likes') {
-                images.sort((a, b) => b.likes - a.likes);
-        } else {
+        if (currentSort === 'explore') {
                 shuffleArray(images);
-        }
-        if (currentSearch.trim() !== '') {
-                images = filterImagesBySearch(images, currentSearch);
         }
         displayImages(images);
 }
@@ -279,5 +292,5 @@ function levenshteinDistance(a, b) {
 
 function handleSearchInput() {
         currentSearch = $(this).val();
-        applySortAndSearch();
+        fetchImagesFromAPI(true);
 }
