@@ -1,9 +1,11 @@
 @media screen and (max-width: 767px) {
 	/*==========PRODUCT==========*/
-	.container {
-		flex-direction: column;
-		height: auto;
-	}
+        .container {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                position: relative;
+        }
 
 	.main-content {
 		flex-direction: column;
@@ -15,11 +17,15 @@
 		display: none;
 	}
 
-	.background {
-		padding: 0;
-		height: auto;
-		align-items: center;
-	}
+        .background {
+                padding: 0;
+                align-items: center;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+        }
 
 	.background-image {
 		position: relative;
@@ -89,6 +95,10 @@
 	}
 
         .bottom-bar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
                 height: auto;
                 padding: 10px;
         }
