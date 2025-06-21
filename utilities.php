@@ -16,7 +16,12 @@ if (!defined('MOCKUP_MAX_DIMENSION')) {
 // Hosts allowed for remote image downloads performed by convert_webp_to_png_server().
 // Only images from these domains will be retrieved.
 if (!defined('ALLOWED_IMAGE_HOSTS')) {
-    define('ALLOWED_IMAGE_HOSTS', ['customiizer.blob.core.windows.net']);
+    $host = parse_url(site_url(), PHP_URL_HOST);
+    $hosts = ['customiizer.blob.core.windows.net'];
+    if ($host && !in_array($host, $hosts, true)) {
+        $hosts[] = $host;
+    }
+    define('ALLOWED_IMAGE_HOSTS', $hosts);
 }
 
 // Timeout for remote image downloads in seconds.
