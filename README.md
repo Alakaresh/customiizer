@@ -18,6 +18,11 @@ Images larger than this value are downscaled before saving. The default is `1500
 `convert_webp_to_png_server()` by restricting which hosts are allowed and by
 limiting request size and timeout.
 
+Orders dispatched through `includes/webhook/send_order.php` are also
+normalized. If a design image URL stored in product metadata uses WebP,
+the script converts it to PNG on the fly before contacting Printful. The
+original WebP files remain stored unchanged.
+
 ## Position editor
 
 Enable the checkbox "Activer l'éditeur de position" in the **Custom Produits** admin page to adjust the mockup position on product pages. When enabled, `js/product/position_editor.js` is enqueued automatically.
