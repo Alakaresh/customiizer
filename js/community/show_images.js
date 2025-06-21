@@ -1,5 +1,5 @@
 const userId = currentUser.ID;
-const imagesPerLoad = 20;
+const imagesPerLoad = 30; // Increased to load more images per batch
 
 // In the WordPress environment jQuery operates in no-conflict mode, so
 // the global `$` alias is not defined. Define it here to reuse jQuery
@@ -66,12 +66,12 @@ jQuery(document).ready(function ($) {
 		});
 	});
 
-	$(window).on('scroll', function () {
-		const nearBottom = $(window).scrollTop() + $(window).height() > $(document).height() - 200;
-		if (nearBottom && !isLoading) {
-			fetchImagesFromAPI();
-		}
-	});
+        $(window).on('scroll', function () {
+                const atBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - 5;
+                if (atBottom && !isLoading) {
+                        fetchImagesFromAPI();
+                }
+        });
 });
 
 // --- Fonctions principales ---
@@ -83,7 +83,9 @@ function fetchImagesFromAPI(reset = false) {
                 allImages = [];
         }
         isLoading = true;
-        $('#scroll-message').show();
+        if (offset > 0) {
+                $('#scroll-message').show();
+        }
 
         const params = new URLSearchParams({
                 user_id: userId,
