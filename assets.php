@@ -124,7 +124,19 @@ function customiizer_enqueue_customize_assets() {
 		wp_enqueue_script('mycreation-images', get_stylesheet_directory_uri() . '/js/mycreation/show_images.js', ['jquery'], null, true);
 	}
 
-	// --- Responsive CSS ---
-	wp_enqueue_style('responsive-tablet', get_stylesheet_directory_uri() . '/styles/responsive/tablet.css', [], null, 'all');
-	wp_enqueue_style('responsive-mobile', get_stylesheet_directory_uri() . '/styles/responsive/mobile.css', [], null, 'all');
+        // --- Responsive CSS ---
+        wp_enqueue_style('responsive-tablet', get_stylesheet_directory_uri() . '/styles/responsive/tablet.css', [], null, 'all');
+        wp_enqueue_style('mobile-base', get_stylesheet_directory_uri() . '/styles/responsive/mobile/base.css', [], null, 'all');
+
+        if ($request_uri === '/' || $request_uri === '/index.php') {
+                wp_enqueue_style('mobile-home', get_stylesheet_directory_uri() . '/styles/responsive/mobile/home.css', [], null, 'all');
+        } elseif (strpos($request_uri, '/customiize') !== false) {
+                wp_enqueue_style('mobile-customize', get_stylesheet_directory_uri() . '/styles/responsive/mobile/customize.css', [], null, 'all');
+        } elseif (strpos($request_uri, '/configurateur') !== false) {
+                wp_enqueue_style('mobile-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/product.css', [], null, 'all');
+        } elseif (strpos($request_uri, '/communaute') !== false) {
+                wp_enqueue_style('mobile-community', get_stylesheet_directory_uri() . '/styles/responsive/mobile/community.css', [], null, 'all');
+        } elseif (strpos($request_uri, '/mycreation') !== false) {
+                wp_enqueue_style('mobile-mycreation', get_stylesheet_directory_uri() . '/styles/responsive/mobile/mycreation.css', [], null, 'all');
+        }
 }
