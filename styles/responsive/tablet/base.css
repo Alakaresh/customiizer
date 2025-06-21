@@ -1,0 +1,187 @@
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+
+	/*==========HEADER==========*/
+	.header-content {
+		padding: 0 0;
+	}
+
+	.mobile-menu-toggle {
+		display: flex !important;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: white;
+		font-size: 24px;
+		margin-top: 10px;
+	}
+
+       .mobile-menu {
+               display: none;
+               top: 55px;
+               position: absolute;
+               flex-direction: column;
+               background-color: #111;
+               padding: 10px 0;
+               border-radius: 6px;
+               gap: 10px;
+               margin-top: 10px;
+               z-index: 1000;
+               opacity: 0;
+               transform: translateY(-10px);
+               transition: opacity 0.3s ease, transform 0.3s ease;
+       }
+
+       .mobile-menu.active {
+               display: flex !important;
+               opacity: 1;
+               transform: translateY(0);
+       }
+
+	.menu-container {
+		display: none;
+	}
+
+	.cart-container .cart-text,
+	.login-register-container .login-text {
+		display: none !important;
+	}
+
+	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
+	.image-credits-container {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		border: none;
+		font-size: 0; /* pour masquer "Crédits:" si encore présent */
+	}
+
+	.image-credits-container i {
+		font-size: 16px;
+		margin: 0;
+		line-height: 1;
+
+	}
+
+	.image-credits-container #userCredits {
+		font-size: 14px;
+		line-height: 1;
+		display: inline-block;
+	}
+
+	/*==========FOOTER==========*/
+	.upper-band {
+		height: auto;
+	}
+
+	.footer-links-container {
+		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.footer-links {
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.footer-link {
+		display: block;
+		padding: 6px 0;
+		font-size: 16px;
+		text-align: center;
+	}
+
+	.footer-links-container::after {
+		display: none;
+	}
+
+	/*==========PREVIEW==========*/
+	.preview-main-container {
+		flex-direction: column;
+		align-items: stretch;
+		width: 90vw;
+                max-height: 95dvh;
+		padding: 10px;
+	}
+
+	.preview-image-container {
+		width: 100%;
+		height: auto;
+		margin: 0 auto 15px auto;
+		padding: 0;
+		justify-content: center;
+	}
+
+	.preview-image-container img,
+	.preview-enlarged-img {
+		width: 100%;
+		height: auto;
+		max-height: 200px;
+		object-fit: contain;
+	}
+
+	.preview-info-container {
+		width: 100%;
+		padding: 0;
+		height: auto;
+	}
+	.prompt-text {
+		max-height: 120px; /* 🔽 réduit la hauteur visible du prompt */
+		overflow-y: auto;
+		font-size: 14px;
+		line-height: 1.4;
+		padding: 8px;
+		background-color: #333;
+		border-radius: 5px;
+	}
+	.prompt-text::-webkit-scrollbar {
+		width: 4px;
+	}
+	.prompt-text::-webkit-scrollbar-thumb {
+		background-color: rgba(255,255,255,0.2);
+		border-radius: 2px;
+	}
+
+	.use-container {
+		flex-direction: column;
+		width: 100%;
+		gap: 10px;
+	}
+	.user-container {
+		margin-bottom: 5px !important; /* 🔽 réduit l’espace sous l’utilisateur */
+	}
+
+	.prompt-container {
+		margin-top: 5px !important; /* 🔽 réduit l’espace au-dessus du prompt */
+	}
+
+
+	.use-button {
+		width: 100%;
+	}
+
+	.close-button {
+		top: 5px;
+		right: 5px;
+		width: 26px;
+		height: 26px;
+		font-size: 16px;
+	}
+	/*==========FOOTER==========*/
+	.upper-band {
+		flex-direction: column;
+		padding: 20px 0;
+	}
+
+	.footer-links-container {
+		order: 1;
+	}
+
+	.social-icons {
+		position: static;
+		margin-top: 20px;
+		justify-content: center;
+	}
+
+}
