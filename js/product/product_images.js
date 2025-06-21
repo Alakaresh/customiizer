@@ -189,6 +189,7 @@ function generateMockup(mockupData) {
                                 if (typeof data.retry_after !== "undefined") {
                                         window.printfulRateLimit.remaining = 0;
                                         window.printfulRateLimit.reset = (Date.now() / 1000) + data.retry_after;
+
                                         alert(`Limite atteinte, réessayez dans ${data.retry_after} secondes.`);
                                 } else {
                                         alert("Erreur lors de la création du mockup: " + data.message);
