@@ -96,6 +96,9 @@ function renderCurrentGroup() {
 
 
 function generateMockup(mockupData) {
+        // Stocke les données pour la création du produit
+        productData = buildProductData(mockupData);
+
         if (!mockupData || !selectedVariant?.mockups?.length) {
                 console.error("❌ Données insuffisantes pour générer un mockup.");
                 alert("Impossible de générer le mockup. Données manquantes.");
@@ -272,6 +275,11 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         }
 
         cacheUpdatedMockup(styleId, mockupUrl);
+
+        // Conserve l'URL du mockup généré pour la création du produit
+        if (productData) {
+                productData.mockup_url = mockupUrl;
+        }
 
 	// ✅ Simuler un clic pour mettre à jour l'image principale
         console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
