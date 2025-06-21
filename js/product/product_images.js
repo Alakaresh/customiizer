@@ -157,6 +157,11 @@ function generateMockup(mockupData) {
                                 pollMockupStatus(taskId);
                         } else {
                                 console.error("❌ Erreur création tâche :", data.message);
+                                if (typeof data.retry_after !== "undefined") {
+                                        alert(`Limite atteinte, réessayez dans ${data.retry_after} secondes.`);
+                                } else {
+                                        alert("Erreur lors de la création du mockup: " + data.message);
+                                }
                         }
                 })
                 .catch(err => {
