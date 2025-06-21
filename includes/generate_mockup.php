@@ -155,11 +155,8 @@ function handle_generate_mockup() {
 
     if (isset($response['data'][0]['id'])) {
         $task_id = $response['data'][0]['id'];
-        if (!unlink($file_path)) {
-            customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file_path");
-        } else {
-            customiizer_log("🗑️ Fichier temporaire supprimé : $file_path");
-        }
+        customiizer_store_mockup_file($task_id, $file_path);
+        customiizer_log("📌 Fichier $file_path enregistré pour la tâche $task_id");
         $total = round(microtime(true) - $overall_start, 3);
         customiizer_log("⏱️ Tâche créée en {$total}s");
         wp_send_json_success(['task_id' => $task_id]);
