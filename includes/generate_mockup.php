@@ -184,6 +184,7 @@ function handle_generate_mockup() {
         customiizer_log("🚦 RateLimit values : remaining={$remaining}, reset={$reset}");
     }
 
+
     if (isset($response['data'][0]['id'])) {
         $task_id = $response['data'][0]['id'];
         customiizer_store_mockup_file($task_id, $file_path);
