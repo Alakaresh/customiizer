@@ -1,9 +1,8 @@
 <?php
 /*
 Template Name: Customize
-get_template_part('templates/customize_header');
 */
-get_template_part('header');
+get_header();
 
 
 function load_sidebar_content() {
@@ -35,15 +34,8 @@ function load_main_content() {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<?php wp_head(); ?>
-	</head>
-	<body>
-		<main id="site-content" class="full-content">
-			<div id="customize-main">
+<main id="site-content" class="full-content">
+               <div id="customize-main">
 				<?php if (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) { ?>
 				<?php get_template_part('templates/generate/customize', 'main'); ?>
 				<?php } ?>
@@ -78,7 +70,7 @@ function load_main_content() {
 					</div>
 				</div>
 			</div>
-		</main>
-		<?php wp_footer(); ?>
-	</body>
-</html>
+               </main>
+               <?php wp_footer(); ?>
+<?php get_footer(); ?>
+

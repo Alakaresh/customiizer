@@ -17,29 +17,21 @@ $user_nicename = $current_user->user_nicename;
 $display_name = $current_user->display_name;
 ?>
 
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-	<head>
-		<meta charset="<?php bloginfo('charset'); ?>">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/customize-header.css">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-		<?php wp_head(); ?>
-		<style>
-			@media (min-width: 1300px) {
-				.logo-container img {
-					content: url('<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/img/full_logo.png');
-				}
-			}
-			@media (max-width: 1300px) {
-				.logo-container img {
-					content: url('<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/img/logo.png');
-				}
-			}
-		</style>
-	</head>
-	<body <?php body_class(); ?>>
-		<header id="header">
+<?php wp_enqueue_style('customize-header', get_stylesheet_directory_uri() . '/styles/customize-header.css'); ?>
+<style>
+       @media (min-width: 1300px) {
+               .logo-container img {
+                       content: url('<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/img/full_logo.png');
+               }
+       }
+       @media (max-width: 1300px) {
+               .logo-container img {
+                       content: url('<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/img/logo.png');
+               }
+       }
+</style>
+
+<header id="header">
 			<div class="header-content">
 				<div class="logo-container">
 					<div class="logo">
@@ -113,7 +105,4 @@ $display_name = $current_user->display_name;
 				user_nicename: "<?php echo esc_js($user_nicename); ?>",
 				display_name: "<?php echo esc_js($display_name); ?>"
 			};
-		</script>
-
-	</body>
-</html>
+               </script>
