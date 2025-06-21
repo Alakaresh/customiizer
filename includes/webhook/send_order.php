@@ -136,8 +136,31 @@ function envoyer_commande_printful(array $payload): bool {
 }
 
 // Previous versions converted WebP images here before sending orders.
-// All images are now stored as PNG when customizing products, so this
-// logic is no longer required and has been removed.
+// Images uploaded through the customization tool are already PNG but
+// community images remain in WebP format.  The helper below ensures we
+// always send PNG files to Printful while still storing WebP on disk.
+
+if (!function_exists('convert_webp_to_png_server')) {
+    require_once __DIR__ . '/../generate_mockup.php';
+}
+
+function ensure_png_for_order(string $url): string {
+        $parts = wp_parse_url($url);
+        $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+        if ($ext === 'png') {
+                customiizer_log("ℹ️ Image déjà PNG : $url");
+                return $url;
+        }
+
+        $result = convert_webp_to_png_server($url);
+        if ($result['success']) {
+                customiizer_log("✅ WebP converti en PNG : " . $result['png_url']);
+                return $result['png_url'];
+        }
+
+        customiizer_log("⚠️ Conversion WebP échouée, utilisation de l'URL d'origine");
+        return $url;
+}
 
 // ——— Préparation du payload ———
 function preparer_commande_pour_printful(array $commande): array {
@@ -161,8 +184,7 @@ function preparer_commande_pour_printful(array $commande): array {
 			continue;
 		}
 
-                $url_png = $meta['design_image_url'];
-                customiizer_log("ℹ️ Image déjà au format PNG : $url_png");
+                $url_png = ensure_png_for_order($meta['design_image_url']);
 
 		$items[] = [
 			'source'       => 'catalog',
