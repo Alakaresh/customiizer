@@ -1,0 +1,19 @@
+@media screen and (max-width: 767px) {
+	/*==========LEGAL==========*/
+	.legal-content {
+		padding: 40px 15px;
+	}
+
+	.legal-content h1 {
+		font-size: 2em;
+	}
+
+	.legal-content h2 {
+		font-size: 1.3em;
+	}
+
+	.legal-content p {
+		font-size: 1em;
+	}
+
+}
