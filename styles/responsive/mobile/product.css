@@ -1,5 +1,9 @@
 @media screen and (max-width: 767px) {
-	/*==========PRODUCT==========*/
+        body {
+                overflow-x: hidden;
+                overflow-y: auto;
+        }
+        /*==========PRODUCT==========*/
 	.container {
 		flex-direction: column;
 		height: auto;

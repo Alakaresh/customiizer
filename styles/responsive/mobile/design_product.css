@@ -1,0 +1,38 @@
+@media screen and (max-width: 767px) {
+    /* Stack modal sections vertically */
+    #customizeModal .modal-body {
+        flex-direction: column;
+    }
+
+    /* Sidebar buttons row at top */
+    #customizeModal .modal-sidebar {
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    /* Variant selection sidebar full width */
+    #product-sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Visual zone below sidebars */
+    #customizeModal .visual-zone {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Display 2D/3D containers vertically */
+    #customizeModal .visual-containers {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    #product2DContainer,
+    #product3DContainer {
+        width: 100%;
+        max-width: 100%;
+    }
+}
