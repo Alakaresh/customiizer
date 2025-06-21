@@ -66,12 +66,23 @@ jQuery(document).ready(function ($) {
 		});
 	});
 
-        $(window).on('scroll', function () {
-                const atBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - 5;
-                if (atBottom && !isLoading) {
-                        fetchImagesFromAPI();
-                }
-        });
+        const loadMoreTrigger = document.getElementById('load-more-trigger');
+
+        if (loadMoreTrigger && 'IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                        if (entries[0].isIntersecting && !isLoading) {
+                                fetchImagesFromAPI();
+                        }
+                }, { rootMargin: '200px' });
+                observer.observe(loadMoreTrigger);
+        } else {
+                $(window).on('scroll', function () {
+                        const atBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - 200;
+                        if (atBottom && !isLoading) {
+                                fetchImagesFromAPI();
+                        }
+                });
+        }
 });
 
 // --- Fonctions principales ---
