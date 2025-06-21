@@ -100,26 +100,32 @@ function fetchImagesFromAPI(reset = false) {
         const url = `${baseUrl}/wp-json/api/v1/images/load?${params.toString()}`;
 
         return fetch(url)
-.then(res => res.json())
-.then(data => {
-if (data.success) {
-offset += data.images.length;
-        allImages = allImages.concat(data.images);
-        applySortAndSearch();
-return data.images;
-} else {
-console.error('[AJAX] ❌ Aucune image trouvée.');
-return [];
-}
-})
-.catch(error => {
-console.error('[AJAX] ❌ Erreur de récupération des images:', error);
-return [];
-})
-.finally(() => {
-isLoading = false;
-$('#scroll-message').hide();
-});
+                .then(res => res.json())
+                .then(data => {
+                        if (data.success) {
+                                offset += data.images.length;
+
+                                if (reset) {
+                                        allImages = data.images;
+                                        applySortAndSearch();
+                                } else {
+                                        allImages = allImages.concat(data.images);
+                                        appendImages(data.images);
+                                }
+                                return data.images;
+                        } else {
+                                console.error('[AJAX] ❌ Aucune image trouvée.');
+                                return [];
+                        }
+                })
+                .catch(error => {
+                        console.error('[AJAX] ❌ Erreur de récupération des images:', error);
+                        return [];
+                })
+                .finally(() => {
+                        isLoading = false;
+                        $('#scroll-message').hide();
+                });
 }
 
 function applySortAndSearch() {
@@ -148,8 +154,8 @@ function filterImagesBySearch(images, searchValue) {
 }
 
 function displayImages(images) {
-	const userFilter = getQueryParam('user');
-	filteredImages = userFilter ? images.filter(i => i.display_name === userFilter) : images;
+        const userFilter = getQueryParam('user');
+        filteredImages = userFilter ? images.filter(i => i.display_name === userFilter) : images;
 
         const columns = initializeColumns();
         const container = $('<div/>', { class: 'image-container' });
@@ -158,6 +164,28 @@ function displayImages(images) {
 
         filteredImages.forEach((img, idx) => {
                 appendImage(img, columns, idx % columns.length);
+        });
+
+        enableImageEnlargement();
+}
+
+function appendImages(images) {
+        const userFilter = getQueryParam('user');
+        const container = $('#image-container .image-container');
+        let columns = container.find('.image-column').toArray().map(el => $(el));
+
+        if (columns.length === 0) {
+                displayImages(allImages);
+                return;
+        }
+
+        const filteredNew = userFilter ? images.filter(i => i.display_name === userFilter) : images;
+        filteredImages = filteredImages.concat(filteredNew);
+
+        const existingCount = container.find('.imageContainer').length;
+
+        filteredNew.forEach((img, idx) => {
+                appendImage(img, columns, (existingCount + idx) % columns.length);
         });
 
         enableImageEnlargement();
