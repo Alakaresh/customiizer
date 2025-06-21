@@ -3,11 +3,6 @@
 Template Name: Conditions générales
 */
 get_header();
-
-// Chargement du CSS global pour les pages légales
-wp_enqueue_style('legal-global', get_stylesheet_directory_uri() . '/styles/legal-global.css');
-wp_enqueue_style('tablet-legal', get_stylesheet_directory_uri() . '/styles/responsive/tablet/legal.css');
-wp_enqueue_style('mobile-legal', get_stylesheet_directory_uri() . '/styles/responsive/mobile/legal.css');
 ?>
 
 <main id="site-content" class="site-content">
