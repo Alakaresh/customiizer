@@ -20,6 +20,8 @@ function isPrintfulRateLimited() {
                 const nowSec = Date.now() / 1000;
                 if (typeof info.reset === 'number' && nowSec < info.reset) {
                         const wait = Math.ceil(info.reset - nowSec);
+                        console.log(`[RateLimit] blocage encore ${wait}s (remaining=${info.remaining}, reset=${info.reset})`);
+
                         alert(`Limite Printful atteinte, réessayez dans ${wait} secondes.`);
                         return true;
                 }
@@ -126,6 +128,9 @@ function generateMockup(mockupData) {
 
         if (typeof window.printfulRateLimit.remaining === 'number' && window.printfulRateLimit.remaining > 0) {
                 window.printfulRateLimit.remaining--;
+
+                console.log(`[RateLimit] décrément local -> remaining=${window.printfulRateLimit.remaining}`);
+
         }
 
         const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
@@ -163,6 +168,8 @@ function generateMockup(mockupData) {
         form.append("top", mockupData.top);
         form.append("style_ids", JSON.stringify(styleIds));
 
+        console.log(`[RateLimit] avant envoi: remaining=${window.printfulRateLimit.remaining}, reset=${window.printfulRateLimit.reset}`);
+
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
@@ -172,6 +179,11 @@ function generateMockup(mockupData) {
                         if (typeof data.data?.ratelimit_reset !== "undefined") {
                                 window.printfulRateLimit.reset = (Date.now() / 1000) + data.data.ratelimit_reset;
                         }
+
+                        if (typeof data.data?.ratelimit_remaining !== "undefined" || typeof data.data?.ratelimit_reset !== "undefined") {
+                                console.log(`[RateLimit] reçu remaining=${data.data?.ratelimit_remaining} reset=${data.data?.ratelimit_reset}`);
+                        }
+
                         if (data.success && data.data?.task_id) {
                                 const taskId = data.data.task_id;
                                 const now = Date.now();
@@ -189,6 +201,8 @@ function generateMockup(mockupData) {
                                 if (typeof data.retry_after !== "undefined") {
                                         window.printfulRateLimit.remaining = 0;
                                         window.printfulRateLimit.reset = (Date.now() / 1000) + data.retry_after;
+
+                                        console.log(`[RateLimit] limite atteinte, retry_after=${data.retry_after}`);
 
                                         alert(`Limite atteinte, réessayez dans ${data.retry_after} secondes.`);
                                 } else {

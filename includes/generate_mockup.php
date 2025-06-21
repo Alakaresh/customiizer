@@ -86,6 +86,13 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         $json['_headers'] = $respHeaders;
         $json['_http_code'] = $httpCode;
 
+        // Journalise les infos de rate limit renvoyées par Printful
+        if (isset($respHeaders['x-ratelimit-remaining']) || isset($respHeaders['x-ratelimit-reset'])) {
+                $rem = $respHeaders['x-ratelimit-remaining'] ?? 'n/a';
+                $rst = $respHeaders['x-ratelimit-reset'] ?? 'n/a';
+                customiizer_log("🚦 RateLimit headers : remaining={$rem}, reset={$rst}");
+        }
+
         if ($httpCode !== 200) {
                 $duration = round(microtime(true) - $start, 3);
                 customiizer_log("⏲️ Appel API Printful terminé en {$duration}s (HTTP {$httpCode})");
@@ -172,6 +179,11 @@ function handle_generate_mockup() {
     $headers = $response['_headers'] ?? [];
     $remaining = isset($headers['x-ratelimit-remaining']) ? intval($headers['x-ratelimit-remaining']) : null;
     $reset = isset($headers['x-ratelimit-reset']) ? intval($headers['x-ratelimit-reset']) : null;
+
+    if ($remaining !== null || $reset !== null) {
+        customiizer_log("🚦 RateLimit values : remaining={$remaining}, reset={$reset}");
+    }
+
 
     if (isset($response['data'][0]['id'])) {
         $task_id = $response['data'][0]['id'];
