@@ -364,6 +364,9 @@ jQuery(document).ready(function ($) {
                         return;
                 }
                 customizeModal.hide();
+                if (typeof dispose3DScene === 'function') {
+                        dispose3DScene();
+                }
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
         });
@@ -371,6 +374,9 @@ jQuery(document).ready(function ($) {
         confirmQuitButton.on('click', function () {
                 unsavedChangesModal.hide();
                 customizeModal.hide();
+                if (typeof dispose3DScene === 'function') {
+                        dispose3DScene();
+                }
                 releaseFocus(unsavedChangesModal);
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();

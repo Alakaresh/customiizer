@@ -1,6 +1,7 @@
 // 📁 threeDManager.js
 
 let scene, camera, renderer, controls;
+let resizeHandler = null;
 let printableMeshes = {};
 
 function show3DLoader(container) {
@@ -106,8 +107,19 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 		alpha: true,
 		antialias: true
 	});
-	renderer.setSize(width, height);
-	renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setSize(width, height);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        const handleResize = () => {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                renderer.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+        };
+        handleResize();
+        resizeHandler = handleResize;
+        window.addEventListener('resize', resizeHandler);
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -306,4 +318,22 @@ window.logPrintableMeshPosition = function (zoneName = null) {
         mesh.geometry.computeBoundingBox();
         const box = mesh.geometry.boundingBox;
         console.log(`[3D Debug] BBox de '${mesh.name}' :`, box);
+};
+
+window.dispose3DScene = function () {
+        if (resizeHandler) {
+                window.removeEventListener('resize', resizeHandler);
+                resizeHandler = null;
+        }
+        if (controls) {
+                controls.dispose();
+                controls = null;
+        }
+        if (renderer) {
+                renderer.dispose();
+                renderer = null;
+        }
+        scene = null;
+        camera = null;
+        printableMeshes = {};
 };
