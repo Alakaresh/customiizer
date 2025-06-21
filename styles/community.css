@@ -263,3 +263,7 @@ body {
     z-index: 1000;
 }
 
+#load-more-trigger {
+    height: 1px;
+}
+

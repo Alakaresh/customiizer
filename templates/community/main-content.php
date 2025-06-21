@@ -15,6 +15,7 @@
         <div class="image-column" id="image-container1"></div>
 </div>
 <div id="scroll-message">Chargement des images suivantes...</div>
+<div id="load-more-trigger"></div>
 <div id="imageModal" class="modal">
 	<img class="modal-content" id="modalImage">
 	<div id="caption"></div>
