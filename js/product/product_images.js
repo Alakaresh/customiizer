@@ -5,7 +5,11 @@ window.currentProductId = window.currentProductId || null;
 const IMAGES_PER_GROUP = 12;
 let bottomBarImages = [];
 let currentGroupIndex = 0;
-const mockupStartTimes = {};
+// Partage d'un objet global pour suivre les temps de génération
+window.mockupTimes = window.mockupTimes || {};
+const mockupTimes = window.mockupTimes;
+// Stocke temporairement le dernier clic avant l'appel à generateMockup
+mockupTimes.pending = null;
 let currentLoadingOverlay = null;
 
 function getLatestMockup(variant) {
@@ -63,20 +67,24 @@ function renderCurrentGroup() {
 
 		console.log("image :",image);
 		// ✅ Ajout du clic pour générer un mockup
-		imgElement.addEventListener("click", function () {
-			const mockupData = {
-				image_url: image.image_url,
+                imgElement.addEventListener("click", function () {
+                        // Démarre le chronomètre au clic sur l'image
+                        mockupTimes.pending = Date.now();
+                        console.log("[Timer] 📸 Clic sur l'image pour mockup");
+
+                        const mockupData = {
+                                image_url: image.image_url,
                                 product_id: window.currentProductId || null,
-				variant_id: selectedVariant?.variant_id || null,
-				placement: selectedVariant?.placement || null,
-				technique: selectedVariant?.technique || null,
+                                variant_id: selectedVariant?.variant_id || null,
+                                placement: selectedVariant?.placement || null,
+                                technique: selectedVariant?.technique || null,
 				width: selectedVariant?.print_area_width || null,
 				height: selectedVariant?.print_area_height || null,
 				left: 0, 
 				top: 0    
 			};
-			generateMockup(mockupData); // 🚀 Envoi du vrai objet complet
-		});
+                        generateMockup(mockupData); // 🚀 Envoi du vrai objet complet
+                });
 
 
 		contentDiv.appendChild(imgElement);
@@ -96,6 +104,13 @@ function generateMockup(mockupData) {
 
         const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
         const mainProductImage = document.getElementById("product-main-image");
+
+        // Mesure du temps écoulé depuis le clic
+        const requestStart = Date.now();
+        if (mockupTimes.pending) {
+                const delay = ((requestStart - mockupTimes.pending) / 1000).toFixed(1);
+                console.log(`[Timer] 🚀 Requête envoyée ${delay}s après le clic`);
+        }
 
         document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
         mainProductImage?.classList.add("loading");
@@ -127,8 +142,15 @@ function generateMockup(mockupData) {
                 .then(data => {
                         if (data.success && data.data?.task_id) {
                                 const taskId = data.data.task_id;
-                                console.log(`✅ Tâche Printful ${taskId} créée`);
-                                mockupStartTimes[taskId] = Date.now();
+                                const now = Date.now();
+                                mockupTimes[taskId] = {
+                                        click: mockupTimes.pending || requestStart,
+                                        request: requestStart,
+                                        taskCreated: now
+                                };
+                                const delay = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
+                                console.log(`✅ Tâche Printful ${taskId} créée après ${delay}s depuis le clic`);
+                                mockupTimes.pending = null;
                                 pollMockupStatus(taskId);
                         } else {
                                 console.error("❌ Erreur création tâche :", data.message);
@@ -275,10 +297,12 @@ function pollMockupStatus(taskId, attempts = 0) {
                                 data.mockups.forEach(m => {
                                         updateMockupThumbnail(m.style_id, m.mockup_url);
                                 });
-                                if (mockupStartTimes[taskId]) {
-                                        const seconds = ((Date.now() - mockupStartTimes[taskId]) / 1000).toFixed(1);
-                                        console.log(`⏱️ Mockup ${taskId} affiché après ${seconds} secondes`);
-                                        delete mockupStartTimes[taskId];
+                                if (mockupTimes[taskId]) {
+                                        const now = Date.now();
+                                        const total = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
+                                        const postTask = ((now - mockupTimes[taskId].taskCreated) / 1000).toFixed(1);
+                                        console.log(`⏱️ Mockup ${taskId} affiché après ${total}s (dont ${postTask}s après création de la tâche)`);
+                                        delete mockupTimes[taskId];
                                         setTimeout(triggerSelectedThumbnail, 0);
                                 }
                         } else if (attempts < 20) {

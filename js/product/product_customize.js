@@ -1,4 +1,6 @@
 window.currentProductId = window.currentProductId || null;
+// Objet partagé pour mesurer les temps de génération de mockup
+window.mockupTimes = window.mockupTimes || {};
 function displayGeneratedImages(images) {
         const siteFilesList = jQuery('#siteFilesList');
         console.log("siteFilesList :",siteFilesList);
@@ -55,6 +57,9 @@ function uploadBase64ToServer(base64Data, debugId) {
 
 jQuery(document).ready(function ($) {
         jQuery('#saveDesignButton').on('click', function () {
+                // Démarre le suivi du temps dès le clic sur "Save to template"
+                window.mockupTimes.pending = Date.now();
+                console.log('[Timer] 💾 Clic sur "Save to template"');
                 console.log("[UI] 💾 Enregistrement du design (mockup)");
 
                 jQuery('#customizeModal').hide();
