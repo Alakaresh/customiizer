@@ -135,74 +135,9 @@ function envoyer_commande_printful(array $payload): bool {
 	return ($code >= 200 && $code < 300);
 }
 
-// ——— Téléchargement d'une image temporaire ———
-function simple_download_url(string $url): ?string {
-	$tmp = tempnam(sys_get_temp_dir(), 'webp_');
-	$fp  = fopen($tmp, 'w+');
-	if (!$fp) {
-		customiizer_log("❌ open tmp file failed");
-		return null;
-	}
-
-	$ch = curl_init($url);
-	curl_setopt_array($ch, [
-		CURLOPT_FILE           => $fp,
-		CURLOPT_TIMEOUT        => 30,
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_FAILONERROR    => true,
-	]);
-
-	$ok = curl_exec($ch);
-	$err = curl_error($ch);
-	curl_close($ch);
-	fclose($fp);
-
-	if (!$ok) {
-		unlink($tmp);
-		customiizer_log("❌ curl error: $err");
-		return null;
-	}
-	return $tmp;
-}
-
-// ——— Conversion WebP → PNG, stockage et URL publique ———
-function convertir_webp_en_png(string $webp_url, string $order_id): ?string {
-	customiizer_log("⏬ Download WebP: $webp_url");
-	$tmp_webp = simple_download_url($webp_url);
-	if (!$tmp_webp) {
-		customiizer_log("❌ Download failed");
-		return null;
-	}
-
-	$img = @imagecreatefromwebp($tmp_webp);
-	if (!$img) {
-		unlink($tmp_webp);
-		customiizer_log("❌ imagecreatefromwebp failed");
-		return null;
-	}
-
-	if (!is_dir(UPLOADS_BASE_PATH)) {
-		mkdir(UPLOADS_BASE_PATH, 0755, true);
-		customiizer_log("📁 Created upload dir: " . UPLOADS_BASE_PATH);
-		chown(UPLOADS_BASE_PATH, 'domcusto');
-		chgrp(UPLOADS_BASE_PATH, 'psacln');
-	}
-
-	$file_name  = 'PF' . $order_id . '_' . uniqid() . '.png';
-	$png_path   = UPLOADS_BASE_PATH . '/' . $file_name;
-	$public_url = UPLOADS_BASE_URL  . '/' . $file_name;
-
-        imagepng($img, $png_path);
-	imagedestroy($img);
-	unlink($tmp_webp);
-
-	chmod($png_path, 0644);
-	chown($png_path, 'domcusto');
-	chgrp($png_path, 'psacln');
-
-	customiizer_log("✅ PNG saved: $png_path");
-	return $public_url;
-}
+// Previous versions converted WebP images here before sending orders.
+// All images are now stored as PNG when customizing products, so this
+// logic is no longer required and has been removed.
 
 // ——— Préparation du payload ———
 function preparer_commande_pour_printful(array $commande): array {
