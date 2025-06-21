@@ -18,6 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: calc(100dvh - 65px); /* Header is 65px */
 }
 
 /* Section principale */
@@ -46,10 +47,14 @@ body {
 }
 
 .background-image {
-    width: auto;
-    height: 100%; /* S'ajuste pour occuper toute la hauteur du conteneur */
-    max-width: none; /* Désactive la limite de largeur */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain; /* Conserve les proportions sans déborder */
+    pointer-events: none;
+    max-width: none; /* Désactive la limite de largeur */
 }
 
 /* Footer */
