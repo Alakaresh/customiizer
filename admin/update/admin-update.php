@@ -248,34 +248,41 @@ function customiizer_render_update_page() {
 	echo '  }';
 
 	echo 'document.addEventListener("DOMContentLoaded", function () {';
-	echo '  function moveItems(sourceId, targetId) {';
-	echo '    const source = document.getElementById(sourceId);';
-	echo '    const target = document.getElementById(targetId);';
-	echo '    source.querySelectorAll("input[type=checkbox]:checked").forEach(cb => {';
-	echo '      cb.checked = false;';
-	echo '      const label = cb.closest("label");';
-	echo '      const path = cb.dataset.path || cb.value;';
-	echo '      if (!path) return;';
-	echo '      const newLabel = document.createElement("label");';
-	echo '      newLabel.style.display = "block";';
-	echo '      newLabel.style.marginLeft = "20px";';
-	echo '      const newInput = document.createElement("input");';
-	echo '      newInput.type = "checkbox";';
-	echo '      newInput.value = path;';
-	echo '      newInput.dataset.path = path;';
-	echo '      const span = document.createElement("span");';
-	echo '      span.className = "file-name";';
-	echo '      span.textContent = path;';
-	echo '      newLabel.appendChild(newInput);';
-	echo '      newLabel.appendChild(span);';
-	echo '      target.appendChild(newLabel);';
-	echo '      label.remove();';
-	echo '    });';
-	echo '  }';
-	echo '  function saveExcludedFiles() {';
-	echo '    const excluded = Array.from(document.querySelectorAll("#excludedFiles input[type=checkbox]"))';
-	echo '      .map(cb => cb.dataset.path || cb.value)';
-	echo '      .filter(Boolean);';
+        echo '  function moveItems(sourceId, targetId) {';
+        echo '    const source = document.getElementById(sourceId);';
+        echo '    const target = document.getElementById(targetId);';
+        echo '    source.querySelectorAll("input[type=checkbox]:checked").forEach(cb => {';
+        echo '      cb.checked = false;';
+        echo '      const path = cb.dataset.path || cb.value;';
+        echo '      if (!path) return;';
+        echo '      const isFolder = cb.dataset.type === "folder";';
+        echo '      if (isFolder) {';
+        echo '        const details = cb.closest("details.folder");';
+        echo '        if (details) target.appendChild(details);';
+        echo '        return;';
+        echo '      }';
+        echo '      const label = cb.closest("label");';
+        echo '      const newLabel = document.createElement("label");';
+        echo '      newLabel.style.display = "block";';
+        echo '      newLabel.style.marginLeft = "20px";';
+        echo '      const newInput = document.createElement("input");';
+        echo '      newInput.type = "checkbox";';
+        echo '      newInput.dataset.type = "file";';
+        echo '      newInput.value = path;';
+        echo '      newInput.dataset.path = path;';
+        echo '      const span = document.createElement("span");';
+        echo '      span.className = "file-name";';
+        echo '      span.textContent = path;';
+        echo '      newLabel.appendChild(newInput);';
+        echo '      newLabel.appendChild(span);';
+        echo '      target.appendChild(newLabel);';
+        echo '      if (label) label.remove();';
+        echo '    });';
+        echo '  }';
+        echo '  function saveExcludedFiles() {';
+        echo '    const excluded = Array.from(document.querySelectorAll("#excludedFiles > label input[type=checkbox], #excludedFiles > details > summary input[type=checkbox]"))';
+        echo '      .map(cb => cb.dataset.path || cb.value)';
+        echo '      .filter(Boolean);';
 	echo '    const params = new URLSearchParams();';
 	echo '    params.append("action", "customiizer_save_excluded");';
 	echo '    excluded.forEach(path => {';
@@ -499,31 +506,38 @@ function customiizer_render_file_tree_dual_column($dir, $prefix = '', $excluded_
 	natcasesort($folders);
 	natcasesort($files);
 
-	foreach ($folders as $folder) {
-		// Appel récursif avec filtrage à l'intérieur
-		ob_start();
-		customiizer_render_file_tree_dual_column("$abs_path/$folder", "$rel_prefix/$folder", $excluded_list, $render_excluded);
-		$inner = ob_get_clean();
+        foreach ($folders as $folder) {
+                $rel_path = ltrim("$rel_prefix/$folder", '/');
+                $rel_folder = $rel_path . '/';
+                $is_excluded = in_array($rel_folder, $excluded_list);
 
-		if (trim($inner) !== '') {
-			echo '<details><summary>📁 ' . esc_html($folder) . '</summary>';
-			echo $inner;
-			echo '</details>';
-		}
-	}
+                if ($render_excluded && !$is_excluded) continue;
+                if (!$render_excluded && $is_excluded) continue;
 
-	foreach ($files as $file) {
-		$rel_path = ltrim("$rel_prefix/$file", '/');
-		$is_excluded = in_array($rel_path, $excluded_list);
+                echo '<details class="folder" data-path="' . esc_attr($rel_folder) . '">';
+                echo '<summary><label style="display:block; margin-left: 20px;">'
+                        . '<input type="checkbox" data-type="folder" value="' . esc_attr($rel_folder) . '" data-path="' . esc_attr($rel_folder) . '"> '
+                        . '<span class="file-name">' . esc_html($folder) . '/</span>'
+                        . '</label></summary>';
+
+                if (!$is_excluded) {
+                        customiizer_render_file_tree_dual_column("$abs_path/$folder", "$rel_prefix/$folder", $excluded_list, $render_excluded);
+                }
+                echo '</details>';
+        }
+
+        foreach ($files as $file) {
+                $rel_path = ltrim("$rel_prefix/$file", '/');
+                $is_excluded = in_array($rel_path, $excluded_list);
 
 		if ($render_excluded && !$is_excluded) continue;
 		if (!$render_excluded && $is_excluded) continue;
 
-		echo '<label style="display:block; margin-left: 20px;" id="file-' . md5($rel_path) . '">
-				<input type="checkbox" value="' . esc_attr($rel_path) . '" data-path="' . esc_attr($rel_path) . '">
-				<span class="file-name">' . esc_html($rel_path) . '</span>
-			</label>';
-	}
+                echo '<label style="display:block; margin-left: 20px;" id="file-' . md5($rel_path) . '">
+                                <input type="checkbox" data-type="file" value="' . esc_attr($rel_path) . '" data-path="' . esc_attr($rel_path) . '">
+                                <span class="file-name">' . esc_html($rel_path) . '</span>
+                        </label>';
+        }
 }
 
 
