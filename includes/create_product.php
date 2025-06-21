@@ -13,7 +13,12 @@ function customiizer_generate_product() {
 	// Nettoyage des données
 	$product_name = sanitize_text_field($data['product_name'] ?? 'Produit personnalisé ' . current_time('d/m/Y H:i'));
 	$product_price = floatval($data['product_price'] ?? 0);
-	$mockup_url = esc_url_raw($data['mockup_url'] ?? '');
+        $mockup_url = esc_url_raw($data['mockup_url'] ?? '');
+
+        // Provide a fallback image if none supplied
+        if (empty($mockup_url)) {
+                $mockup_url = get_stylesheet_directory_uri() . '/images/products/empty.png';
+        }
 
 	// Création du produit
 	$product = new WC_Product_Simple();
