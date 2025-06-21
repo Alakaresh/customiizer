@@ -388,6 +388,10 @@ jQuery(document).ready(function ($) {
                                 if (index === 0) imgElement.addClass('selected');
                         });
                 });
+
+                // 🚀 S'assure que le thumbnail sélectionné déclenche bien ses évènements
+                const selectedThumb = thumbnailsContainer.find('.thumbnail.selected');
+                if (selectedThumb.length) selectedThumb.trigger('click');
         }
 
         // 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
