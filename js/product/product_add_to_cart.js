@@ -26,12 +26,15 @@ jQuery(document).ready(function($) {
 
 		console.log('🛠 [AJAX] Création du produit personnalisé en cours...');
 
-		let productDataToSend = null;
-		console.log('productData :',productData);
-		if (productData !== null) {
-			productDataToSend = productData;
-			console.log('selectedVariant :',selectedVariant);
-		} else if (selectedVariant) {
+                let productDataToSend = null;
+                console.log('productData :',productData);
+                if (productData !== null) {
+                        productDataToSend = productData;
+                        console.log('selectedVariant :',selectedVariant);
+                } else if (window.customizerCache?.designs?.[window.currentProductId]) {
+                        productDataToSend = window.customizerCache.designs[window.currentProductId];
+                        console.log('retrieved from cache :', productDataToSend);
+                } else if (selectedVariant) {
 
 			const productName = $('.product-name').text().trim();
 			const productPrice = selectedVariant.price ? selectedVariant.price : 0;
