@@ -195,6 +195,15 @@ function cacheUpdatedMockup(styleId, mockupUrl) {
         }
 }
 
+// Réactive le thumbnail actuellement sélectionné
+function triggerSelectedThumbnail() {
+        const activeThumb = document.querySelector('.image-thumbnails .thumbnail.selected');
+        if (activeThumb) {
+                console.log('🔁 Re-cliquant sur le thumbnail sélectionné');
+                activeThumb.click();
+        }
+}
+
 
 function updateMockupThumbnail(styleId, mockupUrl) {
         console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
@@ -247,6 +256,9 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         if (styleId === getFirstMockup(selectedVariant)?.mockup_id) {
                 console.log(`🔄 Activation automatique du premier thumbnail (style ${styleId})`);
                 thumbnailToUpdate.click();
+        } else if (window.currentMockup && window.currentMockup.mockup_id == styleId) {
+                console.log(`🔄 Re-clic sur le thumbnail sélectionné (${styleId})`);
+                thumbnailToUpdate.click();
         }
 
         if (currentLoadingOverlay) {
@@ -267,6 +279,7 @@ function pollMockupStatus(taskId, attempts = 0) {
                                         const seconds = ((Date.now() - mockupStartTimes[taskId]) / 1000).toFixed(1);
                                         console.log(`⏱️ Mockup ${taskId} affiché après ${seconds} secondes`);
                                         delete mockupStartTimes[taskId];
+                                        setTimeout(triggerSelectedThumbnail, 0);
                                 }
                         } else if (attempts < 20) {
                                 setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
