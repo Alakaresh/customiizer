@@ -116,13 +116,22 @@ function customiizer_enqueue_customize_assets() {
 		wp_enqueue_script('community-images', get_stylesheet_directory_uri() . '/js/community/show_images.js', ['jquery'], null, true);
 
 		// Page /mycreation
-	} elseif (strpos($request_uri, '/mycreation') !== false) {
-		// --- CSS ---
-		wp_enqueue_style('mycreation-style', get_stylesheet_directory_uri() . '/styles/mycreation.css');
+       } elseif (strpos($request_uri, '/mycreation') !== false) {
+               // --- CSS ---
+               wp_enqueue_style('mycreation-style', get_stylesheet_directory_uri() . '/styles/mycreation.css');
 
-		// --- JS internes ---
-		wp_enqueue_script('mycreation-images', get_stylesheet_directory_uri() . '/js/mycreation/show_images.js', ['jquery'], null, true);
-	}
+                // --- JS internes ---
+                wp_enqueue_script('mycreation-images', get_stylesheet_directory_uri() . '/js/mycreation/show_images.js', ['jquery'], null, true);
+       } elseif (
+               strpos($request_uri, '/mentions-legales') !== false ||
+               strpos($request_uri, '/conditions') !== false ||
+               strpos($request_uri, '/confidentialite') !== false ||
+               strpos($request_uri, '/retours') !== false ||
+               strpos($request_uri, '/cookies') !== false
+       ) {
+               // --- CSS ---
+               wp_enqueue_style('legal-global', get_stylesheet_directory_uri() . '/styles/legal-global.css');
+       }
 
         // --- Responsive CSS ---
         wp_enqueue_style('responsive-tablet', get_stylesheet_directory_uri() . '/styles/responsive/tablet.css', [], null, 'all');
@@ -146,5 +155,14 @@ function customiizer_enqueue_customize_assets() {
        } elseif (strpos($request_uri, '/mycreation') !== false) {
                wp_enqueue_style('tablet-mycreation', get_stylesheet_directory_uri() . '/styles/responsive/tablet/mycreation.css', [], null, 'all');
                wp_enqueue_style('mobile-mycreation', get_stylesheet_directory_uri() . '/styles/responsive/mobile/mycreation.css', [], null, 'all');
+       } elseif (
+               strpos($request_uri, '/mentions-legales') !== false ||
+               strpos($request_uri, '/conditions') !== false ||
+               strpos($request_uri, '/confidentialite') !== false ||
+               strpos($request_uri, '/retours') !== false ||
+               strpos($request_uri, '/cookies') !== false
+       ) {
+               wp_enqueue_style('tablet-legal', get_stylesheet_directory_uri() . '/styles/responsive/tablet/legal.css', [], null, 'all');
+               wp_enqueue_style('mobile-legal', get_stylesheet_directory_uri() . '/styles/responsive/mobile/legal.css', [], null, 'all');
        }
 }
