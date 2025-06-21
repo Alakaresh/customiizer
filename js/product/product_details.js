@@ -40,6 +40,7 @@ try {
 window.customizerCache.templates = window.customizerCache.templates || {};
 window.customizerCache.models = window.customizerCache.models || {};
 window.customizerCache.variants = window.customizerCache.variants || {};
+window.customizerCache.designs = window.customizerCache.designs || {};
 
 function persistCache() {
     const tmp = { ...window.customizerCache, models: {} };

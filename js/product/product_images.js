@@ -172,20 +172,28 @@ function buildProductData(mockupData) {
 	const productName = jQuery('.product-name').text().trim();
 	const productPrice = selectedVariant.price;
 
-	const productData = {
-		product_name: productName,
-		product_price: productPrice,
-		delivery_price: selectedVariant?.delivery_price,
-		mockup_url: mockupData.generated_mockup_url || "",
-		design_image_url: mockupData.image_url,
-		design_width: mockupData.width,
-		design_height: mockupData.height,
-		design_left: mockupData.left,
-		design_top: mockupData.top,
-		variant_id: mockupData.variant_id,
-		placement: mockupData.placement,
-		technique: mockupData.technique
-	};
+        const productData = {
+                product_name: productName,
+                product_price: productPrice,
+                delivery_price: selectedVariant?.delivery_price,
+                mockup_url: mockupData.generated_mockup_url || "",
+                design_image_url: mockupData.image_url,
+                design_width: mockupData.width,
+                design_height: mockupData.height,
+                design_left: mockupData.left,
+                design_top: mockupData.top,
+                variant_id: mockupData.variant_id,
+                placement: mockupData.placement,
+                technique: mockupData.technique
+        };
+
+        if (window.customizerCache) {
+                window.customizerCache.designs = window.customizerCache.designs || {};
+                window.customizerCache.designs[window.currentProductId] = productData;
+                if (typeof persistCache === 'function') {
+                        persistCache();
+                }
+        }
 
         console.log("✅ productData construit :", productData);
         return productData;
