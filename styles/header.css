@@ -190,6 +190,18 @@
 }
 
 @keyframes pulseAccess {
-	0%, 100% { transform: scale(1); }
-	50% { transform: scale(1.05); }
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+}
+
+/* Responsive logo images */
+@media (min-width: 1300px) {
+       .logo-container img {
+               content: url('../assets/img/full_logo.png');
+       }
+}
+@media (max-width: 1300px) {
+       .logo-container img {
+               content: url('../assets/img/logo.png');
+       }
 }

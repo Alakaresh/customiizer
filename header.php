@@ -24,18 +24,7 @@ $display_name = $current_user->display_name;
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 		<?php wp_head(); ?>
-		<style>
-			@media (min-width: 1300px) {
-				.logo-container img {
-					content: url('<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/img/full_logo.png');
-				}
-			}
-			@media (max-width: 1300px) {
-				.logo-container img {
-					content: url('<?php echo esc_url(get_stylesheet_directory_uri()); ?>/assets/img/logo.png');
-				}
-			}
-		</style>
+               <!-- logo styles moved to header.css -->
 	</head>
 	<body <?php body_class(); ?>>
 		<header id="header">
@@ -48,11 +37,11 @@ $display_name = $current_user->display_name;
 						</a>
 					</div>
 
-					<div class="mobile-menu-toggle" style="display: none;">
-						<i class="fas fa-bars"></i>
-					</div>
+                                       <div class="mobile-menu-toggle" aria-expanded="false" aria-label="Menu mobile">
+                                               <i class="fas fa-bars"></i>
+                                       </div>
 
-					<nav class="mobile-menu" style="display: none;">
+                                       <nav class="mobile-menu">
 						<a href="/customiize">Customiize</a>
 						<a href="/boutique">Boutique</a>
 						<a href="/communaute">Communauté</a>
@@ -141,14 +130,20 @@ $display_name = $current_user->display_name;
 				display_name: "<?php echo esc_js($display_name); ?>"
 			};
 		</script>
-		<script>
-			jQuery(document).ready(function ($) {
-				$('.mobile-menu-toggle').on('click', function () {
-					$('.mobile-menu').toggleClass('active');
-				});
-			});
+               <script>
+                       document.addEventListener('DOMContentLoaded', function () {
+                               const toggle = document.querySelector('.mobile-menu-toggle');
+                               const menu = document.querySelector('.mobile-menu');
+                               if (toggle && menu) {
+                                       toggle.addEventListener('click', function () {
+                                               const expanded = toggle.getAttribute('aria-expanded') === 'true';
+                                               toggle.setAttribute('aria-expanded', (!expanded).toString());
+                                               menu.classList.toggle('active');
+                                       });
+                               }
+                       });
 
-		</script>
+               </script>
                 <script>
 <?php if ($user_logged_in): ?>
                         (function(){

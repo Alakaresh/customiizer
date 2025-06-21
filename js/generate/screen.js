@@ -99,11 +99,16 @@ function displayPrompt() {
 
 // Appel des fonctions lors du chargement initial de la page
 document.addEventListener('DOMContentLoaded', () => {
-	enableContainerResize();
-	//enableInfoModal();
-	displayPrompt();
-	if (window.innerWidth > 768) {
-		adjustImageHeight();
-		window.addEventListener('resize', adjustImageHeight);
-	}
+       enableContainerResize();
+       //enableInfoModal();
+       displayPrompt();
+       const mq = window.matchMedia('(min-width: 769px)');
+       const handle = () => {
+               if (mq.matches) {
+                       adjustImageHeight();
+               }
+       };
+       handle();
+       mq.addEventListener('change', handle);
+       window.addEventListener('resize', handle);
 });
