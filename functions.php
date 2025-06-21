@@ -129,8 +129,9 @@ add_action( 'init', function() {
                 '/includes/image_status.php',
 		'/includes/api/api_images.php',
 		'/includes/api/api_imported_images.php',
-		'/includes/api/api_templates.php',
-		'/includes/add_to_cart.php',
+                '/includes/api/api_templates.php',
+                '/includes/api/api_mockup_status.php',
+                '/includes/add_to_cart.php',
 
 	];
 	foreach ($includes as $file) {

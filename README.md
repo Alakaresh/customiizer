@@ -78,3 +78,28 @@ If the constant is missing, functions like `generate_mockups_printful()` return 
 
 Some API calls target a specific Printful store. Define the constant `PRINTFUL_STORE_ID` in `wp-config.php` to automatically add the `X-PF-Store-Id` header when communicating with Printful. When not defined, the header is omitted and your default store is used.
 
+## Mockup status endpoint
+
+Generated mockups are cached when the `mockup_task_finished` webhook fires. Check the status of a Printful task using:
+
+The URLs are stored for a few minutes in a WordPress transient keyed by `task_id`. Once the client fetches them, the transient is removed. No database table is involved – everything is kept only in this temporary cache.
+
+```
+/wp-json/customiizer/v1/mockup-status?task_id=123
+```
+
+The response lists all `mockup_url` values stored for the task:
+
+```json
+{
+  "success": true,
+  "mockups": [
+    {
+      "variant_id": 789,
+      "style_id": 1,
+      "mockup_url": "https://.../image.png"
+    }
+  ]
+}
+```
+

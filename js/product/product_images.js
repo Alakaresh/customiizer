@@ -5,6 +5,7 @@ window.currentProductId = window.currentProductId || null;
 const IMAGES_PER_GROUP = 12;
 let bottomBarImages = [];
 let currentGroupIndex = 0;
+const mockupStartTimes = {};
 
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
@@ -123,7 +124,10 @@ function generateMockup(mockupData) {
                 .then(res => res.json())
                 .then(data => {
                         if (data.success && data.data?.task_id) {
-                                console.log(`✅ Tâche Printful ${data.data.task_id} créée`);
+                                const taskId = data.data.task_id;
+                                console.log(`✅ Tâche Printful ${taskId} créée`);
+                                mockupStartTimes[taskId] = Date.now();
+                                pollMockupStatus(taskId);
                         } else {
                                 console.error("❌ Erreur création tâche :", data.message);
                         }
@@ -243,6 +247,30 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 console.log(`🔄 Activation automatique du premier thumbnail (style ${styleId})`);
                 thumbnailToUpdate.click();
         }
+}
+
+function pollMockupStatus(taskId, attempts = 0) {
+        fetch(`/wp-json/customiizer/v1/mockup-status?task_id=${taskId}`)
+                .then(res => res.json())
+                .then(data => {
+                        if (data.success && Array.isArray(data.mockups) && data.mockups.length) {
+                                data.mockups.forEach(m => {
+                                        updateMockupThumbnail(m.style_id, m.mockup_url);
+                                });
+                                if (mockupStartTimes[taskId]) {
+                                        const seconds = ((Date.now() - mockupStartTimes[taskId]) / 1000).toFixed(1);
+                                        console.log(`⏱️ Mockup ${taskId} affiché après ${seconds} secondes`);
+                                        delete mockupStartTimes[taskId];
+                                }
+                        } else if (attempts < 20) {
+                                setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
+                        }
+                })
+                .catch(() => {
+                        if (attempts < 20) {
+                                setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
+                        }
+                });
 }
 
 function showNextGroup() {
