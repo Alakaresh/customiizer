@@ -49,9 +49,9 @@ function customiizer_enqueue_customize_assets() {
 	// ===============================
 
 	// Page /generate
-	if ($request_uri === '/' || $request_uri === '/index.php') {
-		// --- CSS ---
-		wp_enqueue_style('home-style', get_stylesheet_directory_uri() . '/styles/home.css');
+       if (is_front_page() || is_page('home')) {
+               // --- CSS ---
+               wp_enqueue_style('home-style', get_stylesheet_directory_uri() . '/styles/home.css');
 
 		// --- JS internes ---
 		wp_enqueue_script('home-products', get_stylesheet_directory_uri() . '/js/home/products.js', ['jquery'], null, true);
@@ -128,8 +128,8 @@ function customiizer_enqueue_customize_assets() {
         wp_enqueue_style('responsive-tablet', get_stylesheet_directory_uri() . '/styles/responsive/tablet.css', [], null, 'all');
         wp_enqueue_style('mobile-base', get_stylesheet_directory_uri() . '/styles/responsive/mobile/base.css', [], null, 'all');
 
-        if ($request_uri === '/' || $request_uri === '/index.php') {
-                wp_enqueue_style('mobile-home', get_stylesheet_directory_uri() . '/styles/responsive/mobile/home.css', [], null, 'all');
+       if (is_front_page() || is_page('home')) {
+               wp_enqueue_style('mobile-home', get_stylesheet_directory_uri() . '/styles/responsive/mobile/home.css', [], null, 'all');
         } elseif (strpos($request_uri, '/customiize') !== false) {
                 wp_enqueue_style('mobile-customize', get_stylesheet_directory_uri() . '/styles/responsive/mobile/customize.css', [], null, 'all');
         } elseif (strpos($request_uri, '/configurateur') !== false) {
