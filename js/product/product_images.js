@@ -247,6 +247,9 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         if (styleId === getFirstMockup(selectedVariant)?.mockup_id) {
                 console.log(`🔄 Activation automatique du premier thumbnail (style ${styleId})`);
                 thumbnailToUpdate.click();
+        } else if (window.currentMockup && window.currentMockup.mockup_id == styleId) {
+                console.log(`🔄 Re-clic sur le thumbnail sélectionné (${styleId})`);
+                thumbnailToUpdate.click();
         }
 
         if (currentLoadingOverlay) {
