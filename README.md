@@ -103,3 +103,10 @@ The response lists all `mockup_url` values stored for the task:
 }
 ```
 
+
+## Community images endpoint
+
+The `/wp-json/api/v1/images/load` route powers the public gallery. Query
+results are cached for five minutes in a WordPress transient keyed by the
+user ID, search terms and pagination parameters. Subsequent calls with the
+same options reuse the cached images to lighten database load.

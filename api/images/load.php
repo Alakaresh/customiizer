@@ -5,13 +5,29 @@ register_rest_route('api/v1/images', '/load', [
 	'permission_callback' => '__return_true',
 ]);
 function load_community_images(WP_REST_Request $request) {
-	global $wpdb;
+        global $wpdb;
 
         $limit = intval($request->get_param('limit')) ?: 0;
         $offset = intval($request->get_param('offset')) ?: 0;
         $current_user_id = intval($request->get_param('user_id')) ?: 0;
         $sort = sanitize_text_field($request->get_param('sort')) ?: 'date';
         $search = sanitize_text_field($request->get_param('search')) ?: '';
+
+        // --- Transient cache ---
+        $cache_key = 'community_images_' . md5(serialize([
+                'limit'  => $limit,
+                'offset' => $offset,
+                'user'   => $current_user_id,
+                'sort'   => $sort,
+                'search' => $search,
+        ]));
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+                return new WP_REST_Response([
+                        'success' => true,
+                        'images'  => $cached
+                ], 200);
+        }
 
 	// 🔥 Construction dynamique de la clause LIMIT/OFFSET
 	$limitClause = '';
@@ -68,14 +84,15 @@ function load_community_images(WP_REST_Request $request) {
 	// Ajouter dynamiquement le LIMIT si besoin
 	$query .= " " . $limitClause;
 
-	$results = $wpdb->get_results($query);
+        $results = $wpdb->get_results($query);
 
-	if (empty($results)) {
-		return new WP_REST_Response([
-			'success' => false,
-			'message' => 'No community images found.'
-		], 200);
-	}
+        if (empty($results)) {
+                set_transient($cache_key, [], MINUTE_IN_SECONDS * 5);
+                return new WP_REST_Response([
+                        'success' => false,
+                        'message' => 'No community images found.'
+                ], 200);
+        }
 
 	$images = array_map(function($row) {
 		return [
@@ -93,8 +110,10 @@ function load_community_images(WP_REST_Request $request) {
 		];
 	}, $results);
 
-	return new WP_REST_Response([
-		'success' => true,
-		'images' => $images
-	], 200);
+        set_transient($cache_key, $images, MINUTE_IN_SECONDS * 5);
+
+        return new WP_REST_Response([
+                'success' => true,
+                'images' => $images
+        ], 200);
 }
