@@ -20,6 +20,7 @@ function handle_mockup_task_finished(array $data, PrintfulWebhookLogger $logger)
     $task_id = $payload['id'] ?? ($payload['task']['id'] ?? null);
     if ($task_id) {
         $logger->log("🔢 Tâche concernée : task_id = $task_id");
+        customiizer_delete_mockup_file($task_id, $logger);
     }
 
     // 📦 Extraction des mockups
