@@ -6,6 +6,12 @@
 	--font-color: #ffffff; /* Couleur du texte */
 }
 
+/* Hide mobile navigation elements on larger screens */
+.mobile-menu,
+.mobile-menu-toggle {
+    display: none;
+}
+
 /* Styles généraux pour le header */
 #header {
 	display: flex;
