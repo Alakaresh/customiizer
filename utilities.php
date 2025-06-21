@@ -40,3 +40,27 @@ function customiizer_log($message) {
         $line = "[$date] $message\n";
         file_put_contents($log_file, $line, FILE_APPEND);
 }
+
+/**
+ * Get the frontend version defined in version.json for cache busting.
+ *
+ * @return string|null The version string or null if not found.
+ */
+function customiizer_frontend_version() {
+    static $frontend_version = null;
+
+    if ($frontend_version !== null) {
+        return $frontend_version;
+    }
+
+    $path = get_stylesheet_directory() . '/version.json';
+    if (file_exists($path)) {
+        $data = json_decode(file_get_contents($path), true);
+        if (isset($data['frontend'])) {
+            $frontend_version = $data['frontend'];
+            return $frontend_version;
+        }
+    }
+
+    return $frontend_version;
+}
