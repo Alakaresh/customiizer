@@ -66,6 +66,11 @@ function customiizer_mockups_batch(WP_REST_Request $req) {
             'timeout' => 20,
         ]);
 
+        // Log rate limiting information from Printful headers
+        $remaining = wp_remote_retrieve_header($response, 'x-ratelimit-remaining');
+        $reset     = wp_remote_retrieve_header($response, 'x-ratelimit-reset');
+        customiizer_log("Printful rate limit: remaining=$remaining reset=$reset");
+
         $task_data = json_decode(wp_remote_retrieve_body($response), true);
         $task_id   = $task_data['data'][0]['id'] ?? null;
         if ($task_id) {
