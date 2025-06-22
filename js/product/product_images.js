@@ -110,6 +110,7 @@ function generateMockup(mockupData) {
         const requestStart = Date.now();
         if (mockupTimes.pending) {
                 const delay = ((requestStart - mockupTimes.pending) / 1000).toFixed(1);
+                console.log(`⌛ Request sent after ${delay}s`);
         }
 
         document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
@@ -140,6 +141,9 @@ function generateMockup(mockupData) {
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
+                        if (typeof data.data?.rate_limit_remaining !== 'undefined') {
+                                console.log(`📊 Rate limit: ${data.data.rate_limit_remaining} remaining, reset ${data.data.rate_limit_reset}`);
+                        }
                         if (data.success && data.data?.task_id) {
                                 const taskId = data.data.task_id;
                                 const now = Date.now();
@@ -148,7 +152,9 @@ function generateMockup(mockupData) {
                                         request: requestStart,
                                         taskCreated: now
                                 };
-                                const delay = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
+                                const creation = ((now - requestStart) / 1000).toFixed(1);
+                                const total = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
+                                console.log(`⏱ Task created in ${creation}s (total ${total}s)`);
                                 mockupTimes.pending = null;
                                 pollMockupStatus(taskId);
                         } else {
@@ -305,6 +311,7 @@ function pollMockupStatus(taskId, attempts = 0) {
                                         const now = Date.now();
                                         const total = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
                                         const postTask = ((now - mockupTimes[taskId].taskCreated) / 1000).toFixed(1);
+                                        console.log(`⏱ Mockup displayed in ${total}s (after task ${postTask}s)`);
                                         delete mockupTimes[taskId];
                                         setTimeout(triggerSelectedThumbnail, 0);
                                 }
