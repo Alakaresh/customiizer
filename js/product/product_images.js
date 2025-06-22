@@ -153,7 +153,6 @@ function generateMockup(mockupData) {
                                 console.log(`📊 Rate limit: ${data.data.rate_limit_remaining} remaining, reset ${data.data.rate_limit_reset}`);
                                 if (parseInt(data.data.rate_limit_remaining, 10) === 0) {
                                         mockupCooldownUntil = Date.now() + 60000;
-                                        showRateLimitMessage(60);
                                 }
                         }
                         if (data.success && data.data?.task_id) {
@@ -258,13 +257,13 @@ function showRateLimitMessage(seconds) {
                 document.body.appendChild(msg);
         }
         msg.style.display = 'block';
-        msg.textContent = `Veuillez patienter ${seconds} secondes avant de relancer un mockup.`;
+        msg.textContent = `Surcharge serveur, veuillez attendre ${seconds} secondes.`;
 
         if (cooldownInterval) clearInterval(cooldownInterval);
         cooldownInterval = setInterval(() => {
                 const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
                 if (remain > 0) {
-                        msg.textContent = `Veuillez patienter ${remain} secondes avant de relancer un mockup.`;
+                        msg.textContent = `Surcharge serveur, veuillez attendre ${remain} secondes.`;
                 } else {
                         msg.style.display = 'none';
                         clearInterval(cooldownInterval);
