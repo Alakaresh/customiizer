@@ -11,6 +11,8 @@ const mockupTimes = window.mockupTimes;
 // Stocke temporairement le dernier clic avant l'appel à generateMockup
 mockupTimes.pending = null;
 let currentLoadingOverlay = null;
+let mockupCooldownUntil = 0;
+let cooldownInterval = null;
 
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
@@ -97,6 +99,12 @@ function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
         productData = buildProductData(mockupData);
 
+        if (Date.now() < mockupCooldownUntil) {
+                const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
+                showRateLimitMessage(remain);
+                return;
+        }
+
         if (!mockupData || !selectedVariant?.mockups?.length) {
                 console.error("❌ Données insuffisantes pour générer un mockup.");
                 alert("Impossible de générer le mockup. Données manquantes.");
@@ -143,6 +151,10 @@ function generateMockup(mockupData) {
                 .then(data => {
                         if (typeof data.data?.rate_limit_remaining !== 'undefined') {
                                 console.log(`📊 Rate limit: ${data.data.rate_limit_remaining} remaining, reset ${data.data.rate_limit_reset}`);
+                                if (parseInt(data.data.rate_limit_remaining, 10) === 0) {
+                                        mockupCooldownUntil = Date.now() + 60000;
+                                        showRateLimitMessage(60);
+                                }
                         }
                         if (data.success && data.data?.task_id) {
                                 const taskId = data.data.task_id;
@@ -235,6 +247,30 @@ function triggerSelectedThumbnail() {
         if (activeThumb) {
                 activeThumb.click();
         }
+}
+
+function showRateLimitMessage(seconds) {
+        let msg = document.getElementById('rate-limit-message');
+        if (!msg) {
+                msg = document.createElement('div');
+                msg.id = 'rate-limit-message';
+                msg.className = 'rate-limit-message';
+                document.body.appendChild(msg);
+        }
+        msg.style.display = 'block';
+        msg.textContent = `Veuillez patienter ${seconds} secondes avant de relancer un mockup.`;
+
+        if (cooldownInterval) clearInterval(cooldownInterval);
+        cooldownInterval = setInterval(() => {
+                const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
+                if (remain > 0) {
+                        msg.textContent = `Veuillez patienter ${remain} secondes avant de relancer un mockup.`;
+                } else {
+                        msg.style.display = 'none';
+                        clearInterval(cooldownInterval);
+                        cooldownInterval = null;
+                }
+        }, 1000);
 }
 
 
