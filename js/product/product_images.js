@@ -82,7 +82,6 @@ function renderCurrentGroup() {
 			tooltip.style.opacity = "0";
 		});
 
-		console.log("image :",image);
 		// ✅ Ajout du clic pour générer un mockup
                 imgElement.addEventListener("click", function () {
                         // Démarre le chronomètre au clic sur l'image
@@ -193,7 +192,6 @@ function generateMockup(mockupData) {
                                         taskCreated: now
                                 };
                                 const delay = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
-                                console.log(`✅ Tâche Printful ${taskId} créée après ${delay}s depuis le clic`);
                                 mockupTimes.pending = null;
                                 pollMockupStatus(taskId);
                         } else {
@@ -246,7 +244,6 @@ function buildProductData(mockupData) {
                 }
         }
 
-        console.log("✅ productData construit :", productData);
         return productData;
 }
 
@@ -283,14 +280,12 @@ function cacheUpdatedMockup(styleId, mockupUrl) {
 function triggerSelectedThumbnail() {
         const activeThumb = document.querySelector('.image-thumbnails .thumbnail.selected');
         if (activeThumb) {
-                console.log('🔁 Re-cliquant sur le thumbnail sélectionné');
                 activeThumb.click();
         }
 }
 
 
 function updateMockupThumbnail(styleId, mockupUrl) {
-        console.log(`🔄 Mise à jour du thumbnail pour le style ${styleId}`);
 
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
 	if (!thumbnailsContainer) {
@@ -304,7 +299,6 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 // ✅ Met à jour l'image du thumbnail existant
                 thumbnailToUpdate.src = mockupUrl;
                 thumbnailToUpdate.classList.remove("processing");
-                console.log(`✅ Thumbnail mis à jour pour style ${styleId}`);
 
         } else {
 		console.warn(`⚠️ Aucun thumbnail trouvé pour le style ${styleId}, ajout en cours...`);
@@ -330,7 +324,6 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 });
 
                 thumbnailsContainer.appendChild(thumbnailToUpdate);
-                console.log(`✅ Nouveau thumbnail ajouté pour style ${styleId}`);
         }
 
         cacheUpdatedMockup(styleId, mockupUrl);
@@ -341,12 +334,9 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         }
 
 	// ✅ Simuler un clic pour mettre à jour l'image principale
-        console.log(`🔄 Activation automatique du thumbnail pour style ${styleId}`);
         if (styleId === getFirstMockup(selectedVariant)?.mockup_id) {
-                console.log(`🔄 Activation automatique du premier thumbnail (style ${styleId})`);
                 thumbnailToUpdate.click();
         } else if (window.currentMockup && window.currentMockup.mockup_id == styleId) {
-                console.log(`🔄 Re-clic sur le thumbnail sélectionné (${styleId})`);
                 thumbnailToUpdate.click();
         }
 

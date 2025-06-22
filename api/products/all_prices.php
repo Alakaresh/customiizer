@@ -29,7 +29,6 @@ function set_margin_for_all_variants(WP_REST_Request $req) {
 		$price = floatval($row['price']);
 		$sale_price = round($price * (1 + $margin / 100), 2);
 
-		error_log("🔧 Update variant $vid — price=$price — sale_price=$sale_price — margin=$margin");
 
 		$wpdb->update('WPC_variant_prices', [
 			'custom_margin' => $margin,
@@ -37,9 +36,7 @@ function set_margin_for_all_variants(WP_REST_Request $req) {
 		], ['variant_id' => $vid]);
 
 		if ($wpdb->last_error) {
-			error_log("❌ SQL error variant $vid: " . $wpdb->last_error);
 		} else {
-			error_log("✅ OK variant $vid");
 			$updated++;
 		}
 	}
