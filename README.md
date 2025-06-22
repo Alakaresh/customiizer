@@ -35,39 +35,9 @@ The panel also displays the current `product_id`, `variant_id` and `mockup_id` s
 The floating panel uses a grayscale theme so it stays visually distinct from the product page. The **Save** button now appears in black for higher contrast.
 
 
-## Batch mockup generation
+## Mockup generation
 
-Use the `/wp-json/api/v1/mockups/batch` endpoint to submit several mockup tasks at once. Send a JSON body with a `tasks` array containing one object per job. Each task mirrors the payload required by Printful's `mockup-tasks` API:
-
-```json
-{
-  "tasks": [
-    {
-      "catalog_product_id": 123,
-      "catalog_variant_ids": [456],
-      "mockup_style_ids": [1],
-      "image_url": "https://example.com/mockup.png",
-      "placement": "front",
-      "technique": "DTG",
-      "width": 12.0,
-      "height": 16.0,
-      "top": 0,
-      "left": 0
-    }
-  ]
-}
-```
-
-A successful call returns the created Printful task IDs:
-
-```json
-{
-  "success": true,
-  "task_ids": [1234567, 1234568]
-}
-```
-
-Printful processes the batch asynchronously. When each task finishes, the theme receives a `mockup_task_finished` webhook. Set this webhook URL in your Printful dashboard so generated images are saved automatically.
+Send a single request to the `generate_mockup` AJAX action to create one Printful task at a time. POST to `/wp-admin/admin-ajax.php` with `action=generate_mockup` and the fields required by Printful (image URL, product ID, variant ID, `mockup_style_ids`, placement, technique, width, height, top and left). The response returns the created `task_id` that can be checked with `/wp-json/customiizer/v1/mockup-status` once the Printful webhook completes.
 
 ## Printful API key
 
