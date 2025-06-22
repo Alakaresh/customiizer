@@ -39,7 +39,7 @@ The floating panel uses a grayscale theme so it stays visually distinct from the
 
 Send a single request to the `generate_mockup` AJAX action to create one Printful task at a time. POST to `/wp-admin/admin-ajax.php` with `action=generate_mockup` and the fields required by Printful (image URL, product ID, variant ID, `mockup_style_ids`, placement, technique, width, height, top and left). The response returns the created `task_id` that can be checked with `/wp-json/customiizer/v1/mockup-status` once the Printful webhook completes.
 
-During this process, the browser logs how long each step takes. A message appears when the task is created and another when the mockup image finally displays. Each log indicates the total time since the click and the time spent after the task was created.
+During this process, the browser logs how long each step takes. A message appears when the task is created and another when the mockup image finally displays. Each log indicates the total time since the click and the time spent after the task was created. The script also prints the `X-Rate-Limit-Remaining` and `X-Rate-Limit-Reset` headers returned by Printful so you can monitor usage limits.
 
 ## Printful API key
 

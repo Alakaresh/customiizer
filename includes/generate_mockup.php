@@ -54,6 +54,19 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+        $resp_headers = [];
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($curl, $header) use (&$resp_headers) {
+                $len = strlen($header);
+                $parts = explode(':', $header, 2);
+                if (count($parts) < 2) {
+                        return $len;
+                }
+                $name = strtolower(trim($parts[0]));
+                $value = trim($parts[1]);
+                $resp_headers[$name] = $value;
+                return $len;
+        });
+
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -65,14 +78,25 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
 
         curl_close($ch);
 
+        $remaining = isset($resp_headers['x-ratelimit-remaining']) ? (int)$resp_headers['x-ratelimit-remaining'] : (isset($resp_headers['x-rate-limit-remaining']) ? (int)$resp_headers['x-rate-limit-remaining'] : null);
+        $reset     = isset($resp_headers['x-ratelimit-reset']) ? (int)$resp_headers['x-ratelimit-reset'] : (isset($resp_headers['x-rate-limit-reset']) ? (int)$resp_headers['x-rate-limit-reset'] : null);
 
         if ($httpCode !== 200) {
-                $duration = round(microtime(true) - $start, 3);
-                return ['success' => false, 'error' => "Erreur HTTP {$httpCode}", 'printful_response' => $result];
+                return [
+                        'success' => false,
+                        'error'   => "Erreur HTTP {$httpCode}",
+                        'printful_response' => $result,
+                        'rate_limit_remaining' => $remaining,
+                        'rate_limit_reset' => $reset
+                ];
         }
 
-        $duration = round(microtime(true) - $start, 3);
-        return json_decode($result, true);
+        $decoded = json_decode($result, true);
+        if (is_array($decoded)) {
+                $decoded['rate_limit_remaining'] = $remaining;
+                $decoded['rate_limit_reset'] = $reset;
+        }
+        return $decoded;
 }
 
 
@@ -141,13 +165,21 @@ function handle_generate_mockup() {
         $task_id = $response['data'][0]['id'];
         customiizer_store_mockup_file($task_id, $file_path);
         $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_success(['task_id' => $task_id]);
+        wp_send_json_success([
+            'task_id' => $task_id,
+            'rate_limit_remaining' => $response['rate_limit_remaining'] ?? null,
+            'rate_limit_reset' => $response['rate_limit_reset'] ?? null
+        ]);
     } else {
         if (!unlink($file_path)) {
         } else {
         }
         $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_error(['message' => $response['error'] ?? 'Erreur inconnue']);
+        wp_send_json_error([
+            'message' => $response['error'] ?? 'Erreur inconnue',
+            'rate_limit_remaining' => $response['rate_limit_remaining'] ?? null,
+            'rate_limit_reset' => $response['rate_limit_reset'] ?? null
+        ]);
     }
 }
 function convert_webp_to_png_server($image_url) {
