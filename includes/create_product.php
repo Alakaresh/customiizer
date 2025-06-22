@@ -9,7 +9,6 @@ function customiizer_generate_product() {
 	if (!$data) {
 		wp_send_json_error('Format JSON invalide');
 	}
-	customiizer_log('📦 [AJAX] Données reçues pour création produit : ' . json_encode($data));
 	// Nettoyage des données
 	$product_name = sanitize_text_field($data['product_name'] ?? 'Produit personnalisé ' . current_time('d/m/Y H:i'));
 	$product_price = floatval($data['product_price'] ?? 0);

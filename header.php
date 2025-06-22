@@ -179,7 +179,6 @@ $display_name = $current_user->display_name;
 				myCreationsLink.on('click', function(event) {
 					if (!userIsLoggedIn) {
 						event.preventDefault();
-						console.log("🔒 Utilisateur non connecté, ouverture du modal de connexion...");
 
 						// Stocke l’intention dans sessionStorage
 						sessionStorage.setItem("redirectAfterLogin", "myCreations");

@@ -7,7 +7,6 @@ function save_imported_image_from_url() {
     $size = isset($_POST['size']) ? intval($_POST['size']) : 0;
 
     if (empty($url) || empty($name)) {
-        customiizer_log("Paramètre manquant.");
         wp_send_json_error("Paramètre manquant.");
         return;
     }
@@ -25,7 +24,6 @@ function save_imported_image_from_url() {
     // Décoder l'image encodée en base64
     $decodedData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $url));
     if (!$decodedData) {
-        customiizer_log("Erreur lors du décodage de l'image.");
         wp_send_json_error("Erreur lors du décodage de l'image.");
         return;
     }
@@ -36,7 +34,6 @@ function save_imported_image_from_url() {
     finfo_close($finfo);
 
     if (!in_array($mimeType, ['image/jpeg', 'image/png'])) {
-        customiizer_log("Type MIME non pris en charge : $mimeType.");
         wp_send_json_error("Seuls les fichiers PNG et JPG sont acceptés.");
         return;
     }
@@ -44,7 +41,6 @@ function save_imported_image_from_url() {
     // Convertir en WebP
     $sourceImage = imagecreatefromstring($decodedData);
     if (!$sourceImage) {
-        customiizer_log("Erreur lors du chargement de l'image.");
         wp_send_json_error("Erreur lors du chargement de l'image.");
         return;
     }
@@ -58,7 +54,6 @@ function save_imported_image_from_url() {
 
     if (!imagewebp($sourceImage, $tmpFile)) {
         imagedestroy($sourceImage);
-        customiizer_log("Erreur lors de la conversion de l'image en WebP.");
         wp_send_json_error("Erreur lors de la conversion de l'image en WebP.");
         return;
     }
@@ -68,7 +63,6 @@ function save_imported_image_from_url() {
     $blobClient = azure_get_blob_client();
     if (!$blobClient) {
         unlink($tmpFile);
-        customiizer_log("Erreur de connexion à Azure.");
         wp_send_json_error("Erreur de connexion à Azure.");
         return;
     }
@@ -76,7 +70,6 @@ function save_imported_image_from_url() {
     // Téléverser dans Azure
     if (!azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
         unlink($tmpFile);
-        customiizer_log("Erreur lors du téléversement de l'image.");
         wp_send_json_error("Erreur lors du téléversement de l'image.");
         return;
     }
@@ -99,7 +92,6 @@ function save_imported_image_from_url() {
     );
 
     if ($result === false) {
-        customiizer_log("Erreur lors de l'insertion dans la base de données : " . $wpdb->last_error);
         wp_send_json_error("Erreur lors de l'insertion dans la base de données : " . $wpdb->last_error);
         return;
     }
@@ -129,7 +121,6 @@ function get_saved_images() {
     ", $user_id), ARRAY_A);
 
     if (!$results) {
-        customiizer_log("Aucune image enregistrée pour l'utilisateur ID : $user_id.");
         wp_send_json_error("Aucune image enregistrée.");
     } else {
         wp_send_json_success($results);

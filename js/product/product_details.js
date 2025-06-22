@@ -64,7 +64,6 @@ jQuery(document).ready(function ($) {
                                 const data = await res.json();
                                 if (data.success && data.template) {
                                         window.customizerCache.templates[vid] = data.template;
-                                        console.log('[Cache] Template préchargé pour', vid);
                                 }
                         } catch (e) {
                                 console.error('[Cache] Erreur préchargement template:', e);
@@ -76,7 +75,6 @@ jQuery(document).ready(function ($) {
                         const loader = new THREE.GLTFLoader();
                         loader.load(modelUrl, (gltf) => {
                                 window.customizerCache.models[modelUrl] = gltf;
-                                console.log('[Cache] Modèle 3D préchargé pour', modelUrl);
                         }, undefined, (err) => {
                                 console.error('[Cache] Erreur préchargement modèle 3D:', err);
                         });
@@ -91,7 +89,6 @@ jQuery(document).ready(function ($) {
                 myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
                 communityImages = images.filter(img => img.user_id !== currentUser.ID);
 
-                console.log("myGeneratedImages :", myGeneratedImages);
                 displayGeneratedImages(myGeneratedImages);
 
                 // Si une variante est déjà sélectionnée, met à jour la bottom-bar
@@ -132,7 +129,6 @@ jQuery(document).ready(function ($) {
 
         // Charger les détails d'un produit
         function loadProductDetails(productId) {
-                console.log("productId :", productId);
                 showLoadingOverlay();
 
                 // Assure la présence du cache et du sous-objet 'variants'
@@ -159,7 +155,6 @@ jQuery(document).ready(function ($) {
                         updateProductDisplay(currentVariants);
                         console.group("🎨 Variantes disponibles (couleurs & tailles)");
                         currentVariants.forEach(v => {
-                                console.log(`- ID: ${v.variant_id} | Couleur: ${v.color || '(aucune)'} | Taille: ${v.size || '(aucune)'} | Stock: ${v.stock}`);
                         });
                         console.groupEnd();
                 }).catch(error => {
@@ -243,7 +238,6 @@ jQuery(document).ready(function ($) {
 			updatePriceAndDelivery(selectedVariant);
 			updateMainImage(selectedVariant);
 			updateThumbnails([selectedVariant]);
-			console.log("selectedVariant :", selectedVariant);
 
 			// Gestion du stock
 			const outOfStock = selectedVariant.stock === 'out of stock' || selectedVariant.stock === 'discontinued';
@@ -434,7 +428,6 @@ jQuery(document).ready(function ($) {
 					top: 0
 				};
 
-				console.log("🚀 Déclenchement automatique de generateMockup :", mockupData);
 				generateMockup(mockupData);
 			}
 		}, 200);

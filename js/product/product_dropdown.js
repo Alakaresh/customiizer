@@ -96,8 +96,6 @@ jQuery(document).ready(function ($) {
 		.replace(/[^a-z0-9-]/g, ''); // Supprime caractères spéciaux
 
                 window.currentProductId = product.product_id;
-                console.log("currentProductId :", window.currentProductId);
-                console.log("product :",product);
                const newUrl = `/configurateur?nom=${encodeURIComponent(nom)}&id=${product.product_id}&url=${image_url}&mockup=${mockup}`;
                history.pushState(null, null, newUrl);
 

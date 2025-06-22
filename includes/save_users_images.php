@@ -11,19 +11,16 @@ function save_image_from_url() {
 
 		if (empty($url) || empty($name) || empty($prefix) || empty($ratio)) {
 			$msg = "❌ Paramètre(s) manquant(s)";
-			customiizer_log($msg);
 			wp_send_json_error(['message' => $msg]);
 		}
 
 		$user_id = get_current_user_id();
 		$blobName = "$user_id/$prefix" . "_" . "$name.webp";
-		customiizer_log("📂 Blob cible Azure : $blobName");
 
 		// Traitement image
 		$tmpFile = ajusterEtSauvegarderImageWebP($url, $blobName, $ratio);
 		if ($tmpFile === false) {
 			$msg = "❌ Erreur pendant le traitement de l'image";
-			customiizer_log($msg);
 			wp_send_json_error(['message' => $msg, 'source_url' => $url]);
 		}
 
@@ -31,7 +28,6 @@ function save_image_from_url() {
 		$blobClient = azure_get_blob_client();
 		if (!$blobClient) {
 			$msg = "❌ Erreur de connexion Azure";
-			customiizer_log($msg);
 			wp_send_json_error(['message' => $msg]);
 		}
 
@@ -42,11 +38,9 @@ function save_image_from_url() {
 			wp_send_json_success(['message' => "Image uploadée", 'blob' => $blobName]);
 		} else {
 			$msg = "❌ Échec de l'upload Azure";
-			customiizer_log($msg);
 			wp_send_json_error(['message' => $msg]);
 		}
 	} catch (Throwable $e) {
-		customiizer_log("💥 Exception attrapée : " . $e->getMessage());
 		wp_send_json_error([
 			'message' => "Erreur fatale attrapée",
 			'exception' => $e->getMessage()
@@ -63,7 +57,6 @@ function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
 		list($w, $h) = explode(':', $ratio);
 		$ratioNumerique = floatval($w) / floatval($h);
 	} else {
-		customiizer_log("❌ Ratio mal formé : $ratio");
 		return false;
 	}
 
@@ -81,13 +74,11 @@ function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
 	curl_close($ch);
 
 	if (!$data || $httpCode >= 400) {
-		customiizer_log("❌ Échec téléchargement image [HTTP $httpCode] : $error");
 		return false;
 	}
 
 	$source = imagecreatefromstring($data);
 	if (!$source) {
-		customiizer_log("❌ Impossible de créer une image à partir des données téléchargées.");
 		return false;
 	}
 

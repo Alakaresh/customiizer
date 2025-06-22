@@ -196,7 +196,6 @@ function loadModel(modelUrl, productColor = null) {
 		});
 
                 scene.add(gltf.scene);
-                console.log("[3D] ✅ Zones imprimables :", Object.keys(printableMeshes));
                 hide3DLoader(renderer.domElement.parentElement);
         };
 
@@ -259,7 +258,6 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
         mesh.material.map = texture;
         mesh.material.color.setHex(0xffffff);
         mesh.material.needsUpdate = true;
-        console.log(`[3D] ✅ Texture appliquée à '${mesh.name}'`);
 };
 
 // Permet de supprimer la texture appliquée sur le modèle 3D
@@ -284,7 +282,6 @@ window.clear3DTexture = function (zoneName = null) {
                 mesh.material.color.setHex(mesh.material.userData.baseColor);
         }
         mesh.material.needsUpdate = true;
-        console.log(`[3D] ✅ Texture nettoyée pour '${mesh.name}'`);
 };
 
 window.logPrintableMeshPosition = function (zoneName = null) {
@@ -305,5 +302,4 @@ window.logPrintableMeshPosition = function (zoneName = null) {
 
         mesh.geometry.computeBoundingBox();
         const box = mesh.geometry.boundingBox;
-        console.log(`[3D Debug] BBox de '${mesh.name}' :`, box);
 };

@@ -17,9 +17,7 @@ const CanvasManager = {
 		template.print_area_height = parseFloat(template.print_area_height);
 		template.template_width = parseFloat(template.template_width);
 		template.template_height = parseFloat(template.template_height);
-		console.log('[🧩 SELECTED] Nouvelle variante sélectionnée :', selectedVariant);
 
-		console.log("[🧠 DEBUG TEMPLATE]", {
 			width: template.template_width,
 			height: template.template_height,
 			print_left: template.print_area_left,
@@ -89,7 +87,6 @@ const CanvasManager = {
 			productOverlay = img;
                         canvas.add(productOverlay);
                         canvas.bringToFront(productOverlay);
-			console.log(`✅ Image de fond scaleX=${scaleX}, scaleY=${scaleY}`);
 		}, { crossOrigin: 'anonymous' });
 
                 // 🔁 Resize automatique au conteneur
@@ -282,10 +279,8 @@ const CanvasManager = {
                        const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
                        if (imageObject) {
                                const bounds = imageObject.getBoundingRect(true);
-                               console.log('[Debug] 2D bounds :', bounds, 'zoom=', canvas.getZoom());
                        }
                        if (window.update3DTextureFromCanvas) {
-                               console.log('[Debug] Offscreen size:', offscreen.width, offscreen.height);
                                window.update3DTextureFromCanvas(offscreen);
                                if (window.logPrintableMeshPosition) {
                                        window.logPrintableMeshPosition();
@@ -338,8 +333,6 @@ const CanvasManager = {
 		const sourceW = visibleWidth / scaleX;
 		const sourceH = visibleHeight / scaleY;
 
-		console.log("[Crop Debug] 🖼️ Source image crop:", { sourceX, sourceY, sourceW, sourceH });
-		console.log("[Crop Debug] 🧱 Canvas output:", { width: visibleWidth, height: visibleHeight });
 
 		// ✅ Draw avec source + destination
 		ctx.drawImage(
