@@ -5,7 +5,6 @@ window.CommunityImagesCache = {
 
 async function preloadCommunityImages(params = {}) {
         if (window.CommunityImagesCache.isLoaded) {
-                console.log("[ImageManager] 📦 Images déjà chargées (cache)");
                 // Notifie immédiatement les écouteurs que les images sont prêtes
                 document.dispatchEvent(new CustomEvent('communityImagesLoaded', {
                         detail: { images: window.CommunityImagesCache.images }
@@ -13,7 +12,6 @@ async function preloadCommunityImages(params = {}) {
                 return;
         }
 
-	console.log("[ImageManager] 🔥 Chargement des images depuis API...");
 
 	const apiUrl = new URL("/wp-json/api/v1/images/load", window.location.origin);
 	Object.keys(params).forEach(key => {
@@ -29,7 +27,6 @@ async function preloadCommunityImages(params = {}) {
                 if (data.success && Array.isArray(data.images)) {
                         window.CommunityImagesCache.images = data.images;
                         window.CommunityImagesCache.isLoaded = true;
-                        console.log("[ImageManager] ✅ Images préchargées :", data.images.length);
                         // Informe les autres scripts que les images sont disponibles
                         document.dispatchEvent(new CustomEvent('communityImagesLoaded', {
                                 detail: { images: data.images }

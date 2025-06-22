@@ -3,8 +3,6 @@ window.currentProductId = window.currentProductId || null;
 window.mockupTimes = window.mockupTimes || {};
 function displayGeneratedImages(images) {
         const siteFilesList = jQuery('#siteFilesList');
-        console.log("siteFilesList :",siteFilesList);
-        console.log("images :",images);
         siteFilesList.empty();
         if (!images.length) {
 		siteFilesList.append('<div class="no-images">Aucune image trouvée.</div>');
@@ -40,7 +38,6 @@ function uploadBase64ToServer(base64Data, debugId) {
                 debugId = `image_${Date.now()}`;
         }
         const filename = `${debugId}.png`;
-        console.log(`[Upload] 🔄 Envoi de l’image ${filename}`);
 
 	const formData = new FormData();
 	formData.append('action', 'save_image_from_base64');
@@ -59,8 +56,6 @@ jQuery(document).ready(function ($) {
         jQuery('#saveDesignButton').on('click', function () {
                 // Démarre le suivi du temps dès le clic sur "Save to template"
                 window.mockupTimes.pending = Date.now();
-                console.log('[Timer] 💾 Clic sur "Save to template"');
-                console.log("[UI] 💾 Enregistrement du design (mockup)");
 
                 jQuery('#customizeModal').hide();
 
@@ -88,7 +83,6 @@ jQuery(document).ready(function ($) {
                                 top: 0
                         };
 
-                        console.log("[Mockup] 🌐 Données prêtes avec image URL :", mockupData);
                         generateMockup(mockupData);
                 });
 
@@ -96,7 +90,6 @@ jQuery(document).ready(function ($) {
 });
 
 jQuery(document).ready(function ($) {
-        console.log("[JS] Initialisation du modal de personnalisation...");
 
         let importedFiles = [];
         let allGeneratedImages = [];
@@ -333,9 +326,7 @@ jQuery(document).ready(function ($) {
 
                                 template = data.template;
                                 window.customizerCache.templates[selectedVariant.variant_id] = template;
-                                console.log('[Cache] Template chargé et stocké pour', selectedVariant.variant_id);
                         } else {
-                                console.log('[Cache] Template récupéré depuis le cache pour', selectedVariant.variant_id);
                         }
 
                         // 2. Lancer Fabric.js dans le container
@@ -643,7 +634,6 @@ jQuery(document).ready(function ($) {
                         });
 
                         const result = await response.json();
-                        console.log("result :",result);
                         if (result.success) {
                                 fetchUserImages();
                         } else {

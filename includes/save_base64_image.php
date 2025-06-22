@@ -19,10 +19,8 @@ function save_image_from_base64() {
         wp_send_json_error(['message' => 'Erreur lors de la sauvegarde du fichier.'], 500);
     }
 
-    customiizer_log("📥 Fichier temporaire sauvegardé : $file_path");
 
     $url = trailingslashit($upload_dir['url']) . $filename;
-    customiizer_log("✅ URL publique générée : $url");
     wp_send_json_success(['image_url' => $url]);
 }
 add_action('wp_ajax_save_image_from_base64', 'save_image_from_base64');
