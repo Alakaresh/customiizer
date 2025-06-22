@@ -18,16 +18,6 @@ const CanvasManager = {
 		template.template_width = parseFloat(template.template_width);
 		template.template_height = parseFloat(template.template_height);
 
-			width: template.template_width,
-			height: template.template_height,
-			print_left: template.print_area_left,
-			print_top: template.print_area_top,
-			print_width: template.print_area_width,
-			print_height: template.print_area_height,
-			image_url: template.image_url
-		});
-
-
 		// 🔍 Conteneur principal
                 const container = document.getElementById(containerId);
                 if (!container) {
