@@ -6,6 +6,11 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
                 return ['success' => false, 'error' => 'PRINTFUL_API_KEY undefined'];
         }
 
+        if (!customiizer_can_create_mockup()) {
+                customiizer_log('❌ Printful rate limit reached. Mockup skipped');
+                return ['success' => false, 'error' => 'rate_limit_reached'];
+        }
+
         $api_key = PRINTFUL_API_KEY;
         $url = 'https://api.printful.com/v2/mockup-tasks';
         $start = microtime(true);
@@ -54,6 +59,19 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
+        $response_headers = [];
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($curl, $header) use (&$response_headers) {
+                $len = strlen($header);
+                $parts = explode(':', $header, 2);
+                if (count($parts) < 2) {
+                        return $len;
+                }
+                $name = strtolower(trim($parts[0]));
+                $value = trim($parts[1]);
+                $response_headers[$name] = $value;
+                return $len;
+        });
+
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -65,6 +83,12 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
 
         curl_close($ch);
 
+        $remaining = $response_headers['x-ratelimit-remaining'] ?? null;
+        $reset     = $response_headers['x-ratelimit-reset'] ?? null;
+        if ($remaining !== null) {
+                customiizer_update_printful_rate_limit($remaining, $reset);
+                customiizer_log("Printful rate limit: remaining=$remaining reset=$reset");
+        }
 
         if ($httpCode !== 200) {
                 $duration = round(microtime(true) - $start, 3);

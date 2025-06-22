@@ -64,3 +64,31 @@ function customiizer_frontend_version() {
 
     return $frontend_version;
 }
+
+/**
+ * Update stored Printful rate limit information.
+ */
+function customiizer_update_printful_rate_limit($remaining, $reset) {
+    $data = [
+        'remaining' => is_numeric($remaining) ? (int) $remaining : null,
+        'reset'     => is_numeric($reset) ? (int) $reset : null,
+    ];
+    update_option('customiizer_printful_rate', $data);
+}
+
+/**
+ * Get the last saved Printful rate limit data.
+ */
+function customiizer_get_printful_rate_limit() {
+    $default = ['remaining' => null, 'reset' => null];
+    $rate = get_option('customiizer_printful_rate', $default);
+    return is_array($rate) ? array_merge($default, $rate) : $default;
+}
+
+/**
+ * Determine whether a new mockup request can be sent to Printful.
+ */
+function customiizer_can_create_mockup() {
+    $rate = customiizer_get_printful_rate_limit();
+    return !($rate['remaining'] !== null && $rate['remaining'] <= 0);
+}

@@ -22,6 +22,10 @@ function customiizer_mockups_batch(WP_REST_Request $req) {
 
     $task_ids = [];
     foreach ($tasks as $task) {
+        if (!customiizer_can_create_mockup()) {
+            customiizer_log('❌ Printful rate limit reached. Mockup skipped');
+            break;
+        }
         $body = [
             'format' => 'png',
             'products' => [
@@ -66,9 +70,10 @@ function customiizer_mockups_batch(WP_REST_Request $req) {
             'timeout' => 20,
         ]);
 
-        // Log rate limiting information from Printful headers
+        // Log and store rate limiting information from Printful headers
         $remaining = wp_remote_retrieve_header($response, 'x-ratelimit-remaining');
         $reset     = wp_remote_retrieve_header($response, 'x-ratelimit-reset');
+        customiizer_update_printful_rate_limit($remaining, $reset);
         customiizer_log("Printful rate limit: remaining=$remaining reset=$reset");
 
         $task_data = json_decode(wp_remote_retrieve_body($response), true);

@@ -83,6 +83,13 @@ If the constant is missing, functions like `generate_mockups_printful()` return 
 
 Some API calls target a specific Printful store. Define the constant `PRINTFUL_STORE_ID` in `wp-config.php` to automatically add the `X-PF-Store-Id` header when communicating with Printful. When not defined, the header is omitted and your default store is used.
 
+## Printful rate limits
+
+The theme records the `X-RateLimit-Remaining` header returned by Printful after
+each mockup request. The value is stored in the `customiizer_printful_rate`
+option and logged alongside the reset time. When the stored remaining quota
+reaches `0`, new mockup tasks are refused until the limit resets.
+
 ## Mockup status endpoint
 
 Generated mockups are cached when the `mockup_task_finished` webhook fires. Check the status of a Printful task using:
