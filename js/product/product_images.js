@@ -141,6 +141,9 @@ function generateMockup(mockupData) {
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
+                        if (typeof data.data?.rate_limit_remaining !== 'undefined') {
+                                console.log(`📊 Rate limit: ${data.data.rate_limit_remaining} remaining, reset ${data.data.rate_limit_reset}`);
+                        }
                         if (data.success && data.data?.task_id) {
                                 const taskId = data.data.task_id;
                                 const now = Date.now();
