@@ -25,7 +25,6 @@ register_rest_route(
 );
 
 /*────────────────────────── LOG ──────────────────────────*/
-function product_log( string $msg, string $ctx = 'create' ): void {
 	$log = __DIR__ . '/logs/create_product.log';
 	if ( ! file_exists( dirname( $log ) ) ) {
 		wp_mkdir_p( dirname( $log ) );
@@ -39,8 +38,6 @@ function product_log( string $msg, string $ctx = 'create' ): void {
 function db_err( string $label ): void {
 	global $wpdb;
 	if ( $wpdb->last_error !== '' ) {
-		product_log( "❌ $label : " . $wpdb->last_error, 'sql' );
-		product_log( "     ↳ " . $wpdb->last_query,       'sql' );
 	}
 }
 
@@ -54,7 +51,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 	$catalog_id = (int) $req['catalog_id'];
 	$variant_print_buffer = [];
-	product_log( "→ create/$catalog_id" );
 
 	$token = PRINTFUL_API_KEY;
 	$base  = defined( 'PRINTFUL_API_BASE' ) ? PRINTFUL_API_BASE : 'https://api.printful.com/v2';
@@ -66,7 +62,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 	$p_resp   = wp_remote_get( $prod_url, [ 'headers' => $hdr, 'timeout' => 15 ] );
 	$p_data   = json_decode( wp_remote_retrieve_body( $p_resp ), true )['data'] ?? null;
 	if ( ! $p_data ) {
-		product_log( '❌ produit introuvable', 'error' );
 		return new WP_REST_Response( [ 'success'=>false, 'msg'=>'product not found' ], 404 );
 	}
 	$original_name = $p_data['name'];
@@ -95,16 +90,13 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 	/* ============= 2) MOCKUP-STYLES (« Default ») ================ */
 
 	$mock_url = "$base/catalog-products/$catalog_id/mockup-styles";
-	product_log("📥 Requête mockup-styles URL = $mock_url", 'mockup');
 
 	$mock_resp_raw = wp_remote_get($mock_url, [ 'headers'=>$hdr, 'timeout'=>15 ]);
 	$mock_body = wp_remote_retrieve_body($mock_resp_raw);
 	$mock_json = json_decode($mock_body, true)['data'] ?? [];
 
 	if (empty($mock_json)) {
-		product_log("❌ Aucun mockup-style récupéré — réponse brute : " . $mock_body, 'mockup');
 	} else {
-		product_log("✅ ".count($mock_json)." styles de mockups récupérés", 'mockup');
 	}
 
 	$mock_by_variant = [];
@@ -115,18 +107,15 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		$width     = $m['print_area_width'] ?? 0;
 		$height    = $m['print_area_height'] ?? 0;
 
-		product_log("🔍 Style $i — technique=$technique | placement=$placement | area=(${width}x${height})", 'mockup');
 
 		foreach ($m['mockup_styles'] ?? [] as $s) {
 			$style_id = $s['id'] ?? '??';
 			$variants = $s['restricted_to_variants'] ?? [];
 
 			if (empty($variants)) {
-				product_log("⚠️ Style $style_id ignoré (aucune variante liée)", 'mockup');
 				continue;
 			}
 
-			product_log("➕ Style ID=$style_id applicable à ".count($variants)." variante(s)", 'mockup');
 
 			foreach ($variants as $vid) {
 				$mock_by_variant[$vid][] = [
@@ -388,7 +377,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 						$i--;
 						continue 2; // saute à la prochaine itération de la boucle FOR
 					} else {
-						product_log("❌ Erreur tâche mockup_id=$style_id : " . json_encode($task_data), 'mockup_fail');
 						break;
 					}
 				}
@@ -423,7 +411,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 							$image_data = wp_remote_retrieve_body(wp_remote_get($url));
 							if ($image_data) {
 								file_put_contents($full_path, $image_data);
-								product_log("💡 Saving mockup_id=$style_id for variant_id=$vid — url=$relative_url", 'mockup');
 
 								$wpdb->replace(
 									'WPC_variant_mockup',
@@ -452,7 +439,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 			}
 
 			if (!$success) {
-				product_log("❌ Mockup_id=$style_id (variant_id=$vid) échoué après $retry_count tentatives", 'mockup_fail');
 				$failed_mockups[] = [ 'variant_id' => $vid, 'style_id' => $style_id ];
 			}
 		}
@@ -460,14 +446,12 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		// ➕ Log en fin de traitement
 		if (!empty($failed_mockups)) {
 			foreach ($failed_mockups as $fail) {
-				product_log("🛑 Mockup manquant : variant_id={$fail['variant_id']} — style_id={$fail['style_id']}", 'summary');
 			}
 		}
 		db_err('variant_mockup ' . $vid);
 
 	}
 
-	product_log(
 		"↳ variant #$vid | $color $size | price=$price | avail=$avail",
 		'db'
 	);
@@ -481,7 +465,6 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		if (empty($tpl['catalog_variant_ids'])) continue;
 
 		foreach ($tpl['catalog_variant_ids'] as $vid) {
-			product_log("📦 Template pour variant_ids=[" . implode(',', $tpl['catalog_variant_ids']) . "] — image_url=" . ($tpl['image_url'] ?? 'NULL'), 'mockup');
 
 			$wpdb->replace(
 				'WPC_variant_templates',
@@ -501,11 +484,9 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		}
 	}
 
-	product_log( "✅ FIN UPSERT catalog_id=$catalog_id", 'db' );
 	echo "✅ Terminé avec succès !\n";
 	if (!empty($failed_mockups)) {
 		foreach ($failed_mockups as $fail) {
-			product_log("🛑 Mockup manquant : variant_id={$fail['variant_id']} — style_id={$fail['style_id']}", 'summary');
 		}
 	}
 
@@ -559,7 +540,6 @@ function convert_size_to_cm($size) {
 		$val1 = round(floatval($matches[0][0]) * 2.54, 1);
 		$val2 = round(floatval($matches[0][1]) * 2.54, 1);
 		$converted = "{$val1} x {$val2} cm";
-		product_log("📐 Conversion double : \"$original\" → \"$converted\"", 'size');
 		return $converted;
 	}
 
@@ -568,11 +548,9 @@ function convert_size_to_cm($size) {
 	if (preg_match('/^(\d+)(oz)$/i', $size, $m)) {
 		$ml = round($m[1] * 29.5735);
 		$converted = "{$ml} ml";
-		product_log("🥤 Conversion volume : \"$original\" → \"$converted\"", 'size');
 		return $converted;
 	}
 
-	product_log("⚠️ Taille non convertie : \"$original\" → inchangé", 'size');
 	return $original;
 }
 
@@ -621,7 +599,6 @@ EOT;
 		"temperature" => 0.2
 	];
 
-	product_log("📝 Traduction Mistral : nom='$name' | description='" . mb_substr($description, 0, 100) . "...'", 'translate');
 
 	$response = wp_remote_post($apiUrl, [
 		'headers' => $headers,
@@ -630,7 +607,6 @@ EOT;
 	]);
 
 	if (is_wp_error($response)) {
-		product_log("❌ Erreur API Mistral : " . $response->get_error_message(), 'translate');
 		return [ 'name' => $name, 'description' => $description ];
 	}
 
@@ -642,17 +618,12 @@ EOT;
 		// Nettoyage : suppression éventuelle des balises Markdown
 		$content_clean = preg_replace('/^```json|```$/m', '', trim($content));
 		$parsed = json_decode($content_clean, true);
-		product_log("🧪 JSON brut reçu (nettoyé) : " . $content_clean, 'translate');
 
 		if (json_last_error() === JSON_ERROR_NONE && isset($parsed['name'], $parsed['description'])) {
-			product_log("✅ Traduction réussie : name='" . $parsed['name'] . "'", 'translate');
-			product_log("✅ Description traduite : " . mb_substr($parsed['description'], 0, 100) . "...", 'translate');
 			return $parsed;
 		} else {
-			product_log("⚠️ JSON invalide reçu : $content", 'translate');
 		}
 	} else {
-		product_log("⚠️ Réponse vide de Mistral : $raw", 'translate');
 	}
 
 	return [ 'name' => $name, 'description' => $description ]; // fallback
