@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
 function enableImageEnlargement() {
         // D'abord retirer l'ancien event listener si présent
         document.removeEventListener('click', handleImageClick);
@@ -299,6 +300,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                                 console.log("📦 API produits/format :", data);
                                 window.previewFormatCache[formatImage] = data;
                                 persistPreviewCache();
+
                                 processData(data);
                         })
                         .catch(err => {
