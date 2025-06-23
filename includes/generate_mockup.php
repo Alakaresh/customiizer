@@ -72,6 +72,7 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
 
         if (curl_errno($ch)) {
                 $error_msg = curl_error($ch);
+                customiizer_log("Erreur cURL Printful: $error_msg");
                 curl_close($ch);
                 return ['success' => false, 'error' => $error_msg];
         }
@@ -82,6 +83,7 @@ function generate_mockups_printful($image_url, $product_id, $variant_id, array $
         $reset     = isset($resp_headers['x-ratelimit-reset']) ? (int)$resp_headers['x-ratelimit-reset'] : (isset($resp_headers['x-rate-limit-reset']) ? (int)$resp_headers['x-rate-limit-reset'] : null);
 
         if ($httpCode !== 200) {
+                customiizer_log("Erreur Printful $httpCode: $result");
                 return [
                         'success' => false,
                         'error'   => "Erreur HTTP {$httpCode}",
