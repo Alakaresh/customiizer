@@ -11,7 +11,7 @@ get_header();
 
 	<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/cart.css">
+               <!-- Style moved to assets.php -->
 	</head>
 
 	<body>
