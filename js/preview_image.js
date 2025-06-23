@@ -1,9 +1,41 @@
-function enableImageEnlargement() {
-	// D'abord retirer l'ancien event listener si présent
-	document.removeEventListener('click', handleImageClick);
+// Cache local pour les correspondances format → produits
+try {
+    const saved = sessionStorage.getItem('previewFormatCache');
+    window.previewFormatCache = {
+        ...(saved ? JSON.parse(saved) : {}),
+        ...(window.previewFormatCache || {})
+    };
+} catch (e) {
+    window.previewFormatCache = window.previewFormatCache || {};
+}
 
-	// Puis ajouter le nouvel event listener
-	document.addEventListener('click', handleImageClick);
+function persistPreviewCache() {
+    try {
+        sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
+    } catch (e) {}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const formats = ['1:1', '3:4', '4:3', '16:9', '9:16'];
+    formats.forEach(fmt => {
+        if (!window.previewFormatCache[fmt]) {
+            fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`)
+                .then(res => res.json())
+                .then(data => {
+                    window.previewFormatCache[fmt] = data;
+                    persistPreviewCache();
+                })
+                .catch(err => console.error('❌ Preload format', fmt, err));
+        }
+    });
+});
+
+function enableImageEnlargement() {
+        // D'abord retirer l'ancien event listener si présent
+        document.removeEventListener('click', handleImageClick);
+
+        // Puis ajouter le nouvel event listener
+        document.addEventListener('click', handleImageClick);
 }
 
 // Séparer ta fonction de clic proprement
@@ -204,115 +236,87 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 		e.stopPropagation(); // ✅ empêche la fermeture au clic à l’intérieur
 	});
 
-	const isNeutral = displayOnlyFormats.includes(formatImage);
+        const isNeutral = displayOnlyFormats.includes(formatImage);
 
-	if (isNeutral) {
-		// ✅ Format "neutre" : afficher le ratio, mais permettre l'action
-		formatTextElement.textContent = formatImage;
+        const processData = (data) => {
+                if (!data.success || data.choices.length === 0) {
+                        if (isNeutral) {
+                                useImageButton.disabled = true;
+                        } else {
+                                formatTextElement.textContent = "Aucun produit trouvé.";
+                                useImageButton.disabled = true;
+                        }
+                        return;
+                }
 
-		useImageButton.disabled = true; // Désactivé pendant le chargement
+                const grouped = {};
+                data.choices.forEach(choice => {
+                        if (!grouped[choice.product_id]) {
+                                grouped[choice.product_id] = {
+                                        name: choice.product_name,
+                                        variants: []
+                                };
+                        }
+                        grouped[choice.product_id].variants.push(choice);
+                });
 
-		// Charger les produits compatibles
-		fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
-			.then(res => res.json())
-			.then(data => {
-			console.log("📦 [Neutral] API produits/format :", data);
+                const productIds = Object.keys(grouped);
+                if (!isNeutral) {
+                        if (productIds.length === 1) {
+                                formatTextElement.textContent = grouped[productIds[0]].name;
+                        }
+                }
 
-			if (!data.success || data.choices.length === 0) {
-				useImageButton.disabled = true;
-				return;
-			}
+                useImageButton.disabled = false;
 
-			const grouped = {};
-			data.choices.forEach(choice => {
-				if (!grouped[choice.product_id]) {
-					grouped[choice.product_id] = {
-						name: choice.product_name,
-						variants: []
-					};
-				}
-				grouped[choice.product_id].variants.push(choice);
-			});
+                if (productIds.length === 1) {
+                        const { name, variants } = grouped[productIds[0]];
+                        useImageButton.addEventListener('click', () => {
+                                if (variants.length === 1) {
+                                        const v = variants[0];
+                                        redirectToConfigurator(name, v.product_id, src, prompt, formatImage, v.variant_id);
+                                } else {
+                                        showProductChooserOverlay(variants, src, prompt, formatImage, name);
+                                }
+                        });
+                } else {
+                        useImageButton.addEventListener('click', () => {
+                                const allVariants = Object.values(grouped).flatMap(p => p.variants);
+                                showProductChooserOverlay(allVariants, src, prompt, formatImage);
+                        });
+                }
+        };
 
-			const productIds = Object.keys(grouped);
-			useImageButton.disabled = false;
+        const loadProductInfo = () => {
+                const cached = window.previewFormatCache[formatImage];
+                if (cached) {
+                        processData(cached);
+                        return;
+                }
+                fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                                console.log("📦 API produits/format :", data);
+                                window.previewFormatCache[formatImage] = data;
+                                persistPreviewCache();
+                                processData(data);
+                        })
+                        .catch(err => {
+                                console.error("❌ Erreur chargement produits compatibles :", err);
+                                useImageButton.disabled = true;
+                        });
+        };
 
-			if (productIds.length === 1) {
-				const { name, variants } = grouped[productIds[0]];
-
-				useImageButton.addEventListener('click', () => {
-					if (variants.length === 1) {
-						const v = variants[0];
-						redirectToConfigurator(name, v.product_id, src, prompt, formatImage, v.variant_id);
-					} else {
-						showProductChooserOverlay(variants, src, prompt, formatImage, name);
-					}
-				});
-			} else {
-				useImageButton.addEventListener('click', () => {
-					const allVariants = Object.values(grouped).flatMap(p => p.variants);
-					showProductChooserOverlay(allVariants, src, prompt, formatImage);
-				});
-			}
-		})
-			.catch(err => {
-			console.error("❌ Erreur chargement produits compatibles :", err);
-			useImageButton.disabled = true;
-		});
-	}
-
-	else {
-		// ❌ On n'affiche rien en attendant — on va charger un produit
-		formatTextElement.textContent = ''; // vide volontairement
-
-		fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
-			.then(res => res.json())
-			.then(data => {
-			console.log("📦 API produits/format :", data);
-
-			if (!data.success || data.choices.length === 0) {
-				formatTextElement.textContent = "Aucun produit trouvé.";
-				useImageButton.disabled = true;
-				return;
-			}
-
-			// Groupe les choix par produit
-			const grouped = {};
-			data.choices.forEach(choice => {
-				if (!grouped[choice.product_id]) {
-					grouped[choice.product_id] = {
-						name: choice.product_name,
-						variants: []
-					};
-				}
-				grouped[choice.product_id].variants.push(choice);
-			});
-
-			const productIds = Object.keys(grouped);
-			if (productIds.length === 1) {
-				// ✅ Un seul produit → choisir parmi ses variantes
-				const { name, variants } = grouped[productIds[0]];
-				formatTextElement.textContent = name;
-
-				useImageButton.disabled = false;
-				useImageButton.addEventListener('click', () => {
-					if (variants.length === 1) {
-						const v = variants[0];
-						redirectToConfigurator(name, v.product_id, src, prompt, formatImage, v.variant_id);
-					} else {
-						showProductChooserOverlay(variants, src, prompt, formatImage, name);
-					}
-				});
-			} else {
-				// ✅ Plusieurs produits → afficher sélecteur produit + variante
-				useImageButton.disabled = false;
-				useImageButton.addEventListener('click', () => {
-					const allVariants = Object.values(grouped).flatMap(p => p.variants);
-					showProductChooserOverlay(allVariants, src, prompt, formatImage);
-				});
-			}
-		});
-	}
+        if (isNeutral) {
+                // ✅ Format "neutre" : afficher le ratio, mais permettre l'action
+                formatTextElement.textContent = formatImage;
+                useImageButton.disabled = true; // Désactivé pendant le chargement
+                loadProductInfo();
+        } else {
+                // ❌ On n'affiche rien en attendant — on va charger un produit
+                formatTextElement.textContent = '';
+                loadProductInfo();
+        }
 
 
 }
