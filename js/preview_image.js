@@ -1,5 +1,35 @@
 // Cache local pour les correspondances format → produits
-window.previewFormatCache = window.previewFormatCache || {};
+try {
+    const saved = sessionStorage.getItem('previewFormatCache');
+    window.previewFormatCache = {
+        ...(saved ? JSON.parse(saved) : {}),
+        ...(window.previewFormatCache || {})
+    };
+} catch (e) {
+    window.previewFormatCache = window.previewFormatCache || {};
+}
+
+function persistPreviewCache() {
+    try {
+        sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
+    } catch (e) {}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const formats = ['1:1', '3:4', '4:3', '16:9', '9:16'];
+    formats.forEach(fmt => {
+        if (!window.previewFormatCache[fmt]) {
+            fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`)
+                .then(res => res.json())
+                .then(data => {
+                    window.previewFormatCache[fmt] = data;
+                    persistPreviewCache();
+                })
+                .catch(err => console.error('❌ Preload format', fmt, err));
+        }
+    });
+});
+
 
 function enableImageEnlargement() {
         // D'abord retirer l'ancien event listener si présent
@@ -269,6 +299,8 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         .then(data => {
                                 console.log("📦 API produits/format :", data);
                                 window.previewFormatCache[formatImage] = data;
+                                persistPreviewCache();
+
                                 processData(data);
                         })
                         .catch(err => {
