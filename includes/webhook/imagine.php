@@ -1,8 +1,10 @@
 <?php
-// Activer l'affichage des erreurs pour le débogage
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Activer l'affichage des erreurs pour le débogage uniquement en mode developpement
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 // Inclure WordPress pour accéder à ses fonctions
 define('WP_USE_THEMES', false);
