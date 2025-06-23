@@ -4,7 +4,7 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 ?>
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/modal-login.css">
+       <!-- Style moved to assets.php -->
 </head>
 
 <div id="loginModal" class="login-modal" style="display: none;">
@@ -101,4 +101,4 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 	</div>
 </div>
 
-<script src="/wp-content/themes/customiizer/js/account/sign_modal.js"></script>
+<!-- Script moved to assets.php -->

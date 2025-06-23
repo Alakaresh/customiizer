@@ -22,8 +22,8 @@ $display_name = $current_user->display_name;
 	<head>
 		<meta charset="<?php bloginfo('charset'); ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/customize-header.css">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+               <!-- Style moved to assets.php -->
+               <!-- Font Awesome moved to assets.php -->
 		<?php wp_head(); ?>
 		<style>
 			@media (min-width: 1300px) {

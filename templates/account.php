@@ -9,13 +9,7 @@ get_header();
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/style.css">
-		<link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/dashboard.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/account.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/responsive/tablet/account.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/responsive/mobile/account.css">
-
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css">
+               <!-- Styles moved to assets.php -->
 	</head>
 	<body>
 		<main id="site-content" class="site-content">
@@ -27,12 +21,7 @@ get_header();
 			<script>
 				var ajaxurl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
 			</script>
-                        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
-			
-			<script src="/wp-content/themes/customiizer/js/account/sidebar.js"></script>
-			<script src="/wp-content/themes/customiizer/js/account/dashboard.js"></script>
-			<script src="/wp-content/themes/customiizer/js/account/purchases.js"></script>
-			<script src="/wp-content/themes/customiizer/js/account/profile.js"></script>
+                       <!-- Scripts moved to assets.php -->
 			
 		</main>
 	</body>

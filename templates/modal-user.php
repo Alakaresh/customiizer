@@ -1,6 +1,6 @@
 <head>
 	<meta charset="utf-8">
-	<link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/styles/user-modal.css">
+       <!-- Style moved to assets.php -->
 </head>
 
 <div id="userModal" class="userModal" style="display:none;">
@@ -39,4 +39,4 @@
 	</div>
 </div>
 
-<script src="/wp-content/themes/customiizer/js/account/user-modal.js"></script>
+<!-- Script moved to assets.php -->
