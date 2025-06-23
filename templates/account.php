@@ -27,8 +27,7 @@ get_header();
 			<script>
 				var ajaxurl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
 			</script>
-			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-			<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
 			
 			<script src="/wp-content/themes/customiizer/js/account/sidebar.js"></script>
 			<script src="/wp-content/themes/customiizer/js/account/dashboard.js"></script>

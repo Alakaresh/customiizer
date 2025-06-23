@@ -11,9 +11,32 @@ function customiizer_enqueue_customize_assets() {
         // Retrieve version for cache busting
         $ver = customiizer_frontend_version();
 
-	// NONCES pour les formulaires de connexion et d'inscription
-	$signin_nonce = wp_create_nonce('signin_nonce');
-	$signup_nonce = wp_create_nonce('signup_nonce');
+        // NONCES pour les formulaires de connexion et d'inscription
+        $signin_nonce = wp_create_nonce('signin_nonce');
+        $signup_nonce = wp_create_nonce('signup_nonce');
+
+        // ===============================
+        // jQuery & jQuery Migrate
+        // ===============================
+        wp_deregister_script('jquery');
+        wp_register_script(
+                'jquery',
+                'https://code.jquery.com/jquery-3.7.1.min.js',
+                [],
+                '3.7.1',
+                true
+        );
+
+        wp_deregister_script('jquery-migrate');
+        wp_register_script(
+                'jquery-migrate',
+                'https://code.jquery.com/jquery-migrate-3.5.2.min.js',
+                ['jquery'],
+                '3.5.2',
+                true
+        );
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-migrate');
 
 	// ===============================
 	// STYLES GLOBAUX
