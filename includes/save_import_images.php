@@ -13,12 +13,16 @@ function save_imported_image_from_url() {
 
     $user_id = get_current_user_id();
 
-    $containerName = "imageclient";
+    $containerName = defined('AZURE_STORAGE_CONTAINER') ? AZURE_STORAGE_CONTAINER : 'imageclient';
     $blobFolder = $user_id . "/import/";
     $blobName = $blobFolder . pathinfo($name, PATHINFO_FILENAME) . ".webp";
 
     // URL de base d'Azure Blob Storage
-    $blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
+    if (defined('AZURE_STORAGE_BASE_URL')) {
+        $blobBaseUrl = rtrim(AZURE_STORAGE_BASE_URL, '/') . '/';
+    } else {
+        $blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
+    }
     $blobFullUrl = $blobBaseUrl . $blobName;
 
     // Décoder l'image encodée en base64

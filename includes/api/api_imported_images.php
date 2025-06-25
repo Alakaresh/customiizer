@@ -32,10 +32,14 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	}
 
 	$user_id = isset($params['user_id']) ? intval($params['user_id']) : get_current_user_id();
-	$containerName = "imageclient";
+        $containerName = defined('AZURE_STORAGE_CONTAINER') ? AZURE_STORAGE_CONTAINER : 'imageclient';
 	$blobFolder = $user_id . "/import/";
 	$blobName = $blobFolder . pathinfo($name, PATHINFO_FILENAME) . ".webp";
-	$blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
+        if (defined('AZURE_STORAGE_BASE_URL')) {
+                $blobBaseUrl = rtrim(AZURE_STORAGE_BASE_URL, '/') . '/';
+        } else {
+                $blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
+        }
 	$blobFullUrl = $blobBaseUrl . $blobName;
 
 	customiizer_log("📤 Début de l'upload par UserID: $user_id, Nom: $name");

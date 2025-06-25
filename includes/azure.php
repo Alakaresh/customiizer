@@ -3,7 +3,7 @@ use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 // Fonction pour créer un client Azure Blob
 function azure_get_blob_client() {
-    $connectionString = "DefaultEndpointsProtocol=https;AccountName=customiizer;AccountKey=hJezxhiRNQwweRTDO+tqr1tAKnX9tXWkhMbKssLRzOZOXXS47bqxN0bfIMmjzNkJG6ZeoN30THxF+AStmocKZQ==;EndpointSuffix=core.windows.net";
+    $connectionString = defined('AZURE_STORAGE_CONNECTION_STRING') ? AZURE_STORAGE_CONNECTION_STRING : '';
 
     // Validation de la chaîne de connexion
     if (empty($connectionString)) {

@@ -32,7 +32,7 @@ function save_image_from_url() {
 		}
 
 		// Upload Azure
-		$containerName = "imageclient";
+                $containerName = defined('AZURE_STORAGE_CONTAINER') ? AZURE_STORAGE_CONTAINER : 'imageclient';
 		if (azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
 			unlink($tmpFile);
 			wp_send_json_success(['message' => "Image uploadée", 'blob' => $blobName]);

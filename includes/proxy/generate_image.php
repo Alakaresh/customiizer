@@ -1,7 +1,13 @@
 <?php
 // Constantes pour les valeurs fixes
-define('API_URL', 'https://api.userapi.ai/midjourney/v2/imagine');
-define('API_KEY', '28e69054-9d20-453b-bdc9-79c2f86c027d');
+// API credentials are expected to be defined in wp-config.php or an included
+// config file so they are not committed to the repository.
+if (!defined('MIDJOURNEY_API_URL')) {
+    define('MIDJOURNEY_API_URL', 'https://api.userapi.ai/midjourney/v2/imagine');
+}
+if (!defined('MIDJOURNEY_API_KEY')) {
+    define('MIDJOURNEY_API_KEY', '');
+}
 
 function customiizer_log($message, $level = 'INFO') {
     $logFile = 'logfile.log';
@@ -27,11 +33,11 @@ if (isset($input['prompt']) && !empty($input['prompt'])) {
         'is_disable_prefilter' => $input['is_disable_prefilter'] ?? false,
     ];
 
-    $ch = curl_init(API_URL);
+    $ch = curl_init(MIDJOURNEY_API_URL);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
-        'api-key: ' . API_KEY,
+        'api-key: ' . MIDJOURNEY_API_KEY,
     ]);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
