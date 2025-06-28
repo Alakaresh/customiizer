@@ -44,7 +44,11 @@ mkdir -p "$BUILD_DIR"
 
 # Minification avec Terser
 echo -e "${CYAN}📦 Minification + suppression console.log...${RESET}"
-find "$TARGET_DIR" \( -name "*.js" -o -name "*.mjs" \) ! -path "*/node_modules/*" | while read file; do
+find "$TARGET_DIR" \( -name "*.js" -o -name "*.mjs" \) \
+     ! -path "*/node_modules/*" \
+     ! -path "*/.git/*" \
+     ! -path "$BUILD_DIR/*" \
+     ! -path "$OBF_DIR/*" | while read file; do
   REL_PATH="${file#$TARGET_DIR/}"
   DEST="$BUILD_DIR/$REL_PATH"
   mkdir -p "$(dirname "$DEST")"

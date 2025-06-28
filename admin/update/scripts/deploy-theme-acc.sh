@@ -20,7 +20,7 @@ rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
 echo "📁 Copie du thème vers le dossier temporaire..."
-rsync -a "$SRC" "$BUILD_DIR"
+rsync -a --exclude='.git' "$SRC" "$BUILD_DIR"
 
 # 🔧 Minification si frontend
 if [[ "$TARGET" == "frontend" ]]; then
