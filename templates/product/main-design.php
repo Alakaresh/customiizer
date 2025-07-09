@@ -34,18 +34,18 @@
                         <div class="visual-zone">
                         <div class="visual-header">
                                 <div class="image-controls">
-                                        <button id="alignLeftButton" class="align-button"><i class="fas fa-arrow-left"></i></button>
-                                        <button id="alignCenterButton" class="align-button"><i class="fas fa-arrows-alt-h"></i></button>
-                                        <button id="alignRightButton" class="align-button"><i class="fas fa-arrow-right"></i></button>
-                                        <button id="alignTopButton" class="align-button"><i class="fas fa-arrow-up"></i></button>
-                                        <button id="alignMiddleButton" class="align-button"><i class="fas fa-arrows-alt-v"></i></button>
-                                        <button id="alignBottomButton" class="align-button"><i class="fas fa-arrow-down"></i></button>
-                                        <button id="rotateLeftButton" class="align-button"><i class="fas fa-undo"></i></button>
-                                        <button id="rotateRightButton" class="align-button"><i class="fas fa-redo"></i></button>
-                                        <button id="mirrorImageButton" class="align-button"><i class="fas fa-retweet"></i></button>
-                                        <button id="removeImageButton" class="remove-image-button"><i class="fas fa-trash"></i></button>
-                                        <button id="bringForwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
-                                        <button id="sendBackwardButton" class="align-button"><i class="fas fa-layer-group"></i></button>
+                                        <button id="alignLeftButton" class="align-button" title="Aligner à gauche"><i class="fas fa-arrow-left"></i></button>
+                                        <button id="alignCenterButton" class="align-button" title="Aligner au centre"><i class="fas fa-arrows-alt-h"></i></button>
+                                        <button id="alignRightButton" class="align-button" title="Aligner à droite"><i class="fas fa-arrow-right"></i></button>
+                                        <button id="alignTopButton" class="align-button" title="Aligner en haut"><i class="fas fa-arrow-up"></i></button>
+                                        <button id="alignMiddleButton" class="align-button" title="Centrer verticalement"><i class="fas fa-arrows-alt-v"></i></button>
+                                        <button id="alignBottomButton" class="align-button" title="Aligner en bas"><i class="fas fa-arrow-down"></i></button>
+                                        <button id="rotateLeftButton" class="align-button" title="Pivoter à gauche"><i class="fas fa-undo"></i></button>
+                                        <button id="rotateRightButton" class="align-button" title="Pivoter à droite"><i class="fas fa-redo"></i></button>
+                                        <button id="mirrorImageButton" class="align-button" title="Retourner horizontalement"><i class="fas fa-retweet"></i></button>
+                                        <button id="bringForwardButton" class="align-button" title="Mettre au premier plan"><i class="fas fa-layer-group"></i></button>
+                                        <button id="sendBackwardButton" class="align-button" title="Envoyer à l'arrière-plan"><i class="fas fa-layer-group"></i></button>
+                                        <button id="removeImageButton" class="remove-image-button" title="Supprimer l'image"><i class="fas fa-trash"></i></button>
                                 </div>
                         </div>
                         <div class="visual-containers">
