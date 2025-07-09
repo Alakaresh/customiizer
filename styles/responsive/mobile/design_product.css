@@ -23,8 +23,8 @@
     /* Visual zone below sidebars */
     #customizeModal .visual-zone {
         width: 100%;
-        height: auto;
         flex-grow: 1; /* Take remaining space within the modal body */
+        height: 100%;
         /* Allow visual zone to handle scrolling */
         overflow-y: auto;
     }
@@ -33,6 +33,7 @@
     #customizeModal .visual-containers {
         flex-direction: column;
         padding: 10px;
+        height: auto; /* allow 2D and 3D containers to size naturally */
     }
 
     #product2DContainer,
@@ -41,12 +42,10 @@
         max-width: 100%;
     }
 
-
     #product3DContainer {
         height: auto; /* override desktop 100% height */
         aspect-ratio: 1; /* square based on width */
     }
-
 
     #product3DContainer canvas {
         width: 100%;
