@@ -78,11 +78,6 @@
 		flex-wrap: wrap;
 	}
 
-        .thumbnail {
-                height: 60px;
-                margin: 5px;
-        }
-
 	.options-list {
 		top: 45px;
 		left: 0;
