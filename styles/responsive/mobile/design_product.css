@@ -41,6 +41,13 @@
         max-width: 100%;
     }
 
+
+    #product3DContainer {
+        height: auto; /* override desktop 100% height */
+        aspect-ratio: 1; /* square based on width */
+    }
+
+
     #product3DContainer canvas {
         width: 100%;
         height: 100%;
