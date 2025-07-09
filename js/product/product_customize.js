@@ -120,7 +120,6 @@ jQuery(document).ready(function ($) {
 
         const favoriteFilter = $('#favoriteFilter');
 
-        const toggle3D = $('#toggle3D');
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
         const alignRightButton = $('#alignRightButton');
@@ -267,7 +266,7 @@ jQuery(document).ready(function ($) {
                        }
                        CanvasManager.init(template, 'product2DContainer');
                        updateAddImageButtonVisibility();
-                       if (variant.url_3d && toggle3D.is(':checked')) {
+                       if (variant.url_3d) {
                                $('#product3DContainer').show();
                                init3DScene('product3DContainer', variant.url_3d, variant.color);
                                threeDInitialized = true;
@@ -333,8 +332,8 @@ jQuery(document).ready(function ($) {
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
 
-                        // 3. Lancer Three.js si dispo et si l'aperçu est activé
-                        if (selectedVariant.url_3d && toggle3D.is(':checked')) {
+                        // 3. Lancer Three.js si disponible
+                        if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
                                 init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
                                 threeDInitialized = true;
@@ -474,18 +473,6 @@ jQuery(document).ready(function ($) {
         });
 
 
-        // 6b) Toggle affichage 3D
-        toggle3D.on('change', function () {
-                if ($(this).is(':checked') && selectedVariant.url_3d) {
-                        $('#product3DContainer').show();
-                        if (!threeDInitialized) {
-                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
-                                threeDInitialized = true;
-                        }
-                } else {
-                        $('#product3DContainer').hide();
-                }
-        });
 
 	// 7) Clic sur une miniature
         siteFilesList.on('click', '.image-thumbnail', function () {
