@@ -1,6 +1,0 @@
-@media screen and (min-width: 768px) and (max-width: 1024px) {
-	/*==========MYCREATION==========*/
-	.image-column {
-		flex: 1 1 50%; /* Une demi-largeur pour des écrans plus petits */
-	}
-}
