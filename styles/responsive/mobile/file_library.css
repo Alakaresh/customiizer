@@ -1,0 +1,16 @@
+@media screen and (max-width: 767px) {
+    /* Mobile-specific File Library styles */
+    #imageSourceModal .small-modal {
+        width: 95%;
+        height: 90%;
+    }
+
+    #siteFilesList {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+
+    #pcFilesList {
+        gap: 8px;
+    }
+}
