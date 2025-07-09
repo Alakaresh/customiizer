@@ -400,7 +400,7 @@ $(document).on('click', '.toggle-description', function () {
 });
 
        function mobileReorder() {
-               const isMobile = window.innerWidth <= 767;
+        const isMobile = window.innerWidth <= 1024;
                const background = $('.background');
                const selector = $('.product-selector');
                const mainImage = $('#product-main-image');
