@@ -16,8 +16,9 @@ function customiizer_render_admin_dashboard() {
     echo '<h1>🧭 Customiizer - Tableau de bord</h1>';
 	
 	include __DIR__ . '/modules/section-queue.php';
-	include __DIR__ . '/modules/section-printful.php';
-	include __DIR__ . '/modules/section-monitoring.php';
+        include __DIR__ . '/modules/section-printful.php';
+        include __DIR__ . '/modules/section-mobile-block.php';
+        include __DIR__ . '/modules/section-monitoring.php';
     
     echo '</div>';
 }
