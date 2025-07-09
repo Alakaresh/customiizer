@@ -12,5 +12,7 @@
 
     #pcFilesList {
         gap: 10px;
+        max-height: 30vh;
+        overflow-y: auto;
     }
 }
