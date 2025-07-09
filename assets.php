@@ -141,7 +141,6 @@ function customiizer_enqueue_customize_assets() {
                // --- CSS ---
                wp_enqueue_style('dashboard-style', get_stylesheet_directory_uri() . '/styles/dashboard.css', [], $ver);
                wp_enqueue_style('account-style', get_stylesheet_directory_uri() . '/styles/account.css', [], $ver);
-               wp_enqueue_style('account-tablet', get_stylesheet_directory_uri() . '/styles/responsive/tablet/account.css', [], $ver);
                wp_enqueue_style('account-mobile', get_stylesheet_directory_uri() . '/styles/responsive/mobile/account.css', [], $ver);
                wp_enqueue_style('cropper-style', 'https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css', [], $ver);
 
@@ -186,27 +185,19 @@ function customiizer_enqueue_customize_assets() {
                wp_enqueue_style('legal-global', get_stylesheet_directory_uri() . '/styles/legal-global.css', [], $ver);
        }
 
-        // --- Responsive CSS ---
-        wp_enqueue_style('responsive-tablet', get_stylesheet_directory_uri() . '/styles/responsive/tablet.css', [], $ver, 'all');
-        wp_enqueue_style('tablet-base', get_stylesheet_directory_uri() . '/styles/responsive/tablet/base.css', [], $ver, 'all');
-        wp_enqueue_style('mobile-base', get_stylesheet_directory_uri() . '/styles/responsive/mobile/base.css', [], $ver, 'all');
+       // --- Responsive CSS ---
+       wp_enqueue_style('mobile-base', get_stylesheet_directory_uri() . '/styles/responsive/mobile/base.css', [], $ver, 'all');
 
        if (is_front_page() || is_page('home')) {
-               wp_enqueue_style('tablet-home', get_stylesheet_directory_uri() . '/styles/responsive/tablet/home.css', [], $ver, 'all');
                wp_enqueue_style('mobile-home', get_stylesheet_directory_uri() . '/styles/responsive/mobile/home.css', [], $ver, 'all');
        } elseif (strpos($request_uri, '/customiize') !== false) {
-               wp_enqueue_style('tablet-customize', get_stylesheet_directory_uri() . '/styles/responsive/tablet/customize.css', [], $ver, 'all');
                wp_enqueue_style('mobile-customize', get_stylesheet_directory_uri() . '/styles/responsive/mobile/customize.css', [], $ver, 'all');
        } elseif (strpos($request_uri, '/configurateur') !== false) {
-               wp_enqueue_style('tablet-product', get_stylesheet_directory_uri() . '/styles/responsive/tablet/product.css', [], $ver, 'all');
-               wp_enqueue_style('tablet-design-product', get_stylesheet_directory_uri() . '/styles/responsive/tablet/design_product.css', [], $ver, 'all');
                wp_enqueue_style('mobile-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/product.css', [], $ver, 'all');
                wp_enqueue_style('mobile-design-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/design_product.css', [], $ver, 'all');
        } elseif (strpos($request_uri, '/communaute') !== false) {
-               wp_enqueue_style('tablet-community', get_stylesheet_directory_uri() . '/styles/responsive/tablet/community.css', [], $ver, 'all');
                wp_enqueue_style('mobile-community', get_stylesheet_directory_uri() . '/styles/responsive/mobile/community.css', [], $ver, 'all');
        } elseif (strpos($request_uri, '/mycreation') !== false) {
-               wp_enqueue_style('tablet-mycreation', get_stylesheet_directory_uri() . '/styles/responsive/tablet/mycreation.css', [], $ver, 'all');
                wp_enqueue_style('mobile-mycreation', get_stylesheet_directory_uri() . '/styles/responsive/mobile/mycreation.css', [], $ver, 'all');
        } elseif (
                strpos($request_uri, '/mentions-legales') !== false ||
@@ -215,7 +206,6 @@ function customiizer_enqueue_customize_assets() {
                strpos($request_uri, '/retours') !== false ||
                strpos($request_uri, '/cookies') !== false
        ) {
-               wp_enqueue_style('tablet-legal', get_stylesheet_directory_uri() . '/styles/responsive/tablet/legal.css', [], $ver, 'all');
                wp_enqueue_style('mobile-legal', get_stylesheet_directory_uri() . '/styles/responsive/mobile/legal.css', [], $ver, 'all');
        }
 }

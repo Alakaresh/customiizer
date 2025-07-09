@@ -1,4 +1,4 @@
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 1024px) {
     /* Stack modal sections vertically */
     #customizeModal .modal-body {
         flex-direction: column;

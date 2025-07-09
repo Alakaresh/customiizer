@@ -69,7 +69,7 @@ jQuery(document).ready(function($) {
 
 
        function initCarousel() {
-               var mq = window.matchMedia('(max-width: 767px)');
+               var mq = window.matchMedia('(max-width: 1024px)');
                visibleItems = mq.matches ? 2 : 5;
 
                var containerWidth = jQuery('.carousel-inner').width();
