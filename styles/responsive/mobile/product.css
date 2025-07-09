@@ -59,13 +59,14 @@
 		margin: 10px 0;
 	}
 
-	.product-image {
-		position: static;
-		transform: none;
-		width: 80%;
-		margin: 20px auto;
-		display: block;
-	}
+        .product-image {
+                position: relative; /* L'image principale doit être en position relative */
+                left: auto; /* On retire tout décalage gauche éventuel */
+                transform: none;
+                width: 80%;
+                margin: 20px auto;
+                display: block;
+        }
 
 	.image-thumbnails {
 		position: static;
