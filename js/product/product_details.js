@@ -395,9 +395,44 @@ jQuery(document).ready(function ($) {
                 loadProductDetails(productId);
         });
 	// ✅ Permet d'ouvrir ou fermer la description détaillée du produit
-	$(document).on('click', '.toggle-description', function () {
-		$('.description-content').toggleClass('open');
-	});
+$(document).on('click', '.toggle-description', function () {
+        $('.description-content').toggleClass('open');
+});
+
+       function mobileReorder() {
+               const isMobile = window.innerWidth <= 767;
+               const background = $('.background');
+               const selector = $('.product-selector');
+               const mainImage = $('#product-main-image');
+               const thumbnails = $('.image-thumbnails');
+               const productInfo = $('.product-info');
+               const productDetails = $('.product-details');
+
+               if (!selector.length || !mainImage.length) return;
+
+               if (isMobile) {
+                       if (selector.parent()[0] !== background[0]) {
+                               selector.detach();
+                               selector.insertBefore(mainImage);
+                       }
+                       if (thumbnails.prev()[0] !== mainImage[0]) {
+                               thumbnails.detach();
+                               thumbnails.insertAfter(mainImage);
+                       }
+               } else {
+                       if (selector.parent()[0] !== productInfo[0]) {
+                               selector.detach();
+                               selector.prependTo(productInfo);
+                       }
+                       if (thumbnails.parent()[0] !== background[0] || thumbnails.prev()[0] !== productDetails[0]) {
+                               thumbnails.detach();
+                               thumbnails.insertAfter(productDetails);
+                       }
+               }
+       }
+
+       mobileReorder();
+       $(window).on('resize', mobileReorder);
 
 
 	// 🔥 Charge le produit si un ID est présent au démarrage
