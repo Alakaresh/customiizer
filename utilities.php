@@ -64,3 +64,22 @@ function customiizer_frontend_version() {
 
     return $frontend_version;
 }
+
+/**
+ * Detect if we are running on the production environment.
+ *
+ * Uses wp_get_environment_type() when available, otherwise falls back to
+ * checking the site URL for the customiizer.com domain.
+ *
+ * @return bool True when production environment detected.
+ */
+function customiizer_is_production() {
+    if (function_exists('wp_get_environment_type')) {
+        if (wp_get_environment_type() === 'production') {
+            return true;
+        }
+    }
+
+    return strpos(home_url(), 'customiizer.com') !== false;
+}
+
