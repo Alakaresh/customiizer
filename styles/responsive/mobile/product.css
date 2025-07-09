@@ -59,13 +59,15 @@
 		margin: 10px 0;
 	}
 
-	.product-image {
-		position: static;
-		transform: none;
-		width: 80%;
-		margin: 20px auto;
-		display: block;
-	}
+       .product-image {
+               /* En version mobile, on force l'image principale à ne pas être décalée */
+               position: relative !important;
+               left: auto !important;
+               transform: none !important;
+               width: 80%;
+               margin: 20px auto;
+               display: block;
+       }
 
 	.image-thumbnails {
 		position: static;
