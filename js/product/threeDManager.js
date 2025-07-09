@@ -2,6 +2,7 @@
 
 let scene, camera, renderer, controls;
 let printableMeshes = {};
+let resizeObserver3D = null;
 
 function show3DLoader(container) {
     let loader = container.querySelector('.loading-overlay');
@@ -106,8 +107,20 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 		alpha: true,
 		antialias: true
 	});
-	renderer.setSize(width, height);
-	renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setSize(width, height);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        if (resizeObserver3D) {
+                resizeObserver3D.disconnect();
+        }
+        resizeObserver3D = new ResizeObserver(() => {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                renderer.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+        });
+        resizeObserver3D.observe(container);
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
