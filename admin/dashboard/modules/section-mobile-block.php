@@ -3,6 +3,7 @@
 $enabled = get_option('customiizer_mobile_block', 1);
 $is_prod = function_exists('customiizer_is_production') ? customiizer_is_production() : true;
 
+
 if (isset($_POST['save_mobile_block']) && check_admin_referer('toggle_mobile_block')) {
     $enabled = isset($_POST['mobile_block']) ? 1 : 0;
     update_option('customiizer_mobile_block', $enabled);
@@ -13,6 +14,7 @@ echo '<h2>📱 Accès mobile</h2>';
 if (!$is_prod) {
     echo '<p><em>Cette option est ignorée en environnement de développement.</em></p>';
 }
+
 ?>
 <form method="post">
     <?php wp_nonce_field('toggle_mobile_block'); ?>

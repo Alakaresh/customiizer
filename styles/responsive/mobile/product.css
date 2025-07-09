@@ -1,9 +1,14 @@
 @media screen and (max-width: 767px) {
-	/*==========PRODUCT==========*/
-	.container {
-		flex-direction: column;
-		height: auto;
-	}
+       /* Permet le scroll sur la page produit en version mobile */
+       body {
+               overflow-y: auto;
+       }
+
+       /*==========PRODUCT==========*/
+       .container {
+               flex-direction: column;
+               height: auto;
+       }
 
 	.main-content {
 		flex-direction: column;
@@ -21,12 +26,10 @@
 		align-items: center;
 	}
 
-	.background-image {
-		position: relative;
-		width: 100%;
-		height: auto;
-		object-fit: cover;
-	}
+       .background-image {
+               /* On retire l'image de fond en version mobile */
+               display: none;
+       }
 
 	.product-info,
 	.product-details {
@@ -56,13 +59,14 @@
 		margin: 10px 0;
 	}
 
-	.product-image {
-		position: static;
-		transform: none;
-		width: 80%;
-		margin: 20px auto;
-		display: block;
-	}
+        .product-image {
+                position: relative; /* L'image principale doit être en position relative */
+                left: auto; /* On retire tout décalage gauche éventuel */
+                transform: none;
+                width: 80%;
+                margin: 20px auto;
+                display: block;
+        }
 
 	.image-thumbnails {
 		position: static;
