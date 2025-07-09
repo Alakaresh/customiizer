@@ -89,10 +89,15 @@
 		width: 100%;
 	}
 
-	.custom-select {
-		justify-content: center;
-		width: 100%;
-	}
+       .custom-select {
+               justify-content: center;
+               width: 100%;
+       }
+
+       .product-selector {
+               width: 100%;
+               margin-top: 10px;
+       }
 
         .bottom-bar {
                 height: auto;
