@@ -1,8 +1,0 @@
-@media screen and (min-width: 768px) and (max-width: 1024px) {
-	/*==========COMMUNITY==========*/
-	.image-container {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		column-gap: 10px;
-	}
-}
