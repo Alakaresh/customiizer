@@ -192,8 +192,8 @@ $display_name = $current_user->display_name;
 		</script>
 		<script>
 			jQuery(document).ready(function ($) {
-				// ✅ Activer ou désactiver le blocage mobile ici
-				const MOBILE_BLOCK_ENABLED = true;
+                                // ✅ Activer ou désactiver le blocage mobile via option
+                                const MOBILE_BLOCK_ENABLED = <?php echo get_option('customiizer_mobile_block', 1) ? 'true' : 'false'; ?>;
 
 				// ✅ Détection simple des smartphones (exclut tablettes)
 				const isSmartphone = /Android.+Mobile|iPhone|iPod|Windows Phone/i.test(navigator.userAgent);
