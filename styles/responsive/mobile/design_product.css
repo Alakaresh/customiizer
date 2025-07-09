@@ -2,6 +2,8 @@
     /* Stack modal sections vertically */
     #customizeModal .modal-body {
         flex-direction: column;
+        /* Remove scrolling from modal body on mobile */
+        overflow-y: visible;
     }
 
     /* Sidebar buttons row at top */
@@ -22,6 +24,8 @@
     #customizeModal .visual-zone {
         width: 100%;
         height: auto;
+        /* Allow visual zone to handle scrolling */
+        overflow-y: auto;
     }
 
     /* Display 2D/3D containers vertically */
