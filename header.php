@@ -174,22 +174,20 @@ $display_name = $current_user->display_name;
 <?php endif; ?>
                 </script>
 		<script>
-			jQuery(document).ready(function($) {
-				const myCreationsLink = $('#myCreationsLink');
+                        jQuery(document).ready(function($) {
+                                $('#myCreationsLink, #mobileMyCreationsLink').on('click', function(event) {
+                                        if (!userIsLoggedIn) {
+                                                event.preventDefault();
 
-				myCreationsLink.on('click', function(event) {
-					if (!userIsLoggedIn) {
-						event.preventDefault();
+                                                // Stocke l’intention dans sessionStorage
+                                                sessionStorage.setItem("redirectAfterLogin", "myCreations");
 
-						// Stocke l’intention dans sessionStorage
-						sessionStorage.setItem("redirectAfterLogin", "myCreations");
+                                                $('#loginModal').fadeIn(300);
+                                                return false;
+                                        }
+                                });
 
-						$('#loginModal').fadeIn(300);
-						return false;
-					}
-				});
-
-			});
+                        });
 		</script>
 		<script>
 			jQuery(document).ready(function ($) {

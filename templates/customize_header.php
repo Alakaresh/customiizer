@@ -105,15 +105,30 @@ $display_name = $current_user->display_name;
 		</header>
 
 		<!-- JS global config -->
-		<script>
-			var ajaxurl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
-			var userIsLoggedIn = <?php echo $user_logged_in ? 'true' : 'false'; ?>;
-			var currentUser = {
-				ID: <?php echo $user_id; ?>,
-				user_nicename: "<?php echo esc_js($user_nicename); ?>",
-				display_name: "<?php echo esc_js($display_name); ?>"
-			};
-		</script>
+                <script>
+                        var ajaxurl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
+                        var userIsLoggedIn = <?php echo $user_logged_in ? 'true' : 'false'; ?>;
+                        var currentUser = {
+                                ID: <?php echo $user_id; ?>,
+                                user_nicename: "<?php echo esc_js($user_nicename); ?>",
+                                display_name: "<?php echo esc_js($display_name); ?>"
+                        };
+                </script>
+               <script>
+                       jQuery(document).ready(function($) {
+                               $('#myCreationsLink').on('click', function(event) {
+                                       if (!userIsLoggedIn) {
+                                               event.preventDefault();
 
-	</body>
+                                               // Stocke l’intention dans sessionStorage
+                                               sessionStorage.setItem("redirectAfterLogin", "myCreations");
+
+                                               $('#loginModal').fadeIn(300);
+                                               return false;
+                                       }
+                               });
+                       });
+               </script>
+
+        </body>
 </html>
