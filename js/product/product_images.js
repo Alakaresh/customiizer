@@ -146,9 +146,15 @@ function generateMockup(mockupData) {
         overlayIndex = 0;
         if (overlayInterval) clearInterval(overlayInterval);
         overlayInterval = setInterval(() => {
-                overlayIndex = (overlayIndex + 1) % overlayMessages.length;
                 const textEl = loadingOverlay.querySelector('.loading-text');
-                if (textEl) textEl.textContent = overlayMessages[overlayIndex];
+                if (!textEl) return;
+                if (overlayIndex + 1 < overlayMessages.length) {
+                        overlayIndex++;
+                        textEl.textContent = overlayMessages[overlayIndex];
+                } else {
+                        clearInterval(overlayInterval);
+                        overlayInterval = null;
+                }
         }, 4000);
 
         const form = new FormData();
