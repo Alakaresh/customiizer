@@ -1,6 +1,7 @@
 {
-    "env": "prod",
-    "frontend": "1.0.8",
-    "api": "1.0.0",
-    "generated_at": "2025-06-09 19:58:14"
+  "env": "prod",
+  "frontend": "1.0.8",
+  "api": "1.0.0",
+  "generated_at": "2025-06-09 19:58:14",
+  "early_access": "1.0.3"
 }
