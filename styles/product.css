@@ -354,6 +354,21 @@ body {
     border: 2px solid #ddd; /* Bordure autour de l'image */
 }
 
+/* Spinner affiché lors du chargement de l'image du dropdown */
+.dropdown-spinner {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    pointer-events: none;
+}
+
 
 /* Icône de menu déroulant */
 .dropdown-icon {

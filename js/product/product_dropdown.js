@@ -87,7 +87,17 @@ jQuery(document).ready(function ($) {
         function updateSelectedProduct(product) {
                 selectedProductName.text(product.name);
 
-                // Met à jour immédiatement l'image du dropdown
+                // Affiche un spinner pendant le chargement de l'image
+                selectedProductImage.css('visibility', 'hidden');
+                if (!selectedItem.find('.dropdown-spinner').length) {
+                        selectedItem.append('<div class="dropdown-spinner loading-spinner"></div>');
+                }
+
+                // Met à jour l'image du dropdown
+                selectedProductImage.one('load error', function () {
+                        selectedItem.find('.dropdown-spinner').remove();
+                        selectedProductImage.css('visibility', 'visible');
+                });
                 selectedProductImage.attr('src', product.image || 'default-image-url.jpg');
 
 		const nom = product.name.toLowerCase()
