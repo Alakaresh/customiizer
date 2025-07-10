@@ -55,7 +55,8 @@ $display_name = $current_user->display_name;
 					?>
                                         <div class="early-access-banner">
                                                 🔥 <strong>Early Access</strong> – <span class="highlight">-30%</span> avec le code <strong>CUSTOM30</strong><br>
-                                                <span class="version-info">Version <?php echo esc_html(customiizer_early_access_version()); ?></span>
+                                                <span class="version-info">Version <?php echo esc_html(customiizer_frontend_version()); ?></span>
+
                                         </div>
 					<?php endif; ?>
 				</div>
