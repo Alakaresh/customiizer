@@ -104,12 +104,14 @@
 		<div class="site-files">
                        <h4>Images générées</h4>
                         <div class="switch-wrapper">
-                                <span id="switch-label-left" class="switch-label active">Mes images</span>
-                                <label class="switch-toggle">
-                                        <input type="checkbox" id="imageToggle" class="switch-checkbox" >
-                                        <span class="slider"></span>
-                                </label>
-                                <span id="switch-label-right" class="switch-label">Communauté</span>
+                                <div class="toggle-group">
+                                        <span id="switch-label-left" class="switch-label active">Mes images</span>
+                                        <label class="switch-toggle">
+                                                <input type="checkbox" id="imageToggle" class="switch-checkbox" >
+                                                <span class="slider"></span>
+                                        </label>
+                                        <span id="switch-label-right" class="switch-label">Communauté</span>
+                                </div>
                                 <select id="ratioFilter" class="ratio-filter">
                                         <option value="current">Produit (ratio actuel)</option>
                                         <option value="1:1">1:1</option>
