@@ -66,6 +66,30 @@ function customiizer_frontend_version() {
 }
 
 /**
+ * Get the Early Access version defined in version.json.
+ *
+ * @return string|null The version string or null if not found.
+ */
+function customiizer_early_access_version() {
+    static $early_access_version = null;
+
+    if ($early_access_version !== null) {
+        return $early_access_version;
+    }
+
+    $path = get_stylesheet_directory() . '/version.json';
+    if (file_exists($path)) {
+        $data = json_decode(file_get_contents($path), true);
+        if (isset($data['early_access'])) {
+            $early_access_version = $data['early_access'];
+            return $early_access_version;
+        }
+    }
+
+    return $early_access_version;
+}
+
+/**
  * Detect if we are running on the production environment.
  *
  * Uses wp_get_environment_type() when available, otherwise falls back to
