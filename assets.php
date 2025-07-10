@@ -159,7 +159,7 @@ function customiizer_enqueue_customize_assets() {
                // --- CSS ---
                wp_enqueue_style('cart-style', get_stylesheet_directory_uri() . '/styles/cart.css', [], $ver);
 
-               // Page /community
+               // Page /communaute
 	} elseif (strpos($request_uri, '/communaute') !== false) {
 		// --- CSS ---
                 wp_enqueue_style('community-style', get_stylesheet_directory_uri() . '/styles/community.css', [], $ver);
