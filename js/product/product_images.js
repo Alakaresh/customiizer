@@ -13,6 +13,14 @@ mockupTimes.pending = null;
 let currentLoadingOverlay = null;
 let mockupCooldownUntil = 0;
 let cooldownInterval = null;
+const overlayMessages = [
+    "\uD83D\uDCE6 Pr\u00E9paration du mockup...",
+    "\uD83C\uDFA8 Mise en place du design...",
+    "\uD83D\uDDBC\uFE0F Construction de l'aper\u00E7u...",
+    "\uD83D\uDE80 Finalisation..."
+];
+let overlayInterval = null;
+let overlayIndex = 0;
 
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
@@ -128,10 +136,26 @@ function generateMockup(mockupData) {
         if (!loadingOverlay) {
                 loadingOverlay = document.createElement("div");
                 loadingOverlay.classList.add("loading-overlay");
-                loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">📦 Préparation...</div>`;
+                loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">${overlayMessages[0]}</div>`;
                 mainProductImage?.parentNode.appendChild(loadingOverlay);
+        } else {
+                const textEl = loadingOverlay.querySelector('.loading-text');
+                if (textEl) textEl.textContent = overlayMessages[0];
         }
         currentLoadingOverlay = loadingOverlay;
+        overlayIndex = 0;
+        if (overlayInterval) clearInterval(overlayInterval);
+        overlayInterval = setInterval(() => {
+                const textEl = loadingOverlay.querySelector('.loading-text');
+                if (!textEl) return;
+                if (overlayIndex + 1 < overlayMessages.length) {
+                        overlayIndex++;
+                        textEl.textContent = overlayMessages[overlayIndex];
+                } else {
+                        clearInterval(overlayInterval);
+                        overlayInterval = null;
+                }
+        }, 4000);
 
         const form = new FormData();
         form.append("action", "generate_mockup");
@@ -332,6 +356,10 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 currentLoadingOverlay.remove();
                 currentLoadingOverlay = null;
         }
+        if (overlayInterval) {
+                clearInterval(overlayInterval);
+                overlayInterval = null;
+        }
 }
 
 function pollMockupStatus(taskId, attempts = 0) {
@@ -357,6 +385,10 @@ function pollMockupStatus(taskId, attempts = 0) {
                                         currentLoadingOverlay.remove();
                                         currentLoadingOverlay = null;
                                 }
+                                if (overlayInterval) {
+                                        clearInterval(overlayInterval);
+                                        overlayInterval = null;
+                                }
                         }
                 })
                 .catch(() => {
@@ -366,6 +398,10 @@ function pollMockupStatus(taskId, attempts = 0) {
                                 if (currentLoadingOverlay) {
                                         currentLoadingOverlay.remove();
                                         currentLoadingOverlay = null;
+                                }
+                                if (overlayInterval) {
+                                        clearInterval(overlayInterval);
+                                        overlayInterval = null;
                                 }
                         }
                 });
