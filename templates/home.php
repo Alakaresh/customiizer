@@ -14,7 +14,7 @@ get_header();
     <div class="intro-content">
         <h1 class="first_title">Donne vie à tes idées !</h1>
         <p class="text">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
-        <a href="/generate" class="lien">
+        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="lien">
             <i class="fas fa-magic"></i> Créer maintenant
         </a>
     </div>
@@ -29,7 +29,7 @@ get_header();
     <p class="text">
       Découvre notre sélection de produits à personnaliser selon tes envies. Grâce à nos outils avancés, chaque objet devient une création unique.
     </p>
-    <a href="/customize/shop" class="lien">
+    <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="lien">
       <i class="fas fa-magic"></i> Personnaliser maintenant
     </a>
     <div class="carousel" id="productCarousel">
@@ -51,7 +51,7 @@ get_header();
     <p class="text">
       Plonge dans l’univers créatif de notre communauté !
     </p>
-    <a href="/community" class="lien">
+    <a href="<?php echo esc_url( home_url( '/communaute' ) ); ?>" class="lien">
       <i class="fas fa-users"></i> Explorer la galerie
     </a>
   </div>
@@ -77,7 +77,7 @@ get_header();
           <li><p class="step-text">Sélectionne une image pour ton produit.</p></li>
           <li><p class="step-text">Ajuste, ajoute au panier... et profite !</p></li>
       </ol>
-      <a href="/generate" class="lien">
+      <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="lien">
           <i class="fas fa-magic"></i> Créer maintenant
       </a>
   </div>

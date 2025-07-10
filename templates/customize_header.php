@@ -43,16 +43,16 @@ $display_name = $current_user->display_name;
 			<div class="header-content">
 				<div class="logo-container">
 					<div class="logo">
-						<a href="/home">
-							<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/full_logo.png" alt="Logo du site">
-						</a>
+                                                <a href="<?php echo esc_url( home_url( '/home' ) ); ?>">
+                                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/full_logo.png" alt="Logo du site">
+                                                </a>
 					</div>
 				</div>
 				<div class="menu-container">
-					<nav class="main-menu">
-						<div><a href="generate" class="ajax-link">Customiize</a></div>
-						<div><a href="shop" class="ajax-link">Boutique</a></div>
-						<div><a href="community" class="ajax-link">Communauté</a></div>
+                                        <nav class="main-menu">
+                                                <div><a href="/customiize" class="ajax-link">Customiize</a></div>
+                                                <div><a href="/boutique" class="ajax-link">Boutique</a></div>
+                                                <div><a href="/communaute" class="ajax-link">Communauté</a></div>
 						<div>
 							<a href="account?triggerClick=true" class="ajax-link" id="myCreationsLink" data-redirect="account?triggerClick=true">Mes créations</a>
 						</div>

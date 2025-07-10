@@ -32,9 +32,9 @@ $display_name = $current_user->display_name;
 				<div class="logo-container">
 
 					<div class="logo">
-						<a href="/home">
-							<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/full_logo.png" alt="Logo du site">
-						</a>
+                                                <a href="<?php echo esc_url( home_url( '/home' ) ); ?>">
+                                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/full_logo.png" alt="Logo du site">
+                                                </a>
 					</div>
 
                                        <div class="mobile-menu-toggle" aria-expanded="false" aria-label="Menu mobile">
