@@ -1,0 +1,14 @@
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+    /* Ensure image controls are in a single row on tablets */
+    #customizeModal .visual-header {
+        height: 40px;
+    }
+
+    #customizeModal .image-controls {
+        flex-wrap: nowrap;
+    }
+
+    #customizeModal .image-controls button {
+        width: auto;
+    }
+}
