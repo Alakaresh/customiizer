@@ -15,4 +15,9 @@
         max-height: 30vh;
         overflow-y: auto;
     }
+    .switch-wrapper {
+        flex-direction: column;
+        margin-right: 0;
+    }
+
 }
