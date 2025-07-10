@@ -83,18 +83,18 @@
 		<div class="modal-header">
 			<span class="close-button">&times;</span>
 		</div>
-               <h3 id="imageSourceModalTitle">File Library</h3>
+               <h3 id="imageSourceModalTitle">Bibliothèque de fichiers</h3>
 
                 <!-- Section recherche et upload -->
                 <div class="search-upload">
                         <input type="text" id="searchInput" placeholder="Rechercher un fichier..." class="search-bar">
-                        <button id="uploadPcImageButton" class="source-button">Upload</button>
+                       <button id="uploadPcImageButton" class="source-button">Téléverser</button>
                 </div>
 
 		<!-- Contenu principal du modal -->
 		<!-- Fichiers importés depuis le PC -->
 		<div class="imported-files">
-			<h4>Imported images</h4>
+                       <h4>Images importées</h4>
 			<div id="pcFilesList" class="pcfile-list">
 				<!-- Liste des fichiers importés sera injectée ici -->
 			</div>
@@ -102,7 +102,7 @@
 
 		<!-- Fichiers disponibles sur le site -->
 		<div class="site-files">
-			<h4>Generated images</h4>
+                       <h4>Images générées</h4>
                         <div class="switch-wrapper">
                                 <span id="switch-label-left" class="switch-label active">Mes images</span>
                                 <label class="switch-toggle">
