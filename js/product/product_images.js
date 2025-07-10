@@ -1,5 +1,30 @@
 let productData = null;
 window.currentProductId = window.currentProductId || null;
+window.generatedProductId = window.generatedProductId || null;
+window.productCreationPromise = window.productCreationPromise || null;
+
+window.createProduct = function(pd) {
+    return fetch('/wp-admin/admin-ajax.php?action=generate_custom_product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'product_data=' + encodeURIComponent(JSON.stringify(pd))
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                window.generatedProductId = data.data.product_id;
+                pd.product_id = data.data.product_id;
+                if (window.customizerCache?.designs?.[window.currentProductId]) {
+                    window.customizerCache.designs[window.currentProductId].product_id = data.data.product_id;
+                    if (typeof persistCache === 'function') {
+                        persistCache();
+                    }
+                }
+                return data.data.product_id;
+            }
+            throw new Error(data.data);
+        });
+};
 
 // Gestion des groupes d'images de la bottom-bar
 const IMAGES_PER_GROUP = 12;
@@ -343,6 +368,11 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         // Conserve l'URL du mockup généré pour la création du produit
         if (productData) {
                 productData.mockup_url = mockupUrl;
+                if (!window.generatedProductId && !window.productCreationPromise) {
+                        window.productCreationPromise = window.createProduct(productData)
+                                .catch(err => console.error('❌ Product creation failed:', err))
+                                .finally(() => { window.productCreationPromise = null; });
+                }
         }
 
 	// ✅ Simuler un clic pour mettre à jour l'image principale

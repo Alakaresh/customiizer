@@ -1,26 +1,25 @@
-let generatedProductId = null; // Variable globale
+window.generatedProductId = window.generatedProductId || null;
+window.productCreationPromise = window.productCreationPromise || null;
 
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
 }
 
 jQuery(document).ready(function($) {
-	$('.add-to-cart-button').on('click', function () {
-		window.addToCartTemporarilyDisabled = true;
-		if (window.addToCartTemporarilyDisabled === true) {
-			// ✅ Appel de la fonction (et non juste sa définition)
-			//openInfoModal("🚧 Cette fonctionnalité est temporairement désactivée.<br>Veuillez réessayer plus tard.");
-			//return;
-		}
-		// Protection contre double clic
-		$(this).prop('disabled', true);
+        $('.add-to-cart-button').on('click', function () {
+                window.addToCartTemporarilyDisabled = true;
+                if (window.addToCartTemporarilyDisabled === true) {
+                        //openInfoModal("🚧 Cette fonctionnalité est temporairement désactivée.<br>Veuillez réessayer plus tard.");
+                }
+                const button = $(this);
+                button.prop('disabled', true);
 
-		// Vérification si déjà généré
-		if (generatedProductId !== null) {
-			// Pas de redirection réelle pour observer
-			return;
-		}
+                const proceed = (pid) => { addToCartAjax(pid, '/cart/'); };
 
+                if (window.generatedProductId) {
+                        proceed(window.generatedProductId);
+                        return;
+                }
 
                 let productDataToSend = null;
                 if (productData !== null) {
@@ -51,27 +50,24 @@ jQuery(document).ready(function($) {
 			return;
 		}
 
-		fetch('/wp-admin/admin-ajax.php?action=generate_custom_product', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: 'product_data=' + encodeURIComponent(JSON.stringify(productDataToSend))
-		})
-			.then(res => res.json())
-			.then(data => {
-			if (data.success) {
-				generatedProductId = data.data.product_id;
+                if (window.productCreationPromise) {
+                        window.productCreationPromise.then(proceed).catch(err => {
+                                console.error('❌ [AJAX ERROR] ', err);
+                                alert('Impossible de créer le produit personnalisé.');
+                                button.prop('disabled', false);
+                        });
+                        return;
+                }
 
-				addToCartAjax(generatedProductId, '/cart/');
-			} else {
-				console.error("❌ [AJAX ERROR] Erreur création produit :", data.data);
-				alert("Impossible de créer le produit personnalisé.");
-			}
-		})
-			.catch(err => {
-			console.error("❌ [AJAX ERROR] AJAX échoué :", err);
-			alert("Erreur réseau.");
-		});
-	});
+                window.productCreationPromise = window.createProduct(productDataToSend);
+                window.productCreationPromise.then(proceed)
+                        .catch(err => {
+                                console.error('❌ [AJAX ERROR] Erreur création produit :', err);
+                                alert('Impossible de créer le produit personnalisé.');
+                                button.prop('disabled', false);
+                        })
+                        .finally(() => { window.productCreationPromise = null; });
+        });
 	function getAbsoluteUrl(path) {
 		if (!path) return '';
 
