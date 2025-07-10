@@ -67,4 +67,18 @@
         background-size: 6px 6px, 6px 6px;
         background-repeat: no-repeat;
     }
+
+    /* Arrange image control icons on two rows */
+    #customizeModal .visual-header {
+        height: 80px;
+    }
+
+    #customizeModal .image-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #customizeModal .image-controls button {
+        width: calc(100% / 6 - 10px);
+    }
 }

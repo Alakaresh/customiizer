@@ -53,10 +53,10 @@ $display_name = $current_user->display_name;
 
 					if (is_page($pages_autorisees) || is_front_page()):
 					?>
-					<div class="early-access-banner">
-						🔥 <strong>Early Access</strong> – <span class="highlight">-30%</span> avec le code <strong>CUSTOM30</strong><br>
-						<span class="version-info">Version 1.0.3</span>
-					</div>
+                                        <div class="early-access-banner">
+                                                🔥 <strong>Early Access</strong> – <span class="highlight">-30%</span> avec le code <strong>CUSTOM30</strong><br>
+                                                <span class="version-info">Version <?php echo esc_html(customiizer_early_access_version()); ?></span>
+                                        </div>
 					<?php endif; ?>
 				</div>
 				<div class="menu-container">
