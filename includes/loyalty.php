@@ -16,14 +16,17 @@ $log_table    = 'WPC_loyalty_log';
  * Get loyalty points of a user.
  */
 function customiizer_get_loyalty_points( $user_id = 0 ) {
-    global $wpdb, $points_table;
+    global $wpdb, $points_table; // ← ici c’était oublié
     $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
     if ( ! $user_id ) {
         return 0;
     }
-    $points = $wpdb->get_var( $wpdb->prepare( "SELECT points FROM {$points_table} WHERE user_id = %d", $user_id ) );
+    $points = $wpdb->get_var( $wpdb->prepare(
+        "SELECT points FROM {$points_table} WHERE user_id = %d", $user_id
+    ) );
     return $points ? intval( $points ) : 0;
 }
+
 
 /**
  * Add points to a user.
