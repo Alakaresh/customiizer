@@ -158,6 +158,10 @@ function customiizer_enqueue_customize_assets() {
        } elseif (strpos($request_uri, '/panier') !== false) {
                // --- CSS ---
                wp_enqueue_style('cart-style', get_stylesheet_directory_uri() . '/styles/cart.css', [], $ver);
+               wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
+
+       } elseif (function_exists('is_checkout') && is_checkout()) {
+               wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
 
                // Page /communaute
 	} elseif (strpos($request_uri, '/communaute') !== false) {

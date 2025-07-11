@@ -106,7 +106,8 @@ function customiizer_loyalty_redeem_field() {
     $points = customiizer_get_loyalty_points($user_id);
 
     echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
-    echo '<input type="number" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" min="0" max="' . esc_attr( $points ) . '" step="1" />';
+    echo '<input type="hidden" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" />';
+    echo '<button type="button" id="loyalty_points_button" class="button" data-points="' . esc_attr( $points ) . '">' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</button>';
     echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
     echo '</td></tr>';
 }
