@@ -156,6 +156,7 @@ function customiizer_enqueue_customize_assets() {
                wp_enqueue_script('account-purchases', get_stylesheet_directory_uri() . '/js/account/purchases.js', ['jquery'], $ver, true);
                wp_enqueue_script('account-profile', get_stylesheet_directory_uri() . '/js/account/profile.js', ['jquery'], $ver, true);
                wp_enqueue_script('account-pictures', get_stylesheet_directory_uri() . '/js/account/pictures.js', ['jquery'], $ver, true);
+               wp_enqueue_script('account-missions', get_stylesheet_directory_uri() . '/js/account/missions.js', ['jquery'], $ver, true);
 
        } elseif (strpos($request_uri, '/panier') !== false) {
                // --- CSS ---
