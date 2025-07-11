@@ -7,11 +7,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <div id="loyalty-widget-popup">
-    <div class="loyalty-widget-header">
+   <header class="loyalty-widget-header" id="loyalty-widget-header">
         <span class="loyalty-widget-title"><img class="loyalty-widget-icon" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" /> <span class="loyalty-widget-title-text"><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></span></span>
         <span class="loyalty-widget-points"><?php echo intval( $points ); ?> pts</span>
         <button id="loyalty-widget-close" aria-label="Fermer">&times;</button>
-    </div>
+    </header>
     <div class="loyalty-widget-page loyalty-page-main">
         <button class="button loyalty-how-get"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></button>
         <button class="button loyalty-how-use"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></button>
