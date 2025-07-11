@@ -121,21 +121,16 @@ function customiizer_display_loyalty_balance() {
  * Show field on checkout to use points.
  */
 function customiizer_loyalty_redeem_field() {
-    if ( ! is_user_logged_in() ) {
-        return;
-    }
+    $user_id = get_current_user_id();
+    $points = customiizer_get_loyalty_points($user_id);
+    
+    // Debug SQL
+    global $wpdb, $points_table;
+    $sql = $wpdb->prepare( "SELECT points FROM {$points_table} WHERE user_id = %d", $user_id );
+    $result = $wpdb->get_var( $sql );
+    
+    customiizer_log("DEBUG: user_id = $user_id | SQL = $sql | result = $result | via_function = $points");
 
-    $points = customiizer_get_loyalty_points();
-
-    if ( function_exists( 'customiizer_log' ) ) {
-        $user_id = get_current_user_id();
-        customiizer_log( "loyalty: Affichage des points dans le panier | user_id=$user_id | points=$points" );
-    }
-
-    echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
-    echo '<input type="number" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" min="0" max="' . esc_attr( $points ) . '" step="1" />';
-    echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
-    echo '</td></tr>';
 }
 
 
