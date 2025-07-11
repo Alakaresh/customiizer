@@ -20,6 +20,7 @@
 			<a href="javascript:void(0);" id="accountLink" class="ajax-link" data-target="profile">Profil</a>
                        <a href="javascript:void(0);" id="purchasesLink" class="ajax-link" data-target="purchases">Commandes</a>
                        <a href="javascript:void(0);" id="loyaltyLink" class="ajax-link" data-target="loyalty">Mes avantages</a>
+                       <a href="javascript:void(0);" id="missionsLink" class="ajax-link" data-target="missions">Missions</a>
                </nav>
 
 		<a href="/logout" class="logout-button" style="text-align: center;">Déconnexion</a>
