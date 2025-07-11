@@ -120,27 +120,39 @@ add_action( 'woocommerce_review_order_after_order_total', 'customiizer_loyalty_r
 add_action( 'woocommerce_cart_calculate_fees', 'customiizer_apply_loyalty_discount' );
 function customiizer_apply_loyalty_discount( $cart ) {
     if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
-    if ( ! is_user_logged_in() ) return;
 
+    if ( ! is_user_logged_in() ) {
+        customiizer_log('discount', 'Utilisateur non connecté');
+        return;
+    }
+
+    $user_id = get_current_user_id();
     $points_to_use = 0;
+
     if ( isset($_POST['loyalty_points_to_use']) ) {
         $points_to_use = intval($_POST['loyalty_points_to_use']);
         WC()->session->set('loyalty_points_to_use', $points_to_use);
-    } elseif ( WC()->session ) {
+        customiizer_log('discount', "POST -> $points_to_use points pour user_id=$user_id");
+    } else {
         $points_to_use = intval(WC()->session->get('loyalty_points_to_use'));
+        customiizer_log('discount', "SESSION -> $points_to_use points pour user_id=$user_id");
     }
 
-    $available_points = customiizer_get_loyalty_points();
-    $subtotal_ht = $cart->get_subtotal(); // HT uniquement
-    $max_points = intval(floor($subtotal_ht * 100));
-    $points_to_use = min($points_to_use, $available_points, $max_points);
-    $discount = $points_to_use / 100;
+    $available = customiizer_get_loyalty_points($user_id);
+    $subtotal = $cart->get_subtotal(); // HT
+    $max = intval(floor($subtotal * 100));
+    $used = min($points_to_use, $available, $max);
+    $reduction = $used / 100;
 
-    if ( $discount > 0 ) {
-        $cart->add_fee( sprintf( 'Réduction fidélité (%d pts)', $points_to_use ), -$discount, false );
-        WC()->session->set('loyalty_points_to_use', $points_to_use);
+    customiizer_log('discount', "Dispo: $available, Subtotal: $subtotal, Utilisés: $used, Réduction: $reduction €");
+
+    if ($reduction > 0) {
+        $cart->add_fee( "Réduction fidélité ($used pts)", -$reduction, false );
+        WC()->session->set('loyalty_points_to_use', $used);
+        customiizer_log('discount', "Réduction appliquée de -$reduction € pour $used points.");
     } else {
         WC()->session->set('loyalty_points_to_use', 0);
+        customiizer_log('discount', "Aucune réduction appliquée.");
     }
 }
 
