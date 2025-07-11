@@ -603,6 +603,18 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .password-rules li.invalid::before {
-	content: "❌ ";
-	color: #dc3545;
+        content: "❌ ";
+        color: #dc3545;
+}
+
+.customiizer-loyalty-balance {
+        margin: 10px 0;
+        font-size: 1.2em;
+        font-weight: 600;
+        text-align: center;
+}
+.customiizer-loyalty-explanation {
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 0.9em;
 }

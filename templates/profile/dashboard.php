@@ -20,13 +20,20 @@
 		</div>
 	</div>
 
-	<div class="content-container" id="dashboard-container3">
-		<h2>Mes achats</h2>
-		<div class="centered-content">
-			<img src="/wp-content/themes/customiizer/images/customiizerSiteImages/purchase_logo.webp" alt="Logo achats" style="height: 120px; border-radius: 10px;">
-			<button id="viewPurchasesButton" class="content-button">Mes achats</button>
-		</div>
-	</div>
+        <div class="content-container" id="dashboard-container3">
+                <h2>Mes achats</h2>
+                <div class="centered-content">
+                        <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/purchase_logo.webp" alt="Logo achats" style="height: 120px; border-radius: 10px;">
+                        <button id="viewPurchasesButton" class="content-button">Mes achats</button>
+                </div>
+        </div>
+       <div class="content-container" id="dashboard-container4">
+               <h2>Mes avantages</h2>
+               <div class="centered-content">
+                       <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/logoii.png" alt="Logo Custompoints" style="height: 120px; border-radius: 10px;">
+                       <?php customiizer_display_loyalty_balance(); ?>
+               </div>
+       </div>
 </div>
 
 <script>
