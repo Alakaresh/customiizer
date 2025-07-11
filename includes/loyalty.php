@@ -128,6 +128,8 @@ function customiizer_apply_loyalty_discount( $cart ) {
     }
 
     $points_to_use = 0;
+
+    // Si l’utilisateur a soumis une valeur → on l’utilise
     if ( isset( $_POST['loyalty_points_to_use'] ) ) {
         $points_to_use = intval( $_POST['loyalty_points_to_use'] );
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
@@ -135,23 +137,23 @@ function customiizer_apply_loyalty_discount( $cart ) {
         $points_to_use = intval( WC()->session->get( 'loyalty_points_to_use' ) );
     }
 
-    $available     = customiizer_get_loyalty_points();
-    $points_to_use = min( $points_to_use, $available );
-    $discount      = $points_to_use / 100;
+    $available      = customiizer_get_loyalty_points();
+    $subtotal_excl  = $cart->get_subtotal(); // Montant HT (hors frais et TVA)
+    $max_points     = intval( floor( $subtotal_excl * 100 ) );
 
-    if ( $discount > $cart->get_total( 'edit' ) ) {
-        $discount      = $cart->get_total( 'edit' );
-        $points_to_use = intval( ceil( $discount * 100 ) );
-    }
+    $points_to_use  = min( $points_to_use, $available, $max_points );
+    $discount       = $points_to_use / 100;
 
     if ( $discount > 0 ) {
-        $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount );
+        $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount, false ); // false = ne touche pas à la TVA
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
 
+        customiizer_log("loyalty: Réduction HT appliquée | user_id=" . get_current_user_id() . " | points=$points_to_use | valeur={$discount}€ | sous-total HT={$subtotal_excl}€");
     } else {
         WC()->session->set( 'loyalty_points_to_use', 0 );
     }
 }
+
 
 /**
  * Store points usage in order meta.
