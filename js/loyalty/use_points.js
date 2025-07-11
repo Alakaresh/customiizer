@@ -2,7 +2,7 @@ jQuery(function($) {
     $(document).on('click', '#loyalty_points_button', function(e) {
         e.preventDefault();
         var points = $(this).data('points') || 0;
-        $('#loyalty_points_to_use').val(points);
+        $('#loyalty_points_to_use').val(999999); // On force l’utilisation max
 
         // On the cart page submit the cart form so the discount is applied
         var $cartForm = $('form.woocommerce-cart-form');
