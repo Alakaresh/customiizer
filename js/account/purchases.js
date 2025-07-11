@@ -1,15 +1,21 @@
 let currentPage = 1; // Garder une trace de la page actuelle
 const perPage = 10; // Définir combien d'éléments vous voulez par page
 
-function fetchUserOrders() {
-        const cacheKey = `USER_ORDERS_${currentPage}`;
+
+function fetchUserOrders(options = {}) {
+        const prefetch = options.prefetch === true;
+        const page = options.page || currentPage;
+        const cacheKey = `USER_ORDERS_${page}`;
         const cached = sessionStorage.getItem(cacheKey);
 
         if (cached) {
                 try {
                         const cacheData = JSON.parse(cached);
-                        displayOrders(cacheData.orders, cacheData.max_num_pages);
-                        updatePagination(cacheData.max_num_pages);
+                        if (!prefetch) {
+                                displayOrders(cacheData.orders, cacheData.max_num_pages);
+                                updatePagination(cacheData.max_num_pages);
+                        }
+
                         return;
                 } catch (e) {
                         console.warn('Cache parse error for orders', e);
@@ -27,8 +33,12 @@ function fetchUserOrders() {
                 .then(data => {
                 if (data.success) {
                         sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
-                        displayOrders(data.data.orders, data.data.max_num_pages);
-                        updatePagination(data.data.max_num_pages); // Mettre à jour la pagination basée sur le nombre max de pages
+
+                        if (!prefetch) {
+                                displayOrders(data.data.orders, data.data.max_num_pages);
+                                updatePagination(data.data.max_num_pages); // Mettre à jour la pagination basée sur le nombre max de pages
+                        }
+
                 } else {
                         console.error('Erreur:', data.data);
                 }
