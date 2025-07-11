@@ -107,6 +107,13 @@ function runAfterLoad(targetFile) {
                 fetchUserOrders();
         }
 
+       if (targetFile === 'pictures') {
+               console.log("📦 Chargement de la galerie d'images...");
+               if (typeof ImageLoader !== 'undefined' && ImageLoader.loadUserGeneratedImages) {
+                       ImageLoader.loadUserGeneratedImages();
+               }
+       }
+
         if (targetFile === 'profile') {
                 console.log("📦 Chargement des infos profil...");
                 loadUserDetails();
