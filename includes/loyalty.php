@@ -21,8 +21,6 @@ function customiizer_get_loyalty_points( $user_id = 0 ) {
 
     $sql = $wpdb->prepare( "SELECT points FROM WPC_loyalty_points WHERE user_id = %d", $user_id );
     $points = $wpdb->get_var( $sql );
-
-    customiizer_log("DEBUG: user_id=$user_id | SQL=$sql | result=$points");
     return $points ? intval( $points ) : 0;
 }
 
@@ -42,9 +40,6 @@ function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $descr
          ON DUPLICATE KEY UPDATE points = points + VALUES(points)",
         $user_id, $points
     ) );
-
-    customiizer_log_loyalty_movement( $user_id, $points, 'gain', $origin, $description );
-    customiizer_log("loyalty: Points ajoutés | user_id=$user_id | points=$points | origin=$origin | desc=$description");
 
     return true;
 }
@@ -69,9 +64,6 @@ function customiizer_use_loyalty_points( $user_id, $points, $origin = '', $descr
         "UPDATE WPC_loyalty_points SET points = points - %d WHERE user_id = %d",
         $points, $user_id
     ) );
-
-    customiizer_log_loyalty_movement( $user_id, $points, 'use', $origin, $description );
-    customiizer_log("loyalty: Points utilisés | user_id=$user_id | points=$points | origin=$origin | desc=$description");
 
     return true;
 }
@@ -113,8 +105,6 @@ function customiizer_loyalty_redeem_field() {
     $user_id = get_current_user_id();
     $points = customiizer_get_loyalty_points($user_id);
 
-    customiizer_log("loyalty: Affichage des points dans le panier | user_id=$user_id | points=$points");
-
     echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
     echo '<input type="number" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" min="0" max="' . esc_attr( $points ) . '" step="1" />';
     echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
@@ -155,8 +145,6 @@ function customiizer_apply_loyalty_discount( $cart ) {
     if ( $discount > 0 ) {
         $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount );
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
-
-        customiizer_log("loyalty: Réduction appliquée dans le panier | user_id=" . get_current_user_id() . " | points=$points_to_use | valeur={$discount}€ | total={$cart->get_total('edit')}€");
 
     } else {
         WC()->session->set( 'loyalty_points_to_use', 0 );
