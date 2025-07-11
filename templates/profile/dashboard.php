@@ -1,4 +1,13 @@
-<!-- TABLEAU DE BORD -->      
+<?php
+// Direct access via AJAX needs WordPress functions.
+if ( ! defined( 'ABSPATH' ) ) {
+    $wp_load = __DIR__ . '/../../../../../wp-load.php';
+    if ( file_exists( $wp_load ) ) {
+        require_once $wp_load;
+    }
+}
+?>
+<!-- TABLEAU DE BORD -->
 <div class="dashboard-container" id="dashboard-container">
 	<div class="content-container" id="dashboard-container1">
 		<h2>Profil</h2>
