@@ -25,26 +25,57 @@
     border-radius:4px;
     box-shadow:0 2px 8px rgba(0,0,0,0.2);
     padding:15px;
-    transform:translateY(100%);
-    transition:transform 0.3s ease-out;
+    display:none;
     z-index:9998;
 }
 #loyalty-widget-popup.open{
-    transform:translateY(0);
+    display:block;
+}
+#loyalty-widget-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
 }
 #loyalty-widget-close{
-    position:absolute;
-    top:5px;
-    right:5px;
     background:none;
     border:none;
     font-size:16px;
     color:var(--font-color);
     cursor:pointer;
 }
+#loyalty-widget-title{
+    display:flex;
+    align-items:center;
+    flex-grow:1;
+    justify-content:center;
+    font-size:14px;
+}
+#loyalty-widget-points{
+    font-weight:bold;
+}
 #loyalty-widget-popup h3{
     margin-top:0;
     text-align:center;
+}
+#loyalty-widget-popup .loyalty-widget-page{
+    display:none;
+}
+#loyalty-widget-popup .loyalty-page-main{
+    display:block;
+}
+#loyalty-widget-subheader{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+}
+#loyalty-widget-subheader .loyalty-back-main{
+    background:none;
+    border:none;
+    font-size:16px;
+    color:var(--font-color);
+    cursor:pointer;
 }
 #loyalty-widget-popup button{
     width:100%;
