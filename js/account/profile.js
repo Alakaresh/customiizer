@@ -202,21 +202,37 @@ function initPasswordForm() {
 
 // Fonction pour remplir les champs à partir de l'API
 function loadUserDetails() {
-	$.ajax({
-		url: ajaxurl,
-		data: { action: 'get_user_details' },
-		type: 'POST',
-		dataType: 'json',
-		success: function (response) {
-			if (response.success) {
-				if (response.data.display_name) $('#username').val(response.data.display_name);
-				if (response.data.email) $('#email').val(response.data.email);
-				$('#password-change-form').find('input[name="password_nonce"]').val(response.data.password_nonce);
-			} else {
-				alert('❌ Impossible de charger les infos utilisateur.');
-			}
-		}
-	});
+        const cachedStr = sessionStorage.getItem('USER_DETAILS');
+        if (cachedStr) {
+                try {
+                        const cached = JSON.parse(cachedStr);
+                        if (cached.display_name) $('#username').val(cached.display_name);
+                        if (cached.email) $('#email').val(cached.email);
+                        if (cached.password_nonce) {
+                                $('#password-change-form').find('input[name="password_nonce"]').val(cached.password_nonce);
+                        }
+                        return;
+                } catch (e) {
+                        console.warn('Cache parse error for user details', e);
+                }
+        }
+
+        $.ajax({
+                url: ajaxurl,
+                data: { action: 'get_user_details' },
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                        if (response.success) {
+                                sessionStorage.setItem('USER_DETAILS', JSON.stringify(response.data));
+                                if (response.data.display_name) $('#username').val(response.data.display_name);
+                                if (response.data.email) $('#email').val(response.data.email);
+                                $('#password-change-form').find('input[name="password_nonce"]').val(response.data.password_nonce);
+                        } else {
+                                alert('❌ Impossible de charger les infos utilisateur.');
+                        }
+                }
+        });
 }
 
 // Petit message de confirmation temporaire
