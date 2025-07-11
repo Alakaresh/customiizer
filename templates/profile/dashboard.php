@@ -41,6 +41,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                <div class="centered-content">
                        <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/logoii.png" alt="Logo Custompoints" style="height: 120px; border-radius: 10px;">
                        <button id="viewLoyaltyButton" class="content-button">En savoir plus</button>
+
+                             
                </div>
        </div>
 </div>
