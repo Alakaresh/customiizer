@@ -18,8 +18,9 @@
 			<a href="javascript:void(0);" id="dashboardLink" class="ajax-link" data-target="dashboard">Tableau de bord</a>
 			<a href="javascript:void(0);" id="picturesLink" class="ajax-link" data-target="pictures">Images</a>
 			<a href="javascript:void(0);" id="accountLink" class="ajax-link" data-target="profile">Profil</a>
-			<a href="javascript:void(0);" id="purchasesLink" class="ajax-link" data-target="purchases">Commandes</a>
-		</nav>
+                       <a href="javascript:void(0);" id="purchasesLink" class="ajax-link" data-target="purchases">Commandes</a>
+                       <a href="javascript:void(0);" id="loyaltyLink" class="ajax-link" data-target="loyalty">Mes avantages</a>
+               </nav>
 
 		<a href="/logout" class="logout-button" style="text-align: center;">Déconnexion</a>
 	</div>
