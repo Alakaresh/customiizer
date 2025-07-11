@@ -6,3 +6,4 @@ admin/logs/logs-data/*.log
 api/products/logs/*.log
 includes/proxy/logfile.log
 includes/webhook/created_order.log
+vendor/

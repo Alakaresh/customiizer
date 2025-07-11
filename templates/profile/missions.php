@@ -9,7 +9,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="content-container" id="missions-container">
     <h2>Missions</h2>
-    <div class="centered-content">
-        <p>Cette section affichera vos missions et succès.</p>
-    </div>
+    <div id="missions-list" class="missions-list"></div>
 </div>
