@@ -17,8 +17,16 @@ $(document).ready(function() {
 		}
 	}
 
-        // Préchargement des sections pour un affichage plus rapide
-        preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty']);
+       // Préchargement des sections pour un affichage plus rapide
+       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty']);
+
+       // Précharger aussi les données utilisateur et la première page de commandes
+       if (typeof loadUserDetails === 'function') {
+               loadUserDetails();
+       }
+       if (typeof fetchUserOrders === 'function') {
+               fetchUserOrders({ prefetch: true });
+       }
 
         // Attachement des événements aux liens AJAX de manière centralisée
         $(document).on('click', '.ajax-link', function(e) {
