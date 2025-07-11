@@ -153,7 +153,8 @@ function customiizer_apply_loyalty_discount( $cart ) {
     $discount      = $points_to_use / 100;
 
     if ( $discount > 0 ) {
-        $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount, false ); // false = pas de TVA sur la remise
+        $cart->add_fee( 'Test -10€', -10.00, false );
+        customiizer_log("DEBUG: Ajout test -10€");
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
 
         customiizer_log("loyalty: Max appliqué | user_id=" . get_current_user_id() . " | points=$points_to_use | HT={$subtotal_ht} | remise={$discount}€");
