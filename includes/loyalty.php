@@ -9,12 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Provides point storage, log tracking and WooCommerce integration.
  */
 
-// Table names use the custom "WPC_" prefix.
 $points_table = 'WPC_loyalty_points';
 $log_table    = 'WPC_loyalty_log';
-
-// Database creation is handled manually outside the theme. These functions only
-// read from and write to the tables.
 
 /**
  * Get loyalty points of a user.
@@ -40,9 +36,23 @@ function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $descr
         return false;
     }
 
-    $wpdb->query( $wpdb->prepare( "INSERT INTO {$points_table} (user_id, points) VALUES (%d, %d) ON DUPLICATE KEY UPDATE points = points + VALUES(points)", $user_id, $points ) );
+    $wpdb->query( $wpdb->prepare(
+        "INSERT INTO {$points_table} (user_id, points) VALUES (%d, %d)
+         ON DUPLICATE KEY UPDATE points = points + VALUES(points)",
+        $user_id, $points
+    ) );
 
     customiizer_log_loyalty_movement( $user_id, $points, 'gain', $origin, $description );
+
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'loyalty', 'Points ajoutés', array(
+            'user_id' => $user_id,
+            'points'  => $points,
+            'origin'  => $origin,
+            'desc'    => $description
+        ) );
+    }
+
     return true;
 }
 
@@ -56,14 +66,28 @@ function customiizer_use_loyalty_points( $user_id, $points, $origin = '', $descr
     if ( $user_id <= 0 || $points <= 0 ) {
         return false;
     }
+
     $current = customiizer_get_loyalty_points( $user_id );
     if ( $current < $points ) {
         return false;
     }
 
-    $wpdb->query( $wpdb->prepare( "UPDATE {$points_table} SET points = points - %d WHERE user_id = %d", $points, $user_id ) );
+    $wpdb->query( $wpdb->prepare(
+        "UPDATE {$points_table} SET points = points - %d WHERE user_id = %d",
+        $points, $user_id
+    ) );
 
     customiizer_log_loyalty_movement( $user_id, $points, 'use', $origin, $description );
+
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'loyalty', 'Points utilisés', array(
+            'user_id' => $user_id,
+            'points'  => $points,
+            'origin'  => $origin,
+            'desc'    => $description
+        ) );
+    }
+
     return true;
 }
 
@@ -120,6 +144,7 @@ function customiizer_apply_loyalty_discount( $cart ) {
     if ( ! is_user_logged_in() ) {
         return;
     }
+
     $points_to_use = 0;
     if ( isset( $_POST['loyalty_points_to_use'] ) ) {
         $points_to_use = intval( $_POST['loyalty_points_to_use'] );
@@ -127,9 +152,10 @@ function customiizer_apply_loyalty_discount( $cart ) {
     } elseif ( WC()->session ) {
         $points_to_use = intval( WC()->session->get( 'loyalty_points_to_use' ) );
     }
-    $available = customiizer_get_loyalty_points();
-    $points_to_use = min( $points_to_use, $available );
-    $discount = $points_to_use / 100; // 100 points = 1€
+
+    $available      = customiizer_get_loyalty_points();
+    $points_to_use  = min( $points_to_use, $available );
+    $discount       = $points_to_use / 100;
 
     if ( $discount > $cart->get_total( 'edit' ) ) {
         $discount      = $cart->get_total( 'edit' );
@@ -171,18 +197,22 @@ function customiizer_process_loyalty_after_completion( $order_id ) {
     if ( $order->get_meta( '_loyalty_points_processed' ) ) {
         return; // Already processed
     }
+
     $user_id = $order->get_user_id();
     if ( ! $user_id ) {
         return;
     }
+
     $points_used = intval( $order->get_meta( '_loyalty_points_used' ) );
     if ( $points_used > 0 ) {
         customiizer_use_loyalty_points( $user_id, $points_used, 'paiement', 'Utilisation pour la commande #' . $order->get_order_number() );
     }
+
     $points_earned = intval( $order->get_total() * 10 );
     if ( $points_earned > 0 ) {
         customiizer_add_loyalty_points( $user_id, $points_earned, 'achat', 'Points pour la commande #' . $order->get_order_number() );
     }
+
     $order->update_meta_data( '_loyalty_points_processed', 1 );
     $order->save();
 }
