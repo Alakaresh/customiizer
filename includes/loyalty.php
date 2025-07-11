@@ -232,14 +232,32 @@ function customiizer_loyalty_widget() {
     $link = customiizer_get_referral_link();
     ?>
     <div id="loyalty-widget-popup">
-        <button id="loyalty-widget-close">&times;</button>
-        <h3><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></h3>
-        <p><?php echo intval( $points ); ?> points</p>
-        <button class="button loyalty-how-get"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></button>
-        <button class="button loyalty-how-use"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></button>
-        <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
-        <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
-        <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;" />
+        <div class="loyalty-widget-header">
+            <button id="loyalty-widget-close" aria-label="Fermer">&times;</button>
+            <span class="loyalty-widget-title"><i class="fas fa-coins"></i> <span class="loyalty-widget-title-text"><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></span></span>
+            <span class="loyalty-widget-points"><?php echo intval( $points ); ?> pts</span>
+        </div>
+        <div class="loyalty-widget-page loyalty-page-main">
+            <button class="button loyalty-how-get"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></button>
+            <button class="button loyalty-how-use"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></button>
+            <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
+            <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
+            <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;" />
+        </div>
+        <div class="loyalty-widget-page loyalty-page-get" style="display:none;">
+            <div class="loyalty-widget-subheader">
+                <button class="loyalty-back-main" aria-label="Retour"><i class="fas fa-arrow-left"></i></button>
+                <span><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></span>
+            </div>
+            <p><?php echo esc_html__( 'Explications pour gagner des points...', 'customiizer' ); ?></p>
+        </div>
+        <div class="loyalty-widget-page loyalty-page-use" style="display:none;">
+            <div class="loyalty-widget-subheader">
+                <button class="loyalty-back-main" aria-label="Retour"><i class="fas fa-arrow-left"></i></button>
+                <span><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></span>
+            </div>
+            <p><?php echo esc_html__( 'Explications pour utiliser vos points...', 'customiizer' ); ?></p>
+        </div>
     </div>
     <?php
 }
