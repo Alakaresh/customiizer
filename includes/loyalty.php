@@ -233,9 +233,9 @@ function customiizer_loyalty_widget() {
     ?>
     <div id="loyalty-widget-popup">
         <div class="loyalty-widget-header">
-            <button id="loyalty-widget-close" aria-label="Fermer">&times;</button>
-            <span class="loyalty-widget-title"><i class="fas fa-coins"></i> <span class="loyalty-widget-title-text"><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></span></span>
+            <span class="loyalty-widget-title"><img class="loyalty-widget-icon" src="<?php echo esc_url( get_template_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" /> <span class="loyalty-widget-title-text"><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></span></span>
             <span class="loyalty-widget-points"><?php echo intval( $points ); ?> pts</span>
+            <button id="loyalty-widget-close" aria-label="Fermer">&times;</button>
         </div>
         <div class="loyalty-widget-page loyalty-page-main">
             <button class="button loyalty-how-get"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></button>
