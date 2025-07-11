@@ -7,13 +7,6 @@ jQuery(function($) {
 
         console.log('[LOYALTY] Bouton cliqué, points =', points);
 
-        // Appel AJAX pour log côté PHP (optionnel mais utile)
-        $.post(customiizer_log_ajax.ajax_url, {
-            action: 'customiizer_log_loyalty_event',
-            context: 'JS',
-            message: 'Bouton cliqué avec ' + points + ' points'
-        });
-
         const $cartForm = $('form.woocommerce-cart-form');
         if ($cartForm.length) {
             $cartForm.find('button[name="update_cart"]').prop('disabled', false).trigger('click');
