@@ -10,6 +10,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Sortir si accédé directement.
 }
 
+add_action( 'woocommerce_cart_calculate_fees', 'test_add_fee_simple' );
+function test_add_fee_simple( $cart ) {
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+
+    // On applique un test simple : -5€
+    $cart->add_fee( 'Réduction test', -5.00, false );
+
+    // Pour vérifier dans le log
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log('TEST: add_fee -5€ appliqué');
+    }
+}
+
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
 	class WC_Custom_Dynamic_Shipping_Method extends WC_Shipping_Method {
