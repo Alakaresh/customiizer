@@ -51,6 +51,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_style('fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', [], $ver);
        wp_enqueue_style('modal-login-style', get_stylesheet_directory_uri() . '/styles/modal-login.css', [], $ver);
        wp_enqueue_style('user-modal-style', get_stylesheet_directory_uri() . '/styles/user-modal.css', [], $ver);
+       wp_enqueue_style('loyalty-widget-style', get_stylesheet_directory_uri() . '/styles/loyalty_widget.css', [], $ver);
 
 	// ===============================
 	// SCRIPTS GLOBAUX
@@ -61,6 +62,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_script('sign-modal-script', get_stylesheet_directory_uri() . '/js/account/sign_modal.js', ['jquery'], $ver, true);
        wp_enqueue_script('user-modal-script', get_stylesheet_directory_uri() . '/js/account/user-modal.js', ['jquery'], $ver, true);
        wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/preload_products.js', [], $ver, true);
+       wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
 
         // Mark the preload-products script as async on all pages except the shop
         add_filter('script_loader_tag', function($tag, $handle) {
