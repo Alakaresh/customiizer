@@ -106,11 +106,20 @@ function customiizer_loyalty_redeem_field() {
     $points = customiizer_get_loyalty_points($user_id);
 
     echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
-    echo '<input type="number" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" min="0" max="' . esc_attr( $points ) . '" step="1" />';
-    echo '<button type="button" id="loyalty_points_button" class="button" data-points="' . esc_attr( $points ) . '">' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</button>';
+
+    // Champ masqué, il sera rempli automatiquement par le JS avec une valeur très haute
+    echo '<input type="hidden" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" />';
+
+    // Bouton qui déclenche l’application des points
+    echo '<button type="button" id="loyalty_points_button" class="button" data-points="' . esc_attr( $points ) . '">'
+        . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</button>';
+
+    // Description des points disponibles
     echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
+
     echo '</td></tr>';
 }
+
 
 add_action( 'woocommerce_cart_totals_after_order_total', 'customiizer_loyalty_redeem_field' );
 add_action( 'woocommerce_review_order_after_order_total', 'customiizer_loyalty_redeem_field' );
@@ -129,7 +138,6 @@ function customiizer_apply_loyalty_discount( $cart ) {
 
     $points_to_use = 0;
 
-    // Si l’utilisateur a soumis une valeur → on l’utilise
     if ( isset( $_POST['loyalty_points_to_use'] ) ) {
         $points_to_use = intval( $_POST['loyalty_points_to_use'] );
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
@@ -137,18 +145,18 @@ function customiizer_apply_loyalty_discount( $cart ) {
         $points_to_use = intval( WC()->session->get( 'loyalty_points_to_use' ) );
     }
 
-    $available      = customiizer_get_loyalty_points();
-    $subtotal_excl  = $cart->get_subtotal(); // Montant HT (hors frais et TVA)
-    $max_points     = intval( floor( $subtotal_excl * 100 ) );
+    $available     = customiizer_get_loyalty_points();
+    $subtotal_ht   = $cart->get_subtotal(); // HT
+    $max_points    = intval( floor( $subtotal_ht * 100 ) );
 
-    $points_to_use  = min( $points_to_use, $available, $max_points );
-    $discount       = $points_to_use / 100;
+    $points_to_use = min( $points_to_use, $available, $max_points );
+    $discount      = $points_to_use / 100;
 
     if ( $discount > 0 ) {
-        $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount, false ); // false = ne touche pas à la TVA
+        $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount, false ); // false = pas de TVA sur la remise
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
 
-        customiizer_log("loyalty: Réduction HT appliquée | user_id=" . get_current_user_id() . " | points=$points_to_use | valeur={$discount}€ | sous-total HT={$subtotal_excl}€");
+        customiizer_log("loyalty: Max appliqué | user_id=" . get_current_user_id() . " | points=$points_to_use | HT={$subtotal_ht} | remise={$discount}€");
     } else {
         WC()->session->set( 'loyalty_points_to_use', 0 );
     }
