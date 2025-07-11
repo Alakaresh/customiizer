@@ -98,68 +98,49 @@ function customiizer_display_loyalty_balance() {
  * Show field on checkout to use points.
  */
 function customiizer_loyalty_redeem_field() {
-    if ( ! is_user_logged_in() ) {
-        return;
-    }
+    if ( ! is_user_logged_in() ) return;
 
     $user_id = get_current_user_id();
     $points = customiizer_get_loyalty_points($user_id);
 
     echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
-
-    // Champ masqué, il sera rempli automatiquement par le JS avec une valeur très haute
     echo '<input type="hidden" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" />';
-
-    // Bouton qui déclenche l’application des points
-    echo '<button type="button" id="loyalty_points_button" class="button" data-points="' . esc_attr( $points ) . '">'
+    echo '<button type="button" id="loyalty_points_button" class="button" data-points="' . esc_attr($points) . '">'
         . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</button>';
-
-    // Description des points disponibles
     echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
-
     echo '</td></tr>';
 }
-
-
 add_action( 'woocommerce_cart_totals_after_order_total', 'customiizer_loyalty_redeem_field' );
 add_action( 'woocommerce_review_order_after_order_total', 'customiizer_loyalty_redeem_field' );
+
 
 /**
  * Apply discount based on points.
  */
 add_action( 'woocommerce_cart_calculate_fees', 'customiizer_apply_loyalty_discount' );
 function customiizer_apply_loyalty_discount( $cart ) {
-    if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-        return;
-    }
-    if ( ! is_user_logged_in() ) {
-        return;
-    }
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) ) return;
+    if ( ! is_user_logged_in() ) return;
 
     $points_to_use = 0;
-
-    if ( isset( $_POST['loyalty_points_to_use'] ) ) {
-        $points_to_use = intval( $_POST['loyalty_points_to_use'] );
-        WC()->session->set( 'loyalty_points_to_use', $points_to_use );
+    if ( isset($_POST['loyalty_points_to_use']) ) {
+        $points_to_use = intval($_POST['loyalty_points_to_use']);
+        WC()->session->set('loyalty_points_to_use', $points_to_use);
     } elseif ( WC()->session ) {
-        $points_to_use = intval( WC()->session->get( 'loyalty_points_to_use' ) );
+        $points_to_use = intval(WC()->session->get('loyalty_points_to_use'));
     }
 
-    $available     = customiizer_get_loyalty_points();
-    $subtotal_ht   = $cart->get_subtotal(); // HT
-    $max_points    = intval( floor( $subtotal_ht * 100 ) );
-
-    $points_to_use = min( $points_to_use, $available, $max_points );
-    $discount      = $points_to_use / 100;
+    $available_points = customiizer_get_loyalty_points();
+    $subtotal_ht = $cart->get_subtotal(); // HT uniquement
+    $max_points = intval(floor($subtotal_ht * 100));
+    $points_to_use = min($points_to_use, $available_points, $max_points);
+    $discount = $points_to_use / 100;
 
     if ( $discount > 0 ) {
-        $cart->add_fee( 'Test -10€', -10.00, false );
-        customiizer_log("DEBUG: Ajout test -10€");
-        WC()->session->set( 'loyalty_points_to_use', $points_to_use );
-
-        customiizer_log("loyalty: Max appliqué | user_id=" . get_current_user_id() . " | points=$points_to_use | HT={$subtotal_ht} | remise={$discount}€");
+        $cart->add_fee( sprintf( 'Réduction fidélité (%d pts)', $points_to_use ), -$discount, false );
+        WC()->session->set('loyalty_points_to_use', $points_to_use);
     } else {
-        WC()->session->set( 'loyalty_points_to_use', 0 );
+        WC()->session->set('loyalty_points_to_use', 0);
     }
 }
 
@@ -169,15 +150,16 @@ function customiizer_apply_loyalty_discount( $cart ) {
  */
 add_action( 'woocommerce_checkout_create_order', 'customiizer_store_points_meta', 20, 2 );
 function customiizer_store_points_meta( $order, $data ) {
-    if ( ! is_user_logged_in() || ! WC()->session ) {
-        return;
-    }
-    $points_used = intval( WC()->session->get( 'loyalty_points_to_use' ) );
+    if ( ! is_user_logged_in() || ! WC()->session ) return;
+
+    $points_used = intval( WC()->session->get('loyalty_points_to_use') );
     if ( $points_used > 0 ) {
         $order->update_meta_data( '_loyalty_points_used', $points_used );
+        $order->add_order_note( sprintf( 'Le client a utilisé %d points fidélité (%.2f€ de réduction).', $points_used, $points_used / 100 ) );
     }
-    WC()->session->set( 'loyalty_points_to_use', 0 );
+    WC()->session->set('loyalty_points_to_use', 0);
 }
+
 
 /**
  * Award and deduct points when order is completed.
@@ -185,17 +167,10 @@ function customiizer_store_points_meta( $order, $data ) {
 add_action( 'woocommerce_order_status_completed', 'customiizer_process_loyalty_after_completion' );
 function customiizer_process_loyalty_after_completion( $order_id ) {
     $order = wc_get_order( $order_id );
-    if ( ! $order ) {
-        return;
-    }
-    if ( $order->get_meta( '_loyalty_points_processed' ) ) {
-        return;
-    }
+    if ( ! $order || $order->get_meta( '_loyalty_points_processed' ) ) return;
 
     $user_id = $order->get_user_id();
-    if ( ! $user_id ) {
-        return;
-    }
+    if ( ! $user_id ) return;
 
     $points_used = intval( $order->get_meta( '_loyalty_points_used' ) );
     if ( $points_used > 0 ) {
@@ -210,3 +185,4 @@ function customiizer_process_loyalty_after_completion( $order_id ) {
     $order->update_meta_data( '_loyalty_points_processed', 1 );
     $order->save();
 }
+
