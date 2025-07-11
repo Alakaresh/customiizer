@@ -202,3 +202,45 @@ function customiizer_process_loyalty_after_completion( $order_id ) {
     $order->save();
 }
 
+
+/**
+ * Get referral count for a user.
+ */
+function customiizer_get_referral_count( $user_id = 0 ) {
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
+    return intval( get_user_meta( $user_id, 'referral_count', true ) );
+}
+
+/**
+ * Get referral link for a user.
+ */
+function customiizer_get_referral_link( $user_id = 0 ) {
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
+    return esc_url( home_url( '/?ref=' . $user_id ) );
+}
+
+/**
+ * Output the loyalty popup widget.
+ */
+add_action( 'wp_footer', 'customiizer_loyalty_widget' );
+function customiizer_loyalty_widget() {
+    if ( ! is_user_logged_in() ) {
+        return;
+    }
+    $points = customiizer_get_loyalty_points();
+    $referrals = customiizer_get_referral_count();
+    $link = customiizer_get_referral_link();
+    ?>
+    <div id="loyalty-widget-popup">
+        <button id="loyalty-widget-close">&times;</button>
+        <h3><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></h3>
+        <p><?php echo intval( $points ); ?> points</p>
+        <button class="button loyalty-how-get"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></button>
+        <button class="button loyalty-how-use"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></button>
+        <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
+        <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
+        <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;" />
+    </div>
+    <?php
+}
+
