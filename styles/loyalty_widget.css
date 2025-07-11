@@ -51,6 +51,8 @@
     border-bottom-right-radius: 4px;
     padding: 15px;
     color: var(--font-color);
+    height: 500px;
+    overflow-y: auto;
 }
 
 #loyalty-widget-close{
