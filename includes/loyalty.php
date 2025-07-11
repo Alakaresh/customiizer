@@ -9,9 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Provides point storage, log tracking and WooCommerce integration.
  */
 
-$points_table = 'WPC_loyalty_points';
-$log_table    = 'WPC_loyalty_log';
-
 /**
  * Get loyalty points of a user.
  */
@@ -25,17 +22,15 @@ function customiizer_get_loyalty_points( $user_id = 0 ) {
     $sql = $wpdb->prepare( "SELECT points FROM WPC_loyalty_points WHERE user_id = %d", $user_id );
     $points = $wpdb->get_var( $sql );
 
-    customiizer_log("DEBUG FIX: user_id=$user_id | SQL=$sql | result=$points");
+    customiizer_log("DEBUG: user_id=$user_id | SQL=$sql | result=$points");
     return $points ? intval( $points ) : 0;
 }
-
-
 
 /**
  * Add points to a user.
  */
 function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $description = '' ) {
-    global $wpdb, $points_table;
+    global $wpdb;
     $user_id = intval( $user_id );
     $points  = intval( $points );
     if ( $user_id <= 0 || $points <= 0 ) {
@@ -43,21 +38,13 @@ function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $descr
     }
 
     $wpdb->query( $wpdb->prepare(
-        "INSERT INTO {$points_table} (user_id, points) VALUES (%d, %d)
+        "INSERT INTO WPC_loyalty_points (user_id, points) VALUES (%d, %d)
          ON DUPLICATE KEY UPDATE points = points + VALUES(points)",
         $user_id, $points
     ) );
 
     customiizer_log_loyalty_movement( $user_id, $points, 'gain', $origin, $description );
-
-    if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'loyalty', 'Points ajoutés', array(
-            'user_id' => $user_id,
-            'points'  => $points,
-            'origin'  => $origin,
-            'desc'    => $description
-        ) );
-    }
+    customiizer_log("loyalty: Points ajoutés | user_id=$user_id | points=$points | origin=$origin | desc=$description");
 
     return true;
 }
@@ -66,7 +53,7 @@ function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $descr
  * Deduct points from a user if available.
  */
 function customiizer_use_loyalty_points( $user_id, $points, $origin = '', $description = '' ) {
-    global $wpdb, $points_table;
+    global $wpdb;
     $user_id = intval( $user_id );
     $points  = intval( $points );
     if ( $user_id <= 0 || $points <= 0 ) {
@@ -79,20 +66,12 @@ function customiizer_use_loyalty_points( $user_id, $points, $origin = '', $descr
     }
 
     $wpdb->query( $wpdb->prepare(
-        "UPDATE {$points_table} SET points = points - %d WHERE user_id = %d",
+        "UPDATE WPC_loyalty_points SET points = points - %d WHERE user_id = %d",
         $points, $user_id
     ) );
 
     customiizer_log_loyalty_movement( $user_id, $points, 'use', $origin, $description );
-
-    if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'loyalty', 'Points utilisés', array(
-            'user_id' => $user_id,
-            'points'  => $points,
-            'origin'  => $origin,
-            'desc'    => $description
-        ) );
-    }
+    customiizer_log("loyalty: Points utilisés | user_id=$user_id | points=$points | origin=$origin | desc=$description");
 
     return true;
 }
@@ -101,8 +80,8 @@ function customiizer_use_loyalty_points( $user_id, $points, $origin = '', $descr
  * Insert a log entry.
  */
 function customiizer_log_loyalty_movement( $user_id, $points, $type, $origin = '', $description = '' ) {
-    global $wpdb, $log_table;
-    $wpdb->insert( $log_table, array(
+    global $wpdb;
+    $wpdb->insert( 'WPC_loyalty_log', array(
         'user_id'     => intval( $user_id ),
         'points'      => intval( $points ),
         'type'        => sanitize_text_field( $type ),
@@ -127,19 +106,20 @@ function customiizer_display_loyalty_balance() {
  * Show field on checkout to use points.
  */
 function customiizer_loyalty_redeem_field() {
+    if ( ! is_user_logged_in() ) {
+        return;
+    }
+
     $user_id = get_current_user_id();
     $points = customiizer_get_loyalty_points($user_id);
-    
-    // Debug SQL
-    global $wpdb, $points_table;
-    $sql = $wpdb->prepare( "SELECT points FROM {$points_table} WHERE user_id = %d", $user_id );
-    $result = $wpdb->get_var( $sql );
-    
-    customiizer_log("DEBUG: user_id = $user_id | SQL = $sql | result = $result | via_function = $points");
 
+    customiizer_log("loyalty: Affichage des points dans le panier | user_id=$user_id | points=$points");
+
+    echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
+    echo '<input type="number" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" min="0" max="' . esc_attr( $points ) . '" step="1" />';
+    echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
+    echo '</td></tr>';
 }
-
-
 add_action( 'woocommerce_cart_totals_after_order_total', 'customiizer_loyalty_redeem_field' );
 add_action( 'woocommerce_review_order_after_order_total', 'customiizer_loyalty_redeem_field' );
 
@@ -163,9 +143,9 @@ function customiizer_apply_loyalty_discount( $cart ) {
         $points_to_use = intval( WC()->session->get( 'loyalty_points_to_use' ) );
     }
 
-    $available      = customiizer_get_loyalty_points();
-    $points_to_use  = min( $points_to_use, $available );
-    $discount       = $points_to_use / 100;
+    $available     = customiizer_get_loyalty_points();
+    $points_to_use = min( $points_to_use, $available );
+    $discount      = $points_to_use / 100;
 
     if ( $discount > $cart->get_total( 'edit' ) ) {
         $discount      = $cart->get_total( 'edit' );
@@ -175,6 +155,9 @@ function customiizer_apply_loyalty_discount( $cart ) {
     if ( $discount > 0 ) {
         $cart->add_fee( __( 'Réduction points fidélité', 'customiizer' ), -$discount );
         WC()->session->set( 'loyalty_points_to_use', $points_to_use );
+
+        customiizer_log("loyalty: Réduction appliquée dans le panier | user_id=" . get_current_user_id() . " | points=$points_to_use | valeur={$discount}€ | total={$cart->get_total('edit')}€");
+
     } else {
         WC()->session->set( 'loyalty_points_to_use', 0 );
     }
@@ -205,7 +188,7 @@ function customiizer_process_loyalty_after_completion( $order_id ) {
         return;
     }
     if ( $order->get_meta( '_loyalty_points_processed' ) ) {
-        return; // Already processed
+        return;
     }
 
     $user_id = $order->get_user_id();
