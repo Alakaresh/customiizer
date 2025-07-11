@@ -42,17 +42,27 @@ if ( ! defined( 'ABSPATH' ) ) {
                        <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/customPoint.png" alt="Logo Custompoints" style="height: 120px; border-radius: 10px;">
                        <button id="viewLoyaltyButton" class="content-button">En savoir plus</button>
 
-                             
+
+               </div>
+       </div>
+       <div class="content-container" id="dashboard-container5">
+               <h2>Missions</h2>
+               <div class="centered-content">
+                       <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/logoii.png" alt="Logo Missions" style="height: 120px; border-radius: 10px;">
+                       <button id="viewMissionsButton" class="content-button">Voir</button>
+
+
                </div>
        </div>
 </div>
 
 <script>
-	$(document).ready(function() {
-		// Déclencheurs pour les boutons qui simulent les clics sur les liens
+        $(document).ready(function() {
+                // Déclencheurs pour les boutons qui simulent les clics sur les liens
                 $('#viewProfileButton').click(() => $('#accountLink').trigger('click'));
                 $('#viewImagesButton').click(() => $('#picturesLink').trigger('click'));
                $('#viewPurchasesButton').click(() => $('#purchasesLink').trigger('click'));
                $('#viewLoyaltyButton').click(() => $('#loyaltyLink').trigger('click'));
+               $('#viewMissionsButton').click(() => $('#missionsLink').trigger('click'));
        });
 </script>

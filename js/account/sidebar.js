@@ -17,8 +17,8 @@ $(document).ready(function() {
 		}
 	}
 
-        // Préchargement des sections pour un affichage plus rapide
-        preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty']);
+       // Préchargement des sections pour un affichage plus rapide
+       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions']);
 
         // Attachement des événements aux liens AJAX de manière centralisée
         $(document).on('click', '.ajax-link', function(e) {
