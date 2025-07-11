@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div id="loyalty-widget-popup">
     <header id="loyalty-widget-header">
+        <button id="loyalty-widget-back" class="loyalty-back-main" aria-label="Retour" style="display:none;"><i class="fas fa-arrow-left"></i></button>
         <span class="loyalty-widget-title">
             <img class="loyalty-widget-icon" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" />
             <span class="loyalty-widget-title-text"><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></span>
@@ -27,7 +28,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <div class="loyalty-widget-page loyalty-page-get" style="display:none;">
             <div class="loyalty-widget-subheader">
-                <button class="loyalty-back-main" aria-label="Retour"><i class="fas fa-arrow-left"></i></button>
                 <span><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></span>
             </div>
             <p><?php echo esc_html__( 'Explications pour gagner des points...', 'customiizer' ); ?></p>
@@ -35,7 +35,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <div class="loyalty-widget-page loyalty-page-use" style="display:none;">
             <div class="loyalty-widget-subheader">
-                <button class="loyalty-back-main" aria-label="Retour"><i class="fas fa-arrow-left"></i></button>
                 <span><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></span>
             </div>
             <p><?php echo esc_html__( 'Explications pour utiliser vos points...', 'customiizer' ); ?></p>

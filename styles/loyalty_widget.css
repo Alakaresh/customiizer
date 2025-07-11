@@ -31,9 +31,10 @@
     display:block;
 }
 #loyalty-widget-header {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 10px 15px;
     background: #3399ff;
     color: #fff;
@@ -53,13 +54,25 @@
 }
 
 #loyalty-widget-close{
+    position:absolute;
+    top:6px;
+    right:6px;
     background:none;
     border:none;
     font-size:16px;
     color:inherit;
     cursor:pointer;
-    margin-left:auto;
     width:auto;
+}
+#loyalty-widget-back{
+    background:none;
+    border:none;
+    font-size:16px;
+    color:inherit;
+    cursor:pointer;
+    position:absolute;
+    top:6px;
+    left:6px;
 }
 #loyalty-widget-title{
     display:flex;
