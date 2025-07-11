@@ -19,11 +19,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div id="loyalty-widget-content">
         <div class="loyalty-widget-page loyalty-page-main">
-            <button class="button loyalty-how-get"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></button>
-            <button class="button loyalty-how-use"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></button>
-            <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
-            <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
-            <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;" />
+            <div class="loyalty-widget-card">
+                <button class="loyalty-action loyalty-how-get">
+                    <i class="fas fa-coins"></i>
+                    <span class="loyalty-action-text"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="loyalty-action loyalty-how-use">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="loyalty-action-text"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+            <div class="loyalty-widget-card loyalty-referral">
+                <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
+                <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
+                <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;" />
+            </div>
         </div>
 
         <div class="loyalty-widget-page loyalty-page-get" style="display:none;">
