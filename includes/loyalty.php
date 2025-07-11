@@ -124,12 +124,23 @@ function customiizer_loyalty_redeem_field() {
     if ( ! is_user_logged_in() ) {
         return;
     }
+
     $points = customiizer_get_loyalty_points();
+
+    // Log récupération pour affichage (si fonction disponible)
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'loyalty', 'Affichage des points disponibles dans le panier', array(
+            'user_id' => get_current_user_id(),
+            'points'  => $points
+        ) );
+    }
+
     echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
     echo '<input type="number" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" min="0" max="' . esc_attr( $points ) . '" step="1" />';
     echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
     echo '</td></tr>';
 }
+
 add_action( 'woocommerce_cart_totals_after_order_total', 'customiizer_loyalty_redeem_field' );
 add_action( 'woocommerce_review_order_after_order_total', 'customiizer_loyalty_redeem_field' );
 
