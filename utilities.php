@@ -34,12 +34,20 @@ if (!defined('REMOTE_IMAGE_MAX_BYTES')) {
     define('REMOTE_IMAGE_MAX_BYTES', 5 * 1024 * 1024);
 }
 
-function customiizer_log($message) {
-        $log_file = __DIR__ . '/customiizer.log';
-        $date = date('Y-m-d H:i:s');
-        $line = "[$date] $message\n";
-        file_put_contents($log_file, $line, FILE_APPEND);
+function customiizer_log($context, $message = '') {
+    $log_file = __DIR__ . '/customiizer.log';
+    $date = date('Y-m-d H:i:s');
+
+    // Si un seul argument est donné, on le considère comme le message complet
+    if ($message === '') {
+        $line = "[$date] $context\n";
+    } else {
+        $line = "[$date] [$context] $message\n";
+    }
+
+    file_put_contents($log_file, $line, FILE_APPEND);
 }
+
 
 /**
  * Get the frontend version defined in version.json for cache busting.
