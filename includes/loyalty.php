@@ -191,7 +191,8 @@ function customiizer_process_loyalty_after_completion( $order_id ) {
         customiizer_use_loyalty_points( $user_id, $points_used, 'paiement', 'Utilisation pour la commande #' . $order->get_order_number() );
     }
 
-    $points_earned = intval( $order->get_total() * 10 );
+    // Award points worth 5% of the order subtotal (ex. taxes).
+    $points_earned = intval( $order->get_subtotal() * 5 );
     if ( $points_earned > 0 ) {
         customiizer_add_loyalty_points( $user_id, $points_earned, 'achat', 'Points pour la commande #' . $order->get_order_number() );
     }
