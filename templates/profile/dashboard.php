@@ -41,9 +41,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                <div class="centered-content">
                        <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/logoii.png" alt="Logo Custompoints" style="height: 120px; border-radius: 10px;">
                        <button id="viewLoyaltyButton" class="content-button">En savoir plus</button>
-                       <div id="loyaltyExplanation" style="display:none;">
-                               <?php customiizer_display_loyalty_balance(); ?>
-                       </div>
+
+                             
                </div>
        </div>
 </div>
@@ -53,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		// Déclencheurs pour les boutons qui simulent les clics sur les liens
                 $('#viewProfileButton').click(() => $('#accountLink').trigger('click'));
                 $('#viewImagesButton').click(() => $('#picturesLink').trigger('click'));
-                $('#viewPurchasesButton').click(() => $('#purchasesLink').trigger('click'));
-                $('#viewLoyaltyButton').click(() => $('#loyaltyExplanation').toggle());
-        });
+               $('#viewPurchasesButton').click(() => $('#purchasesLink').trigger('click'));
+               $('#viewLoyaltyButton').click(() => $('#loyaltyLink').trigger('click'));
+       });
 </script>

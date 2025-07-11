@@ -17,10 +17,13 @@ $(document).ready(function() {
 		}
 	}
 
-	// Attachement des événements aux liens AJAX de manière centralisée
-	$(document).on('click', '.ajax-link', function(e) {
-		e.preventDefault();
-		var targetFile = $(this).data('target');
+        // Préchargement des sections pour un affichage plus rapide
+        preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty']);
+
+        // Attachement des événements aux liens AJAX de manière centralisée
+        $(document).on('click', '.ajax-link', function(e) {
+                e.preventDefault();
+                var targetFile = $(this).data('target');
 
 		if (!targetFile) {
 			console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
@@ -58,49 +61,70 @@ $(document).ready(function() {
 
 // Fonctions pour charger le contenu et gérer les états actifs des liens
 function loadContent(targetFile) {
-	if (!targetFile) {
-		console.error("❌ Aucun fichier cible spécifié pour le chargement !");
-		return;
-	}
-	var loadUrl = baseTemplateUrl + targetFile + ".php";
-	console.log("🔄 Chargement du contenu depuis :", loadUrl);
+        if (!targetFile) {
+                console.error("❌ Aucun fichier cible spécifié pour le chargement !");
+                return;
+        }
 
-	$('#main-container').load(loadUrl, function(response, status, xhr) {
-		if (status === "error") {
-			console.error("❌ Erreur lors du chargement du contenu :", xhr.status, xhr.statusText);
-		} else {
-			verifyAndReloadProfileImage();
-			if (targetFile === 'dashboard') {
-				console.log("📦 Déclenchement du chargement des infos utilisateur...");
+        const storageKey = 'account-section-' + targetFile;
+        const cached = localStorage.getItem(storageKey);
 
-				if (!userIsLoggedIn || !currentUser || currentUser.ID <= 0) {
-					console.warn("⚠️ Aucun utilisateur connecté ou ID invalide.");
-					return;
-				}
+        if (cached) {
+                $('#main-container').html(cached);
+                runAfterLoad(targetFile);
+                return;
+        }
 
-				console.log("👤 ID utilisateur :", currentUser.ID);
+        var loadUrl = baseTemplateUrl + targetFile + ".php";
+        console.log("🔄 Chargement du contenu depuis :", loadUrl);
 
-				elementChecks = {
-					profileImage: false,
-				};
+        $('#main-container').load(loadUrl, function(response, status, xhr) {
+                if (status === "error") {
+                        console.error("❌ Erreur lors du chargement du contenu :", xhr.status, xhr.statusText);
+                } else {
+                        localStorage.setItem(storageKey, $('#main-container').html());
+                        runAfterLoad(targetFile);
+                }
+        });
+}
 
-				updateProgress(100 / totalElements);
-			}
+// Exécute les actions nécessaires après l'injection de chaque section
+function runAfterLoad(targetFile) {
+        verifyAndReloadProfileImage();
 
+        if (targetFile === 'dashboard') {
+                console.log("📦 Déclenchement du chargement des infos utilisateur...");
+                if (!userIsLoggedIn || !currentUser || currentUser.ID <= 0) {
+                        console.warn("⚠️ Aucun utilisateur connecté ou ID invalide.");
+                        return;
+                }
+                elementChecks = { profileImage: false };
+                updateProgress(100 / totalElements);
+        }
 
-			if (targetFile === 'purchases') {
-				console.log("📦 Chargement des commandes utilisateur...");
-				fetchUserOrders();
-			}
+        if (targetFile === 'purchases') {
+                console.log("📦 Chargement des commandes utilisateur...");
+                fetchUserOrders();
+        }
 
-			if (targetFile === 'profile') {
-				console.log("📦 Chargement des infos profil...");
-				loadUserDetails();
-				initProfileForm();
-				initPasswordForm();
-			}
-		}
-	});
+        if (targetFile === 'profile') {
+                console.log("📦 Chargement des infos profil...");
+                loadUserDetails();
+                initProfileForm();
+                initPasswordForm();
+        }
+}
+
+// Précharger toutes les sections au chargement initial
+function preloadSections(sections) {
+        sections.forEach(section => {
+                const key = 'account-section-' + section;
+                if (!localStorage.getItem(key)) {
+                        $.get(baseTemplateUrl + section + '.php', function(html) {
+                                localStorage.setItem(key, html);
+                        });
+                }
+        });
 }
 function verifyAndReloadProfileImage() {
 	const profileImage = document.getElementById('profileImage');
