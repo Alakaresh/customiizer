@@ -23,20 +23,22 @@
 	flex-grow: 1;
 }
 .dashboard-container{
-	width: 100%;
-	display: flex;
-	flex-wrap: wrap;
+       width: 100%;
+       display: flex;
+       flex-wrap: wrap;
+       justify-content: center;
 }
 .content-container {
-	flex: 1;
-	position: relative;
-	overflow: hidden;
-	/*width: 100%;   calc(33.33% - 20px);*/
-	margin: 10px;
-	background-color: #5A7D9A;
-	padding: 10px;
-	margin-bottom: 10px;
-	border-radius: 10px;
+       flex: 0 0 calc(33.33% - 20px);
+       max-width: calc(33.33% - 20px);
+       position: relative;
+       overflow: hidden;
+       margin: 10px;
+       background-color: #5A7D9A;
+       padding: 10px;
+       margin-bottom: 10px;
+       border-radius: 10px;
+       box-sizing: border-box;
 }
 
 .content-container h2 {
