@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
        <div class="content-container" id="dashboard-container4">
                <h2>Mes avantages</h2>
                <div class="centered-content">
-                       <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/logoii.png" alt="Logo Custompoints" style="height: 120px; border-radius: 10px;">
+                       <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/customPoint.png" alt="Logo Custompoints" style="height: 120px; border-radius: 10px;">
                        <button id="viewLoyaltyButton" class="content-button">En savoir plus</button>
 
                              
