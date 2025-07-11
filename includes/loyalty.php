@@ -91,7 +91,8 @@ function customiizer_display_loyalty_balance() {
         return;
     }
     $points = customiizer_get_loyalty_points();
-    echo '<p class="customiizer-loyalty-balance">' . esc_html( sprintf( __( 'Vous avez %d points fidélité.', 'customiizer' ), $points ) ) . '</p>';
+    echo '<p class="customiizer-loyalty-balance">' . esc_html( sprintf( __( 'Vous avez %d custompoints.', 'customiizer' ), $points ) ) . '</p>';
+    echo '<p class="customiizer-loyalty-explanation">' . esc_html__( 'Les custompoints sont des points de fidélité : vous gagnez 10 custompoints par euro dépensé et 100 custompoints valent 1€ de réduction.', 'customiizer' ) . '</p>';
 }
 
 /**
