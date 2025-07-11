@@ -31,17 +31,18 @@
 #loyalty-widget-popup.open{
     display:block;
 }
-#loyalty-widget-header{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:-15px -15px 10px -15px;
-    padding:8px 12px;
-    background:#007bff;
-    color:#fff;
-    border-top-left-radius:4px;
-    border-top-right-radius:4px;
+#loyalty-widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: #3399ff; /* variante plus claire que #007bff */
+    color: #fff;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
+
 #loyalty-widget-close{
     background:none;
     border:none;
