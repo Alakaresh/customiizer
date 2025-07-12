@@ -29,10 +29,11 @@ function customiizer_get_missions( $user_id = 0 ) {
         return array();
     }
     $sql = $wpdb->prepare(
-        "SELECT m.mission_id, m.title, m.description, m.goal, m.points_reward, um.progress, um.completed_at
-         FROM WPC_user_missions um
-         JOIN WPC_missions m ON m.mission_id = um.mission_id
-         WHERE um.user_id = %d AND m.is_active = 1",
+        "SELECT m.mission_id, m.title, m.description, m.goal, m.points_reward,
+                IFNULL(um.progress, 0) AS progress, um.completed_at
+         FROM WPC_missions m
+         LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d
+         WHERE m.is_active = 1",
         $user_id
     );
     return $wpdb->get_results( $sql, ARRAY_A );
@@ -47,10 +48,12 @@ function customiizer_update_mission_progress( $user_id, $mission_id, $quantity =
         return false;
     }
     $wpdb->query( $wpdb->prepare(
-        "UPDATE WPC_user_missions SET progress = progress + %d WHERE user_id=%d AND mission_id=%d",
-        $quantity,
+        "INSERT INTO WPC_user_missions (user_id, mission_id, progress)
+         VALUES (%d, %d, %d)
+         ON DUPLICATE KEY UPDATE progress = progress + VALUES(progress)",
         $user_id,
-        $mission_id
+        $mission_id,
+        $quantity
     ) );
     $current = $wpdb->get_row( $wpdb->prepare(
         "SELECT progress, completed_at FROM WPC_user_missions WHERE user_id=%d AND mission_id=%d",
