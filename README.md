@@ -99,7 +99,8 @@ lists the category of existing missions. The REST endpoint
 the front‑end can display it.
 
 `customiizer_get_missions_version` returns a small hash representing the latest
-missions state for the current user. The front‑end compares this value against a
-version stored in `sessionStorage` to determine whether cached mission data is
-still valid and reloads the list if it has changed.
+missions state for the current user. The front‑end displays cached missions
+immediately, then compares the stored version against this value to decide
+whether it needs to reload the list.
+
 

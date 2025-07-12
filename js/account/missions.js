@@ -5,18 +5,18 @@ async function fetchMissions(options = {}) {
     const cached = sessionStorage.getItem(cacheKey);
     const cachedVersion = sessionStorage.getItem(versionKey);
 
-    const serverVersion = await getMissionsVersion();
-
-    if (cached && cachedVersion && serverVersion && cachedVersion === serverVersion) {
+    if (cached && !prefetch) {
         try {
-            const list = JSON.parse(cached);
-            if (!prefetch) {
-                renderMissions(list);
-            }
-            return;
+            renderMissions(JSON.parse(cached));
         } catch (e) {
             console.warn('Cache parse error for missions', e);
         }
+    }
+
+    const serverVersion = await getMissionsVersion();
+
+    if (cached && cachedVersion && serverVersion && cachedVersion === serverVersion) {
+        return;
     }
 
     fetch(ajaxurl, {
