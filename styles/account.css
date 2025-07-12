@@ -708,3 +708,24 @@ td.tracking-cell, td.invoice-cell {
         line-height: 18px;
         font-weight: bold;
 }
+
+.progress-counter {
+        display: block;
+        margin-top: 4px;
+        text-align: right;
+        font-size: 0.8rem;
+        color: #f3e2c7;
+        font-family: 'Cinzel', serif;
+}
+
+.mission-category-group {
+        margin-bottom: 30px;
+}
+
+.mission-category-title {
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 1.3rem;
+        color: #c29a5b;
+        font-family: 'Cinzel', serif;
+}
