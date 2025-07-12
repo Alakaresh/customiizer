@@ -90,3 +90,11 @@ stored in dedicated tables prefixed with `WPC_` so the system can later support
 badges, missions or other gamification features. The tables are created
 manually on deployment.
 
+## Mission categories
+
+Missions can now be grouped under a short text category. The admin page for
+missions includes a new field to specify this value when creating a mission and
+lists the category of existing missions. The REST endpoint
+`customiizer_get_missions` returns the category alongside other mission data so
+the front‑end can display it.
+

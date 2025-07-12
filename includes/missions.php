@@ -29,7 +29,7 @@ function customiizer_get_missions( $user_id = 0 ) {
         return array();
     }
     $sql = $wpdb->prepare(
-        "SELECT m.mission_id, m.title, m.description, m.goal, m.points_reward,
+        "SELECT m.mission_id, m.title, m.description, m.goal, m.points_reward, m.category,
                 IFNULL(um.progress, 0) AS progress, um.completed_at
          FROM WPC_missions m
          LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d
@@ -92,7 +92,7 @@ function customiizer_reward_mission( $user_id, $mission_id ) {
     if ( $user_id <= 0 || $mission_id <= 0 ) {
         return;
     }
-    $mission = $wpdb->get_row( $wpdb->prepare( "SELECT title, points_reward FROM WPC_missions WHERE mission_id=%d", $mission_id ), ARRAY_A );
+    $mission = $wpdb->get_row( $wpdb->prepare( "SELECT title, points_reward, category FROM WPC_missions WHERE mission_id=%d", $mission_id ), ARRAY_A );
     if ( ! $mission ) {
         return;
     }
