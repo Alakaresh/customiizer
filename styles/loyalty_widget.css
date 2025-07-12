@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
+
 #loyalty-widget-button{
     position: fixed;
     bottom: 20px;
@@ -166,11 +168,17 @@
     list-style: none;
     padding-left: 0;
     margin: 0;
+    font-family: 'Cinzel', serif;
 }
 
 .loyalty-missions-list li {
     font-size: 13px;
     margin-bottom: 6px;
+    background: linear-gradient(#3b2d1f, #27190b);
+    border: 1px solid #c29a5b;
+    border-radius: 6px;
+    padding: 4px;
+    color: #f3e2c7;
 }
 
 .loyalty-missions-list progress {
@@ -178,4 +186,16 @@
     height: 6px;
     vertical-align: middle;
     margin: 2px 0;
+    appearance: none;
+    border: 1px solid #c29a5b;
+    border-radius: 4px;
+    background-color: #1b1207;
+}
+.loyalty-missions-list progress::-webkit-progress-value {
+    background-color: #c29a5b;
+    border-radius: 4px;
+}
+.loyalty-missions-list progress::-moz-progress-bar {
+    background-color: #c29a5b;
+    border-radius: 4px;
 }

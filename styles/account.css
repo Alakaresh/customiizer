@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
 .account {
 	margin-top: 5%;
@@ -636,14 +637,14 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .mission-item {
-        background-color: #031927;
-        border: 2px solid #ffd700;
+        background: linear-gradient(#3b2d1f, #27190b);
+        border: 2px solid #c29a5b;
         border-radius: 10px;
         padding: 15px;
         width: 280px;
-        color: #fff;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        font-family: 'Press Start 2P', sans-serif;
+        color: #f3e2c7;
+        box-shadow: 0 0 10px rgba(0,0,0,0.6);
+        font-family: 'Cinzel', serif;
 }
 
 .mission-header {
@@ -656,11 +657,12 @@ td.tracking-cell, td.invoice-cell {
 .mission-header h4 {
         margin: 0;
         font-size: 1rem;
+        font-family: 'Cinzel', serif;
 }
 
 .mission-header .points {
-        background: #ffd700;
-        color: #031927;
+        background: #c29a5b;
+        color: #1b1207;
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 0.8rem;
@@ -676,23 +678,23 @@ td.tracking-cell, td.invoice-cell {
         width: 100%;
         height: 18px;
         appearance: none;
-        border: 2px solid #fff;
+        border: 2px solid #c29a5b;
         border-radius: 8px;
-        background-color: #333;
+        background-color: #1b1207;
 }
 
 .progress-wrapper progress::-webkit-progress-bar {
-        background-color: #333;
+        background-color: #1b1207;
         border-radius: 8px;
 }
 
 .progress-wrapper progress::-webkit-progress-value {
-        background-color: #ffd700;
+        background-color: #c29a5b;
         border-radius: 8px;
 }
 
 .progress-wrapper progress::-moz-progress-bar {
-        background-color: #ffd700;
+        background-color: #c29a5b;
         border-radius: 8px;
 }
 
@@ -701,7 +703,7 @@ td.tracking-cell, td.invoice-cell {
         top: 0;
         left: 50%;
         transform: translate(-50%, 0);
-        color: #000;
+        color: #f3e2c7;
         font-size: 0.75rem;
         line-height: 18px;
         font-weight: bold;
