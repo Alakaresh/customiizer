@@ -161,3 +161,21 @@
         width:260px;
     }
 }
+
+.loyalty-missions-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.loyalty-missions-list li {
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.loyalty-missions-list progress {
+    width: 100%;
+    height: 6px;
+    vertical-align: middle;
+    margin: 2px 0;
+}

@@ -227,9 +227,10 @@ function customiizer_loyalty_widget() {
     if ( ! is_user_logged_in() ) {
         return;
     }
-    $points = customiizer_get_loyalty_points();
+    $points    = customiizer_get_loyalty_points();
     $referrals = customiizer_get_referral_count();
-    $link = customiizer_get_referral_link();
+    $link      = customiizer_get_referral_link();
+    $missions  = customiizer_get_missions();
 
     $template = get_stylesheet_directory() . '/templates/loyalty/widget.php';
     if ( file_exists( $template ) ) {
