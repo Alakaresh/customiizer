@@ -1,18 +1,22 @@
-function fetchMissions(options = {}) {
+async function fetchMissions(options = {}) {
     const prefetch = options.prefetch === true;
     const cacheKey = 'USER_MISSIONS';
+    const versionKey = 'USER_MISSIONS_VERSION';
     const cached = sessionStorage.getItem(cacheKey);
+    const cachedVersion = sessionStorage.getItem(versionKey);
 
-    if (cached) {
+    if (cached && !prefetch) {
         try {
-            const list = JSON.parse(cached);
-            if (!prefetch) {
-                renderMissions(list);
-            }
-            return;
+            renderMissions(JSON.parse(cached));
         } catch (e) {
             console.warn('Cache parse error for missions', e);
         }
+    }
+
+    const serverVersion = await getMissionsVersion();
+
+    if (cached && cachedVersion && serverVersion && cachedVersion === serverVersion) {
+        return;
     }
 
     fetch(ajaxurl, {
@@ -23,16 +27,38 @@ function fetchMissions(options = {}) {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
+                const list = data.data.missions || data.data;
+                const version = data.data.version;
+                sessionStorage.setItem(cacheKey, JSON.stringify(list));
+                if (version) {
+                    sessionStorage.setItem(versionKey, version);
+                }
                 if (!prefetch) {
-                    console.log('Missions récupérées:', data.data);
-                    renderMissions(data.data);
+                    console.log('Missions récupérées:', list);
+                    renderMissions(list);
                 }
             } else {
                 console.error('Erreur lors du chargement des missions', data);
             }
         })
         .catch(err => console.error('Erreur requête missions', err));
+}
+
+async function getMissionsVersion() {
+    try {
+        const res = await fetch(ajaxurl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=customiizer_get_missions_version'
+        });
+        const data = await res.json();
+        if (data.success) {
+            return data.data.version;
+        }
+    } catch (e) {
+        console.error('Erreur lors de la vérification de version des missions', e);
+    }
+    return null;
 }
 
 function renderMissions(list) {

@@ -98,3 +98,8 @@ lists the category of existing missions. The REST endpoint
 `customiizer_get_missions` returns the category alongside other mission data so
 the front‑end can display it.
 
+`customiizer_get_missions_version` returns a small hash representing the latest
+missions state for the current user. The front‑end displays cached missions
+immediately, then compares the stored version against this value to decide
+whether it needs to reload the list.
+
