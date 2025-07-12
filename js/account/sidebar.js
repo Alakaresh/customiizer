@@ -18,7 +18,7 @@ $(document).ready(function() {
 	}
 
        // Préchargement des sections pour un affichage plus rapide
-       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty']);
+       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions']);
 
        // Précharger aussi les données utilisateur et la première page de commandes
        if (typeof loadUserDetails === 'function') {
@@ -26,6 +26,9 @@ $(document).ready(function() {
        }
        if (typeof fetchUserOrders === 'function') {
                fetchUserOrders({ prefetch: true });
+       }
+       if (typeof fetchMissions === 'function') {
+               fetchMissions({ prefetch: true });
        }
 
         // Attachement des événements aux liens AJAX de manière centralisée

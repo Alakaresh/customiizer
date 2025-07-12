@@ -1,4 +1,20 @@
-function fetchMissions() {
+function fetchMissions(options = {}) {
+    const prefetch = options.prefetch === true;
+    const cacheKey = 'USER_MISSIONS';
+    const cached = sessionStorage.getItem(cacheKey);
+
+    if (cached) {
+        try {
+            const list = JSON.parse(cached);
+            if (!prefetch) {
+                renderMissions(list);
+            }
+            return;
+        } catch (e) {
+            console.warn('Cache parse error for missions', e);
+        }
+    }
+
     fetch(ajaxurl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -7,8 +23,11 @@ function fetchMissions() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                console.log('Missions récupérées:', data.data);
-                renderMissions(data.data);
+                sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
+                if (!prefetch) {
+                    console.log('Missions récupérées:', data.data);
+                    renderMissions(data.data);
+                }
             } else {
                 console.error('Erreur lors du chargement des missions', data);
             }
