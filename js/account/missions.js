@@ -70,28 +70,48 @@ function renderMissions(list) {
         return;
     }
 
-    list.forEach(m => {
-        const progress = Math.min(m.progress, m.goal);
-        const percent = Math.round((progress / m.goal) * 100);
+    const groups = {};
+    list.forEach(mission => {
+        const cat = mission.category || 'Autres';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(mission);
+    });
 
-        const item = document.createElement('div');
-        item.className = 'mission-item';
-        item.innerHTML = `
-            <div class="mission-header">
-                <h4>${m.title}</h4>
-                <span class="points">+${m.points_reward} pts</span>
-            </div>
-            <p>${m.description || ''}</p>
-            <div class="progress-wrapper">
-                <progress max="${m.goal}" value="${progress}"></progress>
-                <span class="progress-text">${percent}%</span>
-            </div>
-            <small class="mission-category">${m.category || ''}</small>
-            <progress max="${m.goal}" value="${progress}"></progress>
-            <span>${progress}/${m.goal}</span>
+    Object.keys(groups).forEach(cat => {
+        const section = document.createElement('div');
+        section.className = 'mission-category-group';
 
-        `;
-        container.appendChild(item);
+        const title = document.createElement('h3');
+        title.className = 'mission-category-title';
+        title.textContent = cat;
+        section.appendChild(title);
+
+        const listContainer = document.createElement('div');
+        listContainer.className = 'missions-list';
+
+        groups[cat].forEach(m => {
+            const progress = Math.min(m.progress, m.goal);
+            const percent = Math.round((progress / m.goal) * 100);
+
+            const item = document.createElement('div');
+            item.className = 'mission-item';
+            item.innerHTML = `
+                <div class="mission-header">
+                    <h4>${m.title}</h4>
+                    <span class="points">+${m.points_reward} pts</span>
+                </div>
+                <p>${m.description || ''}</p>
+                <div class="progress-wrapper">
+                    <progress max="${m.goal}" value="${progress}"></progress>
+                    <span class="progress-text">${percent}%</span>
+                </div>
+                <span class="progress-counter">${progress}/${m.goal}</span>
+            `;
+            listContainer.appendChild(item);
+        });
+
+        section.appendChild(listContainer);
+        container.appendChild(section);
     });
 }
 
