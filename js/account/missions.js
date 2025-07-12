@@ -24,17 +24,25 @@ function renderMissions(list) {
         container.textContent = 'Aucune mission en cours.';
         return;
     }
+
     list.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'mission-item';
         const progress = Math.min(m.progress, m.goal);
-        div.innerHTML = `
-            <h4>${m.title}</h4>
+        const percent = Math.round((progress / m.goal) * 100);
+
+        const item = document.createElement('div');
+        item.className = 'mission-item';
+        item.innerHTML = `
+            <div class="mission-header">
+                <h4>${m.title}</h4>
+                <span class="points">+${m.points_reward} pts</span>
+            </div>
             <p>${m.description || ''}</p>
-            <progress max="${m.goal}" value="${progress}"></progress>
-            <span>${progress}/${m.goal}</span>
+            <div class="progress-wrapper">
+                <progress max="${m.goal}" value="${progress}"></progress>
+                <span class="progress-text">${percent}%</span>
+            </div>
         `;
-        container.appendChild(div);
+        container.appendChild(item);
     });
 }
 

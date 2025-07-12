@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 .account {
 	margin-top: 5%;
 	display: flex;
@@ -623,4 +625,84 @@ td.tracking-cell, td.invoice-cell {
         margin-bottom: 10px;
         text-align: center;
         font-size: 0.9em;
+}
+
+/* ===== Missions ===== */
+.missions-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+}
+
+.mission-item {
+        background-color: #031927;
+        border: 2px solid #ffd700;
+        border-radius: 10px;
+        padding: 15px;
+        width: 280px;
+        color: #fff;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        font-family: 'Press Start 2P', sans-serif;
+}
+
+.mission-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+}
+
+.mission-header h4 {
+        margin: 0;
+        font-size: 1rem;
+}
+
+.mission-header .points {
+        background: #ffd700;
+        color: #031927;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: bold;
+}
+
+.progress-wrapper {
+        position: relative;
+        margin-top: 10px;
+}
+
+.progress-wrapper progress {
+        width: 100%;
+        height: 18px;
+        appearance: none;
+        border: 2px solid #fff;
+        border-radius: 8px;
+        background-color: #333;
+}
+
+.progress-wrapper progress::-webkit-progress-bar {
+        background-color: #333;
+        border-radius: 8px;
+}
+
+.progress-wrapper progress::-webkit-progress-value {
+        background-color: #ffd700;
+        border-radius: 8px;
+}
+
+.progress-wrapper progress::-moz-progress-bar {
+        background-color: #ffd700;
+        border-radius: 8px;
+}
+
+.progress-text {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, 0);
+        color: #000;
+        font-size: 0.75rem;
+        line-height: 18px;
+        font-weight: bold;
 }
