@@ -22,8 +22,9 @@ function customiizer_render_missions_page() {
             'description'   => sanitize_textarea_field($_POST['description'] ?? ''),
             'goal'          => intval($_POST['goal'] ?? 1),
             'points_reward' => intval($_POST['points'] ?? 0),
+            'category'      => sanitize_text_field($_POST['category'] ?? ''),
             'is_active'     => 1
-        ], ['%s','%s','%d','%d','%d']);
+        ], ['%s','%s','%d','%d','%s','%d']);
         echo '<div class="updated notice"><p>Mission créée.</p></div>';
     }
 
@@ -46,18 +47,20 @@ function customiizer_render_missions_page() {
     echo '<tr><th scope="row">Description</th><td><textarea name="description" rows="3"></textarea></td></tr>';
     echo '<tr><th scope="row">Objectif</th><td><input type="number" name="goal" value="1" min="1"></td></tr>';
     echo '<tr><th scope="row">Points</th><td><input type="number" name="points" value="0" min="0"></td></tr>';
+    echo '<tr><th scope="row">Catégorie</th><td><input type="text" name="category"></td></tr>';
     echo '</table>';
     echo '<p><input type="submit" class="button button-primary" name="customiizer_add_mission" value="Ajouter"></p>';
     echo '</form>';
 
     echo '<h2>Missions existantes</h2>';
-    echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Titre</th><th>Objectif</th><th>Points</th><th>Active</th><th>Action</th></tr></thead><tbody>';
+    echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Titre</th><th>Objectif</th><th>Points</th><th>Catégorie</th><th>Active</th><th>Action</th></tr></thead><tbody>';
     foreach ($missions as $m) {
         echo '<tr>';
         echo '<td>'.intval($m['mission_id']).'</td>';
         echo '<td>'.esc_html($m['title']).'</td>';
         echo '<td>'.intval($m['goal']).'</td>';
         echo '<td>'.intval($m['points_reward']).'</td>';
+        echo '<td>'.esc_html($m['category']).'</td>';
         echo '<td>'.($m['is_active'] ? 'Oui' : 'Non').'</td>';
         echo '<td><form method="post">';
         echo '<input type="hidden" name="mission_id" value="'.intval($m['mission_id']).'">';

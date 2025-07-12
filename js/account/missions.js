@@ -31,6 +31,7 @@ function renderMissions(list) {
         div.innerHTML = `
             <h4>${m.title}</h4>
             <p>${m.description || ''}</p>
+            <small class="mission-category">${m.category || ''}</small>
             <progress max="${m.goal}" value="${progress}"></progress>
             <span>${progress}/${m.goal}</span>
         `;
