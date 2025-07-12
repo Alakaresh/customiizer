@@ -99,12 +99,45 @@ function customiizer_reward_mission( $user_id, $mission_id ) {
     customiizer_add_loyalty_points( $user_id, intval( $mission['points_reward'] ), 'mission', $mission['title'] );
 }
 
+function customiizer_get_missions_version( $user_id = 0 ) {
+    global $wpdb;
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
+    if ( $user_id <= 0 ) {
+        return '';
+    }
+    $sql = $wpdb->prepare(
+        "SELECT MAX(m.mission_id) AS max_id, COALESCE(SUM(um.progress),0) AS sum_prog, COUNT(um.completed_at) AS completed
+         FROM WPC_missions m
+         LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d
+         WHERE m.is_active = 1",
+        $user_id
+    );
+    $row = $wpdb->get_row( $sql, ARRAY_A );
+    if ( ! $row ) {
+        return '';
+    }
+    return md5( $row['max_id'] . '-' . $row['sum_prog'] . '-' . $row['completed'] );
+}
+
+function customiizer_get_missions_version_ajax() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'not_logged_in' );
+    }
+    $version = customiizer_get_missions_version( get_current_user_id() );
+    wp_send_json_success( [ 'version' => $version ] );
+}
+add_action( 'wp_ajax_customiizer_get_missions_version', 'customiizer_get_missions_version_ajax' );
+
 function customiizer_get_missions_ajax() {
     if ( ! is_user_logged_in() ) {
         wp_send_json_error( 'not_logged_in' );
     }
     $missions = customiizer_get_missions( get_current_user_id() );
-    wp_send_json_success( $missions );
+    $version  = customiizer_get_missions_version( get_current_user_id() );
+    wp_send_json_success( [
+        'missions' => $missions,
+        'version'  => $version,
+    ] );
 }
 add_action( 'wp_ajax_customiizer_get_missions', 'customiizer_get_missions_ajax' );
 
