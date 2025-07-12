@@ -7,6 +7,7 @@ function fetchMissions() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
+                console.log('Missions récupérées:', data.data);
                 renderMissions(data.data);
             } else {
                 console.error('Erreur lors du chargement des missions', data);
@@ -37,4 +38,4 @@ function renderMissions(list) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', fetchMissions);
+// L'appel est déclenché par sidebar.js après le chargement de la section

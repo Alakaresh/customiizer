@@ -110,10 +110,10 @@ function runAfterLoad(targetFile) {
                 updateProgress(100 / totalElements);
         }
 
-        if (targetFile === 'purchases') {
-                console.log("📦 Chargement des commandes utilisateur...");
-                fetchUserOrders();
-        }
+       if (targetFile === 'purchases') {
+               console.log("📦 Chargement des commandes utilisateur...");
+               fetchUserOrders();
+       }
 
        if (targetFile === 'pictures') {
                console.log("📦 Chargement de la galerie d'images...");
@@ -122,12 +122,21 @@ function runAfterLoad(targetFile) {
                }
        }
 
-        if (targetFile === 'profile') {
-                console.log("📦 Chargement des infos profil...");
-                loadUserDetails();
-                initProfileForm();
-                initPasswordForm();
-        }
+       if (targetFile === 'profile') {
+               console.log("📦 Chargement des infos profil...");
+               loadUserDetails();
+               initProfileForm();
+               initPasswordForm();
+       }
+
+       if (targetFile === 'missions') {
+               console.log("📦 Chargement des missions...");
+               if (typeof fetchMissions === 'function') {
+                       fetchMissions();
+               } else {
+                       console.warn("⚠️ fetchMissions n'est pas défini");
+               }
+       }
 }
 
 // Précharger toutes les sections au chargement initial
