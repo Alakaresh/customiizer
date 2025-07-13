@@ -103,9 +103,8 @@ function renderMissions(list) {
                 <p>${m.description || ''}</p>
                 <div class="progress-wrapper">
                     <progress max="${m.goal}" value="${progress}"></progress>
-                    <span class="progress-text">${percent}%</span>
+                    <span class="progress-text">${percent}% (<span class="progress-counter">${progress}/${m.goal}</span>)</span>
                 </div>
-                <span class="progress-counter">${progress}/${m.goal}</span>
             `;
             listContainer.appendChild(item);
         });
