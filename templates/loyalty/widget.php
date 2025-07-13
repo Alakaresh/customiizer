@@ -34,19 +34,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
                 <div class="loyalty-widget-card loyalty-missions">
                     <h4><?php echo esc_html__( 'Missions', 'customiizer' ); ?></h4>
-                    <?php if ( ! empty( $missions ) ) : ?>
-                        <ul class="loyalty-missions-list">
-                            <?php foreach ( array_slice( $missions, 0, 3 ) as $m ) : ?>
-                                <li>
-                                    <?php echo esc_html( $m['title'] ); ?>
-                                    <progress max="<?php echo intval( $m['goal'] ); ?>" value="<?php echo intval( $m['progress'] ); ?>"></progress>
-                                    <span><?php echo intval( $m['progress'] ); ?>/<?php echo intval( $m['goal'] ); ?></span>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else : ?>
-                        <p><?php echo esc_html__( 'Aucune mission en cours', 'customiizer' ); ?></p>
-                    <?php endif; ?>
+                    <p class="loyalty-missions-text">
+                        <?php echo esc_html__( 'Rendez-vous dans votre espace client pour découvrir toutes les missions disponibles.', 'customiizer' ); ?>
+                    </p>
+                    <a class="loyalty-missions-link" href="/compte">
+                        <?php echo esc_html__( 'Voir les missions', 'customiizer' ); ?>
+                    </a>
                 </div>
                 <div class="loyalty-widget-card loyalty-referral">
                     <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
