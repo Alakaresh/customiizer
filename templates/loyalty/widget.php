@@ -18,41 +18,50 @@ if ( ! defined( 'ABSPATH' ) ) {
     </header>
 
     <div id="loyalty-widget-content">
-        <div class="loyalty-widget-page loyalty-page-main">
-            <div class="loyalty-widget-card">
-                <button class="loyalty-action loyalty-how-get">
-                    <i class="fas fa-coins"></i>
-                    <span class="loyalty-action-text"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-                <button class="loyalty-action loyalty-how-use">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="loyalty-action-text"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
+        <?php if ( $logged_in ) : ?>
+            <div class="loyalty-widget-page loyalty-page-main">
+                <div class="loyalty-widget-card">
+                    <button class="loyalty-action loyalty-how-get">
+                        <i class="fas fa-coins"></i>
+                        <span class="loyalty-action-text"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="loyalty-action loyalty-how-use">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="loyalty-action-text"><?php echo esc_html__( 'Comment utiliser mes points', 'customiizer' ); ?></span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="loyalty-widget-card loyalty-missions">
+                    <h4><?php echo esc_html__( 'Missions', 'customiizer' ); ?></h4>
+                    <?php if ( ! empty( $missions ) ) : ?>
+                        <ul class="loyalty-missions-list">
+                            <?php foreach ( array_slice( $missions, 0, 3 ) as $m ) : ?>
+                                <li>
+                                    <?php echo esc_html( $m['title'] ); ?>
+                                    <progress max="<?php echo intval( $m['goal'] ); ?>" value="<?php echo intval( $m['progress'] ); ?>"></progress>
+                                    <span><?php echo intval( $m['progress'] ); ?>/<?php echo intval( $m['goal'] ); ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else : ?>
+                        <p><?php echo esc_html__( 'Aucune mission en cours', 'customiizer' ); ?></p>
+                    <?php endif; ?>
+                </div>
+                <div class="loyalty-widget-card loyalty-referral">
+                    <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
+                    <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
+                    <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;;" />
+                </div>
             </div>
-            <div class="loyalty-widget-card loyalty-missions">
-                <h4><?php echo esc_html__( 'Missions', 'customiizer' ); ?></h4>
-                <?php if ( ! empty( $missions ) ) : ?>
-                    <ul class="loyalty-missions-list">
-                        <?php foreach ( array_slice( $missions, 0, 3 ) as $m ) : ?>
-                            <li>
-                                <?php echo esc_html( $m['title'] ); ?>
-                                <progress max="<?php echo intval( $m['goal'] ); ?>" value="<?php echo intval( $m['progress'] ); ?>"></progress>
-                                <span><?php echo intval( $m['progress'] ); ?>/<?php echo intval( $m['goal'] ); ?></span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else : ?>
-                    <p><?php echo esc_html__( 'Aucune mission en cours', 'customiizer' ); ?></p>
-                <?php endif; ?>
+        <?php else : ?>
+            <div class="loyalty-widget-page loyalty-page-main">
+                <p class="loyalty-login-message">
+                    <?php echo esc_html__( 'Connectez-vous ou créez un compte pour gagner 200 points, soit 2€ de réduction !', 'customiizer' ); ?>
+                </p>
+                <button class="loyalty-login-btn button" type="button"><?php echo esc_html__( 'Se connecter', 'customiizer' ); ?></button>
             </div>
-            <div class="loyalty-widget-card loyalty-referral">
-                <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
-                <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
-                <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;" />
-            </div>
-        </div>
+        <?php endif; ?>
 
         <div class="loyalty-widget-page loyalty-page-get" style="display:none;">
             <div class="loyalty-widget-subheader">

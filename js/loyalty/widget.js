@@ -3,6 +3,7 @@ jQuery(function($){
     const $popup = $('#loyalty-widget-popup');
     const $points = $popup.find('.loyalty-widget-points');
     const $back = $('#loyalty-widget-back');
+    const $loginBtn = $popup.find('.loyalty-login-btn');
     const showPage = (slug) => {
         $popup.find('.loyalty-widget-page').hide();
         $popup.find('.loyalty-page-' + slug).show();
@@ -32,5 +33,12 @@ jQuery(function($){
     });
     $popup.find('.loyalty-back-main').on('click', function(){
         showPage('main');
+    });
+
+    $loginBtn.on('click', function(){
+        if (typeof openLoginModal === 'function') {
+            openLoginModal();
+        }
+        $popup.removeClass('open');
     });
 });
