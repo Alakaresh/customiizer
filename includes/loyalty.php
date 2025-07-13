@@ -224,13 +224,19 @@ function customiizer_get_referral_link( $user_id = 0 ) {
  */
 add_action( 'wp_footer', 'customiizer_loyalty_widget' );
 function customiizer_loyalty_widget() {
-    if ( ! is_user_logged_in() ) {
-        return;
+    $logged_in = is_user_logged_in();
+
+    if ( $logged_in ) {
+        $points    = customiizer_get_loyalty_points();
+        $referrals = customiizer_get_referral_count();
+        $link      = customiizer_get_referral_link();
+        $missions  = customiizer_get_missions();
+    } else {
+        $points    = 0;
+        $referrals = 0;
+        $link      = '';
+        $missions  = array();
     }
-    $points    = customiizer_get_loyalty_points();
-    $referrals = customiizer_get_referral_count();
-    $link      = customiizer_get_referral_link();
-    $missions  = customiizer_get_missions();
 
     $template = get_stylesheet_directory() . '/templates/loyalty/widget.php';
     if ( file_exists( $template ) ) {
