@@ -710,9 +710,8 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .progress-counter {
-        display: block;
-        margin-top: 4px;
-        text-align: right;
+        display: inline;
+        margin-left: 4px;
         font-size: 0.8rem;
         color: #f3e2c7;
         font-family: 'Cinzel', serif;
