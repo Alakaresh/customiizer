@@ -36,8 +36,8 @@ jQuery(function($){
     });
 
     $loginBtn.on('click', function(){
-        if (typeof openLoginModal === 'function') {
-            openLoginModal();
+        if (typeof window.openLoginModal === 'function') {
+            window.openLoginModal();
         }
         $popup.removeClass('open');
     });

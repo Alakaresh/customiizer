@@ -144,6 +144,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function openLoginModal() {
-	const modal = document.getElementById('loginModal');
-	modal.style.display = 'flex';
+        const modal = document.getElementById('loginModal');
+        modal.style.display = 'flex';
 }
+
+// Expose to other scripts
+window.openLoginModal = openLoginModal;
