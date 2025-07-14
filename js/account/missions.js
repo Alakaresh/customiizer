@@ -24,8 +24,17 @@ async function fetchMissions(options = {}) {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'action=customiizer_get_missions'
     })
-        .then(res => res.json())
+        .then(res => {
+            // WordPress can return an HTML error page (e.g. 500/504)
+            // so parse JSON only when the request was successful
+            if (!res.ok) {
+                console.error('Erreur HTTP lors du chargement des missions', res.status);
+                return null;
+            }
+            return res.json();
+        })
         .then(data => {
+            if (!data) return;
             if (data.success) {
                 const list = data.data.missions || data.data;
                 const version = data.data.version;
@@ -51,6 +60,12 @@ async function getMissionsVersion() {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'action=customiizer_get_missions_version'
         });
+        // WordPress may respond with an HTML error page; only parse JSON
+        // if the HTTP status indicates success
+        if (!res.ok) {
+            console.error('Erreur HTTP lors de la vérification de version des missions', res.status);
+            return null;
+        }
         const data = await res.json();
         if (data.success) {
             return data.data.version;
