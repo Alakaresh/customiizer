@@ -146,6 +146,26 @@ function customiizer_reward_mission( $user_id, $mission_id ) {
     customiizer_add_loyalty_points( $user_id, intval( $mission['points_reward'] ), 'mission', $mission['title'] );
 }
 
+/**
+ * Get total loyalty points earned from missions only.
+ *
+ * @param int $user_id Optional user ID.
+ * @return int Total mission points.
+ */
+function customiizer_get_total_mission_points( $user_id = 0 ) {
+    global $wpdb;
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
+    if ( $user_id <= 0 ) {
+        return 0;
+    }
+    $sql = $wpdb->prepare(
+        "SELECT COALESCE(SUM(points),0) FROM WPC_loyalty_log
+         WHERE user_id = %d AND origin = 'mission' AND type = 'credit'",
+        $user_id
+    );
+    return intval( $wpdb->get_var( $sql ) );
+}
+
 function customiizer_get_missions_version( $user_id = 0 ) {
     global $wpdb;
     $user_id = $user_id ? intval( $user_id ) : get_current_user_id();

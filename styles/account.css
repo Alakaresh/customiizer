@@ -628,6 +628,15 @@ td.tracking-cell, td.invoice-cell {
         font-size: 0.9em;
 }
 
+.missions-total-points {
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #c29a5b;
+        font-family: 'Cinzel', serif;
+}
+
 /* ===== Missions ===== */
 .missions-list {
         display: flex;
