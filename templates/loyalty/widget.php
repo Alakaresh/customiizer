@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="loyalty-widget-popup">
     <header id="loyalty-widget-header">
         <button id="loyalty-widget-back" class="loyalty-back-main" aria-label="Retour" style="display:none;"><i class="fas fa-arrow-left"></i></button>
-        <img class="loyalty-widget-logo" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/img/full_logo.png' ); ?>" alt="Customiizer" />
+        <img class="loyalty-widget-logo" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Customiizer" />
         <div class="loyalty-header-info">
             <span class="loyalty-header-title">Mes avantages</span>
             <span class="loyalty-header-points">
