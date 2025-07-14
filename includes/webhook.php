@@ -4,7 +4,7 @@ add_action('rest_api_init', function () {
     register_rest_route('customiizer/v1', '/webhook/', array(
         'methods' => 'POST',
         'callback' => 'handle_customiizer_webhook',
-        'permission_callback' => '__return_true', // Prévoir une sécurité plus robuste en production
+        'permission_callback' => 'customiizer_api_permission',
     ));
 });
 

@@ -2,7 +2,7 @@
 register_rest_route('api/v1/images', '/favorite', [
 	'methods' => 'POST',
 	'callback' => 'toggle_image_favorite',
-	'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
 ]);
 function toggle_image_favorite(WP_REST_Request $request) {
 	global $wpdb;

@@ -30,6 +30,6 @@ add_action('rest_api_init', function () {
     register_rest_route('custom-api/v1', '/variant-template/(?P<variant_id>\d+)', [
         'methods' => 'GET',
         'callback' => 'get_variant_template_by_id',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
     ]);
 });

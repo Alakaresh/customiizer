@@ -3,7 +3,7 @@ add_action('rest_api_init', function() {
     register_rest_route('customiizer/v1', '/mockup-status', [
         'methods'  => 'GET',
         'callback' => 'customiizer_get_mockup_status',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
     ]);
 });
 

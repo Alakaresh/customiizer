@@ -2,7 +2,7 @@
 register_rest_route('api/v1/user', '/load', [
 	'methods'  => 'GET',
 	'callback' => 'customiizer_user_load_flexible',
-	'permission_callback' => '__return_true'
+        'permission_callback' => 'customiizer_api_permission'
 ]);
 function customiizer_user_load_flexible($request) {
 	global $wpdb;

@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/(?P<id>\d+)/toggle', [
 	'methods' => 'POST',
 	'callback' => 'toggle_product_status',
-	'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
 ]);
 function toggle_product_status(WP_REST_Request $request) {
 	global $wpdb;
