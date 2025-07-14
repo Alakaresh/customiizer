@@ -629,9 +629,16 @@ td.tracking-cell, td.invoice-cell {
 }
 
 /* ===== Missions ===== */
+.total-mission-points {
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 10px 0;
+}
+
 .missions-list {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 20px;
         justify-content: center;
 }

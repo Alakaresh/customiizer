@@ -25,6 +25,20 @@ function customiizer_get_loyalty_points( $user_id = 0 ) {
 }
 
 /**
+ * Get total loyalty points ever earned by a user, before spending.
+ */
+function customiizer_get_total_earned_points( $user_id = 0 ) {
+    global $wpdb;
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
+    if ( ! $user_id ) {
+        return 0;
+    }
+    $sql  = $wpdb->prepare( "SELECT SUM(points) FROM WPC_loyalty_log WHERE user_id = %d AND points > 0", $user_id );
+    $sum  = $wpdb->get_var( $sql );
+    return $sum ? intval( $sum ) : 0;
+}
+
+/**
  * Add points to a user.
  */
 function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $description = '' ) {
