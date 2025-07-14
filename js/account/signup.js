@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-	const signupForm = document.getElementById('signup');
+        function getCookie(name) {
+                const value = '; ' + document.cookie;
+                const parts = value.split('; ' + name + '=');
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+        }
+        const signupForm = document.getElementById('signup');
 	const signupButton = signupForm.querySelector('.signup-button');
 	const signupNonceInput = document.getElementById('signup-nonce');
 	const nonceValue = signupNonceInput.value;
@@ -37,8 +43,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		params.append('username', username);
 		params.append('email', email);
 		params.append('password', password);
-		params.append('confirm_password', confirmPassword);
-		params.append('registration_nonce', nonceValue);
+                params.append('confirm_password', confirmPassword);
+                const referrer = getCookie('customiizer_referrer');
+                if (referrer) {
+                        params.append('referrer_id', referrer);
+                }
+                params.append('registration_nonce', nonceValue);
 
 		fetch(ajaxurl, {
 			method: 'POST',
