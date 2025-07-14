@@ -1,3 +1,10 @@
+function formatMissionDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString();
+}
+
 async function fetchMissions(options = {}) {
     const prefetch = options.prefetch === true;
     const cacheKey = 'USER_MISSIONS';
@@ -121,9 +128,13 @@ function renderMissions(list) {
         (groups[cat] || []).forEach(m => {
             const progress = Math.min(m.progress, m.goal);
             const percent = Math.round((progress / m.goal) * 100);
+            const completed = m.completed_at && progress >= m.goal;
+            const completedText = completed
+                ? `<div class="mission-completed">Terminée le ${formatMissionDate(m.completed_at)}</div>`
+                : '';
 
             const item = document.createElement('div');
-            item.className = 'mission-item';
+            item.className = 'mission-item' + (completed ? ' completed' : '');
             item.innerHTML = `
                 <div class="mission-header">
                     <h4>${m.title}</h4>
@@ -134,6 +145,7 @@ function renderMissions(list) {
                     <progress max="${m.goal}" value="${progress}"></progress>
                     <span class="progress-text">${percent}% (<span class="progress-counter">${progress}/${m.goal}</span>)</span>
                 </div>
+                ${completedText}
             `;
             listContainer.appendChild(item);
         });
