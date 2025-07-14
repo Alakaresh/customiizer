@@ -91,11 +91,10 @@ add_action( 'init', function() {
 		require_once __DIR__ . '/vendor/autoload.php';
 	}
 	$includes = [
-		'/admin/dashboard/admin-dashboard.php',
-		'/admin/logs/admin-logs.php',
+                '/admin/dashboard/admin-dashboard.php',
+                '/admin/loyalty/admin-loyalty.php',
                 '/admin/update/admin-update.php',
                 '/admin/products/admin-products.php',
-                '/admin/missions/admin-missions.php',
 		'/utilities.php',
 		'/assets.php',
 		'/includes/azure.php',

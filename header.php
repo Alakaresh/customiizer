@@ -58,9 +58,18 @@ $display_name = $current_user->display_name;
                                                 <span class="version-info">Version <?php echo esc_html(customiizer_frontend_version()); ?></span>
 
                                         </div>
-					<?php endif; ?>
-				</div>
-				<div class="menu-container">
+                                        <?php endif; ?>
+
+                                        <?php if ($user_logged_in): ?>
+                                        <div class="loyalty-header-container">
+                                                <span class="loyalty-header-title">Mes avantages</span>
+                                                <span class="loyalty-header-points">Custompoints: <?php echo intval(customiizer_get_loyalty_points($user_id)); ?>
+                                                        <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints">
+                                                </span>
+                                        </div>
+                                        <?php endif; ?>
+                                </div>
+                                <div class="menu-container">
 					<nav class="main-menu">
 						<div><a href="/customiize">Customiize</a></div>
 						<div><a href="/boutique">Boutique</a></div>

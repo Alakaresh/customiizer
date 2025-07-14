@@ -14,10 +14,10 @@
 
 /* Styles généraux pour le header */
 #header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 80px;
 	background-color: var(--dark-gray);
 	color: var(--font-color);
 	padding: 0 10px;
@@ -50,8 +50,8 @@
 
 /* Style pour le logo, assure que le logo est centré et proportionné */
 .logo img {
-	height: 100%;  /* Utilise toute la hauteur du container tout en restant proportionnel */
-	max-height: 60px; /* Limite la taille du logo pour éviter le surdimensionnement */
+        height: 100%;  /* Utilise toute la hauteur du container tout en restant proportionnel */
+        max-height: 70px; /* Limite la taille du logo pour éviter le surdimensionnement */
 }
 
 .menu-container {
@@ -134,15 +134,32 @@
 }
 
 .image-credits-container {
-	display: inline-block;
-	margin-left: 20px; /* Adjust this value as needed */
-	font-size: 16px; /* Or any other appropriate size */
+        display: inline-block;
+        margin-left: 20px; /* Adjust this value as needed */
+        font-size: 16px; /* Or any other appropriate size */
 	color: #fff; /* Or any other suitable color */
 	vertical-align: middle; /* Ensures alignment with other bar elements */
 	background-color: #333; /* Background color, adjust according to your color palette */
 	padding: 5px 10px; /* Padding around the text */
 	border-radius: 15px; /* Border radius for rounded corners */
-	border: 2px solid #555; /* Solid border, adjust the color as per your design */
+        border: 2px solid #555; /* Solid border, adjust the color as per your design */
+}
+.loyalty-header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 20px;
+        color: #fff;
+        font-size: 14px;
+}
+.loyalty-header-points {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+}
+.loyalty-header-points img {
+        height: 16px;
+        width: auto;
 }
 .cart-container {
 	position: relative;

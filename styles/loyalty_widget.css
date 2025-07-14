@@ -36,13 +36,31 @@
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 10px 15px;
     background: #3399ff;
     color: #fff;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     font-size: 14px;
+}
+
+.loyalty-widget-logo {
+    height: 40px;
+    margin-right: 10px;
+}
+
+.loyalty-header-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.loyalty-header-points {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
 }
 
 #loyalty-widget-content {
