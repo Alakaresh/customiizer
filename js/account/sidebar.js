@@ -61,13 +61,22 @@ $(document).ready(function() {
 		}
 		return false;
 	}
-	// Vérifier si le paramètre 'triggerClick' est présent
-	if (getUrlParameter('triggerClick') === 'true') {
-		$('#picturesLink').trigger('click'); // Déclenche le clic sur l'élément avec l'ID 'picturesLink'
-	} else {
-		// Initialisation en chargeant le tableau de bord
-		$('#dashboardLink').trigger('click');
-	}
+        // Vérifier s'il faut ouvrir un onglet spécifique
+        var tab = getUrlParameter('tab');
+        if (tab) {
+                var target = '#' + tab + 'Link';
+                if ($(target).length) {
+                        $(target).trigger('click');
+                } else {
+                        $('#dashboardLink').trigger('click');
+                }
+        } else if (getUrlParameter('triggerClick') === 'true') {
+                // Ancien paramètre pour ouvrir la galerie d'images
+                $('#picturesLink').trigger('click');
+        } else {
+                // Initialisation en chargeant le tableau de bord
+                $('#dashboardLink').trigger('click');
+        }
 });
 
 // Fonctions pour charger le contenu et gérer les états actifs des liens

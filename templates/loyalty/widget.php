@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <p class="loyalty-missions-text">
                         <?php echo esc_html__( 'Rendez-vous dans votre espace client pour découvrir toutes les missions disponibles.', 'customiizer' ); ?>
                     </p>
-                    <a class="loyalty-missions-link" href="/compte">
+                    <a class="loyalty-missions-link" href="/compte?tab=missions">
                         <?php echo esc_html__( 'Voir les missions', 'customiizer' ); ?>
                     </a>
                 </div>
