@@ -118,4 +118,27 @@ The available actions are:
 * **Création de compte** – fired on `user_register`.
 * **Commande terminée** – fired after an order is marked completed.
 
+## Referral system
+
+Users can share their personal link provided in the loyalty widget. New visitors
+arriving with `?ref=<id>` have this value stored in a cookie for seven days.
+When they sign up, the referenced user ID is saved as `referrer_id` on the new
+account. The pair `(referrer_id, referred_id)` is inserted into the
+`WPC_referrals` table and the referrer gains 100 loyalty points. The number of
+referrals displayed in the widget is computed from this table.
+
+To create the table manually:
+
+```sql
+CREATE TABLE `WPC_referrals` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `referrer_id` BIGINT UNSIGNED NOT NULL,
+  `referred_id` BIGINT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `referrer_id` (`referrer_id`),
+  KEY `referred_id` (`referred_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
 

@@ -74,14 +74,33 @@ function user_signup() {
 
 	// Initialisation dans la table WPC_client
 	global $wpdb;
-	$wpdb->insert(
-		'WPC_users',  // Nom de la table
-		array(
-			'user_id' => $user_id,
-			'image_credits' => 30  // Définir les crédits d'image initiaux à 30
-		),
+        $wpdb->insert(
+                'WPC_users',  // Nom de la table
+                array(
+                        'user_id' => $user_id,
+                        'image_credits' => 30  // Définir les crédits d'image initiaux à 30
+                ),
                array('%d', '%d')  // Les formats de chaque champ
-	);
+        );
+
+        // Enregistrer le parrain dans la table WPC_referrals
+        $referrer_id = isset($_POST['referrer_id']) ? intval($_POST['referrer_id']) : 0;
+        if ($referrer_id > 0 && get_user_by('ID', $referrer_id)) {
+                update_user_meta($user_id, 'referrer_id', $referrer_id);
+                $wpdb->insert(
+                        'WPC_referrals',
+                        [
+                                'referrer_id' => $referrer_id,
+                                'referred_id' => $user_id,
+                                'created_at'  => current_time('mysql')
+                        ],
+                        ['%d', '%d', '%s']
+                );
+
+                if (function_exists('customiizer_add_loyalty_points')) {
+                        customiizer_add_loyalty_points($referrer_id, 100, 'referral', 'Nouveau filleul');
+                }
+        }
 
 	// Connexion automatique après inscription
 	wp_set_current_user($user_id);
