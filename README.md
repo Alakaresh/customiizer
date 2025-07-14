@@ -118,4 +118,12 @@ The available actions are:
 * **Création de compte** – fired on `user_register`.
 * **Commande terminée** – fired after an order is marked completed.
 
+## Referral system
+
+Users can share their personal link provided in the loyalty widget. New visitors
+arriving with `?ref=<id>` have this value stored in a cookie for seven days.
+When they sign up, the referenced user ID is saved as `referrer_id` on the new
+account and the referrer gains 100 loyalty points. Their `referral_count`
+metadata is also incremented.
+
 
