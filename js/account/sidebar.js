@@ -17,66 +17,70 @@ $(document).ready(function() {
 		}
 	}
 
-       // Préchargement des sections pour un affichage plus rapide
-       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions']);
+       function getUrlParameter(sParam) {
+               var sPageURL = window.location.search.substring(1),
+                       sURLVariables = sPageURL.split('&'),
+                       sParameterName,
+                       i;
 
-       // Précharger aussi les données utilisateur et la première page de commandes
-       if (typeof loadUserDetails === 'function') {
-               loadUserDetails();
+               for (i = 0; i < sURLVariables.length; i++) {
+                       sParameterName = sURLVariables[i].split('=');
+
+                       if (sParameterName[0] === sParam) {
+                               return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                       }
+               }
+               return false;
        }
-       if (typeof fetchUserOrders === 'function') {
-               fetchUserOrders({ prefetch: true });
+
+       // Déterminer l'onglet initial à afficher
+       var tabParam = getUrlParameter('tab');
+       var initialTab = 'dashboard';
+       if (tabParam) {
+               initialTab = tabParam;
+       } else if (getUrlParameter('triggerClick') === 'true') {
+               initialTab = 'pictures';
        }
-       if (typeof fetchMissions === 'function') {
-               fetchMissions({ prefetch: true });
+
+       // Charger l'onglet initial immédiatement
+       var initialTarget = '#' + initialTab + 'Link';
+       if ($(initialTarget).length) {
+               $(initialTarget).trigger('click');
+       } else {
+               $('#dashboardLink').trigger('click');
        }
 
-        // Attachement des événements aux liens AJAX de manière centralisée
-        $(document).on('click', '.ajax-link', function(e) {
-                e.preventDefault();
-                var targetFile = $(this).data('target');
+       // Préchargement asynchrone des autres sections
+       var allSections = ['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions'];
+       var otherSections = allSections.filter(function(s) { return s !== initialTab; });
+       setTimeout(function() { preloadSections(otherSections); }, 100);
 
-		if (!targetFile) {
-			console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
-			return;
-		}
+       // Précharger aussi certaines données en arrière-plan
+       setTimeout(function() {
+               if (typeof loadUserDetails === 'function') {
+                       loadUserDetails();
+               }
+               if (typeof fetchUserOrders === 'function') {
+                       fetchUserOrders({ prefetch: true });
+               }
+               if (typeof fetchMissions === 'function') {
+                       fetchMissions({ prefetch: true });
+               }
+       }, 150);
 
-		loadContent(targetFile);
-		updateActiveLink(this);
-	});
+       // Attachement des événements aux liens AJAX de manière centralisée
+       $(document).on('click', '.ajax-link', function(e) {
+               e.preventDefault();
+               var targetFile = $(this).data('target');
 
+               if (!targetFile) {
+                       console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
+                       return;
+               }
 
-	function getUrlParameter(sParam) {
-		var sPageURL = window.location.search.substring(1),
-			sURLVariables = sPageURL.split('&'),
-			sParameterName,
-			i;
-
-		for (i = 0; i < sURLVariables.length; i++) {
-			sParameterName = sURLVariables[i].split('=');
-
-			if (sParameterName[0] === sParam) {
-				return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-			}
-		}
-		return false;
-	}
-        // Vérifier s'il faut ouvrir un onglet spécifique
-        var tab = getUrlParameter('tab');
-        if (tab) {
-                var target = '#' + tab + 'Link';
-                if ($(target).length) {
-                        $(target).trigger('click');
-                } else {
-                        $('#dashboardLink').trigger('click');
-                }
-        } else if (getUrlParameter('triggerClick') === 'true') {
-                // Ancien paramètre pour ouvrir la galerie d'images
-                $('#picturesLink').trigger('click');
-        } else {
-                // Initialisation en chargeant le tableau de bord
-                $('#dashboardLink').trigger('click');
-        }
+               loadContent(targetFile);
+               updateActiveLink(this);
+       });
 });
 
 // Fonctions pour charger le contenu et gérer les états actifs des liens
