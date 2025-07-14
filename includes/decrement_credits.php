@@ -15,6 +15,9 @@ function decrement_user_credits() {
     if ($result === false) {
         wp_send_json_error(['message' => 'Failed to decrement credits']);
     } else {
+        if ( function_exists( 'customiizer_process_mission_action' ) ) {
+            customiizer_process_mission_action( 'image_generated', $user_id );
+        }
         wp_send_json_success(['message' => 'Credits decremented successfully']);
     }
 }
