@@ -2,7 +2,7 @@
 register_rest_route('api/v1/images', '/favorites/(?P<user_id>\d+)', [
 	'methods' => 'GET',
 	'callback' => 'load_user_favorites',
-	'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
 ]);
 function load_user_favorites(WP_REST_Request $request) {
 	global $wpdb;

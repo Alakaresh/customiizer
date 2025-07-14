@@ -2,7 +2,7 @@
 register_rest_route('api/v1/user', '/create', [
 	'methods'  => 'POST',
 	'callback' => 'customiizer_create_wpc_user_only',
-	'permission_callback' => '__return_true'
+        'permission_callback' => 'customiizer_api_permission'
 ]);
 function customiizer_create_wpc_user_only($request) {
 	global $wpdb;

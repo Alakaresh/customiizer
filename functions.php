@@ -128,6 +128,7 @@ add_action( 'init', function() {
                 '/includes/image_status.php',
                 '/includes/missions.php',
                 '/includes/loyalty.php',
+                '/includes/api/api_security.php',
                 '/includes/api/api_images.php',
                 '/includes/api/api_imported_images.php',
                 '/includes/api/api_templates.php',

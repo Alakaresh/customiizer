@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/(?P<product_id>\d+)/margin', [
 	'methods' => 'POST',
 	'callback' => 'set_margin_for_all_variants',
-	'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
 ]);
 
 function set_margin_for_all_variants(WP_REST_Request $req) {

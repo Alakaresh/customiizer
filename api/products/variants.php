@@ -2,7 +2,7 @@
 register_rest_route('api/v1/products', '/(?P<product_id>\d+)/variants', [
 	'methods' => 'GET',
 	'callback' => 'get_product_variants_full',
-	'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
 ]);
 function get_product_variants_full($request) {
 	global $wpdb;

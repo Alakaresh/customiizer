@@ -8,7 +8,7 @@ register_rest_route('api/v1/products', '/format', [
 			'sanitize_callback' => 'sanitize_text_field',
 		],
 	],
-	'permission_callback' => '__return_true',
+        'permission_callback' => 'customiizer_api_permission',
 ]);
 
 function api_get_product_from_format($request) {
