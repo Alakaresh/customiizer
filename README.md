@@ -106,4 +106,16 @@ missions state for the current user. The front‑end displays cached missions
 immediately, then compares the stored version against this value to decide
 whether it needs to reload the list.
 
+## Mission triggers
+
+Each mission can be tied to a predefined action such as user registration or
+order completion. Select the desired action when creating the mission in the
+admin page. Missions with a trigger are automatically updated when the action
+occurs.
+
+The available actions are:
+
+* **Création de compte** – fired on `user_register`.
+* **Commande terminée** – fired after an order is marked completed.
+
 
