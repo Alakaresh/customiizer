@@ -83,12 +83,19 @@ function user_signup() {
                array('%d', '%d')  // Les formats de chaque champ
         );
 
-        // Enregistrer le parrain et incrémenter son compteur
+        // Enregistrer le parrain dans la table WPC_referrals
         $referrer_id = isset($_POST['referrer_id']) ? intval($_POST['referrer_id']) : 0;
         if ($referrer_id > 0 && get_user_by('ID', $referrer_id)) {
                 update_user_meta($user_id, 'referrer_id', $referrer_id);
-                $count = intval(get_user_meta($referrer_id, 'referral_count', true));
-                update_user_meta($referrer_id, 'referral_count', $count + 1);
+                $wpdb->insert(
+                        'WPC_referrals',
+                        [
+                                'referrer_id' => $referrer_id,
+                                'referred_id' => $user_id,
+                                'created_at'  => current_time('mysql')
+                        ],
+                        ['%d', '%d', '%s']
+                );
 
                 if (function_exists('customiizer_add_loyalty_points')) {
                         customiizer_add_loyalty_points($referrer_id, 100, 'referral', 'Nouveau filleul');

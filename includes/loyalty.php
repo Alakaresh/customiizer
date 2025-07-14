@@ -207,8 +207,13 @@ function customiizer_process_loyalty_after_completion( $order_id ) {
  * Get referral count for a user.
  */
 function customiizer_get_referral_count( $user_id = 0 ) {
+    global $wpdb;
     $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
-    return intval( get_user_meta( $user_id, 'referral_count', true ) );
+    if ( ! $user_id ) {
+        return 0;
+    }
+    $sql = $wpdb->prepare( "SELECT COUNT(*) FROM WPC_referrals WHERE referrer_id = %d", $user_id );
+    return intval( $wpdb->get_var( $sql ) );
 }
 
 /**
