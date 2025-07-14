@@ -158,6 +158,42 @@
     pointer-events: none;
 }
 
+.loyalty-copy-container {
+    position: relative;
+    margin-top: 6px;
+}
+
+.loyalty-referral-input {
+    width: 100%;
+    padding-right: 32px;
+}
+
+.loyalty-copy-referral {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    padding: 0;
+}
+
+.loyalty-copy-confirmation {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #444;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    display: none;
+}
+
 @media(max-width:480px){
     #loyalty-widget-popup{
         width:260px;

@@ -41,4 +41,15 @@ jQuery(function($){
         }
         $popup.removeClass('open');
     });
+
+    const $copyBtn = $popup.find('.loyalty-copy-referral');
+    const $copyInput = $popup.find('#loyalty-referral-link');
+    const $copyConfirm = $popup.find('.loyalty-copy-confirmation');
+
+    $copyBtn.on('click', function(){
+        if (!$copyInput.length) return;
+        navigator.clipboard.writeText($copyInput.val()).then(() => {
+            $copyConfirm.fadeIn(200).delay(2000).fadeOut(200);
+        });
+    });
 });
