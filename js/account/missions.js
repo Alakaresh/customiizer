@@ -77,11 +77,13 @@ async function getMissionsVersion() {
 }
 
 function renderMissions(list) {
-    const container = document.getElementById('missions-list');
-    if (!container) return;
-    container.innerHTML = '';
+    const listContainer = document.getElementById('missions-list');
+    const catContainer = document.getElementById('mission-categories');
+    if (!listContainer || !catContainer) return;
+    catContainer.innerHTML = '';
+    listContainer.innerHTML = '';
     if (!list || list.length === 0) {
-        container.textContent = 'Aucune mission en cours.';
+        listContainer.textContent = 'Aucune mission en cours.';
         return;
     }
 
@@ -92,19 +94,31 @@ function renderMissions(list) {
         groups[cat].push(mission);
     });
 
-    Object.keys(groups).forEach(cat => {
-        const section = document.createElement('div');
-        section.className = 'mission-category-group';
+    const categories = Object.keys(groups);
+    if (categories.length === 0) {
+        listContainer.textContent = 'Aucune mission en cours.';
+        return;
+    }
 
-        const title = document.createElement('h3');
-        title.className = 'mission-category-title';
-        title.textContent = cat;
-        section.appendChild(title);
+    let currentCategory = categories[0];
 
-        const listContainer = document.createElement('div');
-        listContainer.className = 'missions-list';
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'mission-category-item';
+        btn.textContent = cat;
+        if (cat === currentCategory) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+            currentCategory = cat;
+            Array.from(catContainer.children).forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderCategory(cat);
+        });
+        catContainer.appendChild(btn);
+    });
 
-        groups[cat].forEach(m => {
+    function renderCategory(cat) {
+        listContainer.innerHTML = '';
+        (groups[cat] || []).forEach(m => {
             const progress = Math.min(m.progress, m.goal);
             const percent = Math.round((progress / m.goal) * 100);
 
@@ -123,10 +137,9 @@ function renderMissions(list) {
             `;
             listContainer.appendChild(item);
         });
+    }
 
-        section.appendChild(listContainer);
-        container.appendChild(section);
-    });
+    renderCategory(currentCategory);
 }
 
 // L'appel est déclenché par sidebar.js après le chargement de la section

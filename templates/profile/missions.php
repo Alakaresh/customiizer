@@ -9,5 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="content-container" id="missions-container">
     <h2>Missions</h2>
-    <div id="missions-list" class="missions-list"></div>
+    <div class="missions-wrapper">
+        <div id="mission-categories"></div>
+        <div id="missions-list" class="missions-list"></div>
+    </div>
 </div>
