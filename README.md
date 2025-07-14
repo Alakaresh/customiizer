@@ -86,9 +86,7 @@ The response lists all `mockup_url` values stored for the task:
 Users earn 5 points for every euro spent before tax once an order is completed.
 A field on the checkout page lets them redeem their points (100 points equal 1€). The
 current balance is shown on the My Account dashboard. Points and history are
-stored in dedicated tables prefixed with `WPC_` so the system can later support
-badges, missions or other gamification features. The tables are created
-manually on deployment.
+stored in dedicated tables prefixed with `WPC_` so the system can later support badges, missions or other gamification features. Every change in balance is recorded in `WPC_loyalty_log` with its origin to keep track of purchases, missions and referrals. The tables are created manually on deployment.
 
 ## Mission categories
 
