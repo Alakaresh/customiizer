@@ -60,14 +60,6 @@ $display_name = $current_user->display_name;
                                         </div>
                                         <?php endif; ?>
 
-                                        <?php if ($user_logged_in): ?>
-                                        <div class="loyalty-header-container">
-                                                <span class="loyalty-header-title">Mes avantages</span>
-                                                <span class="loyalty-header-points">Custompoints: <?php echo intval(customiizer_get_loyalty_points($user_id)); ?>
-                                                        <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints">
-                                                </span>
-                                        </div>
-                                        <?php endif; ?>
                                 </div>
                                 <div class="menu-container">
 					<nav class="main-menu">
