@@ -35,11 +35,16 @@ function customiizer_add_loyalty_points( $user_id, $points, $origin = '', $descr
         return false;
     }
 
-    $wpdb->query( $wpdb->prepare(
+    $result = $wpdb->query( $wpdb->prepare(
         "INSERT INTO WPC_loyalty_points (user_id, points) VALUES (%d, %d)
          ON DUPLICATE KEY UPDATE points = points + VALUES(points)",
-        $user_id, $points
+        $user_id,
+        $points
     ) );
+
+    if ( false !== $result ) {
+        customiizer_log_loyalty_movement( $user_id, $points, 'credit', $origin, $description );
+    }
 
     return true;
 }
@@ -55,16 +60,14 @@ function customiizer_use_loyalty_points( $user_id, $points, $origin = '', $descr
         return false;
     }
 
-    $current = customiizer_get_loyalty_points( $user_id );
-    if ( $current < $points ) {
-        return false;
-    }
-
-    $wpdb->query( $wpdb->prepare(
+    $result = $wpdb->query( $wpdb->prepare(
         "UPDATE WPC_loyalty_points SET points = points - %d WHERE user_id = %d",
         $points, $user_id
     ) );
 
+    if ( false !== $result ) {
+        customiizer_log_loyalty_movement( $user_id, -$points, 'debit', $origin, $description );
+    }
     return true;
 }
 
