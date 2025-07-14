@@ -631,9 +631,8 @@ td.tracking-cell, td.invoice-cell {
 /* ===== Missions ===== */
 .missions-list {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 20px;
-        justify-content: center;
 }
 
 .mission-item {
@@ -641,7 +640,7 @@ td.tracking-cell, td.invoice-cell {
         border: 2px solid #c29a5b;
         border-radius: 10px;
         padding: 15px;
-        width: 280px;
+        width: 100%;
         color: #f3e2c7;
         box-shadow: 0 0 10px rgba(0,0,0,0.6);
         font-family: 'Cinzel', serif;
