@@ -16,6 +16,7 @@ function customiizer_get_mission_actions() {
     return array(
         'user_register'            => __( 'Création de compte', 'customiizer' ),
         'order_completed'          => __( 'Commande terminée', 'customiizer' ),
+        'image_generated'          => __( 'Génération d\'image', 'customiizer' ),
     );
 }
 
