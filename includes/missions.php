@@ -158,12 +158,28 @@ function customiizer_get_total_mission_points( $user_id = 0 ) {
     if ( $user_id <= 0 ) {
         return 0;
     }
+
+    // Primary method: sum rewards of completed missions
     $sql = $wpdb->prepare(
-        "SELECT COALESCE(SUM(points),0) FROM WPC_loyalty_log
-         WHERE user_id = %d AND origin = 'mission' AND type = 'credit'",
+        "SELECT COALESCE(SUM(m.points_reward),0)
+           FROM WPC_user_missions um
+           INNER JOIN WPC_missions m ON um.mission_id = m.mission_id
+          WHERE um.user_id = %d AND um.completed_at IS NOT NULL",
         $user_id
     );
-    return intval( $wpdb->get_var( $sql ) );
+    $points = intval( $wpdb->get_var( $sql ) );
+
+    // Fallback to loyalty log for backwards compatibility
+    if ( $points === 0 ) {
+        $sql = $wpdb->prepare(
+            "SELECT COALESCE(SUM(points),0) FROM WPC_loyalty_log
+             WHERE user_id = %d AND origin = 'mission' AND type = 'credit'",
+            $user_id
+        );
+        $points = intval( $wpdb->get_var( $sql ) );
+    }
+
+    return $points;
 }
 
 function customiizer_get_missions_version( $user_id = 0 ) {
