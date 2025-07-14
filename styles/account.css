@@ -636,6 +636,18 @@ td.tracking-cell, td.invoice-cell {
         justify-content: center;
 }
 
+.mission-item.completed {
+        opacity: 0.85;
+}
+
+.completion-date {
+        margin-top: 6px;
+        text-align: right;
+        font-size: 0.8rem;
+        color: #c29a5b;
+        font-family: 'Cinzel', serif;
+}
+
 .mission-item {
         background: linear-gradient(#3b2d1f, #27190b);
         border: 2px solid #c29a5b;

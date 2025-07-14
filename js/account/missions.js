@@ -122,8 +122,16 @@ function renderMissions(list) {
             const progress = Math.min(m.progress, m.goal);
             const percent = Math.round((progress / m.goal) * 100);
 
+            const completed = !!m.completed_at;
+            let completionHTML = '';
+            if (completed) {
+                const d = new Date(String(m.completed_at).replace(' ', 'T'));
+                const dateStr = d.toLocaleDateString('fr-FR');
+                completionHTML = `<div class="completion-date">Terminé le ${dateStr}</div>`;
+            }
+
             const item = document.createElement('div');
-            item.className = 'mission-item';
+            item.className = 'mission-item' + (completed ? ' completed' : '');
             item.innerHTML = `
                 <div class="mission-header">
                     <h4>${m.title}</h4>
@@ -134,6 +142,7 @@ function renderMissions(list) {
                     <progress max="${m.goal}" value="${progress}"></progress>
                     <span class="progress-text">${percent}% (<span class="progress-counter">${progress}/${m.goal}</span>)</span>
                 </div>
+                ${completionHTML}
             `;
             listContainer.appendChild(item);
         });
