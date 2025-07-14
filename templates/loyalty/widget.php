@@ -44,7 +44,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <div class="loyalty-widget-card loyalty-referral">
                     <h4><?php echo esc_html__( 'Parrainage', 'customiizer' ); ?></h4>
                     <p><?php echo sprintf( esc_html__( '%d parrainages validés', 'customiizer' ), intval( $referrals ) ); ?></p>
-                    <input type="text" readonly value="<?php echo esc_attr( $link ); ?>" style="width:100%;;" />
+                    <div class="loyalty-copy-container">
+                        <input id="loyalty-referral-link" class="loyalty-referral-input" type="text" readonly value="<?php echo esc_attr( $link ); ?>" />
+                        <button type="button" class="loyalty-copy-referral" aria-label="<?php echo esc_attr__( 'Copier le lien', 'customiizer' ); ?>"><i class="fas fa-copy"></i></button>
+                        <span class="loyalty-copy-confirmation"><?php echo esc_html__( 'Copié !', 'customiizer' ); ?></span>
+                    </div>
                 </div>
             </div>
         <?php else : ?>
