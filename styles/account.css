@@ -728,3 +728,40 @@ td.tracking-cell, td.invoice-cell {
         color: #c29a5b;
         font-family: 'Cinzel', serif;
 }
+
+#missions-container .missions-wrapper {
+        display: flex;
+}
+
+#mission-categories {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        margin-right: 20px;
+}
+
+#mission-categories .mission-category-item {
+        background: linear-gradient(#3b2d1f, #27190b);
+        border: 2px solid #c29a5b;
+        border-radius: 10px;
+        color: #f3e2c7;
+        font-family: 'Cinzel', serif;
+        padding: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+
+#mission-categories .mission-category-item:hover {
+        background: linear-gradient(#4c3a26, #3a220f);
+}
+
+#mission-categories .mission-category-item.active {
+        background: linear-gradient(#27190b, #3b2d1f);
+        box-shadow: 0 0 15px rgba(0,0,0,0.8);
+}
+
+.missions-list {
+        flex: 1;
+}
