@@ -135,6 +135,14 @@ function renderMissions(list) {
                     <span class="progress-text">${percent}% (<span class="progress-counter">${progress}/${m.goal}</span>)</span>
                 </div>
             `;
+            if (m.completed_at) {
+                const date = new Date(m.completed_at);
+                const formatted = date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' });
+                const completion = document.createElement('div');
+                completion.className = 'mission-completed-date';
+                completion.textContent = `Terminé le ${formatted}`;
+                item.appendChild(completion);
+            }
             listContainer.appendChild(item);
         });
     }

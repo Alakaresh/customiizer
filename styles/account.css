@@ -717,6 +717,14 @@ td.tracking-cell, td.invoice-cell {
         font-family: 'Cinzel', serif;
 }
 
+.mission-completed-date {
+        margin-top: 6px;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #c29a5b;
+        font-family: 'Cinzel', serif;
+}
+
 .mission-category-group {
         margin-bottom: 30px;
 }
