@@ -177,23 +177,25 @@
 }
 
 .loyalty-copy-container {
-    display: flex;
-    gap: 6px;
     position: relative;
     margin-top: 6px;
 }
 
 .loyalty-referral-input {
-    flex: 1;
+    width: 100%;
+    padding-right: 32px;
 }
 
 .loyalty-copy-referral {
-    background-color: #007bff;
-    color: #fff;
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    background: none;
     border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
+    color: #007bff;
     cursor: pointer;
+    padding: 0;
 }
 
 .loyalty-copy-confirmation {
