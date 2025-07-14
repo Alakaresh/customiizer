@@ -9,11 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="loyalty-widget-popup">
     <header id="loyalty-widget-header">
         <button id="loyalty-widget-back" class="loyalty-back-main" aria-label="Retour" style="display:none;"><i class="fas fa-arrow-left"></i></button>
-        <span class="loyalty-widget-title">
-            <img class="loyalty-widget-icon" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" />
-            <span class="loyalty-widget-title-text"><?php echo esc_html__( 'Mes custompoints', 'customiizer' ); ?></span>
-        </span>
-        <span class="loyalty-widget-points"><?php echo intval( $points ); ?> pts</span>
+        <img class="loyalty-widget-logo" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/img/full_logo.png' ); ?>" alt="Customiizer" />
+        <div class="loyalty-header-info">
+            <span class="loyalty-header-title">Mes avantages</span>
+            <span class="loyalty-header-points">
+                Custompoints: <?php echo intval( $points ); ?>
+                <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" />
+            </span>
+        </div>
         <button id="loyalty-widget-close" aria-label="Fermer">&times;</button>
     </header>
 
