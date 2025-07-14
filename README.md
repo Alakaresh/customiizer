@@ -102,7 +102,8 @@ category shows a heading followed by its missions cards.
 `customiizer_get_missions_version` returns a small hash representing the latest
 missions state for the current user. The front‑end displays cached missions
 immediately, then compares the stored version against this value to decide
-whether it needs to reload the list.
+whether it needs to reload the list. Finished missions include a `completed_at`
+timestamp so the account dashboard can show the completion date.
 
 ## Mission triggers
 
