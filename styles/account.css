@@ -758,8 +758,9 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #mission-categories .mission-category-item.active {
-        background: linear-gradient(#27190b, #3b2d1f);
-        box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        background: linear-gradient(#5f4831, #432d1a);
+        box-shadow: 0 0 20px rgba(255,255,255,0.6);
+        border-color: #d6b36e;
 }
 
 .missions-list {
