@@ -628,6 +628,20 @@ td.tracking-cell, td.invoice-cell {
         font-size: 0.9em;
 }
 
+.loyalty-info h3 {
+        margin-top: 15px;
+        margin-bottom: 5px;
+        text-align: center;
+        font-size: 1.1em;
+        font-weight: 600;
+}
+
+.loyalty-explain-list {
+        margin-left: 20px;
+        margin-bottom: 10px;
+        list-style: disc;
+}
+
 .missions-total-points {
         margin-bottom: 10px;
         text-align: center;
