@@ -796,3 +796,28 @@ td.tracking-cell, td.invoice-cell {
 .missions-list {
         flex: 1;
 }
+
+#mission-achievement {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(16, 124, 16, 0.95);
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-family: 'Segoe UI', sans-serif;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        display: none;
+        z-index: 1000;
+}
+#mission-achievement.show {
+        display: block;
+        animation: missionSlideIn 0.3s ease-out, missionFadeOut 0.3s ease-in 2.7s forwards;
+}
+@keyframes missionSlideIn {
+        from { transform: translateX(-100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+}
+@keyframes missionFadeOut {
+        to { opacity: 0; }
+}

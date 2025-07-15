@@ -11,6 +11,11 @@ async function fetchMissions(options = {}) {
     const versionKey = 'USER_MISSIONS_VERSION';
     const cached = sessionStorage.getItem(cacheKey);
     const cachedVersion = sessionStorage.getItem(versionKey);
+    const shownKey = 'SHOWN_MISSION_COMPLETIONS';
+    let shown = [];
+    try {
+        shown = JSON.parse(localStorage.getItem(shownKey)) || [];
+    } catch (e) {}
 
     if (cached && !prefetch) {
         try {
@@ -45,6 +50,18 @@ async function fetchMissions(options = {}) {
             if (data.success) {
                 const list = data.data.missions || data.data;
                 const version = data.data.version;
+
+                if (!prefetch) {
+                    const newlyCompleted = list.filter(m => m.completed_at && !shown.includes(m.mission_id));
+                    newlyCompleted.forEach(m => {
+                        showMissionToast(`Mission accomplie : ${m.title}`);
+                        shown.push(m.mission_id);
+                    });
+                    if (newlyCompleted.length) {
+                        localStorage.setItem(shownKey, JSON.stringify(shown));
+                    }
+                }
+
                 sessionStorage.setItem(cacheKey, JSON.stringify(list));
                 if (version) {
                     sessionStorage.setItem(versionKey, version);
@@ -152,6 +169,20 @@ function renderMissions(list) {
     }
 
     renderCategory(currentCategory);
+}
+
+function showMissionToast(message) {
+    let toast = document.getElementById('mission-achievement');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'mission-achievement';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
 }
 
 // L'appel est déclenché par sidebar.js après le chargement de la section
