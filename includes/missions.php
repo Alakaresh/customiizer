@@ -16,6 +16,7 @@ function customiizer_get_mission_actions() {
     return array(
         'user_register'            => __( 'Création de compte', 'customiizer' ),
         'order_completed'          => __( 'Commande terminée', 'customiizer' ),
+        'euros_spent'              => __( 'Euros dépensés', 'customiizer' ),
         'image_generated'          => __( 'Génération d\'image', 'customiizer' ),
         'referral'                 => __( 'Parrainage', 'customiizer' ),
     );
@@ -324,6 +325,10 @@ add_action( 'woocommerce_order_status_completed', function( $order_id ) {
     $user_id = $order->get_user_id();
     if ( $user_id ) {
         customiizer_process_mission_action( 'order_completed', $user_id, 1 );
+        $euros = (int) floor( $order->get_subtotal() );
+        if ( $euros > 0 ) {
+            customiizer_process_mission_action( 'euros_spent', $user_id, $euros );
+        }
     }
 } );
 
