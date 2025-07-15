@@ -141,3 +141,63 @@ account and the referrer gains 100 loyalty points. Their `referral_count`
 
 
 
+
+## Custom database tables
+
+The theme relies on several custom MySQL tables that **do not** use the usual `wp_` prefix. Except for `WPC_user_action_totals` which is created automatically, you must create all of them manually before activating the theme. Mission queries will fail if `WPC_user_missions` is missing.
+
+### List of tables
+
+- `WPC_client`
+- `WPC_generated_image`
+- `WPC_image_favorites`
+- `WPC_image_likes`
+- `WPC_imported_image`
+- `WPC_loyalty_log`
+- `WPC_loyalty_points`
+- `WPC_missions`
+- `WPC_products`
+- `WPC_referrals`
+- `WPC_site_product`
+- `WPC_suppliers`
+- `WPC_user_action_totals`
+- `WPC_user_missions`
+- `WPC_users`
+- `WPC_variant_mockup`
+- `WPC_variant_prices`
+- `WPC_variant_print`
+- `WPC_variant_stock`
+- `WPC_variant_templates`
+- `WPC_variants`
+
+### Schema for missions tables
+
+```sql
+CREATE TABLE WPC_missions (
+    mission_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    goal INT UNSIGNED NOT NULL DEFAULT 1,
+    points_reward INT UNSIGNED NOT NULL DEFAULT 0,
+    category VARCHAR(255) DEFAULT '',
+    trigger_action VARCHAR(64) DEFAULT '',
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    PRIMARY KEY (mission_id)
+);
+
+CREATE TABLE WPC_user_missions (
+    user_id BIGINT UNSIGNED NOT NULL,
+    mission_id INT UNSIGNED NOT NULL,
+    progress INT UNSIGNED NOT NULL DEFAULT 0,
+    completed_at DATETIME DEFAULT NULL,
+    PRIMARY KEY (user_id, mission_id)
+);
+
+CREATE TABLE WPC_user_action_totals (
+    user_id BIGINT UNSIGNED NOT NULL,
+    action VARCHAR(64) NOT NULL DEFAULT '',
+    total INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, action)
+);
+```
+
