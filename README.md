@@ -126,6 +126,7 @@ The available actions are:
 
 * **Création de compte** – fired on `user_register`.
 * **Commande terminée** – fired after an order is marked completed.
+* **Parrainage** – fired when a referred user signs up.
 
 ## Referral system
 
