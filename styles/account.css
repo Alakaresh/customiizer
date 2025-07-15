@@ -801,11 +801,12 @@ td.tracking-cell, td.invoice-cell {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: rgba(16, 124, 16, 0.95);
-        color: #fff;
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-family: 'Segoe UI', sans-serif;
+       background: linear-gradient(#3b2d1f, #27190b);
+       color: #f3e2c7;
+       padding: 10px 15px;
+       border: 2px solid #c29a5b;
+       border-radius: 20px;
+       font-family: 'Cinzel', serif;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         display: none;
         z-index: 1000;
