@@ -116,9 +116,11 @@ When an action happens multiple times at once, the handler can pass a quantity
 to `customiizer_process_mission_action`. This same quantity is added to the
 progress of every mission using that trigger, even for missions created later.
 Each user's total for a given action is stored so newly created missions with
+
 the same trigger immediately reflect the client's current progress. These totals
 live in the `WPC_user_action_totals` table which is created automatically when
 the theme loads.
+
 
 The available actions are:
 

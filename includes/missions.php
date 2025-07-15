@@ -137,6 +137,7 @@ function customiizer_get_missions( $user_id = 0 ) {
          $join_totals .
          " WHERE m.is_active = 1",
         $params
+
     );
     $rows = $wpdb->get_results( $sql, ARRAY_A );
 
