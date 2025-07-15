@@ -29,6 +29,22 @@ function customiizer_render_missions_page() {
         echo '<div class="updated notice"><p>Mission créée.</p></div>';
     }
 
+    if (isset($_POST['customiizer_update_mission'])) {
+        check_admin_referer('customiizer_update_mission');
+        $id = intval($_POST['mission_id'] ?? 0);
+        if ($id) {
+            $wpdb->update('WPC_missions', [
+                'title'         => sanitize_text_field($_POST['title'] ?? ''),
+                'description'   => sanitize_textarea_field($_POST['description'] ?? ''),
+                'goal'          => intval($_POST['goal'] ?? 1),
+                'points_reward' => intval($_POST['points'] ?? 0),
+                'category'      => sanitize_text_field($_POST['category'] ?? ''),
+                'trigger_action'=> sanitize_text_field($_POST['trigger_action'] ?? '')
+            ], ['mission_id' => $id], ['%s','%s','%d','%d','%s','%s'], ['%d']);
+            echo '<div class="updated notice"><p>Mission mise à jour.</p></div>';
+        }
+    }
+
     if (isset($_POST['disable_mission'])) {
         $id = intval($_POST['mission_id']);
         $wpdb->update('WPC_missions', ['is_active' => 0], ['mission_id' => $id]);
@@ -40,6 +56,34 @@ function customiizer_render_missions_page() {
     $missions = $wpdb->get_results('SELECT * FROM WPC_missions', ARRAY_A);
 
     echo '<div class="wrap"><h1>🎯 Missions</h1>';
+
+    if (isset($_GET['edit'])) {
+        $edit_id = intval($_GET['edit']);
+        $edit_mission = $wpdb->get_row($wpdb->prepare('SELECT * FROM WPC_missions WHERE mission_id=%d', $edit_id), ARRAY_A);
+        if ($edit_mission) {
+            echo '<h2>Modifier une mission</h2>';
+            echo '<form method="post">';
+            wp_nonce_field('customiizer_update_mission');
+            echo '<input type="hidden" name="mission_id" value="'.intval($edit_id).'">';
+            echo '<table class="form-table">';
+            echo '<tr><th scope="row">Titre</th><td><input type="text" name="title" value="'.esc_attr($edit_mission['title']).'" required></td></tr>';
+            echo '<tr><th scope="row">Description</th><td><textarea name="description" rows="3">'.esc_textarea($edit_mission['description']).'</textarea></td></tr>';
+            echo '<tr><th scope="row">Objectif</th><td><input type="number" name="goal" value="'.intval($edit_mission['goal']).'" min="1"></td></tr>';
+            echo '<tr><th scope="row">Points</th><td><input type="number" name="points" value="'.intval($edit_mission['points_reward']).'" min="0"></td></tr>';
+            $actions = customiizer_get_mission_actions();
+            $action_options = '';
+            foreach ($actions as $value => $label) {
+                $selected = ($value === $edit_mission['trigger_action']) ? ' selected' : '';
+                $action_options .= '<option value="'.esc_attr($value).'"'.$selected.'>'.esc_html($label).'</option>';
+            }
+            echo '<tr><th scope="row">Catégorie</th><td><input type="text" name="category" value="'.esc_attr($edit_mission['category']).'"></td></tr>';
+            echo '<tr><th scope="row">Action</th><td><select name="trigger_action">'.$action_options.'</select></td></tr>';
+            echo '</table>';
+            echo '<p><input type="submit" class="button button-primary" name="customiizer_update_mission" value="Mettre à jour"></p>';
+            echo '</form><hr>';
+        }
+    }
+
     echo '<h2>Ajouter une mission</h2>';
     echo '<form method="post">';
     wp_nonce_field('customiizer_add_mission');
@@ -70,14 +114,16 @@ function customiizer_render_missions_page() {
         echo '<td>'.esc_html($m['category']).'</td>';
         echo '<td>'.esc_html($m['trigger_action']).'</td>';
         echo '<td>'.($m['is_active'] ? 'Oui' : 'Non').'</td>';
-        echo '<td><form method="post">';
+        echo '<td><form method="post" style="display:inline">';
         echo '<input type="hidden" name="mission_id" value="'.intval($m['mission_id']).'">';
         if ($m['is_active']) {
             echo '<button type="submit" name="disable_mission" class="button">Désactiver</button>';
         } else {
             echo '<button type="submit" name="enable_mission" class="button">Activer</button>';
         }
-        echo '</form></td>';
+        echo '</form> ';
+        $edit_url = admin_url('admin.php?page=customiizer-missions&edit='.intval($m['mission_id']));
+        echo '<a href="'.esc_url($edit_url).'" class="button">Modifier</a></td>';
         echo '</tr>';
     }
     echo '</tbody></table></div>';
