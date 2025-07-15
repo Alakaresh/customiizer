@@ -112,6 +112,10 @@ order completion. Select the desired action when creating the mission in the
 admin page. Missions with a trigger are automatically updated when the action
 occurs.
 
+When an action happens multiple times at once, the handler can pass a quantity
+to `customiizer_process_mission_action`. This same quantity is added to the
+progress of every mission using that trigger, even for missions created later.
+
 The available actions are:
 
 * **Création de compte** – fired on `user_register`.
