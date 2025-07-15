@@ -53,6 +53,9 @@ function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) 
         return;
     }
 
+    // Make sure the totals table exists before updating it
+    customiizer_ensure_action_totals_table();
+
     // Keep a running total for this user's action quantity
     $wpdb->query( $wpdb->prepare(
         "INSERT INTO WPC_user_action_totals (user_id, action, total)
@@ -112,15 +115,29 @@ function customiizer_get_missions( $user_id = 0 ) {
     if ( $user_id <= 0 ) {
         return array();
     }
+    $tables = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', 'WPC_user_action_totals' ) );
+
+    $select_totals = '0 AS action_total';
+    $join_totals   = '';
+    $params        = [ $user_id ];
+
+    if ( ! empty( $tables ) ) {
+        $select_totals = 'ut.total AS action_total';
+        $join_totals   = $wpdb->prepare(
+            " LEFT JOIN WPC_user_action_totals ut ON ut.user_id = %d AND ut.action = m.trigger_action",
+            $user_id
+        );
+    }
+
     $sql = $wpdb->prepare(
         "SELECT m.mission_id, m.title, m.description, m.goal, m.points_reward, m.category, m.trigger_action,
-                um.progress AS user_progress, at.total AS action_total, um.completed_at
+                um.progress AS user_progress, {$select_totals}, um.completed_at
          FROM WPC_missions m
-         LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d
-         LEFT JOIN WPC_user_action_totals at ON at.user_id = %d AND at.action = m.trigger_action
-         WHERE m.is_active = 1",
-        $user_id,
-        $user_id
+         LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d" .
+         $join_totals .
+         " WHERE m.is_active = 1",
+        $params
+
     );
     $rows = $wpdb->get_results( $sql, ARRAY_A );
 
