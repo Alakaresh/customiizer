@@ -91,8 +91,8 @@ function customiizer_render_loyalty_missions() {
 
     $missions = $wpdb->get_results('SELECT * FROM WPC_missions', ARRAY_A);
 
-
     $edit_id = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
+
 
     echo '<h2>Ajouter une mission</h2>';
     echo '<form method="post">';
@@ -138,6 +138,7 @@ function customiizer_render_loyalty_missions() {
             echo '<td><input type="submit" class="button button-primary" name="customiizer_update_mission" value="Enregistrer"> ';
             echo '<a href="'.esc_url($cancel_url).'" class="button">Annuler</a></td>';
             echo '</form></tr>';
+
         } else {
             echo '<tr>';
             echo '<td>'.intval($m['mission_id']).'</td>';

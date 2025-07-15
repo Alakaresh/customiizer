@@ -47,6 +47,7 @@ function customiizer_render_missions_page() {
             ], ['mission_id' => $id], ['%s','%s','%d','%d','%s','%s'], ['%d']);
             wp_redirect(add_query_arg('updated', '1', remove_query_arg('edit')));
             exit;
+
         }
     }
 
@@ -108,6 +109,7 @@ function customiizer_render_missions_page() {
             echo '<td><input type="submit" class="button button-primary" name="customiizer_update_mission" value="Enregistrer"> ';
             echo '<a href="'.esc_url($cancel_url).'" class="button">Annuler</a></td>';
             echo '</form></tr>';
+
         } else {
             echo '<tr>';
             echo '<td>'.intval($m['mission_id']).'</td>';
