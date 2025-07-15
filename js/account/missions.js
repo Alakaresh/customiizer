@@ -129,6 +129,7 @@ function renderMissions(list) {
             const progress = Math.min(m.progress, m.goal);
             const percent = Math.round((progress / m.goal) * 100);
             const completed = m.completed_at && progress >= m.goal;
+            const needsValidation = !m.completed_at && progress >= m.goal;
             const completedText = completed
                 ? `<div class="mission-completed">Terminée le ${formatMissionDate(m.completed_at)}</div>`
                 : '';
@@ -147,6 +148,30 @@ function renderMissions(list) {
                 </div>
                 ${completedText}
             `;
+            if (needsValidation) {
+                const btn = document.createElement('button');
+                btn.className = 'mission-validate';
+                btn.textContent = 'Valider';
+                btn.addEventListener('click', () => {
+                    btn.disabled = true;
+                    fetch(ajaxurl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `action=customiizer_validate_mission&mission_id=${encodeURIComponent(m.mission_id)}`
+                    })
+                        .then(res => res.ok ? res.json() : Promise.reject(res.status))
+                        .then(data => {
+                            if (data.success) {
+                                fetchMissions({ prefetch: true });
+                            } else {
+                                console.error('Validation échouée', data);
+                                btn.disabled = false;
+                            }
+                        })
+                        .catch(() => { btn.disabled = false; });
+                });
+                item.appendChild(btn);
+            }
             listContainer.appendChild(item);
         });
     }

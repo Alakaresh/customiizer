@@ -305,6 +305,19 @@ function customiizer_update_mission_progress_ajax() {
 }
 add_action( 'wp_ajax_customiizer_update_mission_progress', 'customiizer_update_mission_progress_ajax' );
 
+function customiizer_validate_mission_ajax() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'not_logged_in' );
+    }
+    $mission_id = intval( $_POST['mission_id'] ?? 0 );
+    if ( $mission_id <= 0 ) {
+        wp_send_json_error( 'invalid_mission' );
+    }
+    customiizer_complete_mission( get_current_user_id(), $mission_id );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_customiizer_validate_mission', 'customiizer_validate_mission_ajax' );
+
 // -----------------------------------------------------------------------------
 // Automatic mission triggers.
 // -----------------------------------------------------------------------------

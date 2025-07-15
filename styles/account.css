@@ -747,6 +747,21 @@ td.tracking-cell, td.invoice-cell {
         font-family: 'Cinzel', serif;
 }
 
+.mission-validate {
+        display: block;
+        margin: 8px auto 0;
+        padding: 4px 8px;
+        background: #c29a5b;
+        color: #1b1207;
+        border: 2px solid #c29a5b;
+        border-radius: 6px;
+        font-family: 'Cinzel', serif;
+        cursor: pointer;
+}
+.mission-item.completed .mission-validate {
+        display: none;
+}
+
 .mission-category-group {
         margin-bottom: 30px;
 }

@@ -104,6 +104,9 @@ missions state for the current user. The front‑end displays cached missions
 immediately, then compares the stored version against this value to decide
 whether it needs to reload the list. Finished missions include a `completed_at`
 timestamp so the account dashboard can show the completion date.
+Missions that require manual confirmation can be validated through the
+`customiizer_validate_mission` AJAX action. This endpoint marks the mission as
+completed and records the timestamp.
 
 ## Mission triggers
 
