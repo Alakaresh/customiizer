@@ -52,12 +52,16 @@ function customiizer_render_loyalty_missions() {
 
     if (isset($_POST['customiizer_add_mission'])) {
         check_admin_referer('customiizer_add_mission');
+        $category = sanitize_text_field($_POST['category'] ?? '');
+        if ($category === '__other') {
+            $category = sanitize_text_field($_POST['category_custom'] ?? '');
+        }
         $wpdb->insert('WPC_missions', [
             'title'         => sanitize_text_field($_POST['title'] ?? ''),
             'description'   => sanitize_textarea_field($_POST['description'] ?? ''),
             'goal'          => intval($_POST['goal'] ?? 1),
             'points_reward' => intval($_POST['points'] ?? 0),
-            'category'      => sanitize_text_field($_POST['category'] ?? ''),
+            'category'      => $category,
             'trigger_action'=> sanitize_text_field($_POST['trigger_action'] ?? ''),
             'is_active'     => 1
         ], ['%s','%s','%d','%d','%s','%s','%d']);
@@ -68,12 +72,16 @@ function customiizer_render_loyalty_missions() {
         check_admin_referer('customiizer_update_mission');
         $id = intval($_POST['mission_id'] ?? 0);
         if ($id) {
+            $category = sanitize_text_field($_POST['category'] ?? '');
+            if ($category === '__other') {
+                $category = sanitize_text_field($_POST['category_custom'] ?? '');
+            }
             $wpdb->update('WPC_missions', [
                 'title'         => sanitize_text_field($_POST['title'] ?? ''),
                 'description'   => sanitize_textarea_field($_POST['description'] ?? ''),
                 'goal'          => intval($_POST['goal'] ?? 1),
                 'points_reward' => intval($_POST['points'] ?? 0),
-                'category'      => sanitize_text_field($_POST['category'] ?? ''),
+                'category'      => $category,
                 'trigger_action'=> sanitize_text_field($_POST['trigger_action'] ?? '')
             ], ['mission_id' => $id], ['%s','%s','%d','%d','%s','%s'], ['%d']);
             wp_redirect(add_query_arg('updated', '1', remove_query_arg('edit')));
@@ -107,7 +115,14 @@ function customiizer_render_loyalty_missions() {
     foreach ($actions as $value => $label) {
         $action_options .= '<option value="'.esc_attr($value).'">'.esc_html($label).'</option>';
     }
-    echo '<tr><th scope="row">Catégorie</th><td><input type="text" name="category"></td></tr>';
+    $cat_select  = '<select name="category" class="category-select">';
+    $defaults = array('Général','Images','Commandes','Communauté');
+    foreach ($defaults as $cat) {
+        $cat_select .= '<option value="'.esc_attr($cat).'">'.esc_html($cat).'</option>';
+    }
+    $cat_select .= '<option value="__other">Autre…</option></select>';
+    $cat_select .= ' <input type="text" name="category_custom" class="category-custom" style="display:none;" />';
+    echo '<tr><th scope="row">Catégorie</th><td>'.$cat_select.'</td></tr>';
     echo '<tr><th scope="row">Action</th><td><select name="trigger_action">'.$action_options.'</select></td></tr>';
     echo '</table>';
     echo '<p><input type="submit" class="button button-primary" name="customiizer_add_mission" value="Ajouter"></p>';
@@ -125,7 +140,18 @@ function customiizer_render_loyalty_missions() {
             echo '<td><input type="text" name="title" value="'.esc_attr($m['title']).'"></td>';
             echo '<td><input type="number" name="goal" value="'.intval($m['goal']).'" min="1"></td>';
             echo '<td><input type="number" name="points" value="'.intval($m['points_reward']).'" min="0"></td>';
-            echo '<td><input type="text" name="category" value="'.esc_attr($m['category']).'"></td>';
+            $defaults = array('Général','Images','Commandes','Communauté');
+            $category_options = '';
+            foreach ($defaults as $cat) {
+                $sel = ($cat === $m['category']) ? ' selected' : '';
+                $category_options .= '<option value="'.esc_attr($cat).'"'.$sel.'>'.esc_html($cat).'</option>';
+            }
+            $other_selected = in_array($m['category'], $defaults) ? '' : ' selected';
+            $category_field  = '<select name="category" class="category-select">'.$category_options.'<option value="__other"'.$other_selected.'>Autre…</option></select>';
+            $custom_style = $other_selected ? '' : 'style="display:none;"';
+            $custom_value = $other_selected ? esc_attr($m['category']) : '';
+            $category_field .= ' <input type="text" name="category_custom" class="category-custom" '.$custom_style.' value="'.$custom_value.'">';
+            echo '<td>'.$category_field.'</td>';
             $actions = customiizer_get_mission_actions();
             $opts = '';
             foreach ($actions as $v => $l) {
@@ -162,6 +188,25 @@ function customiizer_render_loyalty_missions() {
         }
     }
     echo '</tbody></table>';
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded',function(){
+        function toggleCustom(select){
+            var custom = select.parentNode.querySelector('.category-custom');
+            if(!custom) return;
+            if(select.value === '__other'){
+                custom.style.display='';
+            }else{
+                custom.style.display='none';
+            }
+        }
+        document.querySelectorAll('.category-select').forEach(function(sel){
+            toggleCustom(sel);
+            sel.addEventListener('change', function(){ toggleCustom(sel); });
+        });
+    });
+    </script>
+    <?php
 }
 
 function customiizer_render_loyalty_logs() {
