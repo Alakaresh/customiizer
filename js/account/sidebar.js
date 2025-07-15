@@ -17,19 +17,7 @@ $(document).ready(function() {
 		}
 	}
 
-       // Préchargement des sections pour un affichage plus rapide
-       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions']);
-
-       // Précharger aussi les données utilisateur et la première page de commandes
-       if (typeof loadUserDetails === 'function') {
-               loadUserDetails();
-       }
-       if (typeof fetchUserOrders === 'function') {
-               fetchUserOrders({ prefetch: true });
-       }
-       if (typeof fetchMissions === 'function') {
-               fetchMissions({ prefetch: true });
-       }
+       // Les autres onglets et données seront chargés en arrière-plan
 
         // Attachement des événements aux liens AJAX de manière centralisée
         $(document).on('click', '.ajax-link', function(e) {
@@ -77,6 +65,9 @@ $(document).ready(function() {
                 // Initialisation en chargeant le tableau de bord
                 $('#dashboardLink').trigger('click');
         }
+
+       // Lancement différé du préchargement en arrière-plan
+       setTimeout(startPrefetch, 500);
 });
 
 // Fonctions pour charger le contenu et gérer les états actifs des liens
@@ -161,6 +152,27 @@ function preloadSections(sections) {
                         });
                 }
         });
+}
+
+// Lance le préchargement des sections et des données utilisateur
+let sectionsPrefetched = false;
+function startPrefetch() {
+       if (sectionsPrefetched) return;
+       sectionsPrefetched = true;
+
+       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions']);
+
+       if (typeof loadUserDetails === 'function') {
+               loadUserDetails();
+       }
+
+       if (typeof fetchUserOrders === 'function') {
+               fetchUserOrders({ prefetch: true });
+       }
+
+       if (typeof fetchMissions === 'function') {
+               fetchMissions({ prefetch: true });
+       }
 }
 function verifyAndReloadProfileImage() {
 	const profileImage = document.getElementById('profileImage');
