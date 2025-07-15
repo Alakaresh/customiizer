@@ -557,16 +557,17 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #toast-notification, #password-toast-notification {
-	background-color: #28a745; /* vert par défaut */
-	color: white;
-	padding: 10px 15px;
-	margin-top: 10px;
-	border-radius: 4px;
-	font-size: 14px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	transition: opacity 0.3s ease;
-	opacity: 0;
-	display: block;
+        background-color: #28a745; /* vert par défaut */
+        color: white;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease;
+        opacity: 0;
+        display: block;
 }
 #toast-notification.show, #password-toast-notification.show {
 	opacity: 1;
