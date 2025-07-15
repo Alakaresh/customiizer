@@ -187,16 +187,18 @@ function verifyAndReloadProfileImage() {
 
 		// Vérifie que l'image existe vraiment avant de l'afficher
 		const testImg = new Image();
-		testImg.onload = function () {
-			profileImage.src = finalImageUrl + '?t=' + new Date().getTime();
-			profileImage.style.display = 'block';
-			if (circlePlus) circlePlus.style.display = 'none';
-		};
-		testImg.onerror = function () {
-			console.warn("❌ Aucune image de profil trouvée, affichage annulé.");
-			profileImage.style.display = 'none';
-			if (circlePlus) circlePlus.style.display = 'flex';
-		};
+                testImg.onload = function () {
+                        profileImage.src = finalImageUrl + '?t=' + new Date().getTime();
+                        profileImage.style.display = 'block';
+                        if (circlePlus) circlePlus.style.display = 'none';
+                        checkElement('profileImage', checkImageSrcNotEmpty);
+                };
+                testImg.onerror = function () {
+                        console.warn("❌ Aucune image de profil trouvée, affichage annulé.");
+                        profileImage.style.display = 'none';
+                        if (circlePlus) circlePlus.style.display = 'flex';
+                        checkElement('profileImage', checkImageSrcNotEmpty);
+                };
 		testImg.src = finalImageUrl;
 
 
