@@ -129,7 +129,7 @@ function customiizer_render_loyalty_missions() {
     echo '</form>';
 
     echo '<h2>Missions existantes</h2>';
-    echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Titre</th><th>Objectif</th><th>Points</th><th>Catégorie</th><th>Déclencheur</th><th>Active</th><th>Action</th></tr></thead><tbody>';
+    echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Titre</th><th>Description</th><th>Objectif</th><th>Points</th><th>Catégorie</th><th>Déclencheur</th><th>Active</th><th>Action</th></tr></thead><tbody>';
     foreach ($missions as $m) {
         $is_edit = ($edit_id === intval($m['mission_id']));
         if ($is_edit) {
@@ -138,6 +138,7 @@ function customiizer_render_loyalty_missions() {
             wp_nonce_field('customiizer_update_mission');
             echo '<td>'.intval($m['mission_id']).'<input type="hidden" name="mission_id" value="'.intval($m['mission_id']).'"></td>';
             echo '<td><input type="text" name="title" value="'.esc_attr($m['title']).'"></td>';
+            echo '<td><textarea name="description" rows="3">'.esc_textarea($m['description']).'</textarea></td>';
             echo '<td><input type="number" name="goal" value="'.intval($m['goal']).'" min="1"></td>';
             echo '<td><input type="number" name="points" value="'.intval($m['points_reward']).'" min="0"></td>';
             $defaults = array('Général','Images','Commandes','Communauté');
@@ -169,6 +170,7 @@ function customiizer_render_loyalty_missions() {
             echo '<tr>';
             echo '<td>'.intval($m['mission_id']).'</td>';
             echo '<td>'.esc_html($m['title']).'</td>';
+            echo '<td>'.esc_html($m['description']).'</td>';
             echo '<td>'.intval($m['goal']).'</td>';
             echo '<td>'.intval($m['points_reward']).'</td>';
             echo '<td>'.esc_html($m['category']).'</td>';
