@@ -37,8 +37,15 @@ function customiizer_assign_mission( $user_id, $mission_id ) {
 
 /**
  * Increment progress for all missions triggered by an action.
+ *
+ * The same quantity value is applied to every mission using this trigger,
+ * including missions that may be created later.
+ *
+ * @param string $action   Action identifier.
+ * @param int    $user_id  User ID the missions belong to.
+ * @param int    $quantity Amount of progress to add (defaults to 1).
  */
-function customiizer_process_mission_action( $action, $user_id ) {
+function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) {
     global $wpdb;
     $action   = sanitize_key( $action );
     $user_id  = intval( $user_id );
@@ -51,8 +58,10 @@ function customiizer_process_mission_action( $action, $user_id ) {
         $action
     ) );
 
+    $quantity = intval( $quantity );
+
     foreach ( $mission_ids as $mission_id ) {
-        customiizer_update_mission_progress( $user_id, intval( $mission_id ), 1 );
+        customiizer_update_mission_progress( $user_id, intval( $mission_id ), $quantity );
     }
 }
 
@@ -240,7 +249,7 @@ add_action( 'wp_ajax_customiizer_update_mission_progress', 'customiizer_update_m
 // -----------------------------------------------------------------------------
 
 add_action( 'user_register', function( $user_id ) {
-    customiizer_process_mission_action( 'user_register', $user_id );
+    customiizer_process_mission_action( 'user_register', $user_id, 1 );
 } );
 
 add_action( 'woocommerce_order_status_completed', function( $order_id ) {
@@ -250,7 +259,7 @@ add_action( 'woocommerce_order_status_completed', function( $order_id ) {
     }
     $user_id = $order->get_user_id();
     if ( $user_id ) {
-        customiizer_process_mission_action( 'order_completed', $user_id );
+        customiizer_process_mission_action( 'order_completed', $user_id, 1 );
     }
 } );
 
