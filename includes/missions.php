@@ -193,8 +193,10 @@ function customiizer_complete_mission( $user_id, $mission_id ) {
     if ( $user_id <= 0 || $mission_id <= 0 ) {
         return false;
     }
+    $goal = intval( $wpdb->get_var( $wpdb->prepare( "SELECT goal FROM WPC_missions WHERE mission_id=%d", $mission_id ) ) );
     $wpdb->query( $wpdb->prepare(
-        "UPDATE WPC_user_missions SET completed_at = NOW(), progress = goal WHERE user_id=%d AND mission_id=%d AND completed_at IS NULL",
+        "UPDATE WPC_user_missions SET completed_at = NOW(), progress = %d WHERE user_id=%d AND mission_id=%d AND completed_at IS NULL",
+        $goal,
         $user_id,
         $mission_id
     ) );
