@@ -197,7 +197,7 @@ function showMissionToast(mission) {
     toast.classList.add('show');
     setTimeout(() => {
         toast.classList.remove('show');
-    }, 3000);
+    }, 6000);
 }
 
 // L'appel est déclenché par sidebar.js après le chargement de la section
