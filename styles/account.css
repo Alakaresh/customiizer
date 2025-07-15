@@ -800,7 +800,7 @@ td.tracking-cell, td.invoice-cell {
 #mission-achievement {
         position: fixed;
         bottom: 20px;
-        left: 20px;
+        right: 20px;
         background: rgba(16, 124, 16, 0.95);
         color: #fff;
         padding: 10px 15px;
