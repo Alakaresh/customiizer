@@ -54,7 +54,7 @@ async function fetchMissions(options = {}) {
                 if (!prefetch) {
                     const newlyCompleted = list.filter(m => m.completed_at && !shown.includes(m.mission_id));
                     newlyCompleted.forEach(m => {
-                        showMissionToast(`Mission accomplie : ${m.title}`);
+                        showMissionToast(m);
                         shown.push(m.mission_id);
                     });
                     if (newlyCompleted.length) {
@@ -171,14 +171,29 @@ function renderMissions(list) {
     renderCategory(currentCategory);
 }
 
-function showMissionToast(message) {
+function showMissionToast(mission) {
     let toast = document.getElementById('mission-achievement');
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'mission-achievement';
+        toast.innerHTML = `
+            <img class="mission-icon" alt="Logo">
+            <div class="mission-info">
+                <div class="mission-title"></div>
+                <div class="mission-details"></div>
+            </div>`;
         document.body.appendChild(toast);
     }
-    toast.textContent = message;
+
+    const logo = toast.querySelector('.mission-icon');
+    if (logo) {
+        logo.src = baseUrl + '/wp-content/themes/customiizer/assets/img/logo.png';
+    }
+    const titleEl = toast.querySelector('.mission-title');
+    const detailsEl = toast.querySelector('.mission-details');
+    if (titleEl) titleEl.textContent = 'Mission achevée';
+    if (detailsEl) detailsEl.textContent = `+${mission.points_reward} pts - ${mission.title}`;
+
     toast.classList.add('show');
     setTimeout(() => {
         toast.classList.remove('show');

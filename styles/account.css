@@ -804,14 +804,16 @@ td.tracking-cell, td.invoice-cell {
         background: rgba(16, 124, 16, 0.95);
         color: #fff;
         padding: 10px 15px;
-        border-radius: 4px;
+        border-radius: 8px;
         font-family: 'Segoe UI', sans-serif;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         display: none;
         z-index: 1000;
+        align-items: center;
+        gap: 10px;
 }
 #mission-achievement.show {
-        display: block;
+        display: flex;
         animation: missionSlideIn 0.3s ease-out, missionFadeOut 0.3s ease-in 2.7s forwards;
 }
 @keyframes missionSlideIn {
@@ -820,4 +822,19 @@ td.tracking-cell, td.invoice-cell {
 }
 @keyframes missionFadeOut {
         to { opacity: 0; }
+}
+
+#mission-achievement .mission-icon {
+        width: 30px;
+        height: 30px;
+}
+
+#mission-achievement .mission-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+}
+
+#mission-achievement .mission-title {
+        font-weight: bold;
 }
