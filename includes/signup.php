@@ -100,6 +100,9 @@ function user_signup() {
                 if (function_exists('customiizer_add_loyalty_points')) {
                         customiizer_add_loyalty_points($referrer_id, 100, 'referral', 'Nouveau filleul');
                 }
+                if (function_exists('customiizer_process_mission_action')) {
+                        customiizer_process_mission_action('referral', $referrer_id, 1);
+                }
         }
 
 	// Connexion automatique après inscription
