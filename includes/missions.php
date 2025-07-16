@@ -94,6 +94,23 @@ function customiizer_ensure_mission_action_column() {
 add_action( 'after_setup_theme', 'customiizer_ensure_mission_action_column' );
 
 /**
+ * Ensure DB schema includes reward columns.
+ */
+function customiizer_ensure_mission_reward_columns() {
+    global $wpdb;
+    $table = 'WPC_missions';
+    $col = $wpdb->get_col( $wpdb->prepare( "SHOW COLUMNS FROM {$table} LIKE %s", 'reward_amount' ) );
+    if ( empty( $col ) ) {
+        $wpdb->query( "ALTER TABLE {$table} ADD reward_amount INT UNSIGNED NOT NULL DEFAULT 0" );
+    }
+    $col = $wpdb->get_col( $wpdb->prepare( "SHOW COLUMNS FROM {$table} LIKE %s", 'reward_type' ) );
+    if ( empty( $col ) ) {
+        $wpdb->query( "ALTER TABLE {$table} ADD reward_type VARCHAR(16) NOT NULL DEFAULT 'points'" );
+    }
+}
+add_action( 'after_setup_theme', 'customiizer_ensure_mission_reward_columns' );
+
+/**
  * Ensure DB schema for action totals table.
  */
 function customiizer_ensure_action_totals_table() {
@@ -132,7 +149,7 @@ function customiizer_get_missions( $user_id = 0 ) {
     }
 
     $sql = $wpdb->prepare(
-        "SELECT m.mission_id, m.title, m.description, m.goal, m.points_reward, m.category, m.trigger_action,
+        "SELECT m.mission_id, m.title, m.description, m.goal, m.reward_amount, m.reward_type, m.category, m.trigger_action,
                 um.progress AS user_progress, {$select_totals}, um.completed_at
          FROM WPC_missions m
          LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d" .
@@ -213,11 +230,19 @@ function customiizer_reward_mission( $user_id, $mission_id ) {
     if ( $user_id <= 0 || $mission_id <= 0 ) {
         return;
     }
-    $mission = $wpdb->get_row( $wpdb->prepare( "SELECT title, points_reward, category FROM WPC_missions WHERE mission_id=%d", $mission_id ), ARRAY_A );
+    $mission = $wpdb->get_row( $wpdb->prepare( "SELECT title, reward_amount, reward_type, category FROM WPC_missions WHERE mission_id=%d", $mission_id ), ARRAY_A );
     if ( ! $mission ) {
         return;
     }
-    customiizer_add_loyalty_points( $user_id, intval( $mission['points_reward'] ), 'mission', $mission['title'] );
+    $amount = intval( $mission['reward_amount'] );
+    $type   = $mission['reward_type'];
+    if ( $amount > 0 ) {
+        if ( $type === 'credits' && function_exists( 'customiizer_add_image_credits' ) ) {
+            customiizer_add_image_credits( $user_id, $amount );
+        } else {
+            customiizer_add_loyalty_points( $user_id, $amount, 'mission', $mission['title'] );
+        }
+    }
 }
 
 /**
@@ -235,10 +260,10 @@ function customiizer_get_total_mission_points( $user_id = 0 ) {
 
     // Primary method: sum rewards of completed missions
     $sql = $wpdb->prepare(
-        "SELECT COALESCE(SUM(m.points_reward),0)
+        "SELECT COALESCE(SUM(m.reward_amount),0)
            FROM WPC_user_missions um
            INNER JOIN WPC_missions m ON um.mission_id = m.mission_id
-          WHERE um.user_id = %d AND um.completed_at IS NOT NULL",
+          WHERE um.user_id = %d AND um.completed_at IS NOT NULL AND m.reward_type = 'points'",
         $user_id
     );
     $points = intval( $wpdb->get_var( $sql ) );

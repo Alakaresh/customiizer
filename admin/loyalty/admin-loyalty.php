@@ -57,14 +57,15 @@ function customiizer_render_loyalty_missions() {
             $category = sanitize_text_field($_POST['category_custom'] ?? '');
         }
         $wpdb->insert('WPC_missions', [
-            'title'         => sanitize_text_field($_POST['title'] ?? ''),
-            'description'   => sanitize_textarea_field($_POST['description'] ?? ''),
-            'goal'          => intval($_POST['goal'] ?? 1),
-            'points_reward' => intval($_POST['points'] ?? 0),
-            'category'      => $category,
-            'trigger_action'=> sanitize_text_field($_POST['trigger_action'] ?? ''),
-            'is_active'     => 1
-        ], ['%s','%s','%d','%d','%s','%s','%d']);
+            'title'          => sanitize_text_field($_POST['title'] ?? ''),
+            'description'    => sanitize_textarea_field($_POST['description'] ?? ''),
+            'goal'           => intval($_POST['goal'] ?? 1),
+            'reward_amount'  => intval($_POST['reward_amount'] ?? 0),
+            'reward_type'    => sanitize_text_field($_POST['reward_type'] ?? 'points'),
+            'category'       => $category,
+            'trigger_action' => sanitize_text_field($_POST['trigger_action'] ?? ''),
+            'is_active'      => 1
+        ], ['%s','%s','%d','%d','%s','%s','%s','%d']);
         echo '<div class="updated notice"><p>Mission créée.</p></div>';
     }
 
@@ -77,13 +78,14 @@ function customiizer_render_loyalty_missions() {
                 $category = sanitize_text_field($_POST['category_custom'] ?? '');
             }
             $wpdb->update('WPC_missions', [
-                'title'         => sanitize_text_field($_POST['title'] ?? ''),
-                'description'   => sanitize_textarea_field($_POST['description'] ?? ''),
-                'goal'          => intval($_POST['goal'] ?? 1),
-                'points_reward' => intval($_POST['points'] ?? 0),
-                'category'      => $category,
-                'trigger_action'=> sanitize_text_field($_POST['trigger_action'] ?? '')
-            ], ['mission_id' => $id], ['%s','%s','%d','%d','%s','%s'], ['%d']);
+                'title'          => sanitize_text_field($_POST['title'] ?? ''),
+                'description'    => sanitize_textarea_field($_POST['description'] ?? ''),
+                'goal'           => intval($_POST['goal'] ?? 1),
+                'reward_amount'  => intval($_POST['reward_amount'] ?? 0),
+                'reward_type'    => sanitize_text_field($_POST['reward_type'] ?? 'points'),
+                'category'       => $category,
+                'trigger_action' => sanitize_text_field($_POST['trigger_action'] ?? '')
+            ], ['mission_id' => $id], ['%s','%s','%d','%d','%s','%s','%s'], ['%d']);
             wp_redirect(add_query_arg('updated', '1', remove_query_arg('edit')));
             exit;
         }
@@ -109,7 +111,12 @@ function customiizer_render_loyalty_missions() {
     echo '<tr><th scope="row">Titre</th><td><input type="text" name="title" required></td></tr>';
     echo '<tr><th scope="row">Description</th><td><textarea name="description" rows="3"></textarea></td></tr>';
     echo '<tr><th scope="row">Objectif</th><td><input type="number" name="goal" value="1" min="1"></td></tr>';
-    echo '<tr><th scope="row">Points</th><td><input type="number" name="points" value="0" min="0"></td></tr>';
+    $reward_input  = '<input type="number" name="reward_amount" value="0" min="0"> ';
+    $reward_input .= '<select name="reward_type">';
+    $reward_input .= '<option value="points">Points</option>';
+    $reward_input .= '<option value="credits">Crédits</option>';
+    $reward_input .= '</select>';
+    echo '<tr><th scope="row">Récompense</th><td>'.$reward_input.'</td></tr>';
     $actions = customiizer_get_mission_actions();
     $action_options = '';
     foreach ($actions as $value => $label) {
@@ -129,7 +136,7 @@ function customiizer_render_loyalty_missions() {
     echo '</form>';
 
     echo '<h2>Missions existantes</h2>';
-    echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Titre</th><th>Description</th><th>Objectif</th><th>Points</th><th>Catégorie</th><th>Déclencheur</th><th>Active</th><th>Action</th></tr></thead><tbody>';
+    echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Titre</th><th>Description</th><th>Objectif</th><th>Récompense</th><th>Catégorie</th><th>Déclencheur</th><th>Active</th><th>Action</th></tr></thead><tbody>';
     foreach ($missions as $m) {
         $is_edit = ($edit_id === intval($m['mission_id']));
         if ($is_edit) {
@@ -140,7 +147,12 @@ function customiizer_render_loyalty_missions() {
             echo '<td><input type="text" name="title" value="'.esc_attr($m['title']).'"></td>';
             echo '<td><textarea name="description" rows="3">'.esc_textarea($m['description']).'</textarea></td>';
             echo '<td><input type="number" name="goal" value="'.intval($m['goal']).'" min="1"></td>';
-            echo '<td><input type="number" name="points" value="'.intval($m['points_reward']).'" min="0"></td>';
+            $rewardField  = '<input type="number" name="reward_amount" value="'.intval($m['reward_amount']).'" min="0"> ';
+            $rewardField .= '<select name="reward_type">';
+            $rewardField .= '<option value="points"'.($m['reward_type']==='points'?' selected':'').'>Points</option>';
+            $rewardField .= '<option value="credits"'.($m['reward_type']==='credits'?' selected':'').'>Crédits</option>';
+            $rewardField .= '</select>';
+            echo '<td>'.$rewardField.'</td>';
             $defaults = array('Général','Images','Commandes','Communauté');
             $category_options = '';
             foreach ($defaults as $cat) {
@@ -172,7 +184,7 @@ function customiizer_render_loyalty_missions() {
             echo '<td>'.esc_html($m['title']).'</td>';
             echo '<td>'.esc_html($m['description']).'</td>';
             echo '<td>'.intval($m['goal']).'</td>';
-            echo '<td>'.intval($m['points_reward']).'</td>';
+            echo '<td>'.intval($m['reward_amount']).' '.($m['reward_type']==='credits'?'cr':'pts').'</td>';
             echo '<td>'.esc_html($m['category']).'</td>';
             echo '<td>'.esc_html($m['trigger_action']).'</td>';
             echo '<td>'.($m['is_active'] ? 'Oui' : 'Non').'</td>';
