@@ -417,6 +417,19 @@ const CanvasManager = {
                         canvas.setActiveObject(activeObj);
                 }
                 canvas.requestRenderAll();
+
+                const wrapper = document.getElementById('productCanvasWrapper');
+                if (wrapper && wrapper.classList.contains('rotate-90')) {
+                        const rotated = document.createElement('canvas');
+                        rotated.width = outputCanvas.height;
+                        rotated.height = outputCanvas.width;
+                        const rCtx = rotated.getContext('2d');
+                        rCtx.translate(rotated.width / 2, rotated.height / 2);
+                        rCtx.rotate(Math.PI / 2);
+                        rCtx.drawImage(outputCanvas, -outputCanvas.width / 2, -outputCanvas.height / 2);
+                        return rotated.toDataURL('image/png');
+                }
+
                 return outputCanvas.toDataURL('image/png');
         },
 
@@ -459,15 +472,21 @@ const CanvasManager = {
 		canvas.setHeight(canvasH);
 
 		// ✅ wrapper dimensions réelles
-		const wrapper = document.getElementById("productCanvasWrapper");
-		if (wrapper) {
-			wrapper.style.width = `${canvasW}px`;
-			wrapper.style.height = `${canvasH}px`;
-			wrapper.style.margin = "0 auto";
-			wrapper.style.display = "flex";
-			wrapper.style.justifyContent = "center";
-			wrapper.style.alignItems = "center";
-		}
+                const wrapper = document.getElementById("productCanvasWrapper");
+                if (wrapper) {
+                        let w = canvasW;
+                        let h = canvasH;
+                        if (wrapper.classList.contains('rotate-90')) {
+                                w = canvasH;
+                                h = canvasW;
+                        }
+                        wrapper.style.width = `${w}px`;
+                        wrapper.style.height = `${h}px`;
+                        wrapper.style.margin = "0 auto";
+                        wrapper.style.display = "flex";
+                        wrapper.style.justifyContent = "center";
+                        wrapper.style.alignItems = "center";
+                }
 
 		canvas.renderAll();
 	}
