@@ -152,10 +152,14 @@ function renderMissions(list) {
 
             const item = document.createElement('div');
             item.className = 'mission-item' + (completed ? ' completed' : '');
+            const rewards = [];
+            if (m.reward_amount > 0) {
+                rewards.push(`+${m.reward_amount} ${m.reward_type === 'credits' ? 'cr' : 'pts'}`);
+            }
             item.innerHTML = `
                 <div class="mission-header">
                     <h4>${m.title}</h4>
-                    <span class="points">+${m.points_reward} pts</span>
+                    <span class="points">${rewards.join(' ')}</span>
                 </div>
                 <p>${m.description || ''}</p>
                 <div class="progress-wrapper">
@@ -192,7 +196,13 @@ function showMissionToast(mission) {
     const titleEl = toast.querySelector('.mission-title');
     const detailsEl = toast.querySelector('.mission-details');
     if (titleEl) titleEl.textContent = 'Mission achevée';
-    if (detailsEl) detailsEl.textContent = `+${mission.points_reward} pts - ${mission.title}`;
+    if (detailsEl) {
+        const rewards = [];
+        if (mission.reward_amount > 0) {
+            rewards.push(`+${mission.reward_amount} ${mission.reward_type === 'credits' ? 'cr' : 'pts'}`);
+        }
+        detailsEl.textContent = `${rewards.join(' ')} - ${mission.title}`;
+    }
 
     toast.classList.add('show');
     setTimeout(() => {

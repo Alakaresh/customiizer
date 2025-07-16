@@ -180,7 +180,8 @@ CREATE TABLE WPC_missions (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     goal INT UNSIGNED NOT NULL DEFAULT 1,
-    points_reward INT UNSIGNED NOT NULL DEFAULT 0,
+    reward_amount INT UNSIGNED NOT NULL DEFAULT 0,
+    reward_type VARCHAR(16) NOT NULL DEFAULT 'points',
     category VARCHAR(255) DEFAULT '',
     trigger_action VARCHAR(64) DEFAULT '',
     is_active TINYINT(1) NOT NULL DEFAULT 1,
@@ -202,4 +203,9 @@ CREATE TABLE WPC_user_action_totals (
     PRIMARY KEY (user_id, action)
 );
 ```
+
+`reward_amount` holds the quantity given when a mission is completed. The
+`reward_type` column defines if this reward grants loyalty points (`points`) or
+image credits (`credits`). Points use `customiizer_add_loyalty_points()` while
+credits use `customiizer_add_image_credits()`.
 
