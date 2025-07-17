@@ -94,29 +94,34 @@ const CanvasManager = {
 
        addImage: function (url, callback) {
                fabric.Image.fromURL(url, function (img) {
-			const drawX = template.print_area_left;
-			const drawY = template.print_area_top;
+                       const drawX = template.print_area_left;
+                       const drawY = template.print_area_top;
 
 			const scale = Math.min(
 				template.print_area_width / img.width,
 				template.print_area_height / img.height
 			);
 
-			img.set({
-				left: drawX,
-				top: drawY,
-				scaleX: scale,
-				scaleY: scale,
-				originX: 'left',
-				originY: 'top',
-                                selectable: true,
-                                hasControls: true,
-                                lockRotation: false,
-                                lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
-                                hasRotatingPoint: true,
-				//borderColor: 'green',
-				//cornerColor: 'blue'
-			});
+                       img.set({
+                               left: drawX,
+                               top: drawY,
+                               scaleX: scale,
+                               scaleY: scale,
+                               originX: 'left',
+                               originY: 'top',
+                               selectable: true,
+                               hasControls: true,
+                               lockRotation: false,
+                               lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
+                               hasRotatingPoint: true,
+                               //borderColor: 'green',
+                               //cornerColor: 'blue'
+                       });
+
+                       const wrapper = document.getElementById('productCanvasWrapper');
+                       if (wrapper && wrapper.classList.contains('rotate-90')) {
+                               img.rotate(90);
+                       }
 
 			img.setControlsVisibility({
 				tl: true,  // coin haut gauche
