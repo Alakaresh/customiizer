@@ -210,4 +210,6 @@ function showMissionToast(mission) {
     }, 6000);
 }
 
+window.showMissionToast = window.showMissionToast || showMissionToast;
+
 // L'appel est déclenché par sidebar.js après le chargement de la section

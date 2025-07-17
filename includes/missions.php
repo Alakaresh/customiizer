@@ -3,6 +3,20 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Keep track of missions completed during the current request.
+$customiizer_completed_missions = [];
+
+/**
+ * Get and reset the list of missions completed during the current request.
+ *
+ * @return array[] Array of mission rows.
+ */
+function customiizer_pop_completed_missions() {
+    $missions = $GLOBALS['customiizer_completed_missions'] ?? [];
+    $GLOBALS['customiizer_completed_missions'] = [];
+    return $missions;
+}
+
 /**
  * Missions management functions.
  */
@@ -48,7 +62,8 @@ function customiizer_assign_mission( $user_id, $mission_id ) {
  * @param int    $quantity Amount of progress to add (defaults to 1).
  */
 function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) {
-    global $wpdb;
+    global $wpdb, $customiizer_completed_missions;
+    $customiizer_completed_missions = [];
     $action   = sanitize_key( $action );
     $user_id  = intval( $user_id );
     if ( ! $action || $user_id <= 0 ) {
@@ -78,6 +93,8 @@ function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) 
     foreach ( $mission_ids as $mission_id ) {
         customiizer_update_mission_progress( $user_id, intval( $mission_id ), $quantity );
     }
+
+    return customiizer_pop_completed_missions();
 }
 
 /**
@@ -206,7 +223,7 @@ function customiizer_update_mission_progress( $user_id, $mission_id, $quantity =
 }
 
 function customiizer_complete_mission( $user_id, $mission_id ) {
-    global $wpdb;
+    global $wpdb, $customiizer_completed_missions;
     $user_id    = intval( $user_id );
     $mission_id = intval( $mission_id );
     if ( $user_id <= 0 || $mission_id <= 0 ) {
@@ -219,7 +236,14 @@ function customiizer_complete_mission( $user_id, $mission_id ) {
         $user_id,
         $mission_id
     ) );
+    $mission = $wpdb->get_row( $wpdb->prepare(
+        "SELECT mission_id, title, reward_amount, reward_type, category FROM WPC_missions WHERE mission_id=%d",
+        $mission_id
+    ), ARRAY_A );
     customiizer_reward_mission( $user_id, $mission_id );
+    if ( $mission ) {
+        $customiizer_completed_missions[] = $mission;
+    }
     return true;
 }
 
@@ -333,6 +357,21 @@ function customiizer_update_mission_progress_ajax() {
     wp_send_json_success();
 }
 add_action( 'wp_ajax_customiizer_update_mission_progress', 'customiizer_update_mission_progress_ajax' );
+
+function customiizer_process_mission_action_ajax() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'not_logged_in' );
+    }
+    $action = sanitize_key( $_POST['mission_action'] ?? '' );
+    $qty    = intval( $_POST['quantity'] ?? 1 );
+    if ( ! $action ) {
+        wp_send_json_error( 'no_action' );
+    }
+
+    $completed = customiizer_process_mission_action( $action, get_current_user_id(), $qty );
+    wp_send_json_success( [ 'missions' => $completed ] );
+}
+add_action( 'wp_ajax_customiizer_process_mission_action', 'customiizer_process_mission_action_ajax' );
 
 // -----------------------------------------------------------------------------
 // Automatic mission triggers.
