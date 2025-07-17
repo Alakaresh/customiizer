@@ -23,6 +23,19 @@ function displayGeneratedImages(images) {
 let currentRatio = '';
 let filterFavorites = false;
 
+function applyCanvasRotationIfNeeded() {
+        const wrapper = document.getElementById('productCanvasWrapper');
+        const container3D = document.getElementById('product3DContainer');
+        const pid = parseInt(window.currentProductId);
+        const rotate = [1, 366].includes(pid);
+        if (wrapper) {
+                wrapper.classList.toggle('rotate-canvas', rotate);
+        }
+        if (container3D) {
+                container3D.classList.toggle('rotate-canvas', rotate);
+        }
+}
+
 function filterAndDisplayImages(images) {
         let filtered = images;
         if (currentRatio) {
@@ -264,8 +277,9 @@ jQuery(document).ready(function ($) {
                                template = data.template;
                                window.customizerCache.templates[variant.variant_id] = template;
                        }
-                       CanvasManager.init(template, 'product2DContainer');
-                       updateAddImageButtonVisibility();
+                      CanvasManager.init(template, 'product2DContainer');
+                      applyCanvasRotationIfNeeded();
+                      updateAddImageButtonVisibility();
                        if (variant.url_3d) {
                                $('#product3DContainer').show();
                                init3DScene('product3DContainer', variant.url_3d, variant.color);
@@ -330,6 +344,7 @@ jQuery(document).ready(function ($) {
 
                         // 2. Lancer Fabric.js dans le container
                         CanvasManager.init(template, 'product2DContainer');
+                        applyCanvasRotationIfNeeded();
                         updateAddImageButtonVisibility();
 
                         // 3. Lancer Three.js si disponible

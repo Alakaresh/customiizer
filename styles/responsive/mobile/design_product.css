@@ -81,4 +81,9 @@
     #customizeModal .image-controls button {
         width: calc(100% / 6 - 10px);
     }
+
+    .rotate-canvas {
+        transform: rotate(-90deg);
+        transform-origin: center center;
+    }
 }
