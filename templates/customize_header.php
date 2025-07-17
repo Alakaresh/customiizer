@@ -61,9 +61,9 @@ $display_name = $current_user->display_name;
 				<div class="account-icons-container">
 
 					<?php if ($user_logged_in): ?>
-					<div class="image-credits-container">
-						<i class="fas fa-coins"></i> Crédits: <span class="image-credits-count">Chargement...</span>
-					</div>
+                                        <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
+                                                <i class="fas fa-coins"></i> Crédits: <span class="image-credits-count">Chargement...</span>
+                                        </div>
 					<?php endif; ?>
 
 					<?php if (class_exists('WooCommerce')): ?>
