@@ -50,6 +50,35 @@ function initProfileForm() {
                                         updateUsernameProgress(displayName);
                                 }
 
+                                // Met à jour le cache USER_DETAILS
+                                try {
+                                        const detailsStr = sessionStorage.getItem('USER_DETAILS');
+                                        const details = detailsStr ? JSON.parse(detailsStr) : {};
+                                        details.display_name = displayName;
+                                        sessionStorage.setItem('USER_DETAILS', JSON.stringify(details));
+                                } catch (e) {
+                                        console.warn('Impossible de mettre à jour USER_DETAILS', e);
+                                }
+
+                                // Met à jour le cache USER_ESSENTIALS si l'ID correspond
+                                try {
+                                        const essentialsStr = sessionStorage.getItem('USER_ESSENTIALS');
+                                        if (essentialsStr) {
+                                                const essentials = JSON.parse(essentialsStr);
+                                                if (essentials.user_id === (window.currentUser ? currentUser.ID : null)) {
+                                                        essentials.display_name = displayName;
+                                                        sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(essentials));
+                                                }
+                                        }
+                                } catch (e) {
+                                        console.warn('Impossible de mettre à jour USER_ESSENTIALS', e);
+                                }
+
+                                // Actualise la variable globale
+                                if (window.currentUser) {
+                                        currentUser.display_name = displayName;
+                                }
+
 			} else {
 				showToast("toast-notification", "❌ Ce nom d’utilisateur est déjà utilisé.", false);
 			}
