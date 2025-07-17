@@ -121,6 +121,7 @@ const CanvasManager = {
                        const wrapper = document.getElementById('productCanvasWrapper');
                        if (wrapper && wrapper.classList.contains('rotate-90')) {
                                img.rotate(-90);
+
                        }
 
 			img.setControlsVisibility({
@@ -431,6 +432,7 @@ const CanvasManager = {
                         const rCtx = rotated.getContext('2d');
                         rCtx.translate(rotated.width / 2, rotated.height / 2);
                         rCtx.rotate(-Math.PI / 2);
+
                         rCtx.drawImage(outputCanvas, -outputCanvas.width / 2, -outputCanvas.height / 2);
                         return rotated.toDataURL('image/png');
                 }
