@@ -39,3 +39,43 @@ a:hover {
 .woocommerce img, .woocommerce-page img {
     max-width: 200px;
 }
+
+#mission-achievement {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(#3b2d1f, #27190b);
+    color: #f3e2c7;
+    padding: 10px 15px;
+    border: 2px solid #c29a5b;
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 1000;
+    align-items: center;
+    gap: 10px;
+}
+#mission-achievement.show {
+    display: flex;
+    animation: missionSlideIn 0.3s ease-out, missionFadeOut 0.3s ease-in 2.7s forwards;
+}
+@keyframes missionSlideIn {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes missionFadeOut {
+    to { opacity: 0; }
+}
+#mission-achievement .mission-icon {
+    width: 30px;
+    height: 30px;
+}
+#mission-achievement .mission-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+#mission-achievement .mission-title {
+    font-weight: bold;
+}
