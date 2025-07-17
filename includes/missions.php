@@ -55,6 +55,10 @@ function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) 
         return;
     }
 
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'mission', "process_mission_action {$action} for user_id={$user_id} qty={$quantity}" );
+    }
+
     // Make sure the totals table exists before updating it
     customiizer_ensure_action_totals_table();
 
@@ -183,6 +187,9 @@ function customiizer_update_mission_progress( $user_id, $mission_id, $quantity =
     if ( $user_id <= 0 || $mission_id <= 0 || $quantity <= 0 ) {
         return false;
     }
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'mission', "update_progress mission_id={$mission_id} user_id={$user_id} qty={$quantity}" );
+    }
     $wpdb->query( $wpdb->prepare(
         "INSERT INTO WPC_user_missions (user_id, mission_id, progress)
          VALUES (%d, %d, %d)
@@ -211,6 +218,9 @@ function customiizer_complete_mission( $user_id, $mission_id ) {
     $mission_id = intval( $mission_id );
     if ( $user_id <= 0 || $mission_id <= 0 ) {
         return false;
+    }
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'mission', "complete_mission mission_id={$mission_id} user_id={$user_id}" );
     }
     $goal = intval( $wpdb->get_var( $wpdb->prepare( "SELECT goal FROM WPC_missions WHERE mission_id=%d", $mission_id ) ) );
     $wpdb->query( $wpdb->prepare(
@@ -339,6 +349,9 @@ add_action( 'wp_ajax_customiizer_update_mission_progress', 'customiizer_update_m
 // -----------------------------------------------------------------------------
 
 add_action( 'user_register', function( $user_id ) {
+    if ( function_exists( 'customiizer_log' ) ) {
+        customiizer_log( 'mission', "user_register hook for user_id={$user_id}" );
+    }
     customiizer_process_mission_action( 'user_register', $user_id, 1 );
 } );
 
