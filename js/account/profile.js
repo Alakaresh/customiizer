@@ -36,16 +36,19 @@ function initProfileForm() {
 			.then(res => res.json())
 			.then(data => {
 			console.log("🧾 Réponse serveur :", data);
-			if (data.success) {
-				showToast("toast-notification", "✅ Profil mis à jour avec succès.");
-				const nicknameSpan = document.getElementById('nickname');
-				if (nicknameSpan) {
-					nicknameSpan.textContent = displayName;
-				}
-				const modalName = document.querySelector('#userModal .user-name');
-				if (modalName) {
-					modalName.textContent = displayName;
-				}
+                        if (data.success) {
+                                showToast("toast-notification", "✅ Profil mis à jour avec succès.");
+                                const nicknameSpan = document.getElementById('nickname');
+                                if (nicknameSpan) {
+                                        nicknameSpan.textContent = displayName;
+                                }
+                                const modalName = document.querySelector('#userModal .user-name');
+                                if (modalName) {
+                                        modalName.textContent = displayName;
+                                }
+                                if (typeof updateUsernameProgress === 'function') {
+                                        updateUsernameProgress(displayName);
+                                }
 
 			} else {
 				showToast("toast-notification", "❌ Ce nom d’utilisateur est déjà utilisé.", false);
