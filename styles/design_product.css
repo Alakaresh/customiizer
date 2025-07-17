@@ -195,6 +195,11 @@
   display: block;
 }
 
+.rotate-canvas {
+  transform: rotate(-90deg);
+  transform-origin: center center;
+}
+
 
 .fabric-wrapper {
         /* background-color: rgba(255, 0, 0, 0.05); */ /* rouge léger */
