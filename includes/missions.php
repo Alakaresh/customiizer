@@ -353,14 +353,13 @@ add_action( 'user_register', function( $user_id ) {
         customiizer_log( 'mission', "user_register hook for user_id={$user_id} scheduling delayed mission" );
     }
     if ( ! wp_next_scheduled( 'customiizer_delayed_user_register_mission', array( $user_id ) ) ) {
-        wp_schedule_single_event( time() + 5, 'customiizer_delayed_user_register_mission', array( $user_id ) );
+        wp_schedule_single_event( time() + 1, 'customiizer_delayed_user_register_mission', array( $user_id ) );
     }
 } );
 
 add_action( 'customiizer_delayed_user_register_mission', function( $user_id ) {
     if ( function_exists( 'customiizer_log' ) ) {
         customiizer_log( 'mission', "running delayed mission for user_id={$user_id}" );
-
     }
     customiizer_process_mission_action( 'user_register', $user_id, 1 );
 } );
