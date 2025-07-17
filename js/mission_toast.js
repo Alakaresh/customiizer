@@ -70,5 +70,6 @@
     }
 
     window.customiizerCheckMissionToasts = checkMissions;
+
     window.addEventListener('load', checkMissions);
 })();

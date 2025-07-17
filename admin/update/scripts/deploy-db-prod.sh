@@ -49,7 +49,7 @@ for table in "${TABLES[@]}"; do
   echo "📤 INSERT : $table"
   mysqldump -u "$DEV_USER" -p"$DEV_PASS" "$DEV_DB" "$table" \
     --no-create-info --skip-triggers --complete-insert \
-    --skip-add-locks --skip-disable-keys --skip-set-charset \
+    --skip-add-locks --skip-disable-keys --default-character-set=utf8mb4 \
     >> "$TMP_SQL"
 done
 
@@ -58,7 +58,7 @@ echo "SET FOREIGN_KEY_CHECKS=1;" >> "$TMP_SQL"
 
 # 🚀 Exécution sur PROD
 echo "📥 Import final dans PROD..."
-mysql -h "$PROD_HOST" -u "$PROD_USER" -p"$PROD_PASS" "$PROD_DB" < "$TMP_SQL"
+mysql --default-character-set=utf8mb4 -h "$PROD_HOST" -u "$PROD_USER" -p"$PROD_PASS" "$PROD_DB" < "$TMP_SQL"
 
 if [ $? -eq 0 ]; then
   echo "✅ Tables supprimées et recréées avec succès dans PROD."
