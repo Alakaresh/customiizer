@@ -98,7 +98,8 @@ function user_signup() {
                 );
 
                 if (function_exists('customiizer_add_loyalty_points')) {
-                        customiizer_add_loyalty_points($referrer_id, 100, 'referral', 'Nouveau filleul');
+                customiizer_add_loyalty_points($referrer_id, 500, 'referral', 'Nouveau filleul');
+                customiizer_add_loyalty_points($user_id, 500, 'referral', 'Inscription parrainée');
                 }
                 if (function_exists('customiizer_process_mission_action')) {
                         customiizer_process_mission_action('referral', $referrer_id, 1);
