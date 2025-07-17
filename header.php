@@ -94,11 +94,7 @@ $display_name = $current_user->display_name;
 
 					<?php if ($user_logged_in): ?>
 					<?php
-					$base_url = get_site_url();
-					$custom_image_path = "/wp-sauvegarde/user/$user_id/user_logo.png";
-					$custom_image_full_path = $_SERVER['DOCUMENT_ROOT'] . $custom_image_path;
-					$custom_image_url = $base_url . $custom_image_path;
-					$profile_image_url = file_exists($custom_image_full_path) ? $custom_image_url : get_avatar_url($user_id);
+                                        $profile_image_url = customiizer_get_profile_image_url($user_id);
         global $wpdb;
         $image_credits = intval($wpdb->get_var($wpdb->prepare("SELECT image_credits FROM WPC_users WHERE user_id = %d", $user_id)));
 					?>
