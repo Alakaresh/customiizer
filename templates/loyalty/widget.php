@@ -71,7 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <li><?php echo esc_html__( '5 points sont crédités pour chaque euro dépensé hors taxes.', 'customiizer' ); ?></li>
                 <li><?php echo esc_html__( 'Les points sont ajoutés lorsque votre commande passe au statut \'terminée\'.', 'customiizer' ); ?></li>
                 <li><?php echo esc_html__( 'Accomplissez des missions pour obtenir les récompenses indiquées.', 'customiizer' ); ?></li>
-                <li><?php echo esc_html__( 'Parrainez vos amis et gagnez un bonus pour chaque inscription validée.', 'customiizer' ); ?></li>
+                <li><?php echo esc_html__( 'Parrainez vos amis et gagnez 500 points chacun pour chaque inscription validée.', 'customiizer' ); ?></li>
             </ul>
         </div>
 
