@@ -104,6 +104,11 @@ missions state for the current user. The front‑end displays cached missions
 immediately, then compares the stored version against this value to decide
 whether it needs to reload the list. Finished missions include a `completed_at`
 timestamp so the account dashboard can show the completion date.
+`customiizer_mark_mission_notified` can be called with a mission ID to record
+that the toast for this mission was shown so it never appears again. A global
+JavaScript function `customiizerCheckMissionToasts()` is available to check for
+newly finished missions and display the toast. It runs on page load and can be
+invoked after any AJAX action to show the notification right away.
 
 ## Mission triggers
 
@@ -193,6 +198,7 @@ CREATE TABLE WPC_user_missions (
     mission_id INT UNSIGNED NOT NULL,
     progress INT UNSIGNED NOT NULL DEFAULT 0,
     completed_at DATETIME DEFAULT NULL,
+    notified_at DATETIME DEFAULT NULL,
     PRIMARY KEY (user_id, mission_id)
 );
 

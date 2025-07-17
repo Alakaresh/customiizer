@@ -17,6 +17,14 @@ async function fetchMissions(options = {}) {
         shown = JSON.parse(localStorage.getItem(shownKey)) || [];
     } catch (e) {}
 
+    function markNotified(id){
+        fetch(ajaxurl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=customiizer_mark_mission_notified&mission_id=' + encodeURIComponent(id)
+        });
+    }
+
     if (cached && !prefetch) {
         try {
             renderMissions(JSON.parse(cached));
@@ -52,10 +60,11 @@ async function fetchMissions(options = {}) {
                 const version = data.data.version;
 
                 if (!prefetch) {
-                    const newlyCompleted = list.filter(m => m.completed_at && !shown.includes(m.mission_id));
+                    const newlyCompleted = list.filter(m => m.completed_at && !m.notified_at && !shown.includes(m.mission_id));
                     newlyCompleted.forEach(m => {
                         showMissionToast(m);
                         shown.push(m.mission_id);
+                        markNotified(m.mission_id);
                     });
                     if (newlyCompleted.length) {
                         localStorage.setItem(shownKey, JSON.stringify(shown));

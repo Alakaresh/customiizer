@@ -128,6 +128,19 @@ function customiizer_ensure_action_totals_table() {
 }
 add_action( 'after_setup_theme', 'customiizer_ensure_action_totals_table' );
 
+/**
+ * Ensure DB schema includes notification column.
+ */
+function customiizer_ensure_mission_notification_column() {
+    global $wpdb;
+    $table = 'WPC_user_missions';
+    $col   = $wpdb->get_col( $wpdb->prepare( "SHOW COLUMNS FROM {$table} LIKE %s", 'notified_at' ) );
+    if ( empty( $col ) ) {
+        $wpdb->query( "ALTER TABLE {$table} ADD notified_at DATETIME DEFAULT NULL" );
+    }
+}
+add_action( 'after_setup_theme', 'customiizer_ensure_mission_notification_column' );
+
 function customiizer_get_missions( $user_id = 0 ) {
     global $wpdb;
     $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
@@ -150,7 +163,7 @@ function customiizer_get_missions( $user_id = 0 ) {
 
     $sql = $wpdb->prepare(
         "SELECT m.mission_id, m.title, m.description, m.goal, m.reward_amount, m.reward_type, m.category, m.trigger_action,
-                um.progress AS user_progress, {$select_totals}, um.completed_at
+                um.progress AS user_progress, {$select_totals}, um.completed_at, um.notified_at
          FROM WPC_missions m
          LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d" .
          $join_totals .
@@ -333,6 +346,34 @@ function customiizer_update_mission_progress_ajax() {
     wp_send_json_success();
 }
 add_action( 'wp_ajax_customiizer_update_mission_progress', 'customiizer_update_mission_progress_ajax' );
+
+function customiizer_mark_mission_notified( $user_id, $mission_id ) {
+    global $wpdb;
+    $user_id    = intval( $user_id );
+    $mission_id = intval( $mission_id );
+    if ( $user_id <= 0 || $mission_id <= 0 ) {
+        return false;
+    }
+    $wpdb->query( $wpdb->prepare(
+        "UPDATE WPC_user_missions SET notified_at = NOW() WHERE user_id=%d AND mission_id=%d AND notified_at IS NULL",
+        $user_id,
+        $mission_id
+    ) );
+    return true;
+}
+
+function customiizer_mark_mission_notified_ajax() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'not_logged_in' );
+    }
+    $mission_id = intval( $_POST['mission_id'] ?? 0 );
+    if ( $mission_id <= 0 ) {
+        wp_send_json_error( 'invalid_mission' );
+    }
+    customiizer_mark_mission_notified( get_current_user_id(), $mission_id );
+    wp_send_json_success();
+}
+add_action( 'wp_ajax_customiizer_mark_mission_notified', 'customiizer_mark_mission_notified_ajax' );
 
 // -----------------------------------------------------------------------------
 // Automatic mission triggers.

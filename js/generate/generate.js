@@ -363,12 +363,15 @@ jQuery(function($) {
 				},
 				body: `action=decrement_credits&user_id=${encodeURIComponent(userId)}`
 			});
-			if (!response.ok) throw new Error('Échec de décrémentation côté serveur');
-			console.log("✅ Crédits décrémentés côté serveur");
-		} catch (error) {
-			console.error('❌ Erreur côté serveur pour décrémenter les crédits :', error);
-		}
-	}
+                        if (!response.ok) throw new Error('Échec de décrémentation côté serveur');
+                        console.log("✅ Crédits décrémentés côté serveur");
+                        if (typeof customiizerCheckMissionToasts === 'function') {
+                                customiizerCheckMissionToasts();
+                        }
+                } catch (error) {
+                        console.error('❌ Erreur côté serveur pour décrémenter les crédits :', error);
+                }
+        }
 
 	// Fonction pour afficher et sauvegarder les images
 	async function displayAndSaveImage(choices) {
@@ -683,11 +686,14 @@ jQuery(function($) {
 				},
 				body: `action=decrement_credits&user_id=${encodeURIComponent(currentUser.ID)}`
 			});
-			if (!response.ok) {
-				throw new Error('Échec de la mise à jour des crédits dans la base de données.');
-			}
-		} catch (error) {
-			console.error('Erreur de décrémentation des crédits:', error);
-		}
-	}
+                        if (!response.ok) {
+                                throw new Error('Échec de la mise à jour des crédits dans la base de données.');
+                        }
+                        if (typeof customiizerCheckMissionToasts === 'function') {
+                                customiizerCheckMissionToasts();
+                        }
+                } catch (error) {
+                        console.error('Erreur de décrémentation des crédits:', error);
+                }
+        }
 });
