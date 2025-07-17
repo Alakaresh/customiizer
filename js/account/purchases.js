@@ -55,7 +55,8 @@ function displayOrders(orders, maxNumPages) {
 	ordersContainer.innerHTML = ''; // Efface les commandes précédentes
 
 	// Création de la structure de base du tableau
-	const table = document.createElement('table');
+       const table = document.createElement('table');
+       table.className = 'orders-table';
 	const thead = document.createElement('thead');
 	const tbody = document.createElement('tbody');
 	const headerRow = document.createElement('tr');

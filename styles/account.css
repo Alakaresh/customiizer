@@ -551,9 +551,32 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .no-tracking-icon {
-	font-size: 1.2em;
-	line-height: 1;
-	color: #ccc;
+        font-size: 1.2em;
+        line-height: 1;
+        color: #ccc;
+}
+
+/* ===== Orders Table ===== */
+#purchases-container {
+        overflow-x: auto;
+}
+
+#purchases-container table {
+        width: 100%;
+        min-width: 650px;
+        border-collapse: collapse;
+}
+
+#purchases-container th,
+#purchases-container td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        white-space: nowrap;
+}
+
+#purchases-container th {
+        background-color: #031927;
+        color: #fff;
 }
 
 #toast-notification, #password-toast-notification {

@@ -27,8 +27,13 @@
 		align-items: center; /* centre les cards si elles ne prennent pas 100% */
 	}
 
-	.content-container {
-		width: 90% !important;
-		max-width: 400px;
-	}
+        .content-container {
+                width: 90% !important;
+                max-width: 400px;
+        }
+
+        /* Orders table requires horizontal scroll on small screens */
+        #purchases-container table {
+                min-width: 650px;
+        }
 }
