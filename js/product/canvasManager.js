@@ -94,29 +94,34 @@ const CanvasManager = {
 
        addImage: function (url, callback) {
                fabric.Image.fromURL(url, function (img) {
-			const drawX = template.print_area_left;
-			const drawY = template.print_area_top;
+                       const drawX = template.print_area_left;
+                       const drawY = template.print_area_top;
 
 			const scale = Math.min(
 				template.print_area_width / img.width,
 				template.print_area_height / img.height
 			);
 
-			img.set({
-				left: drawX,
-				top: drawY,
-				scaleX: scale,
-				scaleY: scale,
-				originX: 'left',
-				originY: 'top',
-                                selectable: true,
-                                hasControls: true,
-                                lockRotation: false,
-                                lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
-                                hasRotatingPoint: true,
-				//borderColor: 'green',
-				//cornerColor: 'blue'
-			});
+                       img.set({
+                               left: drawX,
+                               top: drawY,
+                               scaleX: scale,
+                               scaleY: scale,
+                               originX: 'left',
+                               originY: 'top',
+                               selectable: true,
+                               hasControls: true,
+                               lockRotation: false,
+                               lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
+                               hasRotatingPoint: true,
+                               //borderColor: 'green',
+                               //cornerColor: 'blue'
+                       });
+
+                       const wrapper = document.getElementById('productCanvasWrapper');
+                       if (wrapper && wrapper.classList.contains('rotate-90')) {
+                               img.rotate(-90);
+                       }
 
 			img.setControlsVisibility({
 				tl: true,  // coin haut gauche
@@ -417,6 +422,19 @@ const CanvasManager = {
                         canvas.setActiveObject(activeObj);
                 }
                 canvas.requestRenderAll();
+
+                const wrapper = document.getElementById('productCanvasWrapper');
+                if (wrapper && wrapper.classList.contains('rotate-90')) {
+                        const rotated = document.createElement('canvas');
+                        rotated.width = outputCanvas.height;
+                        rotated.height = outputCanvas.width;
+                        const rCtx = rotated.getContext('2d');
+                        rCtx.translate(rotated.width / 2, rotated.height / 2);
+                        rCtx.rotate(-Math.PI / 2);
+                        rCtx.drawImage(outputCanvas, -outputCanvas.width / 2, -outputCanvas.height / 2);
+                        return rotated.toDataURL('image/png');
+                }
+
                 return outputCanvas.toDataURL('image/png');
         },
 
@@ -459,15 +477,21 @@ const CanvasManager = {
 		canvas.setHeight(canvasH);
 
 		// ✅ wrapper dimensions réelles
-		const wrapper = document.getElementById("productCanvasWrapper");
-		if (wrapper) {
-			wrapper.style.width = `${canvasW}px`;
-			wrapper.style.height = `${canvasH}px`;
-			wrapper.style.margin = "0 auto";
-			wrapper.style.display = "flex";
-			wrapper.style.justifyContent = "center";
-			wrapper.style.alignItems = "center";
-		}
+                const wrapper = document.getElementById("productCanvasWrapper");
+                if (wrapper) {
+                        let w = canvasW;
+                        let h = canvasH;
+                        if (wrapper.classList.contains('rotate-90')) {
+                                w = canvasH;
+                                h = canvasW;
+                        }
+                        wrapper.style.width = `${w}px`;
+                        wrapper.style.height = `${h}px`;
+                        wrapper.style.margin = "0 auto";
+                        wrapper.style.display = "flex";
+                        wrapper.style.justifyContent = "center";
+                        wrapper.style.alignItems = "center";
+                }
 
 		canvas.renderAll();
 	}
