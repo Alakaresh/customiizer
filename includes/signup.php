@@ -56,9 +56,12 @@ function user_signup() {
 		'user_display_name' => $username,
 	);
 
-	// Créer l'utilisateur
-	// Créer l'utilisateur
-	$user_id = wp_insert_user($userdata);
+        // Créer l'utilisateur
+        $user_id = wp_insert_user($userdata);
+
+        if ( function_exists( 'customiizer_log' ) ) {
+                customiizer_log( 'signup', "wp_insert_user returned {$user_id}" );
+        }
 
 	if (is_wp_error($user_id)) {
 		wp_send_json_error(array('message' => 'Failed to create user: ' . $user_id->get_error_message()));
@@ -83,6 +86,10 @@ function user_signup() {
                array('%d', '%d')  // Les formats de chaque champ
         );
 
+        if ( function_exists( 'customiizer_log' ) ) {
+                customiizer_log( 'signup', "inserted WPC_users for {$user_id}" );
+        }
+
         // Enregistrer le parrain dans la table WPC_referrals
         $referrer_id = isset($_POST['referrer_id']) ? intval($_POST['referrer_id']) : 0;
         if ($referrer_id > 0 && get_user_by('ID', $referrer_id)) {
@@ -97,6 +104,10 @@ function user_signup() {
                         ['%d', '%d', '%s']
                 );
 
+                if ( function_exists( 'customiizer_log' ) ) {
+                        customiizer_log( 'signup', "inserted referral {$referrer_id} -> {$user_id}" );
+                }
+
                 if (function_exists('customiizer_add_loyalty_points')) {
                 customiizer_add_loyalty_points($referrer_id, 500, 'referral', 'Nouveau filleul');
                 customiizer_add_loyalty_points($user_id, 500, 'referral', 'Inscription parrainée');
@@ -107,10 +118,14 @@ function user_signup() {
         }
 
 	// Connexion automatique après inscription
-	wp_set_current_user($user_id);
-	wp_set_auth_cookie($user_id);
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id);
 
-	wp_send_json_success();
+        if ( function_exists( 'customiizer_log' ) ) {
+                customiizer_log( 'signup', "login user {$user_id}" );
+        }
+
+        wp_send_json_success();
 }
 add_action('wp_ajax_user_signup', 'user_signup');
 add_action('wp_ajax_nopriv_user_signup', 'user_signup');
