@@ -52,6 +52,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_style('modal-login-style', get_stylesheet_directory_uri() . '/styles/modal-login.css', [], $ver);
        wp_enqueue_style('user-modal-style', get_stylesheet_directory_uri() . '/styles/user-modal.css', [], $ver);
        wp_enqueue_style('loyalty-widget-style', get_stylesheet_directory_uri() . '/styles/loyalty_widget.css', [], $ver);
+       wp_enqueue_style('mission-toast-style', get_stylesheet_directory_uri() . '/styles/mission_toast.css', [], $ver);
 
 	// ===============================
 	// SCRIPTS GLOBAUX
@@ -64,6 +65,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/preload_products.js', [], $ver, true);
        wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
        wp_enqueue_script('referral-script', get_stylesheet_directory_uri() . '/js/referral/referral.js', [], $ver, true);
+       wp_enqueue_script('mission-toast', get_stylesheet_directory_uri() . '/js/mission_toast.js', ['jquery'], $ver, true);
 
         // Mark the preload-products script as async on all pages except the shop
         add_filter('script_loader_tag', function($tag, $handle) {
