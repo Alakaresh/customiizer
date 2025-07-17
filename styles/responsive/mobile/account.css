@@ -18,19 +18,17 @@
 		box-sizing: border-box;
 	}
 
-	.content-container {
-		width: 100% !important;
-		margin: 10px 0;
-	}
-	.dashboard-container {
-		flex-direction: column;
-		align-items: center; /* centre les cards si elles ne prennent pas 100% */
-	}
+       .dashboard-container {
+               flex-direction: column;
+               align-items: stretch;
+       }
 
-        .content-container {
-                width: 90% !important;
-                max-width: 400px;
-        }
+       .dashboard-container .content-container {
+               flex: 0 0 100% !important;
+               max-width: 100% !important;
+               width: 100% !important;
+               margin: 10px 0;
+       }
 
         /* Orders table requires horizontal scroll on small screens */
         #purchases-container table {
