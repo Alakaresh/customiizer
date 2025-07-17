@@ -59,8 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		})
 			.then(response => response.json())
 			.then(data => {
-			if (data.success) {
-				console.log("[✅] Inscription réussie");
+                        if (data.success) {
+                                console.log("[✅] Inscription réussie");
+                                if (data.data && Array.isArray(data.data.missions)) {
+                                        data.data.missions.forEach(m => {
+                                                if (typeof showMissionToast === 'function') {
+                                                        showMissionToast(m);
+                                                }
+                                        });
+                                }
 
 				const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
 

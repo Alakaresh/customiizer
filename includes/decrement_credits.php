@@ -15,10 +15,14 @@ function decrement_user_credits() {
     if ($result === false) {
         wp_send_json_error(['message' => 'Failed to decrement credits']);
     } else {
+        $missions = [];
         if ( function_exists( 'customiizer_process_mission_action' ) ) {
-            customiizer_process_mission_action( 'image_generated', $user_id, 1 );
+            $missions = customiizer_process_mission_action( 'image_generated', $user_id, 1 );
         }
-        wp_send_json_success(['message' => 'Credits decremented successfully']);
+        wp_send_json_success([
+            'message'  => 'Credits decremented successfully',
+            'missions' => $missions,
+        ]);
     }
 }
 

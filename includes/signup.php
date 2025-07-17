@@ -107,10 +107,11 @@ function user_signup() {
         }
 
 	// Connexion automatique après inscription
-	wp_set_current_user($user_id);
-	wp_set_auth_cookie($user_id);
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id);
 
-	wp_send_json_success();
+        $missions = function_exists('customiizer_pop_completed_missions') ? customiizer_pop_completed_missions() : [];
+        wp_send_json_success(['missions' => $missions]);
 }
 add_action('wp_ajax_user_signup', 'user_signup');
 add_action('wp_ajax_nopriv_user_signup', 'user_signup');

@@ -354,21 +354,29 @@ jQuery(function($) {
 
 		intervalId = setInterval(intervalCallback, checkInterval);
 	};
-	async function updateCreditsInDB(userId) {
-		try {
-			const response = await fetch(ajaxurl, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: `action=decrement_credits&user_id=${encodeURIComponent(userId)}`
-			});
-			if (!response.ok) throw new Error('Échec de décrémentation côté serveur');
-			console.log("✅ Crédits décrémentés côté serveur");
-		} catch (error) {
-			console.error('❌ Erreur côté serveur pour décrémenter les crédits :', error);
-		}
-	}
+        async function updateCreditsInDB(userId) {
+                try {
+                        const response = await fetch(ajaxurl, {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `action=decrement_credits&user_id=${encodeURIComponent(userId)}`
+                        });
+                        if (!response.ok) throw new Error('Échec de décrémentation côté serveur');
+                        const data = await response.json().catch(() => null);
+                        console.log("✅ Crédits décrémentés côté serveur");
+                        if (data && data.success && data.data && Array.isArray(data.data.missions)) {
+                                data.data.missions.forEach(m => {
+                                        if (typeof showMissionToast === 'function') {
+                                                showMissionToast(m);
+                                        }
+                                });
+                        }
+                } catch (error) {
+                        console.error('❌ Erreur côté serveur pour décrémenter les crédits :', error);
+                }
+        }
 
 	// Fonction pour afficher et sauvegarder les images
 	async function displayAndSaveImage(choices) {
