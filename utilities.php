@@ -114,4 +114,47 @@ function customiizer_is_production() {
 
     return strpos(home_url(), 'customiizer.com') !== false;
 }
+/**
+ * Get the user's profile image URL, caching the remote avatar locally.
+ *
+ * If the user uploaded a custom image, that image is returned. Otherwise the
+ * avatar from get_avatar_url() is downloaded once and stored in the user's
+ * wp-sauvegarde directory for faster subsequent access.
+ *
+ * @param int $user_id
+ * @return string URL to the cached profile image or empty string on failure.
+ */
+function customiizer_get_profile_image_url($user_id) {
+    $base_url = get_site_url();
+    $relative_dir = "/wp-sauvegarde/user/$user_id";
+    $full_dir = $_SERVER['DOCUMENT_ROOT'] . $relative_dir;
+
+    // Custom uploaded image takes precedence
+    $custom_path = "$full_dir/user_logo.png";
+    if (file_exists($custom_path)) {
+        return $base_url . "$relative_dir/user_logo.png";
+    }
+
+    $cached_path = "$full_dir/avatar_cache.jpg";
+    if (file_exists($cached_path)) {
+        return $base_url . "$relative_dir/avatar_cache.jpg";
+    }
+
+    $avatar_url = get_avatar_url($user_id);
+    if (!$avatar_url) {
+        return '';
+    }
+
+    if (!file_exists($full_dir)) {
+        wp_mkdir_p($full_dir);
+    }
+
+    $response = wp_remote_get($avatar_url, ['timeout' => 5]);
+    if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+        file_put_contents($cached_path, wp_remote_retrieve_body($response));
+        return $base_url . "$relative_dir/avatar_cache.jpg";
+    }
+
+    return $avatar_url;
+}
 
