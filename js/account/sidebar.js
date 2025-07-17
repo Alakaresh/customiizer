@@ -4,6 +4,7 @@ let allImages = []; // Tableau pour stocker toutes les images
 let originalFile = null;
 let isSelectingImage = false;
 let customImageUrl = null;
+let profileImageChecked = false;
 
 
 $(document).ready(function() {
@@ -178,37 +179,35 @@ function startPrefetch() {
        }
 }
 function verifyAndReloadProfileImage() {
-	const profileImage = document.getElementById('profileImage');
-	const circlePlus = document.getElementById('circlePlus');
+        if (profileImageChecked) return;
 
-	if (profileImage) {
-		let finalImageUrl = customImageUrl
-		? customImageUrl
-		: baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png';
+        const profileImage = document.getElementById('profileImage');
+        const circlePlus = document.getElementById('circlePlus');
 
-		console.log("🔄 Chargement de l'image de profil :", finalImageUrl);
+        if (profileImage) {
+                let finalImageUrl = customImageUrl
+                ? customImageUrl
+                : baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png';
 
-		// Vérifie que l'image existe vraiment avant de l'afficher
-		const testImg = new Image();
+                console.log("🔄 Chargement de l'image de profil :", finalImageUrl);
+
+                const testImg = new Image();
                 testImg.onload = function () {
                         profileImage.src = finalImageUrl + '?t=' + new Date().getTime();
                         profileImage.style.display = 'block';
                         if (circlePlus) circlePlus.style.display = 'none';
+                        profileImageChecked = true;
                         checkElement('profileImage', checkImageSrcNotEmpty);
                 };
                 testImg.onerror = function () {
                         console.warn("❌ Aucune image de profil trouvée, affichage annulé.");
                         profileImage.style.display = 'none';
                         if (circlePlus) circlePlus.style.display = 'flex';
+                        profileImageChecked = true;
                         checkElement('profileImage', checkImageSrcNotEmpty);
                 };
-		testImg.src = finalImageUrl;
-
-
-		if (circlePlus) {
-			circlePlus.style.display = 'none'; // ✅ Cacher le bouton +
-		}
-	}
+                testImg.src = finalImageUrl;
+        }
 }
 
 
@@ -382,14 +381,15 @@ function handleImageSaveResponse(data) {
 }
 
 function updateProfileImage(newImageUrl, skipProgressCheck = false) {
-	var profileImage = document.getElementById('profileImage');
-	var circlePlus = document.getElementById('circlePlus');
+        var profileImage = document.getElementById('profileImage');
+        var circlePlus = document.getElementById('circlePlus');
 
 	// ✅ Mise à jour de la photo principale
 	profileImage.src = baseUrl + newImageUrl + '?t=' + new Date().getTime();
 	profileImage.style.display = 'block';
-	profileImage.setAttribute('loading', 'lazy');
-	circlePlus.style.display = 'none';
+        profileImage.setAttribute('loading', 'lazy');
+        circlePlus.style.display = 'none';
+        profileImageChecked = true;
 
 	// ✅ En plus : mise à jour du header si présent
 	var headerProfileImage = document.querySelector('.user-profile-image');
@@ -405,18 +405,20 @@ function updateProfileImage(newImageUrl, skipProgressCheck = false) {
 
 
 function checkAndDisplayProfileImage() {
-	var imageUrl = baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png';
-	var img = new Image();
-	img.onload = () => {
-		document.getElementById('profileImage').src = imageUrl;
-		document.getElementById('profileImage').style.display = 'block';
-		document.getElementById('circlePlus').style.display = 'none';
-		checkElement('profileImage', checkImageSrcNotEmpty);
-	};
-	img.onerror = () => {
-		checkElement('profileImage', checkImageSrcNotEmpty);
-	};
-	img.src = imageUrl;
+        var imageUrl = baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png';
+        var img = new Image();
+        img.onload = () => {
+                document.getElementById('profileImage').src = imageUrl;
+                document.getElementById('profileImage').style.display = 'block';
+                document.getElementById('circlePlus').style.display = 'none';
+                profileImageChecked = true;
+                checkElement('profileImage', checkImageSrcNotEmpty);
+        };
+        img.onerror = () => {
+                profileImageChecked = true;
+                checkElement('profileImage', checkImageSrcNotEmpty);
+        };
+        img.src = imageUrl;
 }
 
 function afficherGalerie() {
