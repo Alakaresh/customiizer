@@ -11,11 +11,6 @@ async function fetchMissions(options = {}) {
     const versionKey = 'USER_MISSIONS_VERSION';
     const cached = sessionStorage.getItem(cacheKey);
     const cachedVersion = sessionStorage.getItem(versionKey);
-    const shownKey = 'SHOWN_MISSION_COMPLETIONS';
-    let shown = [];
-    try {
-        shown = JSON.parse(localStorage.getItem(shownKey)) || [];
-    } catch (e) {}
 
     if (cached && !prefetch) {
         try {
@@ -51,17 +46,6 @@ async function fetchMissions(options = {}) {
                 const list = data.data.missions || data.data;
                 const version = data.data.version;
 
-                if (!prefetch) {
-                    const newlyCompleted = list.filter(m => m.completed_at && !shown.includes(m.mission_id));
-                    newlyCompleted.forEach(m => {
-                        showMissionToast(m);
-                        shown.push(m.mission_id);
-                    });
-                    if (newlyCompleted.length) {
-                        localStorage.setItem(shownKey, JSON.stringify(shown));
-                    }
-                }
-
                 sessionStorage.setItem(cacheKey, JSON.stringify(list));
                 if (version) {
                     sessionStorage.setItem(versionKey, version);
@@ -69,6 +53,7 @@ async function fetchMissions(options = {}) {
                 if (!prefetch) {
                     console.log('Missions récupérées:', list);
                     renderMissions(list);
+                    checkMissionNotifications();
                 }
             } else {
                 console.error('Erreur lors du chargement des missions', data);
@@ -208,6 +193,20 @@ function showMissionToast(mission) {
     setTimeout(() => {
         toast.classList.remove('show');
     }, 6000);
+}
+
+function checkMissionNotifications() {
+    fetch(ajaxurl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=customiizer_get_mission_notifications'
+    })
+        .then(res => (res.ok ? res.json() : null))
+        .then(data => {
+            if (!data || !data.success) return;
+            (data.data.missions || data.data).forEach(m => showMissionToast(m));
+        })
+        .catch(err => console.error('Erreur notification missions', err));
 }
 
 // L'appel est déclenché par sidebar.js après le chargement de la section
