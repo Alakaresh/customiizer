@@ -1,7 +1,8 @@
 let currentPercentage = 0;
 const totalElements = 2;  // Nombre total d'éléments à vérifier
 let elementChecks = {
-	profileImage: false,
+        profileImage: false,
+        customUsername: false,
 };
 
 function updateProgress(increment) {
@@ -37,7 +38,18 @@ function checkElement(elementId, checkFunction) {
 
 // Exemple de fonctions de vérification spécifiques
 function checkImageSrcNotEmpty(imageElement) {
-	const srcValue = imageElement.getAttribute('src') || '';
-	const result = srcValue.trim() !== '';
-	return result;
+        const srcValue = imageElement.getAttribute('src') || '';
+        const result = srcValue.trim() !== '';
+        return result;
+}
+
+function isCustomUsername(username) {
+        return !/^user-\d+$/.test(username || '');
+}
+
+function updateUsernameProgress(username) {
+        if (isCustomUsername(username) && !elementChecks.customUsername) {
+                updateProgress(100 / totalElements);
+                elementChecks.customUsername = true;
+        }
 }

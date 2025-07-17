@@ -113,8 +113,10 @@ function runAfterLoad(targetFile) {
                         console.warn("⚠️ Aucun utilisateur connecté ou ID invalide.");
                         return;
                 }
-                elementChecks = { profileImage: false };
-                updateProgress(100 / totalElements);
+                elementChecks = { profileImage: false, customUsername: false };
+                if (typeof updateUsernameProgress === 'function') {
+                        updateUsernameProgress(currentUser.display_name || currentUser.user_nicename);
+                }
         }
 
        if (targetFile === 'purchases') {
