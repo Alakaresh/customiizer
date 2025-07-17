@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-        function getCookie(name) {
-                const value = '; ' + document.cookie;
-                const parts = value.split('; ' + name + '=');
-                if (parts.length === 2) return parts.pop().split(';').shift();
-                return '';
+        function getReferrer() {
+                try {
+                        return localStorage.getItem('customiizer_referrer') || '';
+                } catch (e) {
+                        return '';
+                }
         }
         const signupForm = document.getElementById('signup');
 	const signupButton = signupForm.querySelector('.signup-button');
@@ -44,9 +45,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		params.append('email', email);
 		params.append('password', password);
                 params.append('confirm_password', confirmPassword);
-                const referrer = getCookie('customiizer_referrer');
+                const referrer = getReferrer();
                 if (referrer) {
                         params.append('referrer_id', referrer);
+                        try { localStorage.removeItem('customiizer_referrer'); } catch(e) {}
                 }
                 params.append('registration_nonce', nonceValue);
 
