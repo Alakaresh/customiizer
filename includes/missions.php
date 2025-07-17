@@ -79,9 +79,14 @@ function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) 
 
     $quantity = intval( $quantity );
 
+    $completed = array();
     foreach ( $mission_ids as $mission_id ) {
-        customiizer_update_mission_progress( $user_id, intval( $mission_id ), $quantity );
+        if ( customiizer_update_mission_progress( $user_id, intval( $mission_id ), $quantity ) ) {
+            $completed[] = intval( $mission_id );
+        }
     }
+
+    return $completed;
 }
 
 /**
@@ -198,18 +203,20 @@ function customiizer_update_mission_progress( $user_id, $mission_id, $quantity =
         $mission_id,
         $quantity
     ) );
-    $current = $wpdb->get_row( $wpdb->prepare(
+    $current    = $wpdb->get_row( $wpdb->prepare(
         "SELECT progress, completed_at FROM WPC_user_missions WHERE user_id=%d AND mission_id=%d",
         $user_id,
         $mission_id
     ), ARRAY_A );
+    $completed = false;
     if ( $current && empty( $current['completed_at'] ) ) {
         $goal = intval( $wpdb->get_var( $wpdb->prepare( "SELECT goal FROM WPC_missions WHERE mission_id=%d", $mission_id ) ) );
         if ( $current['progress'] >= $goal ) {
             customiizer_complete_mission( $user_id, $mission_id );
+            $completed = true;
         }
     }
-    return true;
+    return $completed;
 }
 
 function customiizer_complete_mission( $user_id, $mission_id ) {
@@ -230,6 +237,7 @@ function customiizer_complete_mission( $user_id, $mission_id ) {
         $mission_id
     ) );
     customiizer_reward_mission( $user_id, $mission_id );
+    do_action( 'customiizer_mission_completed', $user_id, $mission_id );
     return true;
 }
 
@@ -254,6 +262,41 @@ function customiizer_reward_mission( $user_id, $mission_id ) {
         }
     }
 }
+
+function customiizer_add_mission_notification( $user_id, $mission_id ) {
+    $user_id    = intval( $user_id );
+    $mission_id = intval( $mission_id );
+    if ( $user_id <= 0 || $mission_id <= 0 ) {
+        return;
+    }
+    $list = get_user_meta( $user_id, '_customiizer_mission_notifs', true );
+    if ( ! is_array( $list ) ) {
+        $list = array();
+    }
+    if ( ! in_array( $mission_id, $list, true ) ) {
+        $list[] = $mission_id;
+        update_user_meta( $user_id, '_customiizer_mission_notifs', $list );
+    }
+}
+add_action( 'customiizer_mission_completed', 'customiizer_add_mission_notification', 10, 2 );
+
+function customiizer_get_mission_notifications_ajax() {
+    if ( ! is_user_logged_in() ) {
+        wp_send_json_error( 'not_logged_in' );
+    }
+    $user_id = get_current_user_id();
+    $ids     = get_user_meta( $user_id, '_customiizer_mission_notifs', true );
+    delete_user_meta( $user_id, '_customiizer_mission_notifs' );
+    if ( ! is_array( $ids ) || empty( $ids ) ) {
+        wp_send_json_success( [ 'missions' => array() ] );
+    }
+    global $wpdb;
+    $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+    $sql  = $wpdb->prepare( "SELECT mission_id, title, reward_amount, reward_type FROM WPC_missions WHERE mission_id IN ($placeholders)", $ids );
+    $missions = $wpdb->get_results( $sql, ARRAY_A );
+    wp_send_json_success( [ 'missions' => $missions ] );
+}
+add_action( 'wp_ajax_customiizer_get_mission_notifications', 'customiizer_get_mission_notifications_ajax' );
 
 /**
  * Get total loyalty points earned from missions only.
