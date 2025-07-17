@@ -29,6 +29,7 @@ TABLES=(
   "WPC_variant_templates"
   "WPC_products"
   "WPC_suppliers"
+  "WPC_missions"
 )
 
 # 🚫 Désactivation des contraintes
