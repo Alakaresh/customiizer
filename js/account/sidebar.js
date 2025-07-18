@@ -78,9 +78,8 @@ function loadContent(targetFile) {
                 return;
         }
 
-        const storageKey = 'account-section-' + targetFile;
-        const skipCache = targetFile === 'missions';
-        const cached = !skipCache && localStorage.getItem(storageKey);
+       const storageKey = 'account-section-' + targetFile;
+       const cached = localStorage.getItem(storageKey);
 
         if (cached) {
                 $('#main-container').html(cached);
@@ -95,9 +94,7 @@ function loadContent(targetFile) {
                 if (status === "error") {
                         console.error("❌ Erreur lors du chargement du contenu :", xhr.status, xhr.statusText);
                 } else {
-                        if (!skipCache) {
-                                localStorage.setItem(storageKey, $('#main-container').html());
-                        }
+                       localStorage.setItem(storageKey, $('#main-container').html());
                         runAfterLoad(targetFile);
                 }
         });
@@ -166,7 +163,7 @@ function startPrefetch() {
        if (sectionsPrefetched) return;
        sectionsPrefetched = true;
 
-       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty']);
+       preloadSections(['dashboard', 'pictures', 'profile', 'purchases', 'loyalty', 'missions']);
 
        if (typeof loadUserDetails === 'function') {
                loadUserDetails();
