@@ -186,33 +186,7 @@ $display_name = $current_user->display_name;
 
                         });
 		</script>
-		<script>
-			jQuery(document).ready(function ($) {
-                                // ✅ Activer ou désactiver le blocage mobile via option
-
-                                <?php
-                                $option_enabled = get_option('customiizer_mobile_block', 1);
-                                $is_prod = function_exists('customiizer_is_production') ? customiizer_is_production() : true;
-                                $mobile_block = $is_prod ? $option_enabled : 1;
-                                ?>
-                                const MOBILE_BLOCK_ENABLED = <?php echo $mobile_block ? 'true' : 'false'; ?>;
-
-
-				// ✅ Détection simple des smartphones (exclut tablettes)
-				const isSmartphone = /Android.+Mobile|iPhone|iPod|Windows Phone/i.test(navigator.userAgent);
-
-				if (MOBILE_BLOCK_ENABLED && isSmartphone) {
-					$('body').html(`
-			<div style="color: white; background-color: #111; height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;">
-				<div>
-					<h2>📱 Version mobile en cours de développement</h2>
-					<p>La personnalisation de produits sera bientôt disponible sur smartphone.<br>
-					Merci d’utiliser un ordinateur ou une tablette pour le moment.</p>
-			</div>
-			</div>
-		`);
-				}
-			});
+                <script>
 
 			window.addEventListener("load", function () {
 				if (!window.currentUser || !currentUser.ID) {
