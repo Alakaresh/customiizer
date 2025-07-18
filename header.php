@@ -113,9 +113,17 @@ $display_name = $current_user->display_name;
 					<?php endif; ?>
 				</div>
 			</div>
-		</header>
+               </header>
 
-                <!-- JS global config -->
+               <div id="mission-achievement">
+                       <img class="mission-icon" alt="Logo">
+                       <div class="mission-info">
+                               <div class="mission-title"></div>
+                               <div class="mission-details"></div>
+                       </div>
+               </div>
+
+               <!-- JS global config -->
                 <script type="text/javascript">
                         var baseUrl = '<?php echo get_site_url(); ?>';
                         var ajaxurl = baseUrl + '/wp-admin/admin-ajax.php';
