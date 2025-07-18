@@ -5,7 +5,8 @@ const perPage = 10; // Définir combien d'éléments vous voulez par page
 function fetchUserOrders(options = {}) {
         const prefetch = options.prefetch === true;
         const page = options.page || currentPage;
-        const cacheKey = `USER_ORDERS_${page}`;
+        const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+        const cacheKey = `USER_ORDERS_${uid}_${page}`;
         const cached = sessionStorage.getItem(cacheKey);
 
         if (cached) {
