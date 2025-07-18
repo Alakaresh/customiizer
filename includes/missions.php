@@ -263,40 +263,6 @@ function customiizer_reward_mission( $user_id, $mission_id ) {
     }
 }
 
-function customiizer_add_mission_notification( $user_id, $mission_id ) {
-    $user_id    = intval( $user_id );
-    $mission_id = intval( $mission_id );
-    if ( $user_id <= 0 || $mission_id <= 0 ) {
-        return;
-    }
-    $list = get_user_meta( $user_id, '_customiizer_mission_notifs', true );
-    if ( ! is_array( $list ) ) {
-        $list = array();
-    }
-    if ( ! in_array( $mission_id, $list, true ) ) {
-        $list[] = $mission_id;
-        update_user_meta( $user_id, '_customiizer_mission_notifs', $list );
-    }
-}
-add_action( 'customiizer_mission_completed', 'customiizer_add_mission_notification', 10, 2 );
-
-function customiizer_get_mission_notifications_ajax() {
-    if ( ! is_user_logged_in() ) {
-        wp_send_json_error( 'not_logged_in' );
-    }
-    $user_id = get_current_user_id();
-    $ids     = get_user_meta( $user_id, '_customiizer_mission_notifs', true );
-    delete_user_meta( $user_id, '_customiizer_mission_notifs' );
-    if ( ! is_array( $ids ) || empty( $ids ) ) {
-        wp_send_json_success( [ 'missions' => array() ] );
-    }
-    global $wpdb;
-    $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-    $sql  = $wpdb->prepare( "SELECT mission_id, title, reward_amount, reward_type FROM WPC_missions WHERE mission_id IN ($placeholders)", $ids );
-    $missions = $wpdb->get_results( $sql, ARRAY_A );
-    wp_send_json_success( [ 'missions' => $missions ] );
-}
-add_action( 'wp_ajax_customiizer_get_mission_notifications', 'customiizer_get_mission_notifications_ajax' );
 
 /**
  * Get total loyalty points earned from missions only.
