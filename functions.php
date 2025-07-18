@@ -90,14 +90,17 @@ add_action( 'init', function() {
 	if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 		require_once __DIR__ . '/vendor/autoload.php';
 	}
-	$includes = [
+        $admin_includes = [
                 '/admin/dashboard/admin-dashboard.php',
                 '/admin/loyalty/admin-loyalty.php',
                 '/admin/update/admin-update.php',
                 '/admin/products/admin-products.php',
-		'/utilities.php',
-		'/assets.php',
-		'/includes/azure.php',
+        ];
+
+        $includes = [
+                '/utilities.php',
+                '/assets.php',
+                '/includes/azure.php',
 
 		// ===============================
 		// WEBHOOKS
@@ -136,14 +139,18 @@ add_action( 'init', function() {
                 '/includes/add_to_cart.php',
 
 	];
-	foreach ($includes as $file) {
-		$file_path = get_stylesheet_directory() . $file;
-		if (file_exists($file_path)) {
-			require_once $file_path;
-		} else {
-			error_log('Failed to include ' . $file_path);
-		}
-	}
+        if (is_dir(get_stylesheet_directory() . '/admin')) {
+                $includes = array_merge($admin_includes, $includes);
+        }
+
+        foreach ($includes as $file) {
+                $file_path = get_stylesheet_directory() . $file;
+                if (file_exists($file_path)) {
+                        require_once $file_path;
+                } elseif (strpos($file, '/admin/') === false) {
+                        error_log('Failed to include ' . $file_path);
+                }
+        }
 });
 
 
