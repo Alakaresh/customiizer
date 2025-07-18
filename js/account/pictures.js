@@ -6,7 +6,9 @@ var ImageLoader = (function() {
 	function loadUserGeneratedImages() {
 
 		// Vérifier si on a déjà en session
-		const storedImages = sessionStorage.getItem('userGeneratedImages');
+                const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+                const cacheKey = 'userGeneratedImages_' + uid;
+                const storedImages = sessionStorage.getItem(cacheKey);
 
 		if (storedImages) {
 			allImages = JSON.parse(storedImages);
@@ -25,7 +27,7 @@ var ImageLoader = (function() {
 				allImages = data.images;
 
 				// Stocker dans sessionStorage
-				sessionStorage.setItem('userGeneratedImages', JSON.stringify(allImages));
+                                sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
 
 				renderImages();
 				enableImageEnlargement();
