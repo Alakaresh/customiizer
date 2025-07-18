@@ -367,7 +367,7 @@ jQuery(function($) {
                         const data = await response.json();
                         console.log("✅ Crédits décrémentés côté serveur");
                         if (data.missions_completed && data.missions_completed.length) {
-                                checkMissionNotifications();
+                                // Notifications are handled elsewhere
                         }
                 } catch (error) {
                         console.error('❌ Erreur côté serveur pour décrémenter les crédits :', error);
@@ -692,7 +692,7 @@ jQuery(function($) {
                         }
                         const data = await response.json();
                         if (data.missions_completed && data.missions_completed.length) {
-                                checkMissionNotifications();
+                                // Notifications are handled elsewhere
                         }
                 } catch (error) {
                         console.error('Erreur de décrémentation des crédits:', error);

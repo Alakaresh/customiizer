@@ -32,31 +32,5 @@
         }, 6000);
     }
 
-    function checkMissionNotifications() {
-        if (!window.ajaxurl) return;
-        fetch(ajaxurl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=customiizer_get_mission_notifications'
-        })
-            .then(res => (res.ok ? res.json() : null))
-            .then(data => {
-                if (!data || !data.success) return;
-                const list = data.data.missions || data.data;
-                list.forEach(m => showMissionToast(m));
-                if (list.length && typeof fetchMissions === 'function') {
-                    fetchMissions();
-                }
-            })
-            .catch(err => console.error('Erreur notification missions', err));
-    }
-
-    function initMissionNotifications() {
-        if (!window.userIsLoggedIn) return;
-        checkMissionNotifications();
-        setInterval(checkMissionNotifications, 10000);
-    }
-
-    document.addEventListener('DOMContentLoaded', initMissionNotifications);
-    window.checkMissionNotifications = checkMissionNotifications;
+    window.showMissionToast = showMissionToast;
 })();
