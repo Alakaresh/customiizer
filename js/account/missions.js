@@ -5,6 +5,25 @@ function formatMissionDate(dateStr) {
     return d.toLocaleDateString();
 }
 
+function updateMissionTotal(list) {
+    const el = document.querySelector('.missions-total-points');
+    if (!el || !Array.isArray(list)) return;
+    const total = list.reduce((sum, m) => {
+        if (m.reward_type === 'points' && m.completed_at) {
+            return sum + parseInt(m.reward_amount || 0, 10);
+        }
+        return sum;
+    }, 0);
+    el.textContent = 'Total points gagnés via missions : ' + total;
+}
+
+function refreshMissionCache() {
+    const container = document.getElementById('main-container');
+    if (container) {
+        localStorage.setItem('account-section-missions', container.innerHTML);
+    }
+}
+
 async function fetchMissions(options = {}) {
     const prefetch = options.prefetch === true;
     const cacheKey = 'USER_MISSIONS';
@@ -14,7 +33,10 @@ async function fetchMissions(options = {}) {
 
     if (cached && !prefetch) {
         try {
-            renderMissions(JSON.parse(cached));
+            const list = JSON.parse(cached);
+            renderMissions(list);
+            updateMissionTotal(list);
+            refreshMissionCache();
         } catch (e) {
             console.warn('Cache parse error for missions', e);
         }
@@ -53,6 +75,8 @@ async function fetchMissions(options = {}) {
                 if (!prefetch) {
                     console.log('Missions récupérées:', list);
                     renderMissions(list);
+                    updateMissionTotal(list);
+                    refreshMissionCache();
                 }
             } else {
                 console.error('Erreur lors du chargement des missions', data);

@@ -42,7 +42,11 @@
             .then(res => (res.ok ? res.json() : null))
             .then(data => {
                 if (!data || !data.success) return;
-                (data.data.missions || data.data).forEach(m => showMissionToast(m));
+                const list = data.data.missions || data.data;
+                list.forEach(m => showMissionToast(m));
+                if (list.length && typeof fetchMissions === 'function') {
+                    fetchMissions();
+                }
             })
             .catch(err => console.error('Erreur notification missions', err));
     }
