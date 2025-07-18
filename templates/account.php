@@ -18,9 +18,12 @@ get_header();
 				<div id="main-container" class="main-container">
 				</div>
 			</div>
-			<script>
-				var ajaxurl = '<?php echo esc_js(admin_url('admin-ajax.php')); ?>';
-			</script>
+                        <script>
+                                if (typeof baseUrl === 'undefined') {
+                                        var baseUrl = window.location.origin;
+                                }
+                                var ajaxurl = baseUrl + '/wp-admin/admin-ajax.php';
+                        </script>
                        <!-- Scripts moved to assets.php -->
 			
 		</main>
