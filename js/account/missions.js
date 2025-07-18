@@ -20,14 +20,16 @@ function updateMissionTotal(list) {
 function refreshMissionCache() {
     const container = document.getElementById('main-container');
     if (container) {
-        localStorage.setItem('account-section-missions', container.innerHTML);
+        const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+        localStorage.setItem('account-section-' + uid + '-missions', container.innerHTML);
     }
 }
 
 async function fetchMissions(options = {}) {
     const prefetch = options.prefetch === true;
-    const cacheKey = 'USER_MISSIONS';
-    const versionKey = 'USER_MISSIONS_VERSION';
+    const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+    const cacheKey = 'USER_MISSIONS_' + uid;
+    const versionKey = 'USER_MISSIONS_VERSION_' + uid;
     const cached = sessionStorage.getItem(cacheKey);
     const cachedVersion = sessionStorage.getItem(versionKey);
 
