@@ -52,10 +52,12 @@ function initProfileForm() {
 
                                 // Met à jour le cache USER_DETAILS
                                 try {
-                                        const detailsStr = sessionStorage.getItem('USER_DETAILS');
+                                        const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+                                        const key = 'USER_DETAILS_' + uid;
+                                        const detailsStr = sessionStorage.getItem(key);
                                         const details = detailsStr ? JSON.parse(detailsStr) : {};
                                         details.display_name = displayName;
-                                        sessionStorage.setItem('USER_DETAILS', JSON.stringify(details));
+                                        sessionStorage.setItem(key, JSON.stringify(details));
                                 } catch (e) {
                                         console.warn('Impossible de mettre à jour USER_DETAILS', e);
                                 }
@@ -234,7 +236,9 @@ function initPasswordForm() {
 
 // Fonction pour remplir les champs à partir de l'API
 function loadUserDetails() {
-        const cachedStr = sessionStorage.getItem('USER_DETAILS');
+        const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+        const key = 'USER_DETAILS_' + uid;
+        const cachedStr = sessionStorage.getItem(key);
         if (cachedStr) {
                 try {
                         const cached = JSON.parse(cachedStr);
@@ -256,7 +260,7 @@ function loadUserDetails() {
                 dataType: 'json',
                 success: function (response) {
                         if (response.success) {
-                                sessionStorage.setItem('USER_DETAILS', JSON.stringify(response.data));
+                                sessionStorage.setItem(key, JSON.stringify(response.data));
                                 if (response.data.display_name) $('#username').val(response.data.display_name);
                                 if (response.data.email) $('#email').val(response.data.email);
                                 $('#password-change-form').find('input[name="password_nonce"]').val(response.data.password_nonce);

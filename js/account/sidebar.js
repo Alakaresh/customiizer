@@ -1,4 +1,6 @@
 var baseUrl = window.location.origin;
+// Utilisé pour keyer le cache par utilisateur
+var userId = window.currentUser && currentUser.ID ? currentUser.ID : 0;
 var cropper;
 let allImages = []; // Tableau pour stocker toutes les images
 let originalFile = null;
@@ -78,7 +80,7 @@ function loadContent(targetFile) {
                 return;
         }
 
-       const storageKey = 'account-section-' + targetFile;
+       const storageKey = 'account-section-' + userId + '-' + targetFile;
        const cached = localStorage.getItem(storageKey);
 
         if (cached) {
@@ -148,7 +150,7 @@ function runAfterLoad(targetFile) {
 // Précharger toutes les sections au chargement initial
 function preloadSections(sections) {
         sections.forEach(section => {
-                const key = 'account-section-' + section;
+                const key = 'account-section-' + userId + '-' + section;
                 if (!localStorage.getItem(key)) {
                         $.get(baseTemplateUrl + section + '.php', function(html) {
                                 localStorage.setItem(key, html);
