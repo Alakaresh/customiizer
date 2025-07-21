@@ -28,10 +28,11 @@ function set_custom_variant_margin(WP_REST_Request $req) {
 	}
 
 	// 💰 Calcul du nouveau prix de vente
-	$default_margin = 0.3;
-	$effective_margin = ($margin ?? $default_margin) / 100;
+        $default_margin = 30; // Pourcentage par defaut
+        $effective_margin = ($margin ?? $default_margin) / 100;
 
-	$sale_price = round($price * (1 + $effective_margin), 2);
+        $sale_price = $price * (1 + $effective_margin);
+        $sale_price = customiizer_psychological_price($sale_price);
 
 	// 💾 Mise à jour
 	$wpdb->update('WPC_variant_prices', [

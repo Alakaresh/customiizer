@@ -158,3 +158,15 @@ function customiizer_get_profile_image_url($user_id) {
     return $avatar_url;
 }
 
+
+/**
+ * Round a price to the next psychological value ending in .99.
+ * For example, 12.02 => 12.99.
+ */
+function customiizer_psychological_price($price) {
+    $rounded = floor($price) + 0.99;
+    if ($rounded < $price) {
+        $rounded = floor($price) + 1 + 0.99;
+    }
+    return round($rounded, 2);
+}
