@@ -346,11 +346,11 @@ jQuery(document).ready(function ($) {
 		const priceTTC = priceHT * 1.20; // ✅ Ajoute la TVA de 20%
 		const discountedPriceTTC = priceTTC * 0.95; // ✅ 5% de remise sur TTC
 
-		$('.price-value span').text(priceTTC ? priceTTC.toFixed(2) + " € TTC" : "--");
-		$('.discounted-price span').text(priceTTC ? discountedPriceTTC.toFixed(2) + " € TTC" : "--");
-		$('.delivery-time span').text(variant.delivery_time || "--");
-		$('.shipping-cost span').text(variant.delivery_price ? parseFloat(variant.delivery_price).toFixed(2) + " €" : "--");
-	}
+                $('.price-value span').text(priceTTC ? priceTTC.toFixed(2) : "--");
+                $('.discounted-price span').text(priceTTC ? discountedPriceTTC.toFixed(2) : "--");
+                $('.delivery-time span').text(variant.delivery_time || "--");
+                $('.shipping-cost span').text(variant.delivery_price ? parseFloat(variant.delivery_price).toFixed(2) : "--");
+        }
 
 
         function updateThumbnails(variants) {

@@ -59,17 +59,17 @@
 					</div>
 
 					<!-- Blocs de prix et de délai de livraison à droite -->
-					<div class="product-details">
-						<div class="price-info">
-							<p class="price-title">Prix</p>
-							<p class="price-value">€<span>--</span></p>
-							<p class="discounted-price" style="display: none;">€<span>--</span> avec CustomPass</p>
-						</div>
+                                        <div class="product-details">
+                                                <div class="price-info">
+                                                        <p class="price-title">Prix</p>
+                                                        <p class="price-value"><span>--</span> € TTC</p>
+                                                        <p class="discounted-price" style="display: none;"><span>--</span> € TTC avec CustomPass</p>
+                                                </div>
 						<div class="delivery-info">
 							<p class="delivery-title">Délai de livraison estimé</p>
 							<p class="delivery-location"><img src="https://flagcdn.com/fr.svg" alt="France" class="flag-icon"> France</p>
 							<p class="delivery-time"><span>--</span> jours</p>
-							<p class="shipping-cost">Frais de livraison : €<span>--</span></p>
+                                                        <p class="shipping-cost">Frais de livraison : <span>--</span> €</p>
 						</div>
 						<div class="product-actions">
 							<button class="add-to-cart-button">Ajouter au panier</button>
