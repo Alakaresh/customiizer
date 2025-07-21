@@ -27,7 +27,8 @@ function set_margin_for_all_variants(WP_REST_Request $req) {
 	foreach ($variants as $row) {
 		$vid = (int) $row['variant_id'];
 		$price = floatval($row['price']);
-		$sale_price = round($price * (1 + $margin / 100), 2);
+                $sale_price = $price * (1 + $margin / 100);
+                $sale_price = customiizer_psychological_price($sale_price);
 
 		error_log("🔧 Update variant $vid — price=$price — sale_price=$sale_price — margin=$margin");
 
