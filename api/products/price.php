@@ -31,8 +31,9 @@ function set_custom_variant_margin(WP_REST_Request $req) {
         $default_margin = 30; // Pourcentage par defaut
         $effective_margin = ($margin ?? $default_margin) / 100;
 
-        $sale_price = $price * (1 + $effective_margin);
-        $sale_price = customiizer_psychological_price($sale_price);
+       $sale_price_ht = $price * (1 + $effective_margin);
+       // Round so that the price including VAT ends with .99
+       $sale_price = customiizer_psychological_price($sale_price_ht, 0.2);
 
 	// 💾 Mise à jour
 	$wpdb->update('WPC_variant_prices', [

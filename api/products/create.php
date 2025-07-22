@@ -272,7 +272,9 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		db_err( 'WPC_variants '.$vid );
 
 		/* ------ 2) prix ---------------------------------------------- */
-		$sale_price = round($price * 1.3, 2);
+                // Default margin 30% with psychological pricing on TTC
+                $sale_price_ht = $price * 1.3;
+                $sale_price = customiizer_psychological_price($sale_price_ht, 0.2);
 
 		$wpdb->replace(
 			'WPC_variant_prices',

@@ -163,7 +163,19 @@ function customiizer_get_profile_image_url($user_id) {
  * Round a price to the next psychological value ending in .99.
  * For example, 12.02 => 12.99.
  */
-function customiizer_psychological_price($price) {
+function customiizer_psychological_price($price, $tax_rate = 0) {
+    // If a tax rate is provided, round the price including tax to the
+    // next value ending in .99 and then convert back to HT.
+    if ($tax_rate > 0) {
+        $ttc = $price * (1 + $tax_rate);
+        $rounded = floor($ttc) + 0.99;
+        if ($rounded < $ttc) {
+            $rounded = floor($ttc) + 1 + 0.99;
+        }
+        return round($rounded / (1 + $tax_rate), 2);
+    }
+
+    // Default behaviour: round the HT price directly.
     $rounded = floor($price) + 0.99;
     if ($rounded < $price) {
         $rounded = floor($price) + 1 + 0.99;
