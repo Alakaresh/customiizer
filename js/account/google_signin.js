@@ -22,8 +22,16 @@
 
       });
     }
+    function missingIdAlert(e){
+      e.preventDefault();
+      alert('Google login is not configured.');
+    }
     function init(){
-      if(!googleLogin.clientId) return;
+      if(!googleLogin.clientId){
+        if(loginBtn) loginBtn.addEventListener('click', missingIdAlert);
+        if(signupBtn) signupBtn.addEventListener('click', missingIdAlert);
+        return;
+      }
 
       google.accounts.id.initialize({
         client_id: googleLogin.clientId,
