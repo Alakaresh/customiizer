@@ -19,10 +19,12 @@
       }).catch(err=>{
         console.error('Google login error', err);
         alert('Google login failed');
+
       });
     }
     function init(){
       if(!googleLogin.clientId) return;
+
       google.accounts.id.initialize({
         client_id: googleLogin.clientId,
         callback: handleCredential,

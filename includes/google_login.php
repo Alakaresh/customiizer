@@ -72,6 +72,7 @@ function customiizer_google_login(){
     $user = get_user_by('email', $email);
     if(!$user){
         $username_base = isset($payload['given_name']) ? sanitize_user($payload['given_name'], true) : 'googleuser';
+
         $username = $username_base . '_' . wp_generate_password(4, false);
         $password = wp_generate_password();
         $user_id = wp_create_user($username, $password, $email);
@@ -91,3 +92,4 @@ function customiizer_google_login(){
 }
 add_action('wp_ajax_nopriv_google_login','customiizer_google_login');
 add_action('wp_ajax_google_login','customiizer_google_login');
+
