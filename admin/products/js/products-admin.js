@@ -346,9 +346,10 @@ function loadProducts() {
 							row.dataset.loaded = "1";
 							// ✅ Maintenant que les inputs sont dans le DOM
 							row.querySelectorAll('.custom-margin').forEach(input => {
-								input.addEventListener('change', () => {
-									const variantId = input.dataset.id;
-									const margin = input.value === '' ? null : parseFloat(input.value);
+                                                                input.addEventListener('change', () => {
+                                                                        const variantId = input.dataset.id;
+                                                                        const margin = input.value === '' ? null : parseFloat(input.value);
+                                                                        const rowEl = input.closest('tr');
 
 									const icon = document.createElement('span');
 									icon.textContent = '✅';
@@ -367,10 +368,24 @@ function loadProducts() {
 										body: JSON.stringify({ custom_margin: margin })
 									}).then(res => res.json())
 										.then(data => {
-										if (data.success) {
-											input.after(icon);
-											setTimeout(() => icon.remove(), 2000);
-										} else {
+                                                                               if (data.success) {
+                                                                               input.after(icon);
+                                                                               setTimeout(() => icon.remove(), 2000);
+
+                                                                               const saleCell = rowEl.children[5];
+                                                                               const profitCell = rowEl.children[7];
+                                                                               const deliveryCell = rowEl.children[8];
+                                                                               const publicCell = rowEl.children[9];
+                                                                               const variantPrice = parseFloat(rowEl.children[4].textContent);
+                                                                               const deliveryPrice = parseFloat(deliveryCell.textContent);
+                                                                               const salePrice = parseFloat(data.sale_price);
+                                                                               const profit = salePrice - variantPrice;
+                                                                               const publicPrice = (salePrice + deliveryPrice) * 1.2;
+                                                                               saleCell.textContent = salePrice.toFixed(2) + ' €';
+                                                                               profitCell.textContent = profit.toFixed(2) + ' €';
+                                                                               publicCell.textContent = publicPrice.toFixed(2) + ' €';
+
+                                                                               } else {
 											const errIcon = document.createElement('span');
 											errIcon.textContent = '❌';
 											errIcon.style.marginLeft = '5px';
