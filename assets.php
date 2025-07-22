@@ -73,6 +73,9 @@ function customiizer_enqueue_customize_assets() {
                 if ('preload-products' === $handle && strpos($request_uri, '/boutique') === false) {
                         return str_replace(' src', ' async src', $tag);
                 }
+                if ('google-identity' === $handle) {
+                        return str_replace(' src', ' async defer src', $tag);
+                }
                 return $tag;
         }, 10, 2);
 
