@@ -7,6 +7,11 @@ if (!defined('PNG_COMPRESSION_LEVEL')) {
     define('PNG_COMPRESSION_LEVEL', 8);
 }
 
+// Google OAuth client ID for login. Set this in wp-config.php to override.
+if (!defined('GOOGLE_CLIENT_ID')) {
+    define('GOOGLE_CLIENT_ID', '');
+}
+
 // Maximum width or height for PNG mockups generated for Printful.
 // Images larger than this size are downscaled before saving.
 if (!defined('MOCKUP_MAX_DIMENSION')) {

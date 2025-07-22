@@ -8,12 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	const closeModalButtons = document.querySelectorAll('.close');
 	const socialButtons = document.querySelectorAll('.social-button');
 
-	socialButtons.forEach(button => {
-		button.addEventListener('click', function(e) {
-			e.preventDefault();  // Empêche toute action par défaut (comme la soumission d'un formulaire)
-			alert("This feature is not yet active.");  // Affiche une alerte
-		});
-	});
+        socialButtons.forEach(button => {
+                if (button.classList.contains('google')) return;
+                button.addEventListener('click', function(e) {
+                        e.preventDefault();  // Empêche toute action par défaut (comme la soumission d'un formulaire)
+                        alert("This feature is not yet active.");  // Affiche une alerte
+                });
+        });
 
 	function switchView(view) {
 		// Hide all views
