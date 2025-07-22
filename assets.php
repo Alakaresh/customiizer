@@ -57,9 +57,11 @@ function customiizer_enqueue_customize_assets() {
 	// SCRIPTS GLOBAUX
 	// ===============================
         wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', [], $ver, true);
-        wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', ['jquery'], $ver, true);
+       wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', ['jquery'], $ver, true);
        wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', ['jquery'], $ver, true);
        wp_enqueue_script('sign-modal-script', get_stylesheet_directory_uri() . '/js/account/sign_modal.js', ['jquery'], $ver, true);
+       wp_enqueue_script('google-identity', 'https://accounts.google.com/gsi/client', [], null, true);
+       wp_enqueue_script('google-signin', get_stylesheet_directory_uri() . '/js/account/google_signin.js', ['google-identity'], $ver, true);
        wp_enqueue_script('user-modal-script', get_stylesheet_directory_uri() . '/js/account/user-modal.js', ['jquery'], $ver, true);
        wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/preload_products.js', [], $ver, true);
        wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
@@ -75,8 +77,13 @@ function customiizer_enqueue_customize_assets() {
         }, 10, 2);
 
 	// Localiser les scripts avec leurs NONCES
-	wp_localize_script('signin-script', 'signin_object', array('nonce' => $signin_nonce));
-	wp_localize_script('signup-script', 'signup_object', array('nonce' => $signup_nonce));
+       wp_localize_script('signin-script', 'signin_object', array('nonce' => $signin_nonce));
+       wp_localize_script('signup-script', 'signup_object', array('nonce' => $signup_nonce));
+       $google_client = defined('GOOGLE_CLIENT_ID') ? GOOGLE_CLIENT_ID : '';
+       wp_localize_script('google-signin', 'googleLogin', array(
+               'ajaxUrl' => admin_url('admin-ajax.php'),
+               'clientId' => $google_client
+       ));
 
 	// ===============================
 	// STYLES & SCRIPTS PAR PAGE
