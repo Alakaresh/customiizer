@@ -104,7 +104,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         products.forEach(product => {
             const imageUrl = product.image || 'default-image-url.jpg';
             const title = product.name || "Nom du produit";
-            const minPrice = product.lowest_price !== null ? `${product.lowest_price} €` : "Prix non disponible";
+            const minPriceTTC = product.lowest_price !== null ? (parseFloat(product.lowest_price) * 1.20).toFixed(2) : null;
+            const minPrice = minPriceTTC !== null ? `${minPriceTTC} € TTC` : "Prix non disponible";
 
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
