@@ -16,13 +16,8 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 				<h2 class="title">Bienvenue sur Customiizer !</h2>
 				<p class="new-user-prompt">Pas encore de compte ? <a href="#" id="showSignup">Créer un compte</a></p>
 
-				<!-- Boutons sociaux désactivés temporairement -->
-				<!--
- <button class="social-button facebook">Se connecter avec Facebook</button>
- <button class="social-button google">Se connecter avec Google</button>
- <button class="social-button apple">Se connecter avec Apple</button>
-<hr class="split-line">
- -->
+                                <button class="social-button google" id="googleLoginBtn">Se connecter avec Google</button>
+                                <hr class="split-line">
 
 
 				<input type="email" class="input-box" placeholder="Adresse e-mail" required>
@@ -42,13 +37,8 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 				<div class="close">✖</div>
 				<h2 class="title">Créer votre compte Customiizer</h2>
 
-				<!-- Boutons sociaux désactivés temporairement -->
-				<!--
- <button class="social-button facebook">S'inscrire avec Facebook</button>
- <button class="social-button google">S'inscrire avec Google</button>
- <button class="social-button apple">S'inscrire avec Apple</button>
-<hr class="split-line">
- -->
+                                <button class="social-button google" id="googleSignupBtn">S'inscrire avec Google</button>
+                                <hr class="split-line">
 
 
 				<button class="email-signup-button" id="showEmailSignup">S'inscrire avec mon e-mail</button>
