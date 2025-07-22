@@ -56,6 +56,17 @@ If the constant is missing, functions like `generate_mockups_printful()` return 
 
 Some API calls target a specific Printful store. Define the constant `PRINTFUL_STORE_ID` in `wp-config.php` to automatically add the `X-PF-Store-Id` header when communicating with Printful. When not defined, the header is omitted and your default store is used.
 
+
+## Google sign-in
+
+To enable the "Se connecter avec Google" and "S'inscrire avec Google" buttons you must supply an OAuth client ID. Define `GOOGLE_CLIENT_ID` in `wp-config.php`:
+
+```php
+define('GOOGLE_CLIENT_ID', 'your-google-client-id.apps.googleusercontent.com');
+```
+
+If this constant is left empty, the Google buttons will not react when clicked.
+
 ## Mockup status endpoint
 
 Generated mockups are cached when the `mockup_task_finished` webhook fires. Check the status of a Printful task using:
