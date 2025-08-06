@@ -271,7 +271,7 @@ text-align: center;
 .product-name-link {
     display: block;
     background-color: #89b9c8; /* Couleur de fond */
-    color: white; /* Couleur du texte */
+    color: #0D1117; /* Couleur du texte */
     text-decoration: none; /* Enlever le soulignement */
     text-align: center; /* Centrer le texte */
     padding: 5px 0; /* Réduction des marges verticales */
