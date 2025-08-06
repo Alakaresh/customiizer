@@ -39,17 +39,19 @@
 .logout-button {
     margin-top: 20px;
     display: flex;
-    background-color: #ff4d4d;
-    color: white;
+    background-color: transparent;
+    color: #ff4d4d;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
+    text-align: center;
     text-decoration: none;
     cursor: pointer;
 }
 
-.logout-button  {
-    text-align: center;
+.logout-button:hover {
+    background-color: #ff4d4d;
+    color: white;
 }
 
 .profile-picture {

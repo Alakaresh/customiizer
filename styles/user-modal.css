@@ -65,12 +65,13 @@
 }
 
 #userModal .modal-button:last-child {
-	background-color: #d14343;
-	color: white;
-	justify-content: center;
-	text-align: center;
+        background-color: transparent;
+        color: #d14343;
+        justify-content: center;
+        text-align: center;
 }
 
 #userModal .modal-button:last-child:hover {
-	background-color: #b93232;
+        background-color: #d14343;
+        color: white;
 }

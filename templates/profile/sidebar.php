@@ -23,7 +23,7 @@
                        <a href="javascript:void(0);" id="missionsLink" class="ajax-link" data-target="missions">Missions</a>
                </nav>
 
-		<a href="/logout" class="logout-button" style="text-align: center;">Déconnexion</a>
+                <a href="/logout" class="logout-button">Déconnexion</a>
 	</div>
 
 	<!-- MODAL CHOIX IMAGE -->
