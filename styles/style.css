@@ -25,7 +25,12 @@
 body {
   font-family: 'Arial', sans-serif;
   color: var(--color-text);
-  background-color: var(--color-background);
+}
+
+/* Ensure body and Astra container share the same background */
+body,
+.ast-separate-container {
+  background-color: var(--color-background) !important;
 }
 
 h2.title {
