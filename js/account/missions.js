@@ -153,9 +153,10 @@ function renderMissions(list) {
     function renderCategory(cat) {
         listContainer.innerHTML = '';
         (groups[cat] || []).forEach(m => {
-            const progress = Math.min(m.progress, m.goal);
-            const percent = Math.round((progress / m.goal) * 100);
-            const completed = m.completed_at && progress >= m.goal;
+            const goal = parseInt(m.goal, 10) > 0 ? parseInt(m.goal, 10) : 1;
+            const progress = Math.min(parseInt(m.progress, 10) || 0, goal);
+            const percent = goal > 0 ? Math.round((progress / goal) * 100) : 0;
+            const completed = m.completed_at && progress >= goal;
             const completedText = completed
                 ? `<div class="mission-completed">Terminée le ${formatMissionDate(m.completed_at)}</div>`
                 : '';
@@ -173,8 +174,8 @@ function renderMissions(list) {
                 </div>
                 <p>${m.description || ''}</p>
                 <div class="progress-wrapper">
-                    <progress max="${m.goal}" value="${progress}"></progress>
-                    <span class="progress-text">${percent}% (<span class="progress-counter">${progress}/${m.goal}</span>)</span>
+                    <progress max="${goal}" value="${progress}"></progress>
+                    <span class="progress-text">${percent}% (<span class="progress-counter">${progress}/${goal}</span>)</span>
                 </div>
                 ${completedText}
             `;
