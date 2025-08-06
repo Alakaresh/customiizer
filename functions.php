@@ -323,3 +323,22 @@ add_action('wp_head', function() {
         echo '<link rel="shortcut icon" href="' . esc_url(get_site_icon_url()) . '" type="image/png">' . "\n";
     }
 });
+
+function customiizer_output_color_palette() {
+    $defaults = [
+        'primary' => '#5a90a0',
+        'secondary' => '#007bff',
+        'background' => '#242424',
+        'text' => '#ffffff',
+    ];
+
+    $css = ':root{';
+    foreach ($defaults as $name => $default) {
+        $color = sanitize_hex_color(get_option("customiizer_color_{$name}", $default));
+        $css .= "--color-{$name}: {$color};";
+    }
+    $css .= '}';
+
+    echo '<style>' . $css . '</style>';
+}
+add_action('wp_head', 'customiizer_output_color_palette');

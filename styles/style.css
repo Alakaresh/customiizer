@@ -1,6 +1,13 @@
+:root {
+  --color-primary: #5a90a0;
+  --color-secondary: #007bff;
+  --color-background: #242424;
+  --color-text: #ffffff;
+}
+
 #site-content {
-	display: flex;
-	margin: auto;
+        display: flex;
+        margin: auto;
 }
 
 .site-content {
@@ -17,8 +24,8 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  color: #ffffff;
-  background-color: #242424;
+  color: var(--color-text);
+  background-color: var(--color-background);
 }
 
 h2.title {
@@ -26,26 +33,26 @@ h2.title {
 	}
 
 a {
-  color: #89b9c8;
+  color: var(--color-primary);
   text-decoration: none;
 }
 
 a:hover {
-  color: #007bff;
+  color: var(--color-secondary);
   text-decoration: none;
 }
 
 button,
 .button {
-  background-color: #5a90a0;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-text);
   border: none;
   cursor: pointer;
 }
 
 button:hover,
 .button:hover {
-  background-color: #007bff;
+  background-color: var(--color-secondary);
 }
 
 /* Surcharge des styles de WooCommerce pour les images dans le panier */

@@ -18,6 +18,7 @@ function customiizer_render_admin_dashboard() {
 	include __DIR__ . '/modules/section-queue.php';
         include __DIR__ . '/modules/section-printful.php';
         include __DIR__ . '/modules/section-monitoring.php';
+        include __DIR__ . '/modules/section-colors.php';
     
     echo '</div>';
 }
