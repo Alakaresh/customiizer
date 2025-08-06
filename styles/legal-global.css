@@ -1,6 +1,6 @@
 .legal-content {
     padding: 80px 20px;
-    background-color: transparent; /* Fond retiré */
+    background-color: var(--color-background); /* Harmonise le fond avec le thème */
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
     color: #f0f0f0; /* Texte clair */
     line-height: 1.8;
