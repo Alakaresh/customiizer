@@ -675,7 +675,7 @@ td.tracking-cell, td.invoice-cell {
         text-align: center;
         font-size: 1.1em;
         font-weight: 600;
-        color: #c29a5b;
+        color: var(--color-primary);
         font-family: 'Cinzel', serif;
 }
 
@@ -687,12 +687,12 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .mission-item {
-        background: linear-gradient(#3b2d1f, #27190b);
-        border: 2px solid #c29a5b;
+        background-color: var(--color-background);
+        border: 2px solid var(--color-primary);
         border-radius: 10px;
         padding: 15px;
         width: 100%;
-        color: #f3e2c7;
+        color: var(--color-text);
         box-shadow: 0 0 10px rgba(0,0,0,0.6);
         font-family: 'Cinzel', serif;
 }
@@ -711,8 +711,8 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .mission-header .points {
-        background: #c29a5b;
-        color: #1b1207;
+        background: var(--color-primary);
+        color: var(--color-text);
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 0.8rem;
@@ -728,23 +728,23 @@ td.tracking-cell, td.invoice-cell {
         width: 100%;
         height: 18px;
         appearance: none;
-        border: 2px solid #c29a5b;
+        border: 2px solid var(--color-primary);
         border-radius: 8px;
-        background-color: #1b1207;
+        background-color: var(--color-background);
 }
 
 .progress-wrapper progress::-webkit-progress-bar {
-        background-color: #1b1207;
+        background-color: var(--color-background);
         border-radius: 8px;
 }
 
 .progress-wrapper progress::-webkit-progress-value {
-        background-color: #c29a5b;
+        background-color: var(--color-primary);
         border-radius: 8px;
 }
 
 .progress-wrapper progress::-moz-progress-bar {
-        background-color: #c29a5b;
+        background-color: var(--color-primary);
         border-radius: 8px;
 }
 
@@ -753,7 +753,7 @@ td.tracking-cell, td.invoice-cell {
         top: 0;
         left: 50%;
         transform: translate(-50%, 0);
-        color: #f3e2c7;
+        color: var(--color-text);
         font-size: 0.75rem;
         line-height: 18px;
         font-weight: bold;
@@ -763,14 +763,14 @@ td.tracking-cell, td.invoice-cell {
         display: inline;
         margin-left: 4px;
         font-size: 0.8rem;
-        color: #f3e2c7;
+        color: var(--color-text);
         font-family: 'Cinzel', serif;
 }
 
 .mission-completed {
         margin-top: 6px;
         text-align: center;
-        color: #c29a5b;
+        color: var(--color-primary);
         font-size: 0.8rem;
         font-family: 'Cinzel', serif;
 }
@@ -783,7 +783,7 @@ td.tracking-cell, td.invoice-cell {
         margin-bottom: 10px;
         text-align: center;
         font-size: 1.3rem;
-        color: #c29a5b;
+        color: var(--color-primary);
         font-family: 'Cinzel', serif;
 }
 
@@ -799,10 +799,10 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #mission-categories .mission-category-item {
-        background: linear-gradient(#3b2d1f, #27190b);
-        border: 2px solid #c29a5b;
+        background-color: var(--color-background);
+        border: 2px solid var(--color-primary);
         border-radius: 10px;
-        color: #f3e2c7;
+        color: var(--color-text);
         font-family: 'Cinzel', serif;
         padding: 10px;
         margin-bottom: 10px;
@@ -812,13 +812,13 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #mission-categories .mission-category-item:hover {
-        background: linear-gradient(#4c3a26, #3a220f);
+        background-color: var(--color-primary);
 }
 
 #mission-categories .mission-category-item.active {
-        background: linear-gradient(#5f4831, #432d1a);
-        box-shadow: 0 0 20px rgba(255,255,255,0.6);
-        border-color: #d6b36e;
+        background-color: var(--color-secondary);
+        box-shadow: 0 0 20px rgba(0,0,0,0.6);
+        border-color: var(--color-secondary);
 }
 
 .missions-list {
@@ -829,17 +829,17 @@ td.tracking-cell, td.invoice-cell {
         position: fixed;
         bottom: 20px;
         right: 20px;
-       background: linear-gradient(#3b2d1f, #27190b);
-       color: #f3e2c7;
+       background-color: var(--color-background);
+       color: var(--color-text);
        padding: 10px 15px;
-       border: 2px solid #c29a5b;
+       border: 2px solid var(--color-primary);
        border-radius: 20px;
        font-family: 'Cinzel', serif;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        display: none;
-        z-index: 1000;
-        align-items: center;
-        gap: 10px;
+       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+       display: none;
+       z-index: 1000;
+       align-items: center;
+       gap: 10px;
 }
 #mission-achievement.show {
         display: flex;
