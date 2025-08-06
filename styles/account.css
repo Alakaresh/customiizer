@@ -14,7 +14,7 @@
 	width: 20%;
 	padding: 10px;
 	box-sizing: border-box;
-	background-color: #031927;
+	background-color: #181818;
 	border-radius: 20px;
 	overflow: auto;
 }
@@ -131,19 +131,24 @@
 }
 
 .logout-button {
-	margin-top: 20px;
-	display: flex;
-	background-color: #ff4d4d;
-	color: white;
-	padding: 10px 20px;
-	border: none;
-	border-radius: 5px;
-	text-decoration: none;
-	cursor: pointer;
+        margin-top: 20px;
+        display: flex;
+        background-color: transparent;
+        color: #ff4d4d;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
 }
 
 .logout-button  {
-	text-align: center;
+        text-align: center;
+}
+
+.logout-button:hover {
+        background-color: #ff4d4d;
+        color: white;
 }
 
 .profile-picture {

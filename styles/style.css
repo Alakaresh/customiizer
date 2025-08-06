@@ -18,7 +18,7 @@
 body {
   font-family: 'Arial', sans-serif;
   color: #ffffff;
-  background-color: #030F32;
+  background-color: #242424;
 }
 
 h2.title {
@@ -26,13 +26,26 @@ h2.title {
 	}
 
 a {
-  color: #5C6BC0;
+  color: #89b9c8;
   text-decoration: none;
 }
 
 a:hover {
-  color: #5C6BC0;
+  color: #007bff;
   text-decoration: none;
+}
+
+button,
+.button {
+  background-color: #5a90a0;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover,
+.button:hover {
+  background-color: #007bff;
 }
 
 /* Surcharge des styles de WooCommerce pour les images dans le panier */

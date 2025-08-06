@@ -210,10 +210,10 @@ body {
 }
 
 .price-value {
-	font-size: 24px;
-	font-weight: bold;
-	color: #ffffff;
-	margin: 5px 0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #B8B8B8;
+        margin: 5px 0;
 }
 
 .price-value span, .discounted-price, .shipping-cost {
