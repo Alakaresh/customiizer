@@ -64,10 +64,10 @@ button:hover,
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: linear-gradient(#3b2d1f, #27190b);
-    color: #f3e2c7;
+    background-color: var(--color-background);
+    color: var(--color-text);
     padding: 10px 15px;
-    border: 2px solid #c29a5b;
+    border: 2px solid var(--color-primary);
     border-radius: 20px;
     font-family: 'Cinzel', serif;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
