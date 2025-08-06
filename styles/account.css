@@ -529,7 +529,7 @@ button:hover {
 }
 
 #header {
-	background-color: #0A0A23 !important; /* Bleu foncé */
+        background-color: #1A1A1A !important; /* Gris très foncé */
 }
 td:last-child {
 	text-align: center;         /* centrer horizontalement */
