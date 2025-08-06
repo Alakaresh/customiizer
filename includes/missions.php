@@ -147,7 +147,6 @@ function customiizer_get_missions( $user_id = 0 ) {
 
     $select_totals = '0 AS action_total';
     $join_totals   = '';
-    $params        = [ $user_id ];
 
     if ( ! empty( $tables ) ) {
         $select_totals = 'ut.total AS action_total';
@@ -164,8 +163,7 @@ function customiizer_get_missions( $user_id = 0 ) {
          LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d" .
          $join_totals .
          " WHERE m.is_active = 1",
-        $params
-
+        $user_id
     );
     $rows = $wpdb->get_results( $sql, ARRAY_A );
 
