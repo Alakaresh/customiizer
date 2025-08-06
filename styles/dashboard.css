@@ -105,7 +105,7 @@
 
 .active-link {
     color: #fff; /* Couleur du texte pour l'onglet actif */
-    background-color: #007bff; /* Couleur de fond pour l'onglet actif */
+    background-color: #89b9c8; /* Couleur de fond pour l'onglet actif */
 }
 .close-btn {
     float: right;        /* Positionne le bouton à droite */
