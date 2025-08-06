@@ -129,10 +129,14 @@
         border-radius: 4px;
 }
 
-.navigation-menu a.active,
 .navigation-menu a:hover {
         background-color: #3B4D63;
-        color: #0D1117;
+        color: #F1F5F9;
+}
+
+.navigation-menu a.active {
+        background-color: #3B4D63;
+        color: #000000;
 }
 
 .logout-button {
