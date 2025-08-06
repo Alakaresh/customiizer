@@ -131,7 +131,7 @@
 
 .navigation-menu a.active,
 .navigation-menu a:hover {
-        background-color: #F97316;
+        background-color: #3B4D63;
         color: #0D1117;
 }
 
@@ -169,12 +169,12 @@
 	width: 100px;
 	height: 100px;
 	border-radius: 50%;
-        border: 2px solid #F97316;
+        border: 2px solid #3B4D63;
         background-color: #161B22;
 }
 
 .plus-vertical, .plus-horizontal {
-        background-color: #F97316;
+        background-color: #3B4D63;
 	position: absolute;
 	border-radius: 2px;
 }
@@ -212,7 +212,7 @@
 	justify-content: center;
 	align-items: center;
 	position: relative;
-        background: conic-gradient(#F97316 var(--percentage-value, 0%), #334155 var(--percentage-value, 0%));
+        background: conic-gradient(#3B4D63 var(--percentage-value, 0%), #334155 var(--percentage-value, 0%));
 }
 
 .progress-ring .percentage {
@@ -230,7 +230,7 @@
 }
 .content-button {
         display: inline-block;
-        background-color: #F97316;
+        background-color: #3B4D63;
         color: #0D1117;
         padding: 10px 20px;
         margin-top: 10px;
@@ -241,7 +241,7 @@
 }
 
 .content-button:hover {
-        background-color: #FF8A3D; /* Couleur de fond au survol */
+        background-color: #556480; /* Couleur de fond au survol */
 }
 
 .centered-content {
@@ -313,30 +313,30 @@
 
 /* Style pour le bouton de la page active */
 .pagination-container button.active {
-        background-color: #F97316; /* Accent pour la page active */
+        background-color: #3B4D63; /* Accent pour la page active */
         color: #0D1117; /* Texte sombre pour le contraste */
         border-color: #C85C0B; /* Bordure un peu plus foncée que le fond */
 }
 .order-id {
-        color: #F97316; /* Accent */
+        color: #3B4D63; /* Accent */
         cursor: pointer;
         text-decoration: underline;
         transition: color 0.2s ease-in-out; /* Transition douce pour le changement de couleur */
 }
 
 .order-id:hover {
-        color: #FF8A3D; /* Teinte plus claire au survol */
+        color: #556480; /* Teinte plus claire au survol */
 }
 .product-image {
 	max-height: 50px !important; /* ou toute autre taille appropriée */
 	height: auto; /* pour maintenir le ratio aspect */
 }
 .tracking-link {
-        color: #F97316;
+        color: #3B4D63;
         text-decoration: underline !important; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
 }
 .tracking-link:hover {
-        color: #FF8A3D;
+        color: #556480;
 }
 /* Utilise les mêmes styles pour les deux formulaires */
 .form-container {
@@ -378,7 +378,7 @@
 
 button {
         padding: 10px 20px;
-        background-color: #F97316;
+        background-color: #3B4D63;
         color: #0D1117;
         border: none;
         border-radius: 4px;
@@ -386,7 +386,7 @@ button {
 }
 
 button:hover {
-        background-color: #FF8A3D;
+        background-color: #556480;
 }
 /* Style pour le Modal */
 .add-payment-modal {
@@ -485,7 +485,7 @@ button:hover {
 .modal-footer button {
         padding: 10px 20px;      /* Padding confortable pour les boutons */
         margin: 0 10px;          /* Espacement horizontal entre les boutons */
-        background-color: #F97316;   /* Couleur de fond des boutons */
+        background-color: #3B4D63;   /* Couleur de fond des boutons */
         color: #0D1117;            /* Couleur du texte */
         border: none;            /* Pas de bordure */
         border-radius: 5px;      /* Bordures arrondies */
@@ -494,7 +494,7 @@ button:hover {
 }
 
 .modal-footer button:hover {
-        background-color: #FF8A3D; /* Couleur au survol */
+        background-color: #556480; /* Couleur au survol */
 }
 .top-buttons {
 	display: flex;
@@ -587,7 +587,7 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #toast-notification, #password-toast-notification {
-        background-color: #F97316; /* Couleur d'accent */
+        background-color: #3B4D63; /* Couleur d'accent */
         color: #0D1117;
         padding: 10px 15px;
         margin-top: 10px;
@@ -623,7 +623,7 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .strength-strong {
-        background-color: #F97316; /* Accent */
+        background-color: #3B4D63; /* Accent */
 }
 .password-rules {
 	list-style: none;
@@ -638,7 +638,7 @@ td.tracking-cell, td.invoice-cell {
 
 .password-rules li.valid::before {
         content: "✅ ";
-        color: #F97316;
+        color: #3B4D63;
 }
 
 .password-rules li.invalid::before {
