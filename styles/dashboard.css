@@ -38,7 +38,7 @@
 
 .logout-button {
     margin-top: 20px;
-    display: flex;
+    display: block;
     background-color: transparent;
     color: #ff4d4d;
     padding: 10px 20px;
