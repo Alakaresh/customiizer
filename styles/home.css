@@ -26,7 +26,7 @@ text-align: center;
 }
 
 .lien {
-    color: #007BFF; /* Couleur principale */
+    color: #89b9c8; /* Couleur principale */
     font-size: 16px; /* Taille du texte */
     font-weight: bold; /* Poids du texte */
     text-decoration: none; /* Pas de soulignement */
@@ -45,7 +45,7 @@ text-align: center;
 }
 
 .lien:hover {
-    color: #0056b3; /* Couleur au survol, assombrir ou changer selon le thème */
+    color: #6D94A0; /* Couleur au survol, assombrir ou changer selon le thème */
     text-decoration: underline; /* Ajouter un soulignement au survol pour indiquer l'interactivité */
 }
 
@@ -71,7 +71,7 @@ text-align: center;
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background-color: #89b9c8;
     color: white;
     padding: 10px 20px;
     text-decoration: none;
@@ -111,7 +111,7 @@ text-align: center;
 .product-button {
     opacity: 0;
     transition: opacity 0.5s ease;
-    background-color: #007bff; /* Couleur du bouton */
+    background-color: #89b9c8; /* Couleur du bouton */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -270,7 +270,7 @@ text-align: center;
 
 .product-name-link {
     display: block;
-    background-color: #007bff; /* Couleur de fond */
+    background-color: #89b9c8; /* Couleur de fond */
     color: white; /* Couleur du texte */
     text-decoration: none; /* Enlever le soulignement */
     text-align: center; /* Centrer le texte */
@@ -282,12 +282,12 @@ text-align: center;
 }
 
 .product-name-link:hover {
-    background-color: #0056b3; /* Couleur au survol */
+    background-color: #6D94A0; /* Couleur au survol */
 }
 
 .product-name {
     margin: 0; /* Enlever les marges si nécessaire */
 }
 #header {
-	background-color: #0A0A23 !important; /* Bleu foncé */
+        background-color: #1A1A1A !important; /* Gris très foncé */
 }

@@ -1,6 +1,6 @@
 /* Upper band styles */
 .upper-band {
-    background-color: #0A0A23;
+    background-color: #1A1A1A;
     position: relative; /* This allows absolute positioning inside */
     height: 100px;
     display: flex;
@@ -71,7 +71,7 @@
 
 /* Lower band styles */
 .lower-band {
-    background-color: #000000;
+    background-color: #1A1A1A;
     text-align: center;
     padding: 10px 20px;
     border-top: 1px solid white;
