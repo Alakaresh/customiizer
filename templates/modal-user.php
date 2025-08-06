@@ -32,9 +32,9 @@
 
 
 
-			<button class="modal-button" style="background-color: #d14343; text-align: center;" onclick="location.href='<?php echo wp_logout_url(home_url('/home')); ?>'">
-				<i class="fas fa-sign-out-alt"></i> Déconnexion
-			</button>
+                        <button class="modal-button" onclick="location.href='<?php echo wp_logout_url(home_url('/home')); ?>'">
+                                <i class="fas fa-sign-out-alt"></i> Déconnexion
+                        </button>
 		</div>
 	</div>
 </div>
