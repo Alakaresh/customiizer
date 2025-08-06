@@ -23,8 +23,8 @@
                        <a href="javascript:void(0);" id="missionsLink" class="ajax-link" data-target="missions">Missions</a>
                </nav>
 
-                <a href="/logout" class="logout-button">Déconnexion</a>
-	</div>
+                <a href="<?php echo wp_logout_url(home_url('/home')); ?>" class="logout-button">Déconnexion</a>
+        </div>
 
 	<!-- MODAL CHOIX IMAGE -->
 	<div id="modalChoixImage" class="modal" style="display: none;">
