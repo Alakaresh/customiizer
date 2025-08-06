@@ -2,9 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
 .account {
-	margin-top: 5%;
-	display: flex;
-	align-items: flex-start; 
+        margin-top: 5%;
+        display: flex;
+        align-items: flex-start;
+        background-color: #0D1117;
+        color: #F1F5F9;
 }
 
 .sidebar {
@@ -14,9 +16,10 @@
 	width: 20%;
 	padding: 10px;
 	box-sizing: border-box;
-	background-color: #181818;
-	border-radius: 20px;
-	overflow: auto;
+        background-color: #161B22;
+        border: 1px solid #334155;
+        border-radius: 20px;
+        overflow: auto;
 }
 
 .main-container {
@@ -37,9 +40,11 @@
        overflow: hidden;
        /*width: 100%;   calc(33.33% - 20px);*/
        margin: 10px;
-       background-color: #5A7D9A;
+       background-color: #161B22;
+       color: #F1F5F9;
        padding: 10px;
        margin-bottom: 10px;
+       border: 1px solid #334155;
        border-radius: 10px;
 }
 .dashboard-container .content-container {
@@ -49,7 +54,7 @@
 }
 
 .content-container h2 {
-	color: #333;
+        color: #F1F5F9;
 	text-align: center;
 	font-size: 24px;
 	font-family: 'Roboto', sans-serif; 
@@ -86,9 +91,9 @@
 	text-align: center; /* Centre le texte */
 	margin-bottom: 20px; /* Espacement sous le titre */
 	padding: 10px; /* Espacement interne */
-	background-color: #031927; /* Couleur d'arrière-plan pour le titre */
-	color: white; /* Couleur du texte */
-	border-radius: 5px; /* Bords arrondis pour le titre */
+        background-color: #161B22; /* Couleur d'arrière-plan pour le titre */
+        color: #F1F5F9; /* Couleur du texte */
+        border-radius: 5px; /* Bords arrondis pour le titre */
 }
 #details-container{
 	width: 100%; /* Set width to maximum */
@@ -104,10 +109,10 @@
 }
 
 .user-info p {
-	margin: 0;
-	color: #fff;
-	font-weight: bold;
-	text-align: center;
+        margin: 0;
+        color: #F1F5F9;
+        font-weight: bold;
+        text-align: center;
 }
 
 .navigation-menu {
@@ -117,17 +122,17 @@
 }
 
 .navigation-menu a {
-	text-decoration: none;
-	color: #fff;
-	padding: 10px;
-	display: block;
-	border-radius: 4px; 
+        text-decoration: none;
+        color: #F1F5F9;
+        padding: 10px;
+        display: block;
+        border-radius: 4px;
 }
 
 .navigation-menu a.active,
 .navigation-menu a:hover {
-	background-color: #007bff;
-	color: white;
+        background-color: #F97316;
+        color: #0D1117;
 }
 
 .logout-button {
@@ -164,12 +169,12 @@
 	width: 100px;
 	height: 100px;
 	border-radius: 50%;
-	border: 2px solid #007bff;
-	background-color: #fff;
+        border: 2px solid #F97316;
+        background-color: #161B22;
 }
 
 .plus-vertical, .plus-horizontal {
-	background-color: #007bff;
+        background-color: #F97316;
 	position: absolute;
 	border-radius: 2px;
 }
@@ -207,36 +212,36 @@
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	background: conic-gradient(#4d5bf9 var(--percentage-value, 0%), #cadcff var(--percentage-value, 0%));
+        background: conic-gradient(#F97316 var(--percentage-value, 0%), #334155 var(--percentage-value, 0%));
 }
 
 .progress-ring .percentage {
 	position: absolute;
 	width: 90px;
 	height: 90px;
-	background: white;
-	border-radius: 50%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 1em;
-	color: black;
-	z-index: 1;
+        background: #0D1117;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1em;
+        color: #F1F5F9;
+        z-index: 1;
 }
 .content-button {
-	display: inline-block;
-	background-color: #007bff;
-	color: white;
-	padding: 10px 20px;
-	margin-top: 10px;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	font-size: 1em;
+        display: inline-block;
+        background-color: #F97316;
+        color: #0D1117;
+        padding: 10px 20px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
 }
 
 .content-button:hover {
-	background-color: #cadcff; /* Couleur de fond au survol */
+        background-color: #FF8A3D; /* Couleur de fond au survol */
 }
 
 .centered-content {
@@ -291,47 +296,47 @@
 }
 /* Styles pour les boutons de pagination */
 .pagination-container button {
-	padding: 8px 12px;
-	margin: 0 4px;
-	border: 1px solid #555; /* Bordure plus foncée pour contraste */
-	background-color: #333; /* Fond plus sombre */
-	color: #ddd; /* Texte plus clair pour contraste */
-	cursor: pointer;
-	transition: background-color 0.3s, color 0.3s; /* Effet de transition doux */
+        padding: 8px 12px;
+        margin: 0 4px;
+        border: 1px solid #334155; /* Bordure pour contraste */
+        background-color: #161B22; /* Fond sombre */
+        color: #F1F5F9; /* Texte clair pour contraste */
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s; /* Effet de transition doux */
 }
 
 /* Survol des boutons de pagination */
 .pagination-container button:hover {
-	background-color: #444; /* Légèrement plus clair au survol pour un effet visuel */
-	border-color: #666;
+        background-color: #1E293B; /* Légèrement plus clair au survol pour un effet visuel */
+        border-color: #334155;
 }
 
 /* Style pour le bouton de la page active */
 .pagination-container button.active {
-	background-color: #007bff; /* Couleur primaire plus vive pour la page active */
-	color: white; /* Texte blanc pour le contraste */
-	border-color: #0056b3; /* Bordure un peu plus foncée que le fond */
+        background-color: #F97316; /* Accent pour la page active */
+        color: #0D1117; /* Texte sombre pour le contraste */
+        border-color: #C85C0B; /* Bordure un peu plus foncée que le fond */
 }
 .order-id {
-	color: #004488; /* Un bleu plus sombre */
-	cursor: pointer;
-	text-decoration: underline;
-	transition: color 0.2s ease-in-out; /* Transition douce pour le changement de couleur */
+        color: #F97316; /* Accent */
+        cursor: pointer;
+        text-decoration: underline;
+        transition: color 0.2s ease-in-out; /* Transition douce pour le changement de couleur */
 }
 
 .order-id:hover {
-	color: #000000; /* Une teinte encore plus sombre au survol */
+        color: #FF8A3D; /* Teinte plus claire au survol */
 }
 .product-image {
 	max-height: 50px !important; /* ou toute autre taille appropriée */
 	height: auto; /* pour maintenir le ratio aspect */
 }
 .tracking-link {
-	color: #004488; /* Choisissez une couleur qui contraste bien avec #5A7D9A, comme l'or */
-	text-decoration: underline !important; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
+        color: #F97316;
+        text-decoration: underline !important; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
 }
 .tracking-link:hover {
-	color: #000000; /* Choisissez une couleur qui contraste bien avec #5A7D9A, comme l'or */
+        color: #FF8A3D;
 }
 /* Utilise les mêmes styles pour les deux formulaires */
 .form-container {
@@ -372,16 +377,16 @@
 }
 
 button {
-	padding: 10px 20px;
-	background-color: #007bff;
-	color: white;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
+        padding: 10px 20px;
+        background-color: #F97316;
+        color: #0D1117;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
 }
 
 button:hover {
-	background-color: #0056b3;
+        background-color: #FF8A3D;
 }
 /* Style pour le Modal */
 .add-payment-modal {
@@ -478,18 +483,18 @@ button:hover {
 
 /* Styles des boutons */
 .modal-footer button {
-	padding: 10px 20px;      /* Padding confortable pour les boutons */
-	margin: 0 10px;          /* Espacement horizontal entre les boutons */
-	background-color: #007bff;   /* Couleur de fond des boutons */
-	color: white;            /* Couleur du texte */
-	border: none;            /* Pas de bordure */
-	border-radius: 5px;      /* Bordures arrondies */
-	cursor: pointer;         /* Curseur pointer pour indiquer l'interactivité */
-	outline: none;           /* Supprime le contour lors de la sélection */
+        padding: 10px 20px;      /* Padding confortable pour les boutons */
+        margin: 0 10px;          /* Espacement horizontal entre les boutons */
+        background-color: #F97316;   /* Couleur de fond des boutons */
+        color: #0D1117;            /* Couleur du texte */
+        border: none;            /* Pas de bordure */
+        border-radius: 5px;      /* Bordures arrondies */
+        cursor: pointer;         /* Curseur pointer pour indiquer l'interactivité */
+        outline: none;           /* Supprime le contour lors de la sélection */
 }
 
 .modal-footer button:hover {
-	background-color: #0056b3; /* Couleur au survol */
+        background-color: #FF8A3D; /* Couleur au survol */
 }
 .top-buttons {
 	display: flex;
@@ -577,21 +582,21 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #purchases-container th {
-        background-color: #031927;
-        color: #fff;
+        background-color: #161B22;
+        color: #F1F5F9;
 }
 
 #toast-notification, #password-toast-notification {
-	background-color: #28a745; /* vert par défaut */
-	color: white;
-	padding: 10px 15px;
-	margin-top: 10px;
-	border-radius: 4px;
-	font-size: 14px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	transition: opacity 0.3s ease;
-	opacity: 0;
-	display: block;
+        background-color: #F97316; /* Couleur d'accent */
+        color: #0D1117;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease;
+        opacity: 0;
+        display: block;
 }
 #toast-notification.show, #password-toast-notification.show {
 	opacity: 1;
@@ -618,7 +623,7 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .strength-strong {
-	background-color: #28a745; /* Vert */
+        background-color: #F97316; /* Accent */
 }
 .password-rules {
 	list-style: none;
@@ -632,8 +637,8 @@ td.tracking-cell, td.invoice-cell {
 }
 
 .password-rules li.valid::before {
-	content: "✅ ";
-	color: #28a745;
+        content: "✅ ";
+        color: #F97316;
 }
 
 .password-rules li.invalid::before {
