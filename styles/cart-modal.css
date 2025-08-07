@@ -1,3 +1,65 @@
+/* === MODAL OVERLAY === */
+.cart-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* fond semi-transparent */
+  display: none;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === BOÎTE MODALE COMPACTE === */
+.cart-modal-content {
+  background: #f9f9f9;
+  width: 420px;
+  max-width: 95%;
+  border-radius: 10px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+/* === EN-TÊTE === */
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-cart {
+  cursor: pointer;
+  font-size: 24px;
+  color: #777;
+}
+
+/* === CONTENU DU PANIER === */
+.cart-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* === PRODUITS === */
+.custom-cart-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .custom-cart-item {
   display: flex;
   align-items: stretch;
@@ -7,17 +69,18 @@
   position: relative;
 }
 
-.item-image img {
-  height: 100%;
-  max-height: 100px;
-  width: auto;
-  object-fit: cover;
-}
-
 .item-image {
   height: 100px;
+  width: auto;
   margin-right: 15px;
   flex-shrink: 0;
+}
+
+.item-image img {
+  height: 100%;
+  width: auto;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
 .item-info {
@@ -60,6 +123,8 @@
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  background: white;
+  color: #333;
 }
 
 .remove-item {
@@ -74,6 +139,37 @@
 }
 
 .remove-item:hover {
-  background: none !important;
   color: #333;
+  background: none;
+}
+
+/* === RÉCAP === */
+.cart-summary {
+  margin-top: 20px;
+  font-size: 15px;
+  color: #444;
+}
+
+.cart-summary p {
+  margin-bottom: 10px;
+}
+
+/* === PIED DE MODAL === */
+.cart-footer {
+  padding: 20px;
+  border-top: 1px solid #ddd;
+  background: #eee;
+}
+
+.checkout-button {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 15px;
+  background-color: #e50000;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 8px;
+  font-size: 16px;
 }
