@@ -62,6 +62,23 @@ function customiizer_get_cart_body_html() {
         <?php
     endif;
 
+    <?php
+    $shipping_total     = WC()->cart->get_shipping_total() + WC()->cart->get_shipping_tax();
+    $subtotal_ht        = WC()->cart->get_subtotal();
+    $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
+    ?>
+    <div class="cart-summary">
+        <p class="shipping-line">
+            <span class="label">Coût d'expédition estimé :</span>
+            <strong class="shipping-price"><?php echo wc_price( $shipping_total ); ?></strong>
+        </p>
+        <p class="subtotal-line" data-label-ht="Sous-total (HT) :" data-label-ttc="Sous-total (TTC) :">
+            <span class="label">Sous-total (TTC) :</span>
+            <strong class="subtotal-price" data-price-ht="<?php echo esc_attr( wc_price( $subtotal_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $subtotal_ttc ) ); ?>"><?php echo wc_price( $subtotal_ttc ); ?></strong>
+        </p>
+    </div>
+    <?php
+
     return ob_get_clean();
 }
 
