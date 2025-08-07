@@ -48,32 +48,44 @@ function customiizer_get_cart_body_html() {
         $shipping_total_ttc = $shipping_total_ht + WC()->cart->get_shipping_tax();
         $subtotal_ht        = WC()->cart->get_subtotal();
         $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
+        $total_ht           = $subtotal_ht + $shipping_total_ht;
+        $total_ttc          = $subtotal_ttc + $shipping_total_ttc;
         ?>
         <div class="cart-summary">
-            <p class="shipping-line" data-label-ht="Coût d'expédition estimé (HT) :" data-label-ttc="Coût d'expédition estimé (TTC) :">
-                <span class="label">Coût d'expédition estimé (TTC) :</span>
-                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ttc ); ?></strong>
+            <p class="shipping-line" data-label-ht="Coût d'expédition estimé :" data-label-ttc="Coût d'expédition estimé :">
+                <span class="label">Coût d'expédition estimé :</span>
+                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>"><?php echo wc_price( $shipping_total_ht ); ?></strong>
             </p>
             <p class="subtotal-line" data-label-ht="Sous-total (HT) :" data-label-ttc="Sous-total (TTC) :">
                 <span class="label">Sous-total (TTC) :</span>
                 <strong class="subtotal-price" data-price-ht="<?php echo esc_attr( wc_price( $subtotal_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $subtotal_ttc ) ); ?>"><?php echo wc_price( $subtotal_ttc ); ?></strong>
             </p>
+            <p class="total-line" data-label-ht="Total (HT) :" data-label-ttc="Total (TTC) :">
+                <span class="label">Total (TTC) :</span>
+                <strong class="total-price" data-price-ht="<?php echo esc_attr( wc_price( $total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $total_ttc ) ); ?>"><?php echo wc_price( $total_ttc ); ?></strong>
+            </p>
         </div>
         <?php
     endif;
 
-    $shipping_total     = WC()->cart->get_shipping_total() + WC()->cart->get_shipping_tax();
+    $shipping_total_ht  = WC()->cart->get_shipping_total();
+    $shipping_total_ttc = $shipping_total_ht + WC()->cart->get_shipping_tax();
     $subtotal_ht        = WC()->cart->get_subtotal();
     $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
+    $total_ttc          = $subtotal_ttc + $shipping_total_ttc;
     ?>
     <div class="cart-summary">
         <p class="shipping-line">
             <span class="label">Coût d'expédition estimé :</span>
-            <strong class="shipping-price"><?php echo wc_price( $shipping_total ); ?></strong>
+            <strong class="shipping-price"><?php echo wc_price( $shipping_total_ht ); ?></strong>
         </p>
         <p class="subtotal-line" data-label-ht="Sous-total (HT) :" data-label-ttc="Sous-total (TTC) :">
             <span class="label">Sous-total (TTC) :</span>
             <strong class="subtotal-price" data-price-ht="<?php echo esc_attr( wc_price( $subtotal_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $subtotal_ttc ) ); ?>"><?php echo wc_price( $subtotal_ttc ); ?></strong>
+        </p>
+        <p class="total-line">
+            <span class="label">Total (TTC) :</span>
+            <strong class="total-price"><?php echo wc_price( $total_ttc ); ?></strong>
         </p>
     </div>
     <?php
