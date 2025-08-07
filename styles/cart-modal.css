@@ -1,23 +1,22 @@
 .cart-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 80px; /* position under the header */
+    right: 20px;
+    background: transparent; /* no fullscreen overlay */
+    width: auto;
+    height: auto;
+    display: none;
     z-index: 1000;
 }
 
 .cart-modal-content {
-    background: #fff;
+    background: #f0f0f0; /* grayscale background */
+    color: #333;
     padding: 20px;
-    max-width: 500px;
-    width: 90%;
-    position: relative;
+    width: 300px;
+    border: 1px solid #ccc;
     border-radius: 8px;
+    position: relative;
 }
 
 .close-cart {
@@ -26,4 +25,5 @@
     right: 10px;
     cursor: pointer;
     font-size: 20px;
+    color: #555;
 }
