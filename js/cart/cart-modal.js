@@ -84,16 +84,16 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const shippingPrice = cartModal.querySelector('.shipping-price');
       if (shippingPrice) {
-        shippingPrice.innerHTML = showTtc ? shippingPrice.dataset.priceTtc : shippingPrice.dataset.priceHt;
+        // Shipping fees are always HT, so don't switch values
+        shippingPrice.innerHTML = shippingPrice.dataset.priceHt;
       }
-      const shippingLine = cartModal.querySelector('.shipping-line');
-      if (shippingLine) {
-        const label = shippingLine.querySelector('.label');
-        label.textContent = showTtc ? shippingLine.dataset.labelTtc : shippingLine.dataset.labelHt;
-      }
-      const taxPrice = cartModal.querySelector('.tax-price');
-      if (taxPrice) {
-        taxPrice.innerHTML = showTtc ? taxPrice.dataset.priceTtc : taxPrice.dataset.priceHt;
+      const taxLine = cartModal.querySelector('.tax-line');
+      if (taxLine) {
+        taxLine.style.display = showTtc ? '' : 'none';
+        const taxPrice = taxLine.querySelector('.tax-price');
+        if (taxPrice) {
+          taxPrice.innerHTML = showTtc ? taxPrice.dataset.priceTtc : taxPrice.dataset.priceHt;
+        }
       }
       const totalPrice = cartModal.querySelector('.total-price');
       if (totalPrice) {

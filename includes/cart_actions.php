@@ -45,7 +45,8 @@ function customiizer_get_cart_body_html() {
 
         <?php
         $shipping_total_ht  = WC()->cart->get_shipping_total();
-        $shipping_total_ttc = $shipping_total_ht + WC()->cart->get_shipping_tax();
+        // Shipping fees are stored tax excluded, so TTC should match HT
+        $shipping_total_ttc = $shipping_total_ht;
         $subtotal_ht        = WC()->cart->get_subtotal();
         $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
         $total_ht           = $subtotal_ht + $shipping_total_ht;
