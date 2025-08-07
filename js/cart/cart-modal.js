@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const closeBtn = cartModal.querySelector('.close-cart');
+  const taxToggle = document.getElementById('taxToggle');
 
   cartButton.addEventListener('click', function (e) {
     e.preventDefault();
@@ -47,4 +48,31 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(() => location.reload());
     });
   });
+
+  if (taxToggle) {
+    taxToggle.addEventListener('change', function () {
+      const showTtc = this.checked;
+      document.querySelectorAll('.item-price').forEach(el => {
+        el.innerHTML = showTtc ? el.dataset.priceTtc : el.dataset.priceHt;
+      });
+      const shippingPrice = document.querySelector('.shipping-price');
+      if (shippingPrice) {
+        shippingPrice.innerHTML = showTtc ? shippingPrice.dataset.priceTtc : shippingPrice.dataset.priceHt;
+      }
+      const subtotalPrice = document.querySelector('.subtotal-price');
+      if (subtotalPrice) {
+        subtotalPrice.innerHTML = showTtc ? subtotalPrice.dataset.priceTtc : subtotalPrice.dataset.priceHt;
+      }
+      const shippingLine = document.querySelector('.shipping-line');
+      if (shippingLine) {
+        const label = shippingLine.querySelector('.label');
+        label.textContent = showTtc ? shippingLine.dataset.labelTtc : shippingLine.dataset.labelHt;
+      }
+      const subtotalLine = document.querySelector('.subtotal-line');
+      if (subtotalLine) {
+        const label = subtotalLine.querySelector('.label');
+        label.textContent = showTtc ? subtotalLine.dataset.labelTtc : subtotalLine.dataset.labelHt;
+      }
+    });
+  }
 });
