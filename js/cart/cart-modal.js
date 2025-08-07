@@ -82,14 +82,23 @@ document.addEventListener('DOMContentLoaded', function () {
       cartModal.querySelectorAll('.item-price').forEach(el => {
         el.innerHTML = showTtc ? el.dataset.priceTtc : el.dataset.priceHt;
       });
-      const subtotalPrice = cartModal.querySelector('.subtotal-price');
-      if (subtotalPrice) {
-        subtotalPrice.innerHTML = showTtc ? subtotalPrice.dataset.priceTtc : subtotalPrice.dataset.priceHt;
+      const shippingPrice = cartModal.querySelector('.shipping-price');
+      if (shippingPrice) {
+        shippingPrice.innerHTML = showTtc ? shippingPrice.dataset.priceTtc : shippingPrice.dataset.priceHt;
       }
-      const subtotalLine = cartModal.querySelector('.subtotal-line');
-      if (subtotalLine) {
-        const label = subtotalLine.querySelector('.label');
-        label.textContent = showTtc ? subtotalLine.dataset.labelTtc : subtotalLine.dataset.labelHt;
+      const shippingLine = cartModal.querySelector('.shipping-line');
+      if (shippingLine) {
+        const label = shippingLine.querySelector('.label');
+        label.textContent = showTtc ? shippingLine.dataset.labelTtc : shippingLine.dataset.labelHt;
+      }
+      const totalPrice = cartModal.querySelector('.total-price');
+      if (totalPrice) {
+        totalPrice.innerHTML = showTtc ? totalPrice.dataset.priceTtc : totalPrice.dataset.priceHt;
+      }
+      const totalLine = cartModal.querySelector('.total-line');
+      if (totalLine) {
+        const label = totalLine.querySelector('.label');
+        label.textContent = showTtc ? totalLine.dataset.labelTtc : totalLine.dataset.labelHt;
       }
     });
   }
