@@ -91,6 +91,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const label = shippingLine.querySelector('.label');
         label.textContent = showTtc ? shippingLine.dataset.labelTtc : shippingLine.dataset.labelHt;
       }
+      const taxPrice = cartModal.querySelector('.tax-price');
+      if (taxPrice) {
+        taxPrice.innerHTML = showTtc ? taxPrice.dataset.priceTtc : taxPrice.dataset.priceHt;
+      }
       const totalPrice = cartModal.querySelector('.total-price');
       if (totalPrice) {
         totalPrice.innerHTML = showTtc ? totalPrice.dataset.priceTtc : totalPrice.dataset.priceHt;
