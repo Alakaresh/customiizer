@@ -72,7 +72,7 @@ function customiizer_get_cart_body_html() {
  */
 function customiizer_get_cart_footer_html() {
     if ( WC()->cart->is_empty() ) {
-        $shop_url = wc_get_page_permalink( 'shop' );
+        $shop_url = home_url( '/boutique' );
         return '<a href="' . esc_url( $shop_url ) . '" class="checkout-button">Voir la boutique</a>';
     }
 
