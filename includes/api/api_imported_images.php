@@ -31,12 +31,23 @@ function customiizer_upload_image(WP_REST_Request $request) {
 		return new WP_REST_Response(["error" => "Paramètre manquant."], 400);
 	}
 
-	$user_id = isset($params['user_id']) ? intval($params['user_id']) : get_current_user_id();
-	$containerName = "imageclient";
-	$blobFolder = $user_id . "/import/";
-	$blobName = $blobFolder . pathinfo($name, PATHINFO_FILENAME) . ".webp";
-	$blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
-	$blobFullUrl = $blobBaseUrl . $blobName;
+        $user_id = isset($params['user_id']) ? intval($params['user_id']) : get_current_user_id();
+        $containerName = "imageclient";
+
+        // Gestion d'un utilisateur invité : on utilise l'identifiant de session
+        if ($user_id === 0) {
+                if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                }
+                $session_id = session_id();
+                $blobFolder = "guest_{$session_id}/import/";
+        } else {
+                $blobFolder = $user_id . "/import/";
+        }
+
+        $blobName = $blobFolder . pathinfo($name, PATHINFO_FILENAME) . ".webp";
+        $blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
+        $blobFullUrl = $blobBaseUrl . $blobName;
 
 	customiizer_log("📤 Début de l'upload par UserID: $user_id, Nom: $name");
 
@@ -89,32 +100,44 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	unlink($tmpFile); // Suppression du fichier temporaire
 	customiizer_log("✅ Téléversement sur Azure réussi: $blobFullUrl");
 
-	// Sauvegarde en base de données
-	$table_name = 'WPC_imported_image';
-	$image_date = current_time('mysql');
+        $image_date = current_time('mysql');
 
-	$result = $wpdb->insert(
-		$table_name,
-		[
-			'user_id' => $user_id,
-			'image_url' => $blobFullUrl,
-			'image_date' => $image_date,
-		],
-		['%d', '%s', '%s']
-	);
+        if ($user_id === 0) {
+                // Invité : enregistrer en session
+                if (!isset($_SESSION['guest_import_images'])) {
+                        $_SESSION['guest_import_images'] = [];
+                }
+                $_SESSION['guest_import_images'][] = [
+                        'image_url' => $blobFullUrl,
+                        'image_date' => $image_date,
+                ];
+                $db_status = 'Enregistré en session.';
+        } else {
+                // Utilisateur connecté : sauvegarder en base
+                $table_name = 'WPC_imported_image';
+                $result = $wpdb->insert(
+                        $table_name,
+                        [
+                                'customer_id' => $user_id,
+                                'image_url' => $blobFullUrl,
+                                'image_date' => $image_date,
+                        ],
+                        ['%d', '%s', '%s']
+                );
 
-	if ($result === false) {
-		customiizer_log("❌ Erreur insertion BDD: " . $wpdb->last_error);
-		return new WP_REST_Response(["error" => "Erreur d'insertion en base de données."], 500);
-	}
+                if ($result === false) {
+                        customiizer_log("❌ Erreur insertion BDD: " . $wpdb->last_error);
+                        return new WP_REST_Response(["error" => "Erreur d'insertion en base de données."], 500);
+                }
+                customiizer_log("✅ Image enregistrée en base de données pour UserID: $user_id");
+                $db_status = 'Enregistré en base de données.';
+        }
 
-	customiizer_log("✅ Image enregistrée en base de données pour UserID: $user_id");
-
-	return new WP_REST_Response([
-		'success' => true, // ✅ ajouter ça
-		'message' => 'Image téléchargée avec succès.',
+        return new WP_REST_Response([
+                'success' => true,
+                'message' => 'Image téléchargée avec succès.',
                 'blob_path' => $blobName,
-                'db_status' => 'Enregistré en base de données.'
+                'db_status' => $db_status,
         ], 200);
 
 }
@@ -133,22 +156,27 @@ function customiizer_get_user_images(WP_REST_Request $request) {
         }
         $user_id = intval($user_id_param);
 
-	$table_name = 'WPC_imported_image';
+        customiizer_log("📥 Demande de récupération des images pour UserID: $user_id");
 
-	customiizer_log("📥 Demande de récupération des images pour UserID: $user_id");
+        if ($user_id === 0) {
+                if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                }
+                $images = isset($_SESSION['guest_import_images']) ? $_SESSION['guest_import_images'] : [];
+                return new WP_REST_Response($images, 200);
+        }
 
-	$results = $wpdb->get_results($wpdb->prepare("
-        SELECT image_url, image_date 
-        FROM $table_name 
-        WHERE user_id = %d
-        ORDER BY image_date DESC
-    ", $user_id), ARRAY_A);
+        $table_name = 'WPC_imported_image';
+        $results = $wpdb->get_results($wpdb->prepare(
+                "SELECT image_url, image_date FROM $table_name WHERE customer_id = %d ORDER BY image_date DESC",
+                $user_id
+        ), ARRAY_A);
 
-	if (empty($results)) {
-		customiizer_log("⚠️ Aucune image trouvée pour UserID: $user_id.");
-		return new WP_REST_Response(["error" => "Aucune image enregistrée."], 404);
-	}
+        if (!$results) {
+                customiizer_log("⚠️ Aucune image trouvée pour UserID: $user_id.");
+                return new WP_REST_Response([], 200);
+        }
 
-	customiizer_log("✅ Images récupérées avec succès pour UserID: $user_id.");
-	return new WP_REST_Response($results, 200);
+        customiizer_log("✅ Images récupérées avec succès pour UserID: $user_id.");
+        return new WP_REST_Response($results, 200);
 }
