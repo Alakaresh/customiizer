@@ -62,7 +62,6 @@ function customiizer_get_cart_body_html() {
         <?php
     endif;
 
-    <?php
     $shipping_total     = WC()->cart->get_shipping_total() + WC()->cart->get_shipping_tax();
     $subtotal_ht        = WC()->cart->get_subtotal();
     $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
