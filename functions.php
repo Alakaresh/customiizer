@@ -147,6 +147,7 @@ add_action( 'init', function() {
                 '/includes/api/api_imported_images.php',
                 '/includes/api/api_templates.php',
                 '/includes/api/api_mockup_status.php',
+                '/includes/set_default_country.php',
                 '/includes/add_to_cart.php',
 
 	];
