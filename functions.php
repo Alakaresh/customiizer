@@ -149,6 +149,7 @@ add_action( 'init', function() {
                 '/includes/api/api_mockup_status.php',
                 '/includes/set_default_country.php',
                 '/includes/add_to_cart.php',
+                '/includes/cart_actions.php',
 
 	];
         if (is_dir(get_stylesheet_directory() . '/admin')) {
