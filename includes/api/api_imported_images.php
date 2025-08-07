@@ -113,9 +113,9 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	return new WP_REST_Response([
 		'success' => true, // ✅ ajouter ça
 		'message' => 'Image téléchargée avec succès.',
-		'blob_path' => $blob_path,
-		'db_status' => 'Enregistré en base de données.'
-	], 200);
+                'blob_path' => $blobName,
+                'db_status' => 'Enregistré en base de données.'
+        ], 200);
 
 }
 
@@ -123,14 +123,15 @@ function customiizer_upload_image(WP_REST_Request $request) {
  * 🔍 Récupère les images importées par l'utilisateur
  */
 function customiizer_get_user_images(WP_REST_Request $request) {
-	global $wpdb;
+        global $wpdb;
 
-	$user_id = intval($request->get_param('user_id'));
-
-	if (!$user_id) {
-		customiizer_log("❌ Paramètre 'user_id' manquant.");
-		return new WP_REST_Response(["error" => "Le paramètre 'user_id' est requis."], 400);
-	}
+        // Récupération brute pour préserver l'ID 0 (invité)
+        $user_id_param = $request->get_param('user_id');
+        if ($user_id_param === null || $user_id_param === '') {
+                customiizer_log("❌ Paramètre 'user_id' manquant.");
+                return new WP_REST_Response(["error" => "Le paramètre 'user_id' est requis."], 400);
+        }
+        $user_id = intval($user_id_param);
 
 	$table_name = 'WPC_imported_image';
 
