@@ -51,6 +51,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_style('fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', [], $ver);
        wp_enqueue_style('modal-login-style', get_stylesheet_directory_uri() . '/styles/modal-login.css', [], $ver);
        wp_enqueue_style('user-modal-style', get_stylesheet_directory_uri() . '/styles/user-modal.css', [], $ver);
+       wp_enqueue_style('cart-modal-style', get_stylesheet_directory_uri() . '/styles/cart-modal.css', [], $ver);
        wp_enqueue_style('loyalty-widget-style', get_stylesheet_directory_uri() . '/styles/loyalty_widget.css', [], $ver);
 
 	// ===============================
@@ -63,6 +64,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_script('google-identity', 'https://accounts.google.com/gsi/client', [], null, true);
        wp_enqueue_script('google-signin', get_stylesheet_directory_uri() . '/js/account/google_signin.js', ['google-identity'], $ver, true);
        wp_enqueue_script('user-modal-script', get_stylesheet_directory_uri() . '/js/account/user-modal.js', ['jquery'], $ver, true);
+       wp_enqueue_script('cart-modal-script', get_stylesheet_directory_uri() . '/js/cart/cart-modal.js', [], $ver, true);
        wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/preload_products.js', [], $ver, true);
        wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
        wp_enqueue_script('referral-script', get_stylesheet_directory_uri() . '/js/referral/referral.js', [], $ver, true);
