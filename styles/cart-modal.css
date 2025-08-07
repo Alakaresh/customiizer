@@ -211,6 +211,12 @@
   margin-bottom: 10px;
 }
 
+.empty-cart-message {
+  text-align: center;
+  margin: 20px 0;
+  color: #444;
+}
+
 /* === PIED DE MODAL === */
 .cart-footer {
   padding: 20px;
