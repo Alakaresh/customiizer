@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_template_part('templates/modal', 'login');
 get_template_part('templates/modal', 'user');
+get_template_part('templates/modal', 'cart');
 
 $current_user = wp_get_current_user();
 $user_logged_in = is_user_logged_in();
@@ -80,17 +81,17 @@ $display_name = $current_user->display_name;
 					<?php endif; ?>
 
 					<?php if (class_exists('WooCommerce')): ?>
-					<div class="cart-container">
-						<a href="<?php echo wc_get_cart_url(); ?>" class="icon-button">
-							<i class="fas fa-shopping-bag"></i>
-							<span class="cart-text">Panier</span>
-							<?php $count = WC()->cart->get_cart_contents_count(); ?>
-							<?php if ($count > 0): ?>
-							<span class="cart-count"><?php echo esc_html($count); ?></span>
-							<?php endif; ?>
-						</a>
-					</div>
-					<?php endif; ?>
+                                        <div class="cart-container">
+                                                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button">
+                                                        <i class="fas fa-shopping-bag"></i>
+                                                        <span class="cart-text">Panier</span>
+                                                        <?php $count = WC()->cart->get_cart_contents_count(); ?>
+                                                        <?php if ($count > 0): ?>
+                                                        <span class="cart-count"><?php echo esc_html($count); ?></span>
+                                                        <?php endif; ?>
+                                                </a>
+                                        </div>
+                                        <?php endif; ?>
 
 					<?php if ($user_logged_in): ?>
 					<?php
