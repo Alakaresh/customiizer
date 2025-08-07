@@ -14,7 +14,7 @@ jQuery(document).ready(function($) {
                 const button = $(this);
                 button.prop('disabled', true);
 
-                const proceed = (pid) => { addToCartAjax(pid, '/cart/'); };
+                const proceed = (pid) => { addToCartAjax(pid); };
 
                 if (window.generatedProductId) {
                         proceed(window.generatedProductId);
@@ -85,30 +85,27 @@ jQuery(document).ready(function($) {
 	}
 
 
-	function addToCartAjax(productId, redirectUrl = null) {
-		fetch(`/?add-to-cart=${productId}`, {
-			method: 'GET',
-			headers: {
-				'X-Requested-With': 'XMLHttpRequest'
-			}
-		})
-			.then(response => {
-			if (!response.ok) {
-				throw new Error('Erreur lors de l\'ajout au panier.');
-			}
-			return response.text();
-		})
-			.then(html => {
-
-			// ✅ Si un URL de redirection est donné, on y va !
-			if (redirectUrl) {
-				window.location.href = redirectUrl;
-			}
-		})
-			.catch(error => {
-			console.error('❌ Erreur ajout au panier :', error);
-		});
-	}
+        function addToCartAjax(productId) {
+                fetch(`/?add-to-cart=${productId}`, {
+                        method: 'GET',
+                        headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                        }
+                })
+                        .then(response => {
+                        if (!response.ok) {
+                                throw new Error('Erreur lors de l\'ajout au panier.');
+                        }
+                        return response.text();
+                })
+                        .then(html => {
+                        sessionStorage.setItem('openCartModal', 'true');
+                        window.location.reload();
+                })
+                        .catch(error => {
+                        console.error('❌ Erreur ajout au panier :', error);
+                });
+        }
 
 
 });

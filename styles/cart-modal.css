@@ -8,10 +8,10 @@
   background: rgba(0, 0, 0, 0.3); /* fond semi-transparent */
   display: none;
   z-index: 1000;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: 80px;
+  padding-right: 20px;
 }
 
 /* === BOÎTE MODALE COMPACTE === */

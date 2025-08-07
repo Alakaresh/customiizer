@@ -3,11 +3,16 @@ document.addEventListener('DOMContentLoaded', function () {
   const cartModal = document.getElementById('cartModal');
   if (!cartButton || !cartModal) return;
 
+  if (sessionStorage.getItem('openCartModal') === 'true') {
+    cartModal.style.display = 'flex';
+    sessionStorage.removeItem('openCartModal');
+  }
+
   const closeBtn = cartModal.querySelector('.close-cart');
 
   cartButton.addEventListener('click', function (e) {
     e.preventDefault();
-    cartModal.style.display = 'block';
+    cartModal.style.display = 'flex';
   });
 
   if (closeBtn) {
