@@ -25,7 +25,7 @@ WC()->cart->calculate_totals();
     </div>
 
     <div class="cart-footer">
-      <a href="<?php echo wc_get_checkout_url(); ?>" class="checkout-button">Poursuivre la commande</a>
+      <?php echo customiizer_get_cart_footer_html(); ?>
     </div>
   </div>
 </div>

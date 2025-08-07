@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  function refreshCartBody(html) {
+  function refreshCartBody(html, footerHtml) {
     const body = cartModal.querySelector('.cart-body');
     if (body) {
       body.innerHTML = html;
@@ -36,6 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
       if (taxToggle && !taxToggle.checked) {
         taxToggle.dispatchEvent(new Event('change'));
       }
+    }
+    const footer = cartModal.querySelector('.cart-footer');
+    if (footer && footerHtml !== undefined) {
+      footer.innerHTML = footerHtml;
     }
   }
 
@@ -49,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
           .then(res => res.json())
           .then(data => {
             if (data.success && data.data && data.data.html) {
-              refreshCartBody(data.data.html);
+              refreshCartBody(data.data.html, data.data.footer);
             }
           });
       });
@@ -63,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
           .then(res => res.json())
           .then(data => {
             if (data.success && data.data && data.data.html) {
-              refreshCartBody(data.data.html);
+              refreshCartBody(data.data.html, data.data.footer);
             }
           });
       });
