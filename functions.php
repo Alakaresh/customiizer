@@ -7,11 +7,21 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Sortir si accédé directement.
+        exit; // Sortir si accédé directement.
 }
+
+/**
+ * Démarre une session PHP pour les visiteurs non connectés afin de pouvoir
+ * stocker temporairement des données comme les images importées.
+ */
+add_action('init', function () {
+        if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+        }
+}, 1);
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
-	class WC_Custom_Dynamic_Shipping_Method extends WC_Shipping_Method {
+        class WC_Custom_Dynamic_Shipping_Method extends WC_Shipping_Method {
 		public function __construct($instance_id = 0) {
 			$this->id                 = 'custom_dynamic_shipping';
 			$this->instance_id       = absint($instance_id);
