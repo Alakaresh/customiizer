@@ -28,47 +28,70 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Changement quantité (appel AJAX recommandé ensuite)
-  document.querySelectorAll('.quantity').forEach(input => {
-    input.addEventListener('change', function () {
-      const key = this.dataset.cartItemKey;
-      const qty = this.value;
+  function refreshCartBody(html) {
+    const body = cartModal.querySelector('.cart-body');
+    if (body) {
+      body.innerHTML = html;
+      bindCartActions();
+      if (taxToggle && !taxToggle.checked) {
+        taxToggle.dispatchEvent(new Event('change'));
+      }
+    }
+  }
 
-      fetch(`/wp-admin/admin-ajax.php?action=update_cart_item_quantity&key=${key}&quantity=${qty}`)
-        .then(() => location.reload()); // ou rafraîchir modal dynamiquement
+  function bindCartActions() {
+    cartModal.querySelectorAll('.quantity').forEach(input => {
+      input.addEventListener('change', function () {
+        const key = this.dataset.cartItemKey;
+        const qty = this.value;
+
+        fetch(`/wp-admin/admin-ajax.php?action=update_cart_item_quantity&key=${key}&quantity=${qty}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.data && data.data.html) {
+              refreshCartBody(data.data.html);
+            }
+          });
+      });
     });
-  });
 
-  // Supprimer un produit
-  document.querySelectorAll('.remove-item').forEach(btn => {
-    btn.addEventListener('click', function () {
-      const key = this.dataset.cartItemKey;
+    cartModal.querySelectorAll('.remove-item').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const key = this.dataset.cartItemKey;
 
-      fetch(`/wp-admin/admin-ajax.php?action=remove_cart_item&key=${key}`)
-        .then(() => location.reload());
+        fetch(`/wp-admin/admin-ajax.php?action=remove_cart_item&key=${key}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.data && data.data.html) {
+              refreshCartBody(data.data.html);
+            }
+          });
+      });
     });
-  });
+  }
+
+  bindCartActions();
 
   if (taxToggle) {
     taxToggle.addEventListener('change', function () {
       const showTtc = this.checked;
-      document.querySelectorAll('.item-price').forEach(el => {
+      cartModal.querySelectorAll('.item-price').forEach(el => {
         el.innerHTML = showTtc ? el.dataset.priceTtc : el.dataset.priceHt;
       });
-      const shippingPrice = document.querySelector('.shipping-price');
+      const shippingPrice = cartModal.querySelector('.shipping-price');
       if (shippingPrice) {
         shippingPrice.innerHTML = showTtc ? shippingPrice.dataset.priceTtc : shippingPrice.dataset.priceHt;
       }
-      const subtotalPrice = document.querySelector('.subtotal-price');
+      const subtotalPrice = cartModal.querySelector('.subtotal-price');
       if (subtotalPrice) {
         subtotalPrice.innerHTML = showTtc ? subtotalPrice.dataset.priceTtc : subtotalPrice.dataset.priceHt;
       }
-      const shippingLine = document.querySelector('.shipping-line');
+      const shippingLine = cartModal.querySelector('.shipping-line');
       if (shippingLine) {
         const label = shippingLine.querySelector('.label');
         label.textContent = showTtc ? shippingLine.dataset.labelTtc : shippingLine.dataset.labelHt;
       }
-      const subtotalLine = document.querySelector('.subtotal-line');
+      const subtotalLine = cartModal.querySelector('.subtotal-line');
       if (subtotalLine) {
         const label = subtotalLine.querySelector('.label');
         label.textContent = showTtc ? subtotalLine.dataset.labelTtc : subtotalLine.dataset.labelHt;
