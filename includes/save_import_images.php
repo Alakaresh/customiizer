@@ -12,9 +12,21 @@ function save_imported_image_from_url() {
     }
 
     $user_id = get_current_user_id();
-
     $containerName = "imageclient";
-    $blobFolder = $user_id . "/import/";
+
+    // Déterminer si l'utilisateur est invité et préparer le dossier de stockage
+    if ($user_id === 0) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $session_id = session_id();
+        $blobFolder = "guest_{$session_id}/import/";
+        $is_guest = true;
+    } else {
+        $blobFolder = $user_id . "/import/";
+        $is_guest = false;
+    }
+
     $blobName = $blobFolder . pathinfo($name, PATHINFO_FILENAME) . ".webp";
 
     // URL de base d'Azure Blob Storage
@@ -76,55 +88,80 @@ function save_imported_image_from_url() {
 
     unlink($tmpFile); // Supprimer le fichier temporaire
 
-    // Sauvegarder les métadonnées dans la base de données
-    global $wpdb;
-    $table_name = 'WPC_imported_image';
     $image_date = current_time('mysql');
 
-    $result = $wpdb->insert(
-        $table_name,
-        [
-            'customer_id' => $user_id,
+    if ($is_guest) {
+        if (!isset($_SESSION['guest_import_images'])) {
+            $_SESSION['guest_import_images'] = [];
+        }
+        $_SESSION['guest_import_images'][] = [
             'image_url' => $blobFullUrl,
             'image_date' => $image_date,
-        ],
-        ['%d', '%s', '%s']
-    );
+        ];
 
-    if ($result === false) {
-        wp_send_json_error("Erreur lors de l'insertion dans la base de données : " . $wpdb->last_error);
-        return;
+        wp_send_json_success([
+            "message" => "L'image a été téléchargée et enregistrée en session.",
+            "blob_path" => $blobFullUrl,
+            "db_status" => "Enregistré en session."
+        ]);
+    } else {
+        // Sauvegarder les métadonnées dans la base de données
+        global $wpdb;
+        $table_name = 'WPC_imported_image';
+
+        $result = $wpdb->insert(
+            $table_name,
+            [
+                'customer_id' => $user_id,
+                'image_url' => $blobFullUrl,
+                'image_date' => $image_date,
+            ],
+            ['%d', '%s', '%s']
+        );
+
+        if ($result === false) {
+            wp_send_json_error("Erreur lors de l'insertion dans la base de données : " . $wpdb->last_error);
+            return;
+        }
+
+        wp_send_json_success([
+            "message" => "L'image a été téléchargée et enregistrée avec succès.",
+            "blob_path" => $blobFullUrl,
+            "db_status" => "Enregistré dans la base de données."
+        ]);
     }
-
-    wp_send_json_success([
-        "message" => "L'image a été téléchargée et enregistrée avec succès.",
-        "blob_path" => $blobFullUrl,
-        "db_status" => "Enregistré dans la base de données."
-    ]);
 }
 
 add_action('wp_ajax_save_imported_image_from_url', 'save_imported_image_from_url');
 add_action('wp_ajax_nopriv_save_imported_image_from_url', 'save_imported_image_from_url');
 
 function get_saved_images() {
-    global $wpdb;
+    if (is_user_logged_in()) {
+        global $wpdb;
+        $user_id = get_current_user_id();
+        $table_name = 'WPC_imported_image';
 
-    $user_id = get_current_user_id();
-    $table_name = 'WPC_imported_image';
+        $results = $wpdb->get_results($wpdb->prepare(
+            "SELECT image_url, image_date FROM $table_name WHERE customer_id = %d ORDER BY image_date DESC",
+            $user_id
+        ), ARRAY_A);
 
-    // Rechercher les images pour l'utilisateur connecté
-    $results = $wpdb->get_results($wpdb->prepare("
-        SELECT image_url, image_date 
-        FROM $table_name 
-        WHERE customer_id = %d
-        ORDER BY image_date DESC
-    ", $user_id), ARRAY_A);
-
-    if (!$results) {
-        wp_send_json_error("Aucune image enregistrée.");
+        if (!$results) {
+            wp_send_json_error("Aucune image enregistrée.");
+        } else {
+            wp_send_json_success($results);
+        }
     } else {
-        wp_send_json_success($results);
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $images = isset($_SESSION['guest_import_images']) ? $_SESSION['guest_import_images'] : [];
+        if (empty($images)) {
+            wp_send_json_error("Aucune image enregistrée.");
+        } else {
+            wp_send_json_success($images);
+        }
     }
 }
-add_action('wp_ajax_get_saved_images', 'get_saved_images'); // AJAX pour utilisateur connecté
-add_action('wp_ajax_nopriv_get_saved_images', 'get_saved_images'); // Optionnel pour visiteurs
+add_action('wp_ajax_get_saved_images', 'get_saved_images');
+add_action('wp_ajax_nopriv_get_saved_images', 'get_saved_images');
