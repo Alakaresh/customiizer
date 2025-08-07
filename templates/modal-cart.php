@@ -2,6 +2,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+// Ensure cart totals are calculated so prices such as the subtotal are accurate
+WC()->cart->calculate_totals();
 ?>
 <div id="cartModal" class="cart-modal">
   <div class="cart-modal-content">
@@ -37,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
       <div class="cart-summary">
         <p>Coût d'expédition estimé : <strong><?php echo wc_price( WC()->cart->get_shipping_total() ); ?></strong></p>
-        <p>Sous-total (taxes incluses) : <strong><?php echo wc_price( WC()->cart->get_total() ); ?></strong></p>
+        <p>Sous-total (taxes incluses) : <strong><?php echo wc_price( WC()->cart->get_subtotal() + WC()->cart->get_subtotal_tax() ); ?></strong></p>
       </div>
     </div>
 
