@@ -2,6 +2,10 @@
 
 This WordPress theme powers the Customiizer site. Some features rely on PHP's GD extension for generating PNG images.
 
+## Color palette templates
+
+The admin dashboard color settings now support named templates. Save the current palette, reload a saved one or remove unused templates from the "Modèles de palette" section.
+
 ## PNG compression
 
 Only mockup images converted from WebP to PNG use the `PNG_COMPRESSION_LEVEL` constant defined in `utilities.php`. This constant is read by the `convert_webp_to_png_server()` function in `includes/generate_mockup.php`. The value ranges from `0` (no compression) to `9` (maximum compression). Higher compression reduces file size but increases CPU usage when saving images.
