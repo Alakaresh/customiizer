@@ -1,10 +1,4 @@
-/* Variables CSS pour les couleurs et dimensions récurrentes */
-:root {
-        --dark-gray: #1A1A1A; /* Gris très foncé pour le fond */
-	--medium-gray: #555555; /* Gris moyen pour les éléments moins importants */
-	--light-gray: #cccccc; /* Gris clair pour les bordures et les séparateurs */
-	--font-color: #ffffff; /* Couleur du texte */
-}
+/* Couleurs basées sur la palette globale */
 
 /* Hide mobile navigation elements on larger screens */
 .mobile-menu,
@@ -18,10 +12,10 @@
         align-items: center;
         justify-content: space-between;
         height: 80px;
-	background-color: var(--dark-gray);
-	color: var(--font-color);
-	padding: 0 10px;
-	border-bottom: 1px solid var(--light-gray);
+       background-color: var(--color-header-primary);
+       color: var(--color-text);
+       padding: 0 10px;
+       border-bottom: 1px solid var(--color-ui-border);
 }
 
 .page-id-413 #header {
@@ -74,8 +68,8 @@
 }
 
 .main-menu a {
-	font-size: 24px; /* Ajuste cette valeur selon tes besoins pour augmenter la taille de la police */
-	color: white;
+       font-size: 24px; /* Ajuste cette valeur selon tes besoins pour augmenter la taille de la police */
+       color: var(--color-text);
 }
 
 .main-menu > div {
@@ -91,7 +85,7 @@
 	transform: translate(50%, -50%);  /* Décale le séparateur vers le centre entre deux éléments */
 	height: 70%;  /* Hauteur de la séparation, ajustable selon le design */
 	width: 1px;  /* Largeur de la séparation */
-	background-color: var(--light-gray);  /* Couleur de la séparation */
+       background-color: var(--color-ui-border);  /* Couleur de la séparation */
 }
 
 .main-menu > div:last-child {
@@ -99,13 +93,13 @@
 }
 
 .icon-button {
-	display: flex;
-	flex-direction: column; /* Les éléments sont empilés verticalement */
-	align-items: center; /* Centrer les éléments horizontalement */
-	text-align: center;
-	margin-top: 10px; /* Ajoute une marge au-dessus du bouton */
-	color: white; /* Définit la couleur du texte à blanc pour tout le bouton */
-	cursor: pointer;
+       display: flex;
+       flex-direction: column; /* Les éléments sont empilés verticalement */
+       align-items: center; /* Centrer les éléments horizontalement */
+       text-align: center;
+       margin-top: 10px; /* Ajoute une marge au-dessus du bouton */
+       color: var(--color-text); /* Couleur du texte adaptée à la palette */
+       cursor: pointer;
 }
 
 .account-icons-container {
@@ -134,22 +128,22 @@
 }
 
 .image-credits-container {
-        display: inline-block;
-        margin-left: 20px; /* Adjust this value as needed */
-        font-size: 16px; /* Or any other appropriate size */
-	color: #fff; /* Or any other suitable color */
-	vertical-align: middle; /* Ensures alignment with other bar elements */
-	background-color: #333; /* Background color, adjust according to your color palette */
-	padding: 5px 10px; /* Padding around the text */
-	border-radius: 15px; /* Border radius for rounded corners */
-        border: 2px solid #555; /* Solid border, adjust the color as per your design */
+       display: inline-block;
+       margin-left: 20px; /* Adjust this value as needed */
+       font-size: 16px; /* Or any other appropriate size */
+       color: var(--color-text); /* Couleur de texte dynamique */
+       vertical-align: middle; /* Ensures alignment with other bar elements */
+       background-color: var(--color-header-secondary); /* Couleur de fond basée sur la palette */
+       padding: 5px 10px; /* Padding around the text */
+       border-radius: 15px; /* Border radius for rounded corners */
+       border: 2px solid var(--color-ui-border); /* Bordure utilisant la palette */
 }
 .loyalty-header-container {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         margin-left: 20px;
-        color: #fff;
+       color: var(--color-text);
         font-size: 14px;
 }
 .loyalty-header-points {
@@ -166,20 +160,20 @@
 }
 
 .cart-count {
-	position: absolute;
-	top: 0px;
-	right: 40px;
-	background-color: #3B4D63;
-	color: white;
-	font-size: 0.65rem;
-	font-weight: bold;
-	min-width: 16px;
-	height: 16px;
-	line-height: 16px;
-	border-radius: 50%;
-	text-align: center;
-	padding: 0 4px;
-	box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+       position: absolute;
+       top: 0px;
+       right: 40px;
+       background-color: var(--color-header-secondary);
+       color: var(--color-text);
+       font-size: 0.65rem;
+       font-weight: bold;
+       min-width: 16px;
+       height: 16px;
+       line-height: 16px;
+       border-radius: 50%;
+       text-align: center;
+       padding: 0 4px;
+       box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 .early-access-banner {
 	margin-top: 6px;
@@ -188,8 +182,8 @@
 	transform: translateX(-50%);
 
 	text-align: center;
-        color: #ffffff;
-        background: #3b4d63;
+       color: var(--color-text);
+       background: var(--color-header-secondary);
 	border-radius: 6px;
 	padding: 8px 12px;
 	font-size: 0.8rem;
@@ -201,15 +195,16 @@
 	z-index: 10;
 }
 .early-access-banner .highlight {
-	color: #fff;
-	font-weight: bold;
+       color: var(--color-action-accent);
+       font-weight: bold;
 }
 
 .early-access-banner .version-info {
-	display: block;
-	font-size: 0.7rem;
-	color: rgba(255, 255, 255, 0.85);
-	margin-top: 3px;
+        display: block;
+        font-size: 0.7rem;
+       color: var(--color-text);
+       opacity: 0.85;
+        margin-top: 3px;
 }
 
 @keyframes pulseAccess {
