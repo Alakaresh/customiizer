@@ -45,16 +45,6 @@ if ( $user_logged_in ) {
                 </div>
         </footer>
         <?php wp_footer(); ?>
-        <script type="text/javascript">
-                var baseUrl = '<?php echo get_site_url(); ?>';
-                var ajaxurl = baseUrl + '/wp-admin/admin-ajax.php';
-                var userIsLoggedIn = <?php echo $user_logged_in ? 'true' : 'false'; ?>;
-                var currentUser = {
-                        ID: <?php echo $user_id; ?>,
-                        user_nicename: "<?php echo esc_js( $user_nicename ); ?>",
-                        display_name: "<?php echo esc_js( $display_name ); ?>"
-                };
-        </script>
         <script>
                 document.addEventListener('DOMContentLoaded', function () {
                         const toggle = document.querySelector('.mobile-menu-toggle');
