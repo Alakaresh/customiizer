@@ -70,11 +70,13 @@ $display_name   = $current_user->display_name;
 				</div>
 				<div class="account-icons-container">
 
-					<?php if ($user_logged_in): ?>
+                                        <?php if ($user_logged_in): ?>
                                         <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
-                                                <i class="fas fa-coins"></i> Crédits: <span id="userCredits" class="image-credits-count">...</span>
+                                                <i class="fas fa-coins"></i>
+                                                <span class="image-credits-label">Crédits:</span>
+                                                <span id="userCredits" class="image-credits-count">...</span>
                                         </div>
-					<?php endif; ?>
+                                        <?php endif; ?>
 
 					<?php if (class_exists('WooCommerce')): ?>
                                         <div class="cart-container">
