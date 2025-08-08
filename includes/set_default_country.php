@@ -8,22 +8,19 @@ add_filter( 'woocommerce_customer_default_location', function ( $location ) {
         return $location;
     }
 
-    return [
-        'country' => 'FR',
-        'state'   => '',
-    ];
+    return 'FR';
 } );
 
-add_action( 'init', function () {
+add_action( 'woocommerce_init', function () {
     if ( is_user_logged_in() ) {
         return;
     }
 
-    if ( function_exists( 'WC' ) && WC()->customer ) {
+    if ( WC()->customer ) {
         $customer = WC()->customer;
         $customer->set_billing_country( 'FR' );
         $customer->set_shipping_country( 'FR' );
         $customer->save();
     }
-}, 0 );
+} );
 
