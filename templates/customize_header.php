@@ -108,6 +108,7 @@ $display_name = $current_user->display_name;
                 </a>
         </div>
         <?php endif; ?>
+
 				</div>
 			</div>
 		</header>
