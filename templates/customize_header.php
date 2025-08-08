@@ -60,44 +60,55 @@ $display_name = $current_user->display_name;
 				</div>
 				<div class="account-icons-container">
 
-                                        <?php if ($user_logged_in): ?>
-                                        <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
-                                                <i class="fas fa-coins"></i>
-                                                <span class="image-credits-label">Crédits:</span>
-                                                <span class="image-credits-count">Chargement...</span>
-                                        </div>
-                                        <?php endif; ?>
+        <?php if ($user_logged_in): ?>
+        <?php
+        $profile_image_url = customiizer_get_profile_image_url($user_id);
+        global $wpdb;
+        $image_credits = intval($wpdb->get_var($wpdb->prepare("SELECT image_credits FROM WPC_users WHERE user_id = %d", $user_id)));
+        ?>
+        <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
+                <i class="fas fa-coins"></i>
+                <span class="image-credits-label">Crédits:</span>
+                <span id="userCredits" class="image-credits-count"><?php echo esc_html($image_credits); ?></span>
+        </div>
+        <?php if (class_exists('WooCommerce')): ?>
+        <div class="cart-container">
+                <a href="<?php echo wc_get_cart_url(); ?>" class="icon-button">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-text">Panier</span>
+                        <?php $count = WC()->cart->get_cart_contents_count(); ?>
+                        <?php if ($count > 0): ?>
+                        <span class="cart-count"><?php echo esc_html($count); ?></span>
+                        <?php endif; ?>
+                </a>
+        </div>
+        <?php endif; ?>
+        <div class="profile-container">
+                <a id="profileLink" class="icon-button">
+                        <img src="<?php echo esc_url($profile_image_url); ?>" alt="Profile Image" class="user-profile-image">
+                </a>
+        </div>
+        <?php else: ?>
+        <?php if (class_exists('WooCommerce')): ?>
+        <div class="cart-container">
+                <a href="<?php echo wc_get_cart_url(); ?>" class="icon-button">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-text">Panier</span>
+                        <?php $count = WC()->cart->get_cart_contents_count(); ?>
+                        <?php if ($count > 0): ?>
+                        <span class="cart-count"><?php echo esc_html($count); ?></span>
+                        <?php endif; ?>
+                </a>
+        </div>
+        <?php endif; ?>
+        <div class="login-register-container">
+                <a id="loginRegisterButton" class="icon-button">
+                        <i class="fas fa-user"></i>
+                        <span class="login-text">Se connecter</span>
+                </a>
+        </div>
+        <?php endif; ?>
 
-					<?php if (class_exists('WooCommerce')): ?>
-					<div class="cart-container">
-						<a href="<?php echo wc_get_cart_url(); ?>" class="icon-button">
-							<i class="fas fa-shopping-bag"></i>
-							<span class="cart-text">Panier</span>
-							<?php $count = WC()->cart->get_cart_contents_count(); ?>
-							<?php if ($count > 0): ?>
-							<span class="cart-count"><?php echo esc_html($count); ?></span>
-							<?php endif; ?>
-						</a>
-					</div>
-					<?php endif; ?>
-
-					<?php if ($user_logged_in): ?>
-					<?php
-                                        $profile_image_url = customiizer_get_profile_image_url($user_id);
-					?>
-					<div class="profile-container">
-						<a id="profileLink" class="icon-button">
-							<img src="<?php echo esc_url($profile_image_url); ?>" alt="Profile Image" class="user-profile-image">
-						</a>
-					</div>
-					<?php else: ?>
-					<div class="login-register-container">
-						<a id="loginRegisterButton" class="icon-button">
-							<i class="fas fa-user"></i>
-							<span class="login-text">Se connecter</span>
-						</a>
-					</div>
-					<?php endif; ?>
 				</div>
 			</div>
 		</header>
