@@ -338,16 +338,40 @@ add_action('wp_head', function() {
 
 function customiizer_output_color_palette() {
     $defaults = [
-        'primary' => '#5a90a0',
-        'secondary' => '#007bff',
-        'background' => '#242424',
-        'text' => '#ffffff',
+        'bg'               => '#242424',
+        'primary'          => '#5a90a0',
+        'secondary'        => '#007bff',
+        'text'             => '#ffffff',
+        'text_muted'       => '#6c757d',
+        'text_inverse'     => '#000000',
+        'header_primary'   => '#5a90a0',
+        'header_secondary' => '#007bff',
+        'action_primary'   => '#007bff',
+        'action_secondary' => '#6c757d',
+        'action_accent'    => '#ffc107',
+        'on_primary'       => '#ffffff',
+        'on_secondary'     => '#ffffff',
+        'on_accent'        => '#000000',
+        'ui_border'        => '#ced4da',
+        'ui_focus'         => '#80bdff',
+        'feedback_success' => '#28a745',
+        'feedback_warning' => '#ffc107',
+        'feedback_danger'  => '#dc3545',
     ];
 
     $css = ':root{';
     foreach ($defaults as $name => $default) {
-        $color = sanitize_hex_color(get_option("customiizer_color_{$name}", $default));
-        $css .= "--color-{$name}: {$color};";
+        $raw = get_option("customiizer_color_{$name}", null);
+        if ($name === 'bg' && !$raw) {
+            $raw = get_option('customiizer_color_background', $default);
+        }
+        $color = sanitize_hex_color($raw ?: $default);
+        $var_name = str_replace('_', '-', $name);
+        $css .= "--color-{$var_name}: {$color};";
+        if ($name === 'bg') {
+            // rétrocompatibilité avec l'ancien nom
+            $css .= "--color-background: {$color};";
+        }
     }
     $css .= '}';
 
