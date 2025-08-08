@@ -1,28 +1,48 @@
 <?php
 echo '<h2>🎨 Palette de couleurs</h2>';
 
-// Définition des champs et valeurs par défaut
-$fields = [
-    'bg'               => 'Surfaces - Arrière-plan',
-    'primary'          => 'Surfaces - Primaire',
-    'secondary'        => 'Surfaces - Secondaire',
-    'text'             => 'Texte',
-    'text_muted'       => 'Texte atténué',
-    'text_inverse'     => 'Texte inversé',
-    'header_primary'   => 'Header/Footer - Primaire',
-    'header_secondary' => 'Header/Footer - Secondaire',
-    'action_primary'   => 'Actions - Primaire',
-    'action_secondary' => 'Actions - Secondaire',
-    'action_accent'    => 'Actions - Accent',
-    'on_primary'       => 'Contraste actions - Sur primaire',
-    'on_secondary'     => 'Contraste actions - Sur secondaire',
-    'on_accent'        => 'Contraste actions - Sur accent',
-    'ui_border'        => 'UI - Bordure',
-    'ui_focus'         => 'UI - Focus',
-    'feedback_success' => 'Feedback - Succès',
-    'feedback_warning' => 'Feedback - Avertissement',
-    'feedback_danger'  => 'Feedback - Danger',
+// Définition des champs regroupés par catégories
+$categories = [
+    'Surfaces' => [
+        'bg'       => 'Arrière-plan',
+        'primary'  => 'Primaire',
+        'secondary'=> 'Secondaire',
+    ],
+    'Texte' => [
+        'text'       => 'Texte',
+        'text_muted' => 'Texte atténué',
+        'text_inverse'=> 'Texte inversé',
+    ],
+    'Header/Footer' => [
+        'header_primary'   => 'Primaire',
+        'header_secondary' => 'Secondaire',
+    ],
+    'Actions' => [
+        'action_primary'   => 'Primaire',
+        'action_secondary' => 'Secondaire',
+        'action_accent'    => 'Accent',
+        'on_primary'       => 'Contraste - Sur primaire',
+        'on_secondary'     => 'Contraste - Sur secondaire',
+        'on_accent'        => 'Contraste - Sur accent',
+    ],
+    'UI' => [
+        'ui_border' => 'Bordure',
+        'ui_focus'  => 'Focus',
+    ],
+    'Feedback' => [
+        'feedback_success' => 'Succès',
+        'feedback_warning' => 'Avertissement',
+        'feedback_danger'  => 'Danger',
+    ],
 ];
+
+// Liste à plat des champs pour le traitement des formulaires
+$fields = [];
+foreach ($categories as $group) {
+    foreach ($group as $field => $label) {
+        $fields[$field] = $label;
+    }
+}
 
 $defaults = [
     'bg'               => '#242424',
@@ -74,14 +94,19 @@ foreach ($defaults as $field => $default) {
 <form method="post">
     <?php wp_nonce_field('customiizer_save_colors', 'customiizer_colors_nonce'); ?>
     <table class="form-table">
-        <?php foreach ($fields as $field => $label): ?>
-        <tr>
-            <th scope="row"><label for="<?php echo esc_attr($field); ?>"><?php echo esc_html($label); ?></label></th>
-            <td>
-                <input type="color" id="<?php echo esc_attr($field); ?>" name="<?php echo esc_attr($field); ?>" value="<?php echo esc_attr($colors[$field]); ?>">
-                <input type="text" id="<?php echo esc_attr($field); ?>-hex" class="customiizer-color-hex" value="<?php echo esc_attr($colors[$field]); ?>" maxlength="7" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$">
-            </td>
-        </tr>
+        <?php foreach ($categories as $category => $fields_group): ?>
+            <tr class="customiizer-category-heading">
+                <th colspan="2"><h3><?php echo esc_html($category); ?></h3></th>
+            </tr>
+            <?php foreach ($fields_group as $field => $label): ?>
+                <tr>
+                    <th scope="row"><label for="<?php echo esc_attr($field); ?>"><?php echo esc_html($label); ?></label></th>
+                    <td>
+                        <input type="color" id="<?php echo esc_attr($field); ?>" name="<?php echo esc_attr($field); ?>" value="<?php echo esc_attr($colors[$field]); ?>">
+                        <input type="text" id="<?php echo esc_attr($field); ?>-hex" class="customiizer-color-hex" value="<?php echo esc_attr($colors[$field]); ?>" maxlength="7" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$">
+                    </td>
+                </tr>
+            <?php endforeach; ?>
         <?php endforeach; ?>
     </table>
     <?php submit_button('Enregistrer la palette'); ?>
