@@ -66,19 +66,53 @@ $defaults = [
     'feedback_danger'  => '#dc3545',
 ];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['customiizer_colors_nonce']) && wp_verify_nonce($_POST['customiizer_colors_nonce'], 'customiizer_save_colors')) {
-    foreach (array_keys($fields) as $field) {
-        if (isset($_POST[$field])) {
-            $color = sanitize_hex_color($_POST[$field]);
-            if ($color) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['customiizer_colors_nonce']) && wp_verify_nonce($_POST['customiizer_colors_nonce'], 'customiizer_save_colors')) {
+        foreach (array_keys($fields) as $field) {
+            if (isset($_POST[$field])) {
+                $color = sanitize_hex_color($_POST[$field]);
+                if ($color) {
+                    update_option('customiizer_color_' . $field, $color);
+                    if ($field === 'bg') {
+                        update_option('customiizer_color_background', $color);
+                    }
+                }
+            }
+        }
+        echo '<div class="notice notice-success"><p>Palette mise à jour.</p></div>';
+    }
+
+    if (isset($_POST['customiizer_palette_nonce']) && wp_verify_nonce($_POST['customiizer_palette_nonce'], 'customiizer_palette_action')) {
+        $templates = get_option('customiizer_color_templates', []);
+        $name = sanitize_text_field($_POST['template_name'] ?? '');
+        $action = $_POST['palette_action'] ?? '';
+
+        if ($action === 'save' && $name !== '') {
+            $palette = [];
+            foreach ($defaults as $field => $default) {
+                if ($field === 'bg') {
+                    $palette[$field] = get_option('customiizer_color_bg', get_option('customiizer_color_background', $default));
+                } else {
+                    $palette[$field] = get_option('customiizer_color_' . $field, $default);
+                }
+            }
+            $templates[$name] = $palette;
+            update_option('customiizer_color_templates', $templates);
+            echo '<div class="notice notice-success"><p>Modèle enregistré.</p></div>';
+        } elseif ($action === 'load' && $name !== '' && isset($templates[$name])) {
+            foreach ($templates[$name] as $field => $color) {
                 update_option('customiizer_color_' . $field, $color);
                 if ($field === 'bg') {
                     update_option('customiizer_color_background', $color);
                 }
             }
+            echo '<div class="notice notice-success"><p>Modèle chargé.</p></div>';
+        } elseif ($action === 'delete' && $name !== '' && isset($templates[$name])) {
+            unset($templates[$name]);
+            update_option('customiizer_color_templates', $templates);
+            echo '<div class="notice notice-success"><p>Modèle supprimé.</p></div>';
         }
     }
-    echo '<div class="notice notice-success"><p>Palette mise à jour.</p></div>';
 }
 
 $colors = [];
@@ -89,6 +123,8 @@ foreach ($defaults as $field => $default) {
         $colors[$field] = get_option('customiizer_color_' . $field, $default);
     }
 }
+
+$templates = get_option('customiizer_color_templates', []);
 ?>
 
 <form method="post">
@@ -114,6 +150,38 @@ foreach ($defaults as $field => $default) {
 
 <hr style="margin-top:30px;margin-bottom:30px;">
 
+<h3>Modèles de palette</h3>
+<form method="post" style="margin-bottom:20px;">
+    <?php wp_nonce_field('customiizer_palette_action', 'customiizer_palette_nonce'); ?>
+    <input type="hidden" name="palette_action" value="save">
+    <input type="text" name="template_name" placeholder="Nom du modèle" required>
+    <?php submit_button('Sauvegarder le modèle', 'secondary', 'submit', false); ?>
+</form>
+
+<?php if ($templates): ?>
+    <ul>
+        <?php foreach ($templates as $name => $palette): ?>
+            <li>
+                <strong><?php echo esc_html($name); ?></strong>
+                <form method="post" style="display:inline;margin-left:10px;">
+                    <?php wp_nonce_field('customiizer_palette_action', 'customiizer_palette_nonce'); ?>
+                    <input type="hidden" name="template_name" value="<?php echo esc_attr($name); ?>">
+                    <input type="hidden" name="palette_action" value="load">
+                    <?php submit_button('Charger', 'secondary', 'submit', false); ?>
+                </form>
+                <form method="post" style="display:inline;margin-left:5px;">
+                    <?php wp_nonce_field('customiizer_palette_action', 'customiizer_palette_nonce'); ?>
+                    <input type="hidden" name="template_name" value="<?php echo esc_attr($name); ?>">
+                    <input type="hidden" name="palette_action" value="delete">
+                    <?php submit_button('Supprimer', 'link-delete', 'submit', false); ?>
+                </form>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php else: ?>
+    <p>Aucun modèle enregistré.</p>
+<?php endif; ?>
+
 <script>
 document.querySelectorAll('.customiizer-color-hex').forEach(function(hexInput){
     var colorInput = document.getElementById(hexInput.id.replace('-hex',''));
@@ -130,4 +198,3 @@ document.querySelectorAll('.customiizer-color-hex').forEach(function(hexInput){
     });
 });
 </script>
-
