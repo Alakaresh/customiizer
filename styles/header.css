@@ -128,7 +128,9 @@
 }
 
 .image-credits-container {
-       display: inline-block;
+       display: inline-flex;
+       align-items: center;
+       gap: 4px;
        margin-left: 20px; /* Adjust this value as needed */
        font-size: 16px; /* Or any other appropriate size */
        color: var(--color-text); /* Couleur de texte dynamique */
