@@ -7,6 +7,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Returns the inner HTML for the cart modal body (list of items and summary).
  */
 function customiizer_get_cart_body_html() {
+    if ( ! is_user_logged_in() && function_exists( 'WC' ) && WC()->customer ) {
+        $customer = WC()->customer;
+        $customer->set_billing_country( 'FR' );
+        $customer->set_shipping_country( 'FR' );
+        $customer->save();
+    }
+
     WC()->cart->calculate_totals();
 
     ob_start();
