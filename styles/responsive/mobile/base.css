@@ -53,13 +53,16 @@
         }
 
 	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
-	.image-credits-container {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		border: none;
-		font-size: 0; /* pour masquer "Crédits:" si encore présent */
-	}
+        .image-credits-container {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                border: none;
+        }
+
+        .image-credits-label {
+                display: none;
+        }
 
 	.image-credits-container i {
 		font-size: 16px;
