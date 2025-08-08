@@ -14,6 +14,7 @@ function customiizer_get_cart_body_html() {
         $customer->set_billing_country( 'FR' );
         $customer->set_shipping_country( 'FR' );
         $customer->set_is_vat_exempt( false );
+
         $customer->save();
     }
 
