@@ -288,6 +288,3 @@ text-align: center;
 .product-name {
     margin: 0; /* Enlever les marges si nécessaire */
 }
-#header {
-        background-color: #1A1A1A !important; /* Gris très foncé */
-}
