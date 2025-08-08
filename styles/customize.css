@@ -45,7 +45,7 @@
 
 #content {
     flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
-    background-color: var(--dark-gray);
+    background-color: var(--color-bg);
     /*padding: 20px;*/
         /* max-height: calc(100dvh - 65px); */
 }
