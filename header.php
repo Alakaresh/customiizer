@@ -4,18 +4,14 @@ Template Name: Header
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+        exit; // Exit if accessed directly.
 }
 
-get_template_part('templates/modal', 'login');
-get_template_part('templates/modal', 'user');
-get_template_part('templates/modal', 'cart');
-
-$current_user = wp_get_current_user();
+$current_user   = wp_get_current_user();
 $user_logged_in = is_user_logged_in();
-$user_id = $current_user->ID;
-$user_nicename = $current_user->user_nicename;
-$display_name = $current_user->display_name;
+$user_id        = $current_user->ID;
+$user_nicename  = $current_user->user_nicename;
+$display_name   = $current_user->display_name;
 ?>
 
 <!DOCTYPE html>
@@ -116,138 +112,17 @@ $display_name = $current_user->display_name;
 			</div>
                </header>
 
-               <div id="mission-achievement">
-                       <img class="mission-icon" alt="Logo">
-                       <div class="mission-info">
-                               <div class="mission-title"></div>
-                               <div class="mission-details"></div>
+               <div id="content">
+<?php
+get_template_part('templates/modal', 'login');
+get_template_part('templates/modal', 'user');
+get_template_part('templates/modal', 'cart');
+?>
+                       <div id="mission-achievement">
+                               <img class="mission-icon" alt="Logo">
+                               <div class="mission-info">
+                                       <div class="mission-title"></div>
+                                       <div class="mission-details"></div>
+                               </div>
                        </div>
-               </div>
 
-               <!-- JS global config -->
-                <script type="text/javascript">
-                        var baseUrl = '<?php echo get_site_url(); ?>';
-                        var ajaxurl = baseUrl + '/wp-admin/admin-ajax.php';
-                        var userIsLoggedIn = <?php echo $user_logged_in ? 'true' : 'false'; ?>;
-                        var currentUser = {
-				ID: <?php echo $user_id; ?>,
-				user_nicename: "<?php echo esc_js($user_nicename); ?>",
-				display_name: "<?php echo esc_js($display_name); ?>"
-			};
-		</script>
-               <script>
-                       document.addEventListener('DOMContentLoaded', function () {
-                               const toggle = document.querySelector('.mobile-menu-toggle');
-                               const menu = document.querySelector('.mobile-menu');
-                               if (toggle && menu) {
-                                       toggle.addEventListener('click', function () {
-                                               const expanded = toggle.getAttribute('aria-expanded') === 'true';
-                                               toggle.setAttribute('aria-expanded', (!expanded).toString());
-                                               menu.classList.toggle('active');
-                                       });
-                               }
-                       });
-
-               </script>
-                <script>
-<?php if ($user_logged_in): ?>
-                        (function(){
-                                const essentials = {
-                                        user_id: <?php echo intval($user_id); ?>,
-                                        display_name: <?php echo json_encode($display_name); ?>,
-                                        image_credits: <?php echo intval($image_credits); ?>,
-                                        user_logo: <?php echo json_encode($profile_image_url); ?>
-                                };
-
-                                const cachedStr = sessionStorage.getItem("USER_ESSENTIALS");
-                                if (cachedStr) {
-                                        try {
-                                                const cached = JSON.parse(cachedStr);
-                                                if (cached.user_id === essentials.user_id) {
-                                                        essentials.image_credits = cached.image_credits;
-                                                }
-                                        } catch(e) {}
-                                }
-
-                                sessionStorage.setItem("USER_ESSENTIALS", JSON.stringify(essentials));
-                                document.addEventListener("DOMContentLoaded", function(){
-                                        const creditsEl = document.getElementById("userCredits");
-                                        if (creditsEl) creditsEl.textContent = essentials.image_credits;
-                                });
-                        })();
-<?php endif; ?>
-                </script>
-		<script>
-                        jQuery(document).ready(function($) {
-                                $('#myCreationsLink, #mobileMyCreationsLink').on('click', function(event) {
-                                        if (!userIsLoggedIn) {
-                                                event.preventDefault();
-
-                                                // Stocke l’intention dans sessionStorage
-                                                sessionStorage.setItem("redirectAfterLogin", "myCreations");
-
-                                                $('#loginModal').fadeIn(300);
-                                                return false;
-                                        }
-                                });
-
-                        });
-		</script>
-                <script>
-
-			window.addEventListener("load", function () {
-				if (!window.currentUser || !currentUser.ID) {
-					console.warn("⛔️ Aucun utilisateur connecté.");
-					return;
-				}
-
-				const userId = currentUser.ID;
-
-				// Références DOM
-				const creditsEl = document.getElementById('userCredits');
-				const nameEl = document.getElementById('userDisplayName');
-				const logoEl = document.getElementById('userLogo');
-
-				// Vérifie si les éléments existent avant de continuer
-                                if (!creditsEl) {
-                                        console.warn("⚠️ Élément #userCredits introuvable.");
-                                } else {
-                                        const cached = sessionStorage.getItem('USER_ESSENTIALS');
-                                        let fromCache = false;
-                                        if (cached) {
-                                                const data = JSON.parse(cached);
-                                                if (data.user_id === userId) {
-                                                        creditsEl.textContent = data.image_credits;
-                                                        if (nameEl) nameEl.textContent = data.display_name;
-                                                        if (logoEl && data.user_logo) logoEl.src = data.user_logo;
-                                                        fromCache = true;
-                                                }
-                                        }
-
-                                        if (!fromCache) {
-                                                // Récupère depuis l’API si pas trouvé dans le cache
-                                                fetch(`/wp-json/api/v1/user/load?user_id=${userId}&include=display_name,image_credits,user_logo`, {
-                                                        credentials: 'include'
-                                                })
-                                                        .then(res => res.json())
-                                                        .then(data => {
-                                                        if (data.success && data.data) {
-                                                                const essentials = {
-                                                                        user_id: userId,
-                                                                        display_name: data.data.display_name,
-                                                                        image_credits: data.data.image_credits,
-                                                                        user_logo: data.data.user_logo
-                                                                };
-                                                                sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(essentials));
-
-                                                                if (creditsEl) creditsEl.textContent = data.data.image_credits;
-                                                                if (nameEl) nameEl.textContent = data.data.display_name;
-                                                                if (logoEl && data.data.user_logo) logoEl.src = data.data.user_logo;
-                                                        }
-                                                });
-                                        }
-                                }
-			});
-		</script>
-	</body>
-</html>
