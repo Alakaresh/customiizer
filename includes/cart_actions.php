@@ -9,8 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 function customiizer_get_cart_body_html() {
     if ( ! is_user_logged_in() && function_exists( 'WC' ) && WC()->customer ) {
         $customer = WC()->customer;
+        // Ensure taxes are estimated for France
+        $customer->set_location( 'FR', '', '', '' );
         $customer->set_billing_country( 'FR' );
         $customer->set_shipping_country( 'FR' );
+        $customer->set_is_vat_exempt( false );
+
         $customer->save();
     }
 
