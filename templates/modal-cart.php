@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Ensure cart totals are calculated so prices such as the subtotal are accurate
 WC()->cart->calculate_totals();
 ?>
-<div id="cartModal" class="cart-modal">
+<div id="cartModal" class="cart-modal" style="display: none;">
   <div class="cart-modal-content">
     <div class="cart-header">
       <span class="cart-title">Mon panier</span>
