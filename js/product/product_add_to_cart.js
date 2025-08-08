@@ -14,6 +14,15 @@ jQuery(document).ready(function($) {
                 const button = $(this);
                 button.prop('disabled', true);
 
+                const cartModal = document.getElementById('cartModal');
+                if (cartModal) {
+                        cartModal.style.display = 'flex';
+                        const body = cartModal.querySelector('.cart-body');
+                        if (body) {
+                                body.innerHTML = '<p class="creating-message">Création du produit...</p>';
+                        }
+                }
+
                 const proceed = (pid) => { addToCartAjax(pid); };
 
                 if (window.generatedProductId) {
@@ -93,18 +102,33 @@ jQuery(document).ready(function($) {
                         }
                 })
                         .then(response => {
-                        if (!response.ok) {
-                                throw new Error('Erreur lors de l\'ajout au panier.');
-                        }
-                        return response.text();
-                })
-                        .then(html => {
-                        sessionStorage.setItem('openCartModal', 'true');
-                        window.location.reload();
-                })
+                                if (!response.ok) {
+                                        throw new Error('Erreur lors de l\'ajout au panier.');
+                                }
+                                return response.text();
+                        })
+                        .then(() => {
+                                return fetch('/wp-admin/admin-ajax.php?action=refresh_cart');
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                                if (data.success && data.data) {
+                                        if (typeof window.refreshCartBody === 'function') {
+                                                window.refreshCartBody(data.data.html, data.data.footer);
+                                        } else {
+                                                const cartModal = document.getElementById('cartModal');
+                                                if (cartModal) {
+                                                        const body = cartModal.querySelector('.cart-body');
+                                                        if (body) body.innerHTML = data.data.html;
+                                                        const footer = cartModal.querySelector('.cart-footer');
+                                                        if (footer) footer.innerHTML = data.data.footer;
+                                                }
+                                        }
+                                }
+                        })
                         .catch(error => {
-                        console.error('❌ Erreur ajout au panier :', error);
-                });
+                                console.error('❌ Erreur ajout au panier :', error);
+                        });
         }
 
 

@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
       footer.innerHTML = footerHtml;
     }
   }
+  window.refreshCartBody = refreshCartBody;
 
   function bindCartActions() {
     cartModal.querySelectorAll('.quantity').forEach(input => {
