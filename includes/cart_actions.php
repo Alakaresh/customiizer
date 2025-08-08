@@ -130,3 +130,15 @@ function customiizer_remove_cart_item() {
 }
 add_action( 'wp_ajax_remove_cart_item', 'customiizer_remove_cart_item' );
 add_action( 'wp_ajax_nopriv_remove_cart_item', 'customiizer_remove_cart_item' );
+
+/**
+ * AJAX handler to refresh cart modal content.
+ */
+function customiizer_refresh_cart() {
+    wp_send_json_success( array(
+        'html'   => customiizer_get_cart_body_html(),
+        'footer' => customiizer_get_cart_footer_html(),
+    ) );
+}
+add_action( 'wp_ajax_refresh_cart', 'customiizer_refresh_cart' );
+add_action( 'wp_ajax_nopriv_refresh_cart', 'customiizer_refresh_cart' );
