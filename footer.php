@@ -45,18 +45,6 @@ if ( $user_logged_in ) {
                 </div>
         </footer>
         <?php wp_footer(); ?>
-<script>
-    // Ce script s’exécute sur la page de checkout
-jQuery(function($){
-    // WooCommerce ajoute la classe .showlogin au lien "Cliquez ici pour vous connecter"
-    $('p.woocommerce-info a.showlogin').off('click').on('click', function(e){
-        e.preventDefault();
-        // On masque éventuellement le formulaire WooCommerce et on affiche ton modal
-        openLoginModal(); // fonction définie dans sign_modal.js:contentReference[oaicite:1]{index=1}
-    });
-});
-
-      </script>
         <script>
                 document.addEventListener('DOMContentLoaded', function () {
                         const toggle = document.querySelector('.mobile-menu-toggle');
