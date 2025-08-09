@@ -9,17 +9,22 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
-add_filter('woocommerce_customer_default_location', function($location) {
-    // Log pour vérifier ce qu'on reçoit
-    error_log('Default location raw: ' . print_r($location, true));
+add_filter('pre_option_woocommerce_default_customer_address', function($value) {
+    // Ce filtre se déclenche avant que WooCommerce calcule l'adresse par défaut
+    if (is_array($value) && isset($value['country'])) {
+        return $value['country'] . (isset($value['state']) && $value['state'] ? ':' . $value['state'] : '');
+    }
+    return $value;
+});
 
-    // Si c'est un tableau, on récupère juste le code pays
+add_filter('woocommerce_customer_default_location', function($location) {
+    // Forcer une string même si la valeur initiale est un array
     if (is_array($location) && isset($location['country'])) {
         return $location['country'] . (isset($location['state']) && $location['state'] ? ':' . $location['state'] : '');
     }
-
     return $location;
 });
+
 
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
