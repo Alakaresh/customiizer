@@ -193,6 +193,13 @@ function customiizer_enqueue_customize_assets() {
 
        } elseif (function_exists('is_checkout') && is_checkout()) {
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
+			   wp_enqueue_script(
+			        'checkout-fixes',
+			        get_stylesheet_directory_uri() . '/js/checkout/checkout-fixes.js',
+			        ['jquery', 'wc-checkout'], // dépend de jQuery et du script WC du checkout
+			        $ver,
+			        true
+			    );
 
                // Page /communaute
 	} elseif (strpos($request_uri, '/communaute') !== false) {
