@@ -151,3 +151,14 @@ function openLoginModal() {
 
 // Expose to other scripts
 window.openLoginModal = openLoginModal;
+
+// WooCommerce checkout login link should open the modal
+document.addEventListener('DOMContentLoaded', function () {
+        const checkoutLoginLink = document.querySelector('.woocommerce-form-login-toggle .showlogin');
+        if (checkoutLoginLink) {
+                checkoutLoginLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        openLoginModal();
+                });
+        }
+});
