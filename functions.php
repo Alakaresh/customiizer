@@ -20,6 +20,14 @@ add_filter('woocommerce_customer_default_location', function($location) {
 
     return $location;
 }, 1); // priorité 1 = exécution très tôt
+/* Place ce code dans functions.php de ton thème enfant */
+add_filter(
+    'woocommerce_checkout_login_message',
+    function( $message ) {
+        // On renvoie notre propre phrase en ajoutant un onclick qui appelle ton modal
+        return 'Déjà client ? <a href="#" onclick="openLoginModal();return false;">Cliquez ici pour vous connecter</a>';
+    }
+);
 
 
 // 1. Classe déclarée globalement
