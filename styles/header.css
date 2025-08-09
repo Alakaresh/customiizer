@@ -209,8 +209,13 @@
         margin-top: 3px;
 }
 
-.error-404 {
-        background-color: var(--color-bg);
+.ast-separate-container .error-404,
+.ast-separate-container .no-results,
+.single.ast-separate-container .ast-author-meta,
+.ast-separate-container .comments-count-wrapper,
+.ast-separate-container .comments-area .comments-title {
+    background-color: var(--color-bg);
+    background-image: none;
 }
 
 @keyframes pulseAccess {
