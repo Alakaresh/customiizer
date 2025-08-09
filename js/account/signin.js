@@ -54,12 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
 						console.warn("🔁 Lien 'Mes créations' introuvable, fallback sur /compte");
 						window.location.href = "/compte";
 					}
-				} else if (redirectAfterLogin) {
-					sessionStorage.removeItem('redirectAfterLogin');
-					window.location.href = redirectAfterLogin;
-				} else {
-					window.location.reload(); // Fallback
-				}
+                                } else if (redirectAfterLogin) {
+                                        sessionStorage.removeItem('redirectAfterLogin');
+                                        window.location.href = redirectAfterLogin;
+                                } else {
+                                        if (typeof window.handleAuthSuccess === 'function') {
+                                                window.handleAuthSuccess();
+                                        }
+                                }
 
 			}
 			else {

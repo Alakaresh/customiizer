@@ -12,7 +12,21 @@
         body:params
       }).then(r=>r.json()).then(data=>{
         if(data.success){
-          window.location.reload();
+          const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+          if (redirectAfterLogin === 'myCreations') {
+            sessionStorage.removeItem('redirectAfterLogin');
+            const targetLink = document.querySelector('#myCreationsLink');
+            if (targetLink) {
+              window.location.href = targetLink.getAttribute('href');
+            } else {
+              window.location.href = '/compte';
+            }
+          } else if (redirectAfterLogin) {
+            sessionStorage.removeItem('redirectAfterLogin');
+            window.location.href = redirectAfterLogin;
+          } else if (typeof window.handleAuthSuccess === 'function') {
+            window.handleAuthSuccess();
+          }
         }else{
           alert(data.data.message || 'Google login failed');
         }
