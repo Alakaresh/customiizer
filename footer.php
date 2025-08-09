@@ -88,19 +88,23 @@ if ( $user_logged_in ) {
 <?php endif; ?>
 <?php if ( is_checkout() ) : ?>
 <script>
-    jQuery(function($){
-        // Intercepte le clic sur le lien WooCommerce « Cliquez ici pour vous connecter »
-        $('body').on('click', 'a.showlogin', function(e){
-            e.preventDefault();
-            // Ouvre ton modal si la fonction existe
-            if (typeof window.openLoginModal === 'function') {
-                window.openLoginModal();
-            }
-        });
+jQuery(function($){
+    $('body').on('click', 'a.showlogin', function(e){
+        // Empêche le comportement par défaut du lien
+        e.preventDefault();
+        // Empêche les autres gestionnaires de clics sur ce lien de s'exécuter
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        // Ouvre ton modal si la fonction existe
+        if (typeof window.openLoginModal === 'function') {
+            window.openLoginModal();
+        }
+        return false;
     });
+});
 </script>
 <?php endif; ?>
-
 
         <script>
                 jQuery(document).ready(function($) {
