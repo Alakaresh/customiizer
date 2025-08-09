@@ -78,6 +78,10 @@ add_filter('woocommerce_shipping_methods', function ($methods) {
 	return $methods;
 });
 
+add_filter( 'woocommerce_login_redirect', function( $redirect, $user ) {
+    return wc_get_checkout_url();
+}, 10, 2 );
+
 add_action('rest_api_init', function () {
 
 	$api_dir = get_stylesheet_directory() . '/api';
