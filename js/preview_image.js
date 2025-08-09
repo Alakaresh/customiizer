@@ -196,7 +196,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 	usePromptButton.textContent = 'Utiliser ce prompt';
 	usePromptButton.classList.add('use-button');
 	usePromptButton.addEventListener('click', () => {
-		window.open(`/customize?prompt=${encodeURIComponent(prompt)}`, '_blank');
+		window.open(`/customiize?prompt=${encodeURIComponent(prompt)}`, '_blank');
 	});
 
 	const useImageButton = document.createElement('button');
