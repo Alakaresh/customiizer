@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-	const signinForm = document.getElementById('signin');
-	const signinButton = signinForm.querySelector('.signin-button');
-	const signinNonceInput = document.getElementById('signin-nonce');
-	const nonceValue = signinNonceInput.value;
+        const signinForm = document.getElementById('signin');
+        if (!signinForm) {
+                return;
+        }
+        const signinButton = signinForm.querySelector('.signin-button');
+        const signinNonceInput = document.getElementById('signin-nonce');
+        const nonceValue = signinNonceInput.value;
 
 	// Validation du formulaire avant la soumission
 	signinButton.addEventListener('click', function(event) {
@@ -45,23 +48,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
 
-				if (redirectAfterLogin === 'myCreations') {
-					sessionStorage.removeItem('redirectAfterLogin');
-					const targetLink = document.querySelector('#myCreationsLink');
-					if (targetLink) {
-						window.location.href = targetLink.getAttribute('href');
-					} else {
-						console.warn("🔁 Lien 'Mes créations' introuvable, fallback sur /compte");
-						window.location.href = "/compte";
-					}
-                                } else if (redirectAfterLogin) {
+                               if (redirectAfterLogin === 'myCreations') {
+                                        sessionStorage.removeItem('redirectAfterLogin');
+                                        const targetLink = document.querySelector('#myCreationsLink');
+                                        if (targetLink) {
+                                                window.location.href = targetLink.getAttribute('href');
+                                        } else {
+                                                console.warn("🔁 Lien 'Mes créations' introuvable, fallback sur /compte");
+                                                window.location.href = "/compte";
+                                        }
+                               } else if (redirectAfterLogin) {
                                         sessionStorage.removeItem('redirectAfterLogin');
                                         window.location.href = redirectAfterLogin;
-                                } else {
-                                        if (typeof window.handleAuthSuccess === 'function') {
-                                                window.handleAuthSuccess();
-                                        }
-                                }
+                               } else {
+                                       if (document.body.classList.contains('woocommerce-checkout')) {
+                                               window.location.reload();
+                                       } else if (typeof window.handleAuthSuccess === 'function') {
+                                               window.handleAuthSuccess();
+                                       }
+                               }
 
 			}
 			else {
