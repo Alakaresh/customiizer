@@ -86,6 +86,21 @@ if ( $user_logged_in ) {
                 })();
         </script>
 <?php endif; ?>
+<?php if ( is_page() && is_checkout() ) : ?>
+<script>
+    jQuery(function($){
+        // Intercepte le clic sur le lien de connexion personnalisé (classe définie plus haut)
+        $('body').on('click', '.open-login-modal', function(e){
+            e.preventDefault();
+            // Fonction définie dans sign_modal.js qui ouvre ton modal
+            if (typeof window.openLoginModal === 'function') {
+                window.openLoginModal();
+            }
+        });
+    });
+</script>
+<?php endif; ?>
+
         <script>
                 jQuery(document).ready(function($) {
                         $('#myCreationsLink, #mobileMyCreationsLink').on('click', function(event) {
