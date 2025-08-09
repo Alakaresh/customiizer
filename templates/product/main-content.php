@@ -69,7 +69,7 @@
 							<p class="delivery-title">Délai de livraison estimé</p>
 							<p class="delivery-location"><img src="https://flagcdn.com/fr.svg" alt="France" class="flag-icon"> France</p>
 							<p class="delivery-time"><span>--</span> jours</p>
-                                                        <p class="shipping-cost">Frais de livraison : <span>--</span> €</p>
+                                                        <p class="shipping-cost">Frais de livraison : <span>--</span> € TTC</p>
 						</div>
 						<div class="product-actions">
 							<button class="add-to-cart-button">Ajouter au panier</button>
