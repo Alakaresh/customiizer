@@ -161,5 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         e.stopPropagation();
                         openLoginModal();
                 }, true);
+
         }
 });
