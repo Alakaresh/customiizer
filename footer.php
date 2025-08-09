@@ -86,13 +86,13 @@ if ( $user_logged_in ) {
                 })();
         </script>
 <?php endif; ?>
-<?php if ( is_page() && is_checkout() ) : ?>
+<?php if ( is_checkout() ) : ?>
 <script>
     jQuery(function($){
-        // Intercepte le clic sur le lien de connexion personnalisé (classe définie plus haut)
-        $('body').on('click', '.open-login-modal', function(e){
+        // Intercepte le clic sur le lien WooCommerce « Cliquez ici pour vous connecter »
+        $('body').on('click', 'a.showlogin', function(e){
             e.preventDefault();
-            // Fonction définie dans sign_modal.js qui ouvre ton modal
+            // Ouvre ton modal si la fonction existe
             if (typeof window.openLoginModal === 'function') {
                 window.openLoginModal();
             }
@@ -100,6 +100,7 @@ if ( $user_logged_in ) {
     });
 </script>
 <?php endif; ?>
+
 
         <script>
                 jQuery(document).ready(function($) {
