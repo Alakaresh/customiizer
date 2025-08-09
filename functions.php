@@ -20,38 +20,6 @@ add_filter('woocommerce_customer_default_location', function($location) {
 
     return $location;
 }, 1); // priorité 1 = exécution très tôt
-/* Place ce code dans functions.php de ton thème enfant */
-// Dans functions.php ou un fichier inclus une seule fois
-
-// 1. Remplacer le message WooCommerce par notre propre texte.
-// On ne met aucun onclick dans le HTML, on se contenter d’ajouter une classe.
-add_filter( 'woocommerce_checkout_login_message', function( $message ) {
-    // Affiche seulement si l’utilisateur n’est pas connecté
-    if ( ! is_user_logged_in() ) {
-        return 'Déjà client ? <a href="#" class="custom-open-login">Cliquez ici pour vous connecter</a>';
-    }
-    return $message;
-}, 10 );
-
-// 2. Injecter le script uniquement sur la page de paiement.
-add_action( 'wp_enqueue_scripts', function() {
-    if ( is_checkout() ) {
-        $script = <<<JS
-        // Déléguer l’évènement pour capter le clic sur notre lien personnalisé
-        jQuery(document).on('click', 'a.custom-open-login', function(e) {
-            e.preventDefault();
-            // Vérifier si la fonction existe sur l’objet global
-            if (typeof window.openLoginModal === 'function') {
-                window.openLoginModal();
-            } else {
-                console.warn('La fonction openLoginModal n\\'est pas disponible.');
-            }
-        });
-        JS;
-        // Ajoute le script après jQuery
-        wp_add_inline_script( 'jquery', $script );
-    }
-}, 10 );
 
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
