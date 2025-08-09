@@ -149,5 +149,12 @@ function openLoginModal() {
         modal.style.display = 'flex';
 }
 
+function handleAuthSuccess() {
+        userIsLoggedIn = true;
+        const modal = document.getElementById('loginModal');
+        if (modal) modal.style.display = 'none';
+}
+
 // Expose to other scripts
 window.openLoginModal = openLoginModal;
+window.handleAuthSuccess = handleAuthSuccess;
