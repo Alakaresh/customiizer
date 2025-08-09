@@ -9,23 +9,18 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
-add_filter('woocommerce_customer_get_country', function($country) {
-    // Log de ce que WooCommerce reçoit comme "pays"
-    error_log('WooCommerce country value: ' . print_r($country, true));
+add_filter('woocommerce_customer_default_location', function($location) {
+    // Log pour vérifier ce qu'on reçoit
+    error_log('Default location raw: ' . print_r($location, true));
 
-    // Retour inchangé pour ne pas fausser le test
-    return $country;
+    // Si c'est un tableau, on récupère juste le code pays
+    if (is_array($location) && isset($location['country'])) {
+        return $location['country'] . (isset($location['state']) && $location['state'] ? ':' . $location['state'] : '');
+    }
+
+    return $location;
 });
 
-/**
- * Démarre une session PHP pour les visiteurs non connectés afin de pouvoir
- * stocker temporairement des données comme les images importées.
- */
-add_action('init', function () {
-        if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-        }
-}, 1);
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
         class WC_Custom_Dynamic_Shipping_Method extends WC_Shipping_Method {
