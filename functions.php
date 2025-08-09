@@ -9,6 +9,13 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
+add_filter('woocommerce_customer_get_country', function($country) {
+    // Log de ce que WooCommerce reçoit comme "pays"
+    error_log('WooCommerce country value: ' . print_r($country, true));
+
+    // Retour inchangé pour ne pas fausser le test
+    return $country;
+});
 
 /**
  * Démarre une session PHP pour les visiteurs non connectés afin de pouvoir
