@@ -78,12 +78,6 @@ add_filter('woocommerce_shipping_methods', function ($methods) {
 	return $methods;
 });
 
-
-add_filter( 'woocommerce_checkout_login_message', function () {
-    return __( 'Déjà client ? ', 'customiizer' ) .
-           '<a href="#" class="open-login-modal">Cliquez ici pour vous connecter</a>';
-});
-
 add_action('rest_api_init', function () {
 
 	$api_dir = get_stylesheet_directory() . '/api';
