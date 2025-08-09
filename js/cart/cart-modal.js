@@ -87,14 +87,6 @@ document.addEventListener('DOMContentLoaded', function () {
       if (shippingPrice) {
         shippingPrice.innerHTML = showTtc ? shippingPrice.dataset.priceTtc : shippingPrice.dataset.priceHt;
       }
-      const taxLine = cartModal.querySelector('.tax-line');
-      if (taxLine) {
-        taxLine.style.display = showTtc ? '' : 'none';
-        const taxPrice = taxLine.querySelector('.tax-price');
-        if (taxPrice) {
-          taxPrice.innerHTML = showTtc ? taxPrice.dataset.priceTtc : taxPrice.dataset.priceHt;
-        }
-      }
       const totalPrice = cartModal.querySelector('.total-price');
       if (totalPrice) {
         totalPrice.innerHTML = showTtc ? totalPrice.dataset.priceTtc : totalPrice.dataset.priceHt;
