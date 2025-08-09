@@ -45,18 +45,18 @@ function customiizer_get_cart_body_html() {
 
         <?php
         $shipping_total_ht  = WC()->cart->get_shipping_total();
-        // Shipping fees are stored tax excluded, so TTC should match HT
-        $shipping_total_ttc = $shipping_total_ht;
+        $shipping_tax       = WC()->cart->get_shipping_tax();
+        $shipping_total_ttc = $shipping_total_ht + $shipping_tax;
         $subtotal_ht        = WC()->cart->get_subtotal();
         $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
         $total_ht           = $subtotal_ht + $shipping_total_ht;
         $total_ttc          = $subtotal_ttc + $shipping_total_ttc;
-        $tax_total          = $total_ttc - $total_ht;
+        $tax_total          = WC()->cart->get_subtotal_tax() + $shipping_tax;
         ?>
         <div class="cart-summary">
             <p class="shipping-line" data-label-ht="Coût d'expédition estimé :" data-label-ttc="Coût d'expédition estimé :">
                 <span class="label">Coût d'expédition estimé :</span>
-                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ht ); ?></strong>
+                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ttc ); ?></strong>
             </p>
             <p class="tax-line">
                 <span class="label">TVA :</span>

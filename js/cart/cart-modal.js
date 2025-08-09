@@ -85,8 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const shippingPrice = cartModal.querySelector('.shipping-price');
       if (shippingPrice) {
-        // Shipping fees are always HT, so don't switch values
-        shippingPrice.innerHTML = shippingPrice.dataset.priceHt;
+        shippingPrice.innerHTML = showTtc ? shippingPrice.dataset.priceTtc : shippingPrice.dataset.priceHt;
       }
       const taxLine = cartModal.querySelector('.tax-line');
       if (taxLine) {
