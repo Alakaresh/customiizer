@@ -55,14 +55,14 @@ function customiizer_get_cart_body_html() {
         </ul>
 
         <?php
-        $shipping_total_ht  = WC()->cart->get_shipping_total();
-        // Shipping fees are stored tax excluded, so TTC should match HT
-        $shipping_total_ttc = $shipping_total_ht;
-        $subtotal_ht        = WC()->cart->get_subtotal();
-        $subtotal_ttc       = $subtotal_ht + WC()->cart->get_subtotal_tax();
-        $total_ht           = $subtotal_ht + $shipping_total_ht;
-        $total_ttc          = $subtotal_ttc + $shipping_total_ttc;
-        $tax_total          = $total_ttc - $total_ht;
+        $totals            = WC()->cart->get_totals();
+        $shipping_total_ht  = $totals['shipping_total'];
+        $shipping_total_ttc = $totals['shipping_total'] + $totals['shipping_tax_total'];
+        $subtotal_ht        = $totals['subtotal'];
+        $subtotal_ttc       = $totals['subtotal'] + $totals['subtotal_tax'];
+        $total_ht           = $totals['total'] - $totals['total_tax'];
+        $total_ttc          = $totals['total'];
+        $tax_total          = $totals['total_tax'];
         ?>
         <div class="cart-summary">
             <p class="shipping-line" data-label-ht="Coût d'expédition estimé :" data-label-ttc="Coût d'expédition estimé :">
