@@ -195,7 +195,7 @@ function customiizer_enqueue_customize_assets() {
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
 			   wp_enqueue_script(
 			        'checkout-fixes',
-			        get_stylesheet_directory_uri() . '/js/checkout/checkout-fixes.js',
+			        get_stylesheet_directory_uri() . '/js/account/checkout-fixes.js',
 			        ['jquery', 'wc-checkout'], // dépend de jQuery et du script WC du checkout
 			        $ver,
 			        true
