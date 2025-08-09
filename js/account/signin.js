@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
-	const signinForm = document.getElementById('signin');
-	const signinButton = signinForm.querySelector('.signin-button');
-	const signinNonceInput = document.getElementById('signin-nonce');
-	const nonceValue = signinNonceInput.value;
+        const signinForm = document.getElementById('signin');
+        if (!signinForm) {
+                return;
+        }
+        const signinButton = signinForm.querySelector('.signin-button');
+        const signinNonceInput = document.getElementById('signin-nonce');
+        const nonceValue = signinNonceInput.value;
 
 	// Validation du formulaire avant la soumission
 	signinButton.addEventListener('click', function(event) {
