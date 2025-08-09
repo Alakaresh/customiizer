@@ -209,6 +209,10 @@
         margin-top: 3px;
 }
 
+.error-404 {
+        background-color: var(--color-bg);
+}
+
 @keyframes pulseAccess {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.05); }
