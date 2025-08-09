@@ -158,7 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (checkoutLoginLink) {
                 checkoutLoginLink.addEventListener('click', function (e) {
                         e.preventDefault();
+                        e.stopPropagation();
                         openLoginModal();
-                });
+                }, true);
+
         }
 });
