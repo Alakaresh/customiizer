@@ -21,6 +21,27 @@ add_filter('woocommerce_customer_default_location', function($location) {
     return $location;
 }, 1); // priorité 1 = exécution très tôt
 /* Place ce code dans functions.php de ton thème enfant */
+add_action( 'wp_enqueue_scripts', function() {
+    // Ne charge le script que sur la page du checkout
+    if ( is_checkout() ) {
+        $script = <<<JS
+        jQuery(function($){
+            // Délégation pour capter le clic même si le lien est injecté plus tard
+            $(document).on('click', 'p.woocommerce-info a.showlogin', function(e){
+                e.preventDefault();
+                // Vérifie que la fonction existe sur l’objet global
+                if (typeof window.openLoginModal === 'function') {
+                    window.openLoginModal();
+                } else {
+                    console.warn('openLoginModal n\\'est pas disponible.');
+                }
+            });
+        });
+        JS;
+        // Ajoute ce script inline après jQuery
+        wp_add_inline_script( 'jquery', $script );
+    }
+});
 
 // 1. Classe déclarée globalement
 add_action('woocommerce_shipping_init', function () {
