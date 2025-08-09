@@ -62,7 +62,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                         window.location.href = redirectAfterLogin;
                                } else {
                                        if (document.body.classList.contains('woocommerce-checkout')) {
-                                               window.location.reload();
+                                               if (typeof window.handleAuthSuccess === 'function') {
+                                                       window.handleAuthSuccess();
+                                               }
+                                               if (typeof jQuery !== 'undefined') {
+                                                       jQuery(document.body).trigger('update_checkout');
+                                               }
+
                                        } else if (typeof window.handleAuthSuccess === 'function') {
                                                window.handleAuthSuccess();
                                        }
