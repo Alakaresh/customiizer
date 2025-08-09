@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                if (typeof jQuery !== 'undefined') {
                                                        jQuery(document.body).trigger('update_checkout');
                                                }
+
                                        } else if (typeof window.handleAuthSuccess === 'function') {
                                                window.handleAuthSuccess();
                                        }
