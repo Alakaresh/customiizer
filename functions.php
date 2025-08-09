@@ -9,21 +9,17 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
-add_filter('pre_option_woocommerce_default_customer_address', function($value) {
-    // Ce filtre se déclenche avant que WooCommerce calcule l'adresse par défaut
-    if (is_array($value) && isset($value['country'])) {
-        return $value['country'] . (isset($value['state']) && $value['state'] ? ':' . $value['state'] : '');
-    }
-    return $value;
-});
-
+// Log la valeur brute renvoyée par wc_get_customer_default_location
 add_filter('woocommerce_customer_default_location', function($location) {
-    // Forcer une string même si la valeur initiale est un array
+    error_log('wc_get_customer_default_location() returned: ' . print_r($location, true));
+
+    // Patch sécurité : si c'est un array, on le convertit en string
     if (is_array($location) && isset($location['country'])) {
         return $location['country'] . (isset($location['state']) && $location['state'] ? ':' . $location['state'] : '');
     }
+
     return $location;
-});
+}, 1); // priorité 1 = exécution très tôt
 
 
 // 1. Classe déclarée globalement
