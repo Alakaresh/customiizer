@@ -16,12 +16,15 @@ get_header();
 
 	<body>
 
-		<main id="site-content" class="site-content">
-			<?php
-			// Afficher le panier avec le shortcode de WooCommerce
-			echo do_shortcode('[woocommerce_cart]');
-			?>
-		</main>
+                <main id="site-content" class="site-content">
+                        <?php
+                        // Afficher le panier avec le shortcode de WooCommerce
+                        echo do_shortcode('[woocommerce_cart]');
+                        ?>
+                        <p class="cart-info-message">
+                                <?php echo esc_html__( 'Les codes promo et les points pourront être utilisés lors du paiement.', 'customiizer' ); ?>
+                        </p>
+                </main>
 
 	</body>
 </html>
