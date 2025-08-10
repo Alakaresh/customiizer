@@ -81,7 +81,12 @@ document.addEventListener('DOMContentLoaded', function () {
     taxToggle.addEventListener('change', function () {
       const showTtc = this.checked;
       cartModal.querySelectorAll('.item-price').forEach(el => {
-        el.innerHTML = showTtc ? el.dataset.priceTtc : el.dataset.priceHt;
+        const price = showTtc ? el.dataset.priceTtc : el.dataset.priceHt;
+        const total = showTtc ? el.dataset.totalTtc : el.dataset.totalHt;
+        el.innerHTML = price;
+        if (parseInt(el.dataset.qty, 10) > 1) {
+          el.innerHTML += ` <span class="item-total">(${total})</span>`;
+        }
       });
       const shippingPrice = cartModal.querySelector('.shipping-price');
       if (shippingPrice) {
