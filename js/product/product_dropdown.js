@@ -54,12 +54,12 @@ jQuery(document).ready(function ($) {
 			populateDropdown(products);
 
 			// Si URL contient un ID au chargement
-			if (initialProductId) {
-				const selectedProduct = products.find(p => p.product_id == initialProductId);
-				if (selectedProduct) {
-					updateSelectedProduct(selectedProduct);
-				}
-			}
+                        if (initialProductId) {
+                                const selectedProduct = products.find(p => p.product_id == initialProductId);
+                                if (selectedProduct) {
+                                        updateSelectedProduct(selectedProduct, true);
+                                }
+                        }
 		} else {
 			console.warn("Aucun produit trouvé dans la liste.");
 		}
@@ -84,7 +84,7 @@ jQuery(document).ready(function ($) {
 	}
 
 
-        function updateSelectedProduct(product) {
+        function updateSelectedProduct(product, initial = false) {
                 selectedProductName.text(product.name);
 
                 // Affiche un spinner pendant le chargement de l'image
@@ -100,14 +100,19 @@ jQuery(document).ready(function ($) {
                 });
                 selectedProductImage.attr('src', product.image || 'default-image-url.jpg');
 
-		const nom = product.name.toLowerCase()
-		.normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlève les accents
-		.replace(/\s+/g, '-')  // Espaces → tirets
-		.replace(/[^a-z0-9-]/g, ''); // Supprime caractères spéciaux
-
                 window.currentProductId = product.product_id;
-               const newUrl = `/configurateur?nom=${encodeURIComponent(nom)}&id=${product.product_id}&url=${image_url}&mockup=${mockup}`;
-               history.pushState(null, null, newUrl);
+
+                if (initial) {
+                        return;
+                }
+
+                const nom = product.name.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Enlève les accents
+                .replace(/\s+/g, '-')  // Espaces → tirets
+                .replace(/[^a-z0-9-]/g, ''); // Supprime caractères spéciaux
+
+                const newUrl = `/configurateur?nom=${encodeURIComponent(nom)}&id=${product.product_id}&image_url=${image_url}&mockup=${mockup}`;
+                history.pushState(null, null, newUrl);
 
                 // Affiche l'overlay avant de charger les détails
                 if (window.showLoadingOverlay) {
