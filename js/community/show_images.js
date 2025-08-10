@@ -15,7 +15,7 @@ let currentSearch = '';
 let searchTimeout;
 
 jQuery(document).ready(function ($) {
-        fetchImagesFromAPI();
+        fetchImagesFromAPI(true);
 
         $('#sort-explore').on('click', function () {
                 $(this).addClass('active');
@@ -122,6 +122,7 @@ function fetchImagesFromAPI(reset = false) {
                                         allImages = data.images;
                                         applySortAndSearch();
                                 } else {
+                                        shuffleArray(data.images);
                                         allImages = allImages.concat(data.images);
                                         appendImages(data.images);
                                 }
