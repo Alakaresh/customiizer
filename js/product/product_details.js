@@ -51,9 +51,6 @@ jQuery(document).ready(function ($) {
         const mainProductImage = $('#product-main-image');
 
         let currentVariants = [];
-        const urlParams = new URLSearchParams(window.location.search);
-        const isPreview = urlParams.get('mockup') === '1';
-        window.currentProductId = urlParams.get('id');
 
         // Préchargement du template et du modèle 3D pour une variante
         async function preloadVariantAssets(variant) {
@@ -84,32 +81,30 @@ jQuery(document).ready(function ($) {
                 }
         }
 
-        if (!isPreview) {
-                // Dès le chargement général de la page
-                // On transmet l'ID utilisateur pour récupérer correctement
-                // l'état des favoris depuis l'API
-                preloadCommunityImages({ user_id: currentUser.ID }).then(() => {
-                        const images = getAllCommunityImages();
-                        myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
-                        communityImages = images.filter(img => img.user_id !== currentUser.ID);
+        // Dès le chargement général de la page
+        // On transmet l'ID utilisateur pour récupérer correctement
+        // l'état des favoris depuis l'API
+        preloadCommunityImages({ user_id: currentUser.ID }).then(() => {
+                const images = getAllCommunityImages();
+                myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
+                communityImages = images.filter(img => img.user_id !== currentUser.ID);
 
-                        displayGeneratedImages(myGeneratedImages);
+                displayGeneratedImages(myGeneratedImages);
 
-                        // Si une variante est déjà sélectionnée, met à jour la bottom-bar
-                        if (selectedVariant) {
-                                const filtered = images.filter(img => img.format === selectedVariant.ratio_image);
-                                displayImagesInBottomBar(filtered);
-                        }
-                });
-
-                // Met à jour la bottom-bar dès que les images communautaires sont chargées
-                document.addEventListener('communityImagesLoaded', () => {
-                        if (!selectedVariant) return;
-                        const images = getAllCommunityImages();
+                // Si une variante est déjà sélectionnée, met à jour la bottom-bar
+                if (selectedVariant) {
                         const filtered = images.filter(img => img.format === selectedVariant.ratio_image);
                         displayImagesInBottomBar(filtered);
-                });
-        }
+                }
+        });
+
+        // Met à jour la bottom-bar dès que les images communautaires sont chargées
+        document.addEventListener('communityImagesLoaded', () => {
+                if (!selectedVariant) return;
+                const images = getAllCommunityImages();
+                const filtered = images.filter(img => img.format === selectedVariant.ratio_image);
+                displayImagesInBottomBar(filtered);
+        });
 
 
         // Gestion de l'overlay de chargement
@@ -174,7 +169,8 @@ jQuery(document).ready(function ($) {
                         v.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
                         v.mockups = dedupeMockups(v.mockups);
                 });
-                const variantParam = urlParams.get('variant');
+                const urlParams = new URLSearchParams(window.location.search);
+		const variantParam = urlParams.get('variant');
                 selectedVariant = variants[0];
 
                 updateColors(variants);
@@ -183,32 +179,30 @@ jQuery(document).ready(function ($) {
                 // Si aucun variant spécifique n'est indiqué, simule un clic sur
                 // la première couleur et la première taille disponibles pour
                 // appliquer correctement la sélection initiale
-                if (!variantParam && !isPreview) {
+                if (!variantParam) {
                         const firstColor = $('.color-option:not(.disabled)').first();
                         if (firstColor.length) firstColor.trigger('click');
                         const firstSize = $('.size-option:not(.disabled)').first();
                         if (firstSize.length) firstSize.trigger('click');
                 }
 
-                // ✅ Si un paramètre variant est présent dans l'URL
-                if (variantParam) {
-                        const foundVariant = variants.find(v => v.variant_id == variantParam);
-                        if (foundVariant) {
-                                selectedVariant = foundVariant;
+		// ✅ Si un paramètre variant est présent dans l'URL
+		if (variantParam) {
+			const foundVariant = variants.find(v => v.variant_id == variantParam);
+			if (foundVariant) {
+				selectedVariant = foundVariant;
 
-                                // 👉 Sélectionne automatiquement les bonnes options dans l'interface
-                                $('.color-option').removeClass('selected');
-                                $(`.color-option[data-color="${selectedVariant.color}"]`).addClass('selected');
+				// 👉 Sélectionne automatiquement les bonnes options dans l'interface
+				$('.color-option').removeClass('selected');
+				$(`.color-option[data-color="${selectedVariant.color}"]`).addClass('selected');
 
-                                $('.size-option').removeClass('selected');
-                                $(`.size-option[data-size="${selectedVariant.size}"]`).addClass('selected');
-                        }
-                }
+				$('.size-option').removeClass('selected');
+				$(`.size-option[data-size="${selectedVariant.size}"]`).addClass('selected');
+			}
+		}
 
-                if (!isPreview) {
-                        updateSelectedVariant();
-                }
-        }
+		updateSelectedVariant();
+	}
 
 
         function updateMainImage(variant) {
@@ -395,7 +389,7 @@ jQuery(document).ready(function ($) {
 
                 // 🚀 S'assure que le thumbnail sélectionné déclenche bien ses évènements
                 const selectedThumb = thumbnailsContainer.find('.thumbnail.selected');
-                if (selectedThumb.length && !isPreview) selectedThumb.trigger('click');
+                if (selectedThumb.length) selectedThumb.trigger('click');
         }
 
         // 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
@@ -444,35 +438,37 @@ $(document).on('click', '.toggle-description', function () {
        $(window).on('resize', mobileReorder);
 
 
-        // 🔥 Charge le produit si un ID est présent au démarrage
+	// 🔥 Charge le produit si un ID est présent au démarrage
+        const urlParams = new URLSearchParams(window.location.search);
+        window.currentProductId = urlParams.get('id');
         if (window.currentProductId) {
                 loadProductDetails(window.currentProductId);
         }
-        // 🔄 Auto-génération du mockup si mockup=1
-        if (isPreview) {
-                const imageUrl = urlParams.get("image_url");
-                const variantId = urlParams.get("variant");
+	// 🔄 Auto-génération du mockup si mockup=1
+	if (urlParams.get("mockup") === "1") {
+		const imageUrl = urlParams.get("image_url");
+		const variantId = urlParams.get("variant");
 
-                // ⏳ Attendre que les variantes soient chargées
-                const checkReady = setInterval(() => {
-                        if (selectedVariant && selectedVariant.variant_id == variantId) {
-                                clearInterval(checkReady);
+		// ⏳ Attendre que les variantes soient chargées
+		const checkReady = setInterval(() => {
+			if (selectedVariant && selectedVariant.variant_id == variantId) {
+				clearInterval(checkReady);
 
                                 const mockupData = {
                                         image_url: imageUrl,
                                         product_id: window.currentProductId,
                                         variant_id: selectedVariant.variant_id,
-                                        placement: selectedVariant.placement,
-                                        technique: selectedVariant.technique,
-                                        width: selectedVariant.print_area_width,
-                                        height: selectedVariant.print_area_height,
-                                        left: 0,
-                                        top: 0
-                                };
+					placement: selectedVariant.placement,
+					technique: selectedVariant.technique,
+					width: selectedVariant.print_area_width,
+					height: selectedVariant.print_area_height,
+					left: 0,
+					top: 0
+				};
 
-                                generateMockup(mockupData);
-                        }
-                }, 200);
-        }
+				generateMockup(mockupData);
+			}
+		}, 200);
+	}
 
 });
