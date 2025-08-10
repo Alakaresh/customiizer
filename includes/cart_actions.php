@@ -21,8 +21,10 @@ function customiizer_get_cart_body_html() {
             <?php foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) :
                 $_product = $cart_item['data'];
                 if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 ) :
-                    $price_ht  = wc_get_price_excluding_tax( $_product );
-                    $price_ttc = wc_get_price_including_tax( $_product );
+                    $price_ht       = wc_get_price_excluding_tax( $_product );
+                    $price_ttc      = wc_get_price_including_tax( $_product );
+                    $line_total_ht  = wc_get_price_excluding_tax( $_product, array( 'qty' => $cart_item['quantity'] ) );
+                    $line_total_ttc = wc_get_price_including_tax( $_product, array( 'qty' => $cart_item['quantity'] ) );
                     ?>
                     <li class="custom-cart-item" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
                         <div class="item-image">
@@ -31,7 +33,12 @@ function customiizer_get_cart_body_html() {
                         <div class="item-info">
                             <div class="info-top">
                                 <p class="item-name"><?php echo $_product->get_name(); ?></p>
-                                <p class="item-price" data-price-ht="<?php echo esc_attr( wc_price( $price_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $price_ttc ) ); ?>"><?php echo wc_price( $price_ttc ); ?></p>
+                                <p class="item-price" data-price-ht="<?php echo esc_attr( wc_price( $price_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $price_ttc ) ); ?>" data-total-ht="<?php echo esc_attr( wc_price( $line_total_ht ) ); ?>" data-total-ttc="<?php echo esc_attr( wc_price( $line_total_ttc ) ); ?>" data-qty="<?php echo esc_attr( $cart_item['quantity'] ); ?>">
+                                    <?php echo wc_price( $price_ttc ); ?>
+                                    <?php if ( $cart_item['quantity'] > 1 ) : ?>
+                                        <span class="item-total">(<?php echo wc_price( $line_total_ttc ); ?>)</span>
+                                    <?php endif; ?>
+                                </p>
                             </div>
                             <div class="item-qty">
                                 <label>Qté :</label>
