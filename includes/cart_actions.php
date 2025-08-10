@@ -31,7 +31,7 @@ function customiizer_get_cart_body_html() {
                         <div class="item-info">
                             <div class="info-top">
                                 <p class="item-name"><?php echo $_product->get_name(); ?></p>
-                                <p class="item-price" data-price-ht="<?php echo esc_attr( wc_price( $price_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $price_ttc ) ); ?>"><?php echo wc_price( $price_ttc ); ?></p>
+                                <p class="item-price" data-price-ht="<?php echo esc_attr( wc_price( $price_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $price_ttc ) ); ?>"><?php echo wc_price( $price_ttc ); // wc_price respects the euro symbol position ?></p>
                             </div>
                             <div class="item-qty">
                                 <label>Qté :</label>
@@ -55,11 +55,11 @@ function customiizer_get_cart_body_html() {
         <div class="cart-summary">
             <p class="shipping-line" data-label-ht="Coût d'expédition estimé :" data-label-ttc="Coût d'expédition estimé :">
                 <span class="label">Coût d'expédition estimé :</span>
-                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ttc ); ?></strong>
+                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ttc ); // euro symbol follows amount ?></strong>
             </p>
             <p class="total-line" data-label-ht="Total (HT) :" data-label-ttc="Total (TTC) :">
                 <span class="label">Total (TTC) :</span>
-                <strong class="total-price" data-price-ht="<?php echo esc_attr( wc_price( $total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $total_ttc ) ); ?>"><?php echo wc_price( $total_ttc ); ?></strong>
+                <strong class="total-price" data-price-ht="<?php echo esc_attr( wc_price( $total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $total_ttc ) ); ?>"><?php echo wc_price( $total_ttc ); // euro symbol follows amount ?></strong>
             </p>
         </div>
         <?php
