@@ -444,15 +444,25 @@ $(document).on('click', '.toggle-description', function () {
         if (window.currentProductId) {
                 loadProductDetails(window.currentProductId);
         }
-	// 🔄 Auto-génération du mockup si mockup=1
-	if (urlParams.get("mockup") === "1") {
-		const imageUrl = urlParams.get("image_url");
-		const variantId = urlParams.get("variant");
+        // 🔄 Auto-génération du mockup si mockup=1
+        if (urlParams.get("mockup") === "1") {
+                const imageUrl = urlParams.get("image_url");
+                const variantId = urlParams.get("variant");
 
-		// ⏳ Attendre que les variantes soient chargées
-		const checkReady = setInterval(() => {
-			if (selectedVariant && selectedVariant.variant_id == variantId) {
-				clearInterval(checkReady);
+                // 🧹 Nettoie l'URL pour éviter une nouvelle génération au rafraîchissement
+                const clearMockupParams = () => {
+                        urlParams.delete("mockup");
+                        urlParams.delete("image_url");
+                        urlParams.delete("variant");
+                        const newQuery = urlParams.toString();
+                        const newUrl = window.location.pathname + (newQuery ? `?${newQuery}` : "");
+                        window.history.replaceState({}, "", newUrl);
+                };
+
+                // ⏳ Attendre que les variantes soient chargées
+                const checkReady = setInterval(() => {
+                        if (selectedVariant && selectedVariant.variant_id == variantId) {
+                                clearInterval(checkReady);
 
                                 const mockupData = {
                                         image_url: imageUrl,
@@ -461,14 +471,15 @@ $(document).on('click', '.toggle-description', function () {
 					placement: selectedVariant.placement,
 					technique: selectedVariant.technique,
 					width: selectedVariant.print_area_width,
-					height: selectedVariant.print_area_height,
-					left: 0,
-					top: 0
-				};
+                                        height: selectedVariant.print_area_height,
+                                        left: 0,
+                                        top: 0
+                                };
 
-				generateMockup(mockupData);
-			}
-		}, 200);
-	}
+                                generateMockup(mockupData);
+                                clearMockupParams();
+                        }
+                }, 200);
+        }
 
 });
