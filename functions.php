@@ -380,3 +380,15 @@ function customiizer_output_color_palette() {
     echo '<style>' . $css . '</style>';
 }
 add_action('wp_head', 'customiizer_output_color_palette');
+
+/**
+ * Place the Euro currency symbol after the amount in prices.
+ */
+add_filter('woocommerce_currency_pos', 'customiizer_move_euro_symbol_after_amount');
+function customiizer_move_euro_symbol_after_amount($position) {
+    if ('EUR' === get_woocommerce_currency()) {
+        return 'right';
+    }
+
+    return $position;
+}
