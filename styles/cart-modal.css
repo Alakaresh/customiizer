@@ -25,7 +25,7 @@
   flex-direction: column;
   font-family: Arial, sans-serif;
 
-  max-height: 90vh;
+  max-height: 50vh; /* Limite par défaut sur desktop */
   overflow: hidden;
 }
 

@@ -187,10 +187,15 @@
 		order: 1;
 	}
 
-	.social-icons {
-		position: static;
-		margin-top: 20px;
-		justify-content: center;
-	}
+        .social-icons {
+                position: static;
+                margin-top: 20px;
+                justify-content: center;
+        }
+
+       /*==========CART MODAL==========*/
+       .cart-modal-content {
+               max-height: 70vh;
+       }
 
 }
