@@ -33,13 +33,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (body) {
       body.innerHTML = html;
       bindCartActions();
-      if (taxToggle && !taxToggle.checked) {
-        taxToggle.dispatchEvent(new Event('change'));
-      }
     }
     const footer = cartModal.querySelector('.cart-footer');
     if (footer && footerHtml !== undefined) {
       footer.innerHTML = footerHtml;
+    }
+    if (taxToggle && !taxToggle.checked) {
+      taxToggle.dispatchEvent(new Event('change'));
     }
   }
   window.refreshCartBody = refreshCartBody;
