@@ -61,12 +61,12 @@ function customiizer_get_cart_footer_html() {
     WC()->cart->calculate_totals();
 
     ob_start();
-    ?>
-    <p class="cart-note" style="color: #000;">
-        <?php echo esc_html__( 'Les codes promo et les points pourront être utilisés lors du paiement.', 'customiizer' ); ?>
-    </p>
-    <?php
+
+    $note_html = '<p class="cart-note">' . esc_html__( 'Les codes promo et les points pourront être utilisés lors du paiement.', 'customiizer' ) . '</p>';
+
     if ( WC()->cart->is_empty() ) {
+        echo $note_html;
+
         $shop_url = home_url( '/boutique' );
         ?>
         <a href="<?php echo esc_url( $shop_url ); ?>" class="checkout-button">Voir la boutique</a>
@@ -90,6 +90,8 @@ function customiizer_get_cart_footer_html() {
                 <strong class="total-price" data-price-ht="<?php echo esc_attr( wc_price( $total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $total_ttc ) ); ?>"><?php echo wc_price( $total_ttc ); ?></strong>
             </p>
         </div>
+        <?php echo $note_html; ?>
+
         <a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="checkout-button">Finaliser la commande</a>
         <?php
     }
