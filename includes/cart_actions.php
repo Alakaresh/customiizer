@@ -84,7 +84,7 @@ function customiizer_get_cart_footer_html() {
         return '<a href="' . esc_url( $shop_url ) . '" class="checkout-button">Voir la boutique</a>';
     }
 
-    return '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="checkout-button">Poursuivre la commande</a>';
+    return '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="checkout-button">Finaliser la commande</a>';
 }
 
 /**
