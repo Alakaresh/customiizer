@@ -28,7 +28,7 @@ add_action('woocommerce_shipping_init', function () {
 			$this->id                 = 'custom_dynamic_shipping';
 			$this->instance_id       = absint($instance_id);
 			$this->method_title       = 'Livraison personnalisée dynamique';
-			$this->method_description = 'Utilise le tarif défini par produit pour le premier, puis +1€ par unité supplémentaire.';
+                        $this->method_description = 'Applique le tarif défini par article puis ajoute +1€ pour chaque unité identique supplémentaire.';
 			$this->title              = 'Livraison';
 			$this->enabled            = 'yes';
 			$this->supports           = ['shipping-zones', 'instance-settings'];
@@ -42,28 +42,21 @@ add_action('woocommerce_shipping_init', function () {
 		}
 
 		public function calculate_shipping($package = []) {
-			$total_shipping = 0;
-			$first_cost_applied = false;
+                        $total_shipping = 0;
 
-			foreach ($package['contents'] as $item_id => $values) {
-				$quantity = $values['quantity'];
-				$product_id = $values['product_id'];
+                        foreach ($package['contents'] as $item_id => $values) {
+                                $quantity   = $values['quantity'];
+                                $product_id = $values['product_id'];
 
-				if (!$first_cost_applied) {
-					// On applique le tarif personnalisé du 1er produit
-					$base_cost = floatval(get_post_meta($product_id, 'custom_shipping_cost', true));
-					$total_shipping += $base_cost;
-					$first_cost_applied = true;
+                                // Coût de base appliqué une fois par paire produit + variante
+                                $base_cost = floatval(get_post_meta($product_id, 'custom_shipping_cost', true));
+                                $total_shipping += $base_cost;
 
-					// +1€ pour les unités supplémentaires de ce même produit
-					if ($quantity > 1) {
-						$total_shipping += ($quantity - 1) * 1.00;
-					}
-				} else {
-					// +1€ pour chaque unité des autres produits
-					$total_shipping += $quantity * 1.00;
-				}
-			}
+                                // +1€ pour chaque unité supplémentaire identique
+                                if ($quantity > 1) {
+                                        $total_shipping += ($quantity - 1) * 1.00;
+                                }
+                        }
 
 			$this->add_rate([
 				'id'       => $this->id . ':' . $this->instance_id,
