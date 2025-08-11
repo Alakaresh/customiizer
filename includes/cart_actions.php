@@ -33,8 +33,12 @@ function customiizer_get_cart_body_html() {
                         <div class="item-info">
                             <div class="info-top">
                                 <p class="item-name"><?php echo $_product->get_name(); ?></p>
-                                <p class="item-price" data-price-ht="<?php echo esc_attr( wc_price( $price_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $price_ttc ) ); ?>"><?php echo wc_price( $price_ttc ); // wc_price respects the euro symbol position ?></p>
-
+                                <p class="item-price" data-qty="<?php echo esc_attr( $cart_item['quantity'] ); ?>" data-price-ht="<?php echo esc_attr( wc_price( $price_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $price_ttc ) ); ?>" data-total-ht="<?php echo esc_attr( wc_price( $line_total_ht ) ); ?>" data-total-ttc="<?php echo esc_attr( wc_price( $line_total_ttc ) ); ?>">
+                                    <?php echo wc_price( $price_ttc ); // wc_price respects the euro symbol position ?>
+                                    <?php if ( $cart_item['quantity'] > 1 ) : ?>
+                                        <span class="item-total"><?php echo '(' . wc_price( $line_total_ttc ) . ')'; ?></span>
+                                    <?php endif; ?>
+                                </p>
                             </div>
                             <div class="item-qty">
                                 <label>Qté :</label>
