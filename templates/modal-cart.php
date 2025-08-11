@@ -27,5 +27,8 @@ WC()->cart->calculate_totals();
     <div class="cart-footer">
       <?php echo customiizer_get_cart_footer_html(); ?>
     </div>
+    <p class="cart-note">
+      <?php echo esc_html__( 'Les codes promo et les points pourront être utilisés lors du paiement.', 'customiizer' ); ?>
+    </p>
   </div>
 </div>
