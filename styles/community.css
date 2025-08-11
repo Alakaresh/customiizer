@@ -267,3 +267,14 @@ body {
     height: 1px;
 }
 
+@media (max-width: 768px) {
+    .search-and-sort-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-container {
+        margin-top: 10px;
+    }
+}
+
