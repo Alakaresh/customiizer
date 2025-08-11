@@ -4,11 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Returns the inner HTML for the cart modal body (list of items and summary).
+ * Returns the inner HTML for the cart modal body (list of items).
  */
 function customiizer_get_cart_body_html() {
-    WC()->cart->calculate_totals();
-
     ob_start();
 
     if ( WC()->cart->is_empty() ) :
@@ -51,6 +49,27 @@ function customiizer_get_cart_body_html() {
         </ul>
 
         <?php
+    endif;
+
+    return ob_get_clean();
+}
+
+/**
+ * Returns the HTML for the cart modal footer (note, summary and button).
+ */
+function customiizer_get_cart_footer_html() {
+    WC()->cart->calculate_totals();
+
+    ob_start();
+    $note_html = '<p class="cart-note">' . esc_html__( 'Les codes promo et les points pourront être utilisés lors du paiement.', 'customiizer' ) . '</p>';
+
+    if ( WC()->cart->is_empty() ) {
+        echo $note_html;
+        $shop_url = home_url( '/boutique' );
+        ?>
+        <a href="<?php echo esc_url( $shop_url ); ?>" class="checkout-button">Voir la boutique</a>
+        <?php
+    } else {
         $shipping_total_ht  = WC()->cart->get_shipping_total();
         $shipping_tax       = WC()->cart->get_shipping_tax();
         $shipping_total_ttc = $shipping_total_ht + $shipping_tax;
@@ -62,29 +81,19 @@ function customiizer_get_cart_body_html() {
         <div class="cart-summary">
             <p class="shipping-line" data-label-ht="Coût d'expédition estimé :" data-label-ttc="Coût d'expédition estimé :">
                 <span class="label">Coût d'expédition estimé :</span>
-                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ttc ); // euro symbol follows amount ?></strong>
+                <strong class="shipping-price" data-price-ht="<?php echo esc_attr( wc_price( $shipping_total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $shipping_total_ttc ) ); ?>"><?php echo wc_price( $shipping_total_ttc ); ?></strong>
             </p>
             <p class="total-line" data-label-ht="Total (HT) :" data-label-ttc="Total (TTC) :">
                 <span class="label">Total (TTC) :</span>
-                <strong class="total-price" data-price-ht="<?php echo esc_attr( wc_price( $total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $total_ttc ) ); ?>"><?php echo wc_price( $total_ttc ); // euro symbol follows amount ?></strong>
+                <strong class="total-price" data-price-ht="<?php echo esc_attr( wc_price( $total_ht ) ); ?>" data-price-ttc="<?php echo esc_attr( wc_price( $total_ttc ) ); ?>"><?php echo wc_price( $total_ttc ); ?></strong>
             </p>
         </div>
+        <?php echo $note_html; ?>
+        <a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="checkout-button">Finaliser la commande</a>
         <?php
-    endif;
-
-    return ob_get_clean();
-}
-
-/**
- * Returns the HTML for the cart modal footer.
- */
-function customiizer_get_cart_footer_html() {
-    if ( WC()->cart->is_empty() ) {
-        $shop_url = home_url( '/boutique' );
-        return '<a href="' . esc_url( $shop_url ) . '" class="checkout-button">Voir la boutique</a>';
     }
 
-    return '<a href="' . esc_url( wc_get_checkout_url() ) . '" class="checkout-button">Finaliser la commande</a>';
+    return ob_get_clean();
 }
 
 /**

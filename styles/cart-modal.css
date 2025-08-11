@@ -207,13 +207,19 @@
 
 /* === RÉCAP === */
 .cart-summary {
-  margin-top: 20px;
+  margin: 0 0 8px;
   font-size: 15px;
   color: #444;
 }
 
 .cart-summary p {
-  margin-bottom: 10px;
+  margin: 0 0 4px;
+}
+
+.cart-note {
+  color: #000;
+  font-size: 13px;
+  margin: 8px 0;
 }
 
 .empty-cart-message {
