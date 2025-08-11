@@ -263,11 +263,12 @@ function appendImage(image, columns, columnIndex) {
 // --- Utilitaires ---
 
 function initializeColumns() {
-	const columns = [];
-	for (let i = 0; i < 5; i++) {
-		columns.push($('<div/>', { class: 'image-column' }));
-	}
-	return columns;
+        const columns = [];
+        const columnCount = window.innerWidth <= 1024 ? 2 : 5;
+        for (let i = 0; i < columnCount; i++) {
+                columns.push($('<div/>', { class: 'image-column' }));
+        }
+        return columns;
 }
 
 function getQueryParam(param) {
