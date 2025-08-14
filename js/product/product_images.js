@@ -162,7 +162,7 @@ function generateMockup(mockupData) {
                 loadingOverlay = document.createElement("div");
                 loadingOverlay.classList.add("loading-overlay");
                 loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">${overlayMessages[0]}</div>`;
-                mainProductImage?.parentNode.appendChild(loadingOverlay);
+                mainProductImage?.parentNode?.appendChild(loadingOverlay);
         } else {
                 const textEl = loadingOverlay.querySelector('.loading-text');
                 if (textEl) textEl.textContent = overlayMessages[0];
@@ -196,7 +196,12 @@ function generateMockup(mockupData) {
         form.append("style_ids", JSON.stringify(styleIds));
 
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
-                .then(res => res.json())
+                .then(res => {
+                        if (!res.ok) {
+                                throw new Error(`HTTP ${res.status}`);
+                        }
+                        return res.json();
+                })
                 .then(data => {
                         if (typeof data.data?.rate_limit_remaining !== 'undefined') {
                                 console.log(`📊 Rate limit: ${data.data.rate_limit_remaining} remaining, reset ${data.data.rate_limit_reset}`);
@@ -223,6 +228,7 @@ function generateMockup(mockupData) {
                 })
                 .catch(err => {
                         console.error("❌ Erreur réseau :", err.message);
+                        alert("Erreur serveur lors de la génération du mockup.");
                 })
                 .finally(() => {
                         document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
