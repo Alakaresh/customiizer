@@ -43,16 +43,26 @@ function products_list( WP_REST_Request $request ) {
 		return new WP_REST_Response('Aucun produit trouvé', 404);
 	}
 
-	$products = array_map(function($row) {
-		return [
-			'product_id'   => (int) $row['product_id'],
-			'name'         => $row['name'],
-			'image'        => $row['image'],
-			'lowest_price' => (float) $row['lowest_price'],
-			'is_active'    => (int) $row['is_active'],
-		];
-	}, $results);
+        $products = array_map(function($row) {
+                return [
+                        'product_id'   => (int) $row['product_id'],
+                        'name'         => $row['name'],
+                        'image'        => $row['image'],
+                        'lowest_price' => (float) $row['lowest_price'],
+                        'is_active'    => (int) $row['is_active'],
+                ];
+        }, $results);
 
-	return new WP_REST_Response($products, 200);
+        // Sauvegarde une copie JSON dans le répertoire "products"
+        $export_dir  = get_stylesheet_directory() . '/products';
+        $export_file = $export_dir . '/products.json';
+
+        if ( ! file_exists( $export_dir ) ) {
+                wp_mkdir_p( $export_dir );
+        }
+
+        file_put_contents( $export_file, json_encode( $products, JSON_PRETTY_PRINT ) );
+
+        return new WP_REST_Response($products, 200);
 }
 
