@@ -30,14 +30,14 @@
 		overflow: auto;
 	}
 
-	#right-sidebar {
-		order: 2;
-		margin-top: 0;
-		padding: 0 0 5px 0;
-		background-color: var(--darker-gray);
-		border-top: 1px solid #2a2a2a;
+        #right-sidebar {
+                order: 2;
+                margin-top: 0;
+                padding: 0 0 5px 0;
+                background-color: var(--color-header-primary);
+                border-top: 1px solid #2a2a2a;
                 max-height: 25dvh;
-	}
+        }
 
 	#right-sidebar h2 {
 		margin: 0;
