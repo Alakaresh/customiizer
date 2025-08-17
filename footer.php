@@ -87,22 +87,6 @@ if ( $user_logged_in ) {
         </script>
 <?php endif; ?>
         <script>
-                jQuery(document).ready(function($) {
-                        $('#myCreationsLink, #mobileMyCreationsLink').on('click', function(event) {
-                                if (!userIsLoggedIn) {
-                                        event.preventDefault();
-
-                                        // Stocke l’intention dans sessionStorage
-                                        sessionStorage.setItem("redirectAfterLogin", "myCreations");
-
-                                        $('#loginModal').fadeIn(300);
-                                        return false;
-                                }
-                        });
-
-                });
-        </script>
-        <script>
                 window.addEventListener("load", function () {
                         if (!window.currentUser || !currentUser.ID) {
                                 console.warn("⛔️ Aucun utilisateur connecté.");

@@ -90,7 +90,7 @@ document.querySelector('.reset-password-button').addEventListener('click', funct
 	});
 });
 document.addEventListener("DOMContentLoaded", function() {
-	const loginRegisterButton = document.getElementById('loginRegisterButton');
+        const loginRegisterButton = document.getElementById('loginRegisterButton');
 
 	// Vérifier si le bouton existe dans le DOM avant d'ajouter l'écouteur
 	if (loginRegisterButton) {
@@ -98,11 +98,24 @@ document.addEventListener("DOMContentLoaded", function() {
 			if (!userIsLoggedIn) {  // S'exécute seulement si l'utilisateur n'est pas connecté
 				openLoginModal();  // Fonction pour ouvrir le modal de connexion
 			}
-		});
-	}
+                });
+        }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+        const myCreationsLinks = document.querySelectorAll('#myCreationsLink, #mobileMyCreationsLink');
+        myCreationsLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                        if (!userIsLoggedIn) {
+                                e.preventDefault();
+                                sessionStorage.setItem('redirectAfterLogin', 'myCreations');
+                                openLoginModal();
+                        }
+                });
+        });
 });
 document.addEventListener('DOMContentLoaded', function () {
-	const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(window.location.search);
 	const key = params.get('reset_key');
 	const login = params.get('login');
 
