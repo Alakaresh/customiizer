@@ -372,4 +372,7 @@ function customiizer_output_color_palette() {
 
     echo '<style>' . $css . '</style>';
 }
-add_action('wp_head', 'customiizer_output_color_palette');
+
+if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] === 'dev.customiizer.com') {
+    add_action('wp_head', 'customiizer_output_color_palette');
+}
