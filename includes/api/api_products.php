@@ -149,7 +149,7 @@ function get_product_variants($request) {
         v.variant_id, v.color, v.size, v.ratio_image, v.url_3d, v.zone_3d_name,
         vp.sale_price, vp.delivery_price, vp.delivery_time, vp.stock,
         pr.technique, pr.print_area_width, pr.print_area_height, pr.placement,
-        vm.mockup_id, vm.image AS mockup_image, vm.position_top, vm.position_left,
+        vm.mockup_id, vm.image AS mockup_image, vm.position_top, vm.position_left, vm.view_name,
         p.description AS product_description
     FROM {$prefix}variants AS v
     LEFT JOIN {$prefix}variant_prices AS vp ON vp.variant_id = v.variant_id
@@ -199,12 +199,13 @@ function get_product_variants($request) {
 
 		if (!empty($row['mockup_id'])) {
 			$variants[$variant_id]['mockups'][] = [
-				'mockup_id' => $row['mockup_id'],
-				'mockup_image' => $row['mockup_image'],
-				'position_top' => $row['position_top'],
-				'position_left' => $row['position_left']
-			];
-		}
+                                'mockup_id' => $row['mockup_id'],
+                                'mockup_image' => $row['mockup_image'],
+                                'position_top' => $row['position_top'],
+                                'position_left' => $row['position_left'],
+                                'view_name' => $row['view_name']
+                        ];
+                }
 	}
 
 	return new WP_REST_Response([

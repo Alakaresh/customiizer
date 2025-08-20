@@ -193,16 +193,19 @@ function generateMockup(mockupData) {
         form.append("left", mockupData.left);
         form.append("top", mockupData.top);
 
-        const styleId = getFirstMockup(selectedVariant)?.mockup_id;
+        const firstViewName = getFirstMockup(selectedVariant)?.view_name;
 
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
                         console.log('📥 Mockup response', data);
 
-                        if (data.success && data.data?.mockup_url && styleId) {
+                        if (data.success && Array.isArray(data.data?.files)) {
                                 mockupTimes.pending = null;
-                                updateMockupThumbnail(styleId, data.data.mockup_url);
+                                data.data.files.forEach(f => updateMockupThumbnail(f.name, f.url));
+                        } else if (data.success && data.data?.mockup_url && firstViewName) {
+                                mockupTimes.pending = null;
+                                updateMockupThumbnail(firstViewName, data.data.mockup_url);
                         } else {
                                 console.error("❌ Erreur création mockup :", data.message);
                         }
@@ -246,14 +249,14 @@ function buildProductData(mockupData) {
         return productData;
 }
 
-function cacheUpdatedMockup(styleId, mockupUrl) {
+function cacheUpdatedMockup(viewName, mockupUrl) {
         if (!selectedVariant) return;
 
-        let mockup = selectedVariant.mockups.find(m => m.mockup_id == styleId);
+        let mockup = selectedVariant.mockups.find(m => m.view_name == viewName);
         if (mockup) {
                 mockup.mockup_image = mockupUrl;
         } else {
-                mockup = { mockup_id: styleId, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
+                mockup = { view_name: viewName, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
                 selectedVariant.mockups.push(mockup);
         }
 
@@ -261,11 +264,11 @@ function cacheUpdatedMockup(styleId, mockupUrl) {
         if (cache && Array.isArray(cache.variants)) {
                 const v = cache.variants.find(v => v.variant_id == selectedVariant.variant_id);
                 if (v) {
-                        let cachedMockup = v.mockups.find(m => m.mockup_id == styleId);
+                        let cachedMockup = v.mockups.find(m => m.view_name == viewName);
                         if (cachedMockup) {
                                 cachedMockup.mockup_image = mockupUrl;
                         } else {
-                                cachedMockup = { mockup_id: styleId, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
+                                cachedMockup = { view_name: viewName, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
                                 v.mockups.push(cachedMockup);
                         }
                         if (typeof persistCache === 'function') {
@@ -308,17 +311,20 @@ function showRateLimitMessage(seconds) {
 }
 
 
-function updateMockupThumbnail(styleId, mockupUrl) {
+function updateMockupThumbnail(viewName, mockupUrl) {
 
-        console.log('🆕 Updating mockup thumbnail', { styleId, mockupUrl });
+        console.log('🆕 Updating mockup thumbnail', { viewName, mockupUrl });
 
-	const thumbnailsContainer = document.querySelector(".image-thumbnails");
-	if (!thumbnailsContainer) {
-		console.error("❌ Impossible de trouver le conteneur des thumbnails !");
-		return;
-	}
+        const thumbnailsContainer = document.querySelector(".image-thumbnails");
+        if (!thumbnailsContainer) {
+                console.error("❌ Impossible de trouver le conteneur des thumbnails !");
+                return;
+        }
 
-        let thumbnailToUpdate = document.querySelector(`.thumbnail[data-style-id="${styleId}"]`);
+        cacheUpdatedMockup(viewName, mockupUrl);
+        const mockup = selectedVariant.mockups.find(m => m.view_name === viewName);
+
+        let thumbnailToUpdate = document.querySelector(`.thumbnail[data-view-name="${viewName}"]`);
 
         if (thumbnailToUpdate) {
                 // ✅ Met à jour l'image du thumbnail existant
@@ -326,20 +332,20 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 thumbnailToUpdate.classList.remove("processing");
 
         } else {
-		console.warn(`⚠️ Aucun thumbnail trouvé pour le style ${styleId}, ajout en cours...`);
+                console.warn(`⚠️ Aucun thumbnail trouvé pour la vue ${viewName}, ajout en cours...`);
 
                 // ✅ Création d'un nouveau thumbnail si aucun existant
                 thumbnailToUpdate = document.createElement("img");
                 thumbnailToUpdate.src = mockupUrl;
-                thumbnailToUpdate.alt = `Mockup Style ${styleId}`;
+                thumbnailToUpdate.alt = `Mockup ${viewName}`;
                 thumbnailToUpdate.classList.add("thumbnail");
-                thumbnailToUpdate.dataset.styleId = styleId;
+                thumbnailToUpdate.dataset.viewName = viewName;
+                if (mockup?.mockup_id) thumbnailToUpdate.dataset.styleId = mockup.mockup_id;
 
                 // ⚡ Ajoute le gestionnaire de clic comme dans updateThumbnails
                 thumbnailToUpdate.addEventListener('click', function () {
                         const mainProductImage = document.getElementById('product-main-image');
                         if (!mainProductImage) return;
-                        const mockup = { mockup_id: styleId, mockup_image: this.src, position_top: 0, position_left: 0 };
                         if (typeof currentMockup !== 'undefined') currentMockup = mockup;
                         window.currentMockup = mockup;
                         mainProductImage.src = this.src;
@@ -351,10 +357,8 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 thumbnailsContainer.appendChild(thumbnailToUpdate);
         }
 
-        cacheUpdatedMockup(styleId, mockupUrl);
-
         // Conserve l'URL du mockup généré pour la création du produit
-        if (productData) {
+        if (productData && viewName === getFirstMockup(selectedVariant)?.view_name) {
                 productData.mockup_url = mockupUrl;
                 if (!window.generatedProductId && !window.productCreationPromise) {
                         window.productCreationPromise = window.createProduct(productData)
@@ -363,10 +367,8 @@ function updateMockupThumbnail(styleId, mockupUrl) {
                 }
         }
 
-	// ✅ Simuler un clic pour mettre à jour l'image principale
-        if (styleId === getFirstMockup(selectedVariant)?.mockup_id) {
-                thumbnailToUpdate.click();
-        } else if (window.currentMockup && window.currentMockup.mockup_id == styleId) {
+        // ✅ Simuler un clic pour mettre à jour l'image principale
+        if (viewName === getFirstMockup(selectedVariant)?.view_name || (window.currentMockup && window.currentMockup.view_name == viewName)) {
                 thumbnailToUpdate.click();
         }
 

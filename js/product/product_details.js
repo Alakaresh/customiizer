@@ -370,6 +370,7 @@ jQuery(document).ready(function ($) {
                                 .addClass('thumbnail')
                                 .attr('src', mockup.mockup_image)
                                 .attr('data-style-id', mockup.mockup_id)
+                                .attr('data-view-name', mockup.view_name)
                                 .on('click', function () {
                                         currentMockup = mockup;
                                         mainProductImage.attr('src', $(this).attr('src')).css({
