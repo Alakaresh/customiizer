@@ -4,7 +4,7 @@ add_action('wp_ajax_render_loadtest', 'customiizer_handle_render_loadtest');
 function customiizer_handle_render_loadtest() {
     $total = 60;
     $url = 'https://mockup.customiizer.com/render';
-    $variantId = isset($_POST['variantId']) ? intval($_POST['variantId']) : 1;
+    $variantId = isset($_POST['variantId']) ? intval($_POST['variantId']) : 1320;
     $imageUrl = isset($_POST['imageUrl']) ? esc_url_raw($_POST['imageUrl']) : 'https://customiizer.blob.core.windows.net/imageclient/1/4_54f189c6-4f5f-4cd1-a4b2-ac3fc0d4b21d.webp';
     $payload = json_encode([
         'variantId' => $variantId,
