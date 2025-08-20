@@ -54,17 +54,40 @@ function handle_generate_mockup() {
     error_log('[Mockup] Response: ' . $raw_body);
 
     $body = json_decode($raw_body, true);
-    if (!is_array($body) || empty($body['mockupUrl'])) {
+    if (!is_array($body)) {
         error_log('[Mockup] Invalid response');
         wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
     }
 
-    $mockup_url = esc_url_raw($body['mockupUrl']);
-    error_log('[Mockup] Success: ' . $mockup_url);
+    // Nouvelle API : retourne plusieurs fichiers
+    if (!empty($body['files']) && is_array($body['files'])) {
+        $files = [];
+        foreach ($body['files'] as $f) {
+            if (empty($f['url']) || empty($f['name'])) {
+                continue;
+            }
+            $files[] = [
+                'url'  => esc_url_raw($f['url']),
+                'name' => sanitize_text_field($f['name'])
+            ];
+        }
+        if ($files) {
+            error_log('[Mockup] Success: multiple files');
+            wp_send_json_success(['files' => $files]);
+        }
+    }
 
-    wp_send_json_success([
-        'mockup_url' => $mockup_url,
-    ]);
+    // Ancienne réponse : un seul mockupUrl
+    if (!empty($body['mockupUrl'])) {
+        $mockup_url = esc_url_raw($body['mockupUrl']);
+        error_log('[Mockup] Success: ' . $mockup_url);
+        wp_send_json_success([
+            'mockup_url' => $mockup_url,
+        ]);
+    }
+
+    error_log('[Mockup] Invalid response format');
+    wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
 }
 function convert_webp_to_png_server($image_url) {
         $parts = wp_parse_url($image_url);

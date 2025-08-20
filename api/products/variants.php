@@ -22,9 +22,10 @@ function get_product_variants_full($request) {
 			vp.custom_margin,
 			vs.region,
 			vs.availability,
-			vm.image AS mockup_image,
-			vm.position_top,
-			vm.position_left,
+                        vm.image AS mockup_image,
+                        vm.position_top,
+                        vm.position_left,
+                        vm.view_name,
 			vt.image_url AS template_image,
 			vt.template_width,
 			vt.template_height,
@@ -66,11 +67,12 @@ function get_product_variants_full($request) {
 				'custom_margin' => $v['custom_margin'] !== null ? floatval($v['custom_margin']) : null,
 				'delivery_time' => $v['delivery_time'],
 				'delivery_price' => $v['delivery_price'] ? floatval($v['delivery_price']) : null,
-				'mockup' => [
-					'image' => $v['mockup_image'],
-					'top' => $v['position_top'],
-					'left' => $v['position_left']
-				],
+                                'mockup' => [
+                                        'image' => $v['mockup_image'],
+                                        'top' => $v['position_top'],
+                                        'left' => $v['position_left'],
+                                        'view_name' => $v['view_name']
+                                ],
 				'template' => [
 					'image' => $v['template_image'],
 					'width' => $v['template_width'],
