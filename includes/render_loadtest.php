@@ -2,7 +2,11 @@
 add_action('wp_ajax_render_loadtest', 'customiizer_handle_render_loadtest');
 
 function customiizer_handle_render_loadtest() {
-    $total = 60;
+    $total = isset($_POST['requests']) ? intval($_POST['requests']) : 60;
+    if ($total < 1) {
+        $total = 1;
+    }
+
     $url = 'https://mockup.customiizer.com/render';
     $variantId = isset($_POST['variantId']) ? intval($_POST['variantId']) : 1320;
     $imageUrl = isset($_POST['imageUrl']) ? esc_url_raw($_POST['imageUrl']) : 'https://customiizer.blob.core.windows.net/imageclient/1/4_54f189c6-4f5f-4cd1-a4b2-ac3fc0d4b21d.webp';
@@ -11,45 +15,59 @@ function customiizer_handle_render_loadtest() {
         'imageUrl'  => $imageUrl,
     ]);
 
-    $mh = curl_multi_init();
-    $handles = [];
+    $interval = 60 / $total; // seconds between requests
+    error_log("Render load test start: variantId=$variantId imageUrl=$imageUrl total=$total interval=" . round($interval, 3) . "s");
 
+    $results = [];
     for ($i = 0; $i < $total; $i++) {
+        $start = microtime(true);
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
-        $handles[] = ['handle' => $ch, 'start' => microtime(true)];
-        curl_multi_add_handle($mh, $ch);
-    }
-
-    $running = null;
-    do {
-        curl_multi_exec($mh, $running);
-        curl_multi_select($mh);
-    } while ($running > 0);
-
-    $results = [];
-    foreach ($handles as $info) {
-        $ch = $info['handle'];
-        $duration = (microtime(true) - $info['start']) * 1000;
+        $body = curl_exec($ch);
+        $duration = (microtime(true) - $start) * 1000;
         $error = curl_errno($ch);
-        if ($error) {
-            $results[] = ['time' => $duration, 'ok' => false, 'error' => curl_error($ch)];
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($error || $status < 200 || $status >= 300) {
+            $errMsg = $error ? curl_error($ch) : 'HTTP ' . $status;
+            if (!$error && $body) {
+                $errMsg .= ' - ' . substr($body, 0, 200);
+            }
+            error_log("Request " . ($i + 1) . " failed: status=$status time=" . round($duration, 2) . "ms error=$errMsg");
+            $results[] = [
+                'time'   => $duration,
+                'ok'     => false,
+                'status' => $status,
+                'error'  => $errMsg,
+            ];
         } else {
-            $results[] = ['time' => $duration, 'ok' => true];
+            error_log("Request " . ($i + 1) . " ok: status=$status time=" . round($duration, 2) . "ms");
+            $results[] = [
+                'time'   => $duration,
+                'ok'     => true,
+                'status' => $status,
+            ];
         }
-        curl_multi_remove_handle($mh, $ch);
+
         curl_close($ch);
+
+        $elapsed = microtime(true) - $start;
+        $sleep = $interval - $elapsed;
+        if ($i < $total - 1 && $sleep > 0) {
+            usleep((int)($sleep * 1e6));
+        }
     }
-    curl_multi_close($mh);
 
     $times = array_column($results, 'time');
     $avg = $times ? array_sum($times) / count($times) : 0;
     $fails = count(array_filter($results, fn($r) => !$r['ok']));
 
+    error_log("Render load test completed: avg=" . round($avg, 2) . "ms failures=$fails");
     wp_send_json_success([
         'results' => $results,
         'average_ms' => $avg,

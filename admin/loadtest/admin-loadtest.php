@@ -26,7 +26,11 @@ echo <<<HTML
     <label for="image-url">Image URL :</label>
     <input type="text" id="image-url" size="80" value="$default_image" />
   </p>
-  <button id="start-loadtest" class="button button-primary">Lancer le test (60 requêtes)</button>
+  <p>
+    <label for="request-count">Nombre de requêtes :</label>
+    <input type="number" id="request-count" value="60" min="1" />
+  </p>
+  <button id="start-loadtest" class="button button-primary">Lancer le test</button>
   <pre id="loadtest-output" style="margin-top:20px;max-height:400px;overflow:auto;"></pre>
   <script>
     const defaultImage = $default_image_js; // <- toujours string valide
@@ -35,17 +39,18 @@ echo <<<HTML
       out.textContent = 'Test en cours...';
       var variantId = document.getElementById('variant-id').value || 1;
       var imageUrl = document.getElementById('image-url').value || defaultImage;
+      var requests = document.getElementById('request-count').value || 60;
       var res = await fetch(ajaxurl, {
         method: 'POST',
         credentials: 'same-origin',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams({action: 'render_loadtest', variantId: variantId, imageUrl: imageUrl})
+        body: new URLSearchParams({action: 'render_loadtest', variantId: variantId, imageUrl: imageUrl, requests: requests})
       });
       var data = await res.json();
       if (!data.success) { out.textContent = 'Erreur: ' + data.data; return; }
       var txt = '';
       data.data.results.forEach(function(r,i){
-        txt += (i+1) + '. ' + (r.ok ? 'OK' : 'FAIL') + ' ' + r.time.toFixed(0) + ' ms' + (r.error ? ' - ' + r.error : '') + '\\n';
+        txt += (i+1) + '. ' + (r.ok ? 'OK' : 'FAIL') + ' ' + r.status + ' ' + r.time.toFixed(0) + ' ms' + (r.error ? ' - ' + r.error : '') + '\\n';
       });
       txt += '---\\nMoyenne: ' + data.data.average_ms.toFixed(0) + ' ms\\nEchecs: ' + data.data.failures;
       out.textContent = txt;
