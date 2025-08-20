@@ -13,7 +13,9 @@ add_action('admin_menu', function () {
 
 function customiizer_render_test_page() {
     $default_image = esc_url('https://customiizer.blob.core.windows.net/imageclient/1/4_54f189c6-4f5f-4cd1-a4b2-ac3fc0d4b21d.webp');
-    echo <<<HTML
+$default_image_js = json_encode($default_image); // safe pour JS
+
+echo <<<HTML
 <div class="wrap">
   <h1>⚙️ Test de charge /render</h1>
   <p>
@@ -27,11 +29,12 @@ function customiizer_render_test_page() {
   <button id="start-loadtest" class="button button-primary">Lancer le test (60 requêtes)</button>
   <pre id="loadtest-output" style="margin-top:20px;max-height:400px;overflow:auto;"></pre>
   <script>
+    const defaultImage = $default_image_js; // <- toujours string valide
     document.getElementById('start-loadtest').addEventListener('click', async function() {
       var out = document.getElementById('loadtest-output');
       out.textContent = 'Test en cours...';
-      var variantId = document.getElementById('variant-id').value;
-      var imageUrl = document.getElementById('image-url').value;
+      var variantId = document.getElementById('variant-id').value || 1;
+      var imageUrl = document.getElementById('image-url').value || defaultImage;
       var res = await fetch(ajaxurl, {
         method: 'POST',
         credentials: 'same-origin',
@@ -42,12 +45,13 @@ function customiizer_render_test_page() {
       if (!data.success) { out.textContent = 'Erreur: ' + data.data; return; }
       var txt = '';
       data.data.results.forEach(function(r,i){
-        txt += (i+1) + '. ' + (r.ok ? 'OK' : 'FAIL') + ' ' + r.time.toFixed(0) + ' ms' + (r.error ? ' - ' + r.error : '') + '\n';
+        txt += (i+1) + '. ' + (r.ok ? 'OK' : 'FAIL') + ' ' + r.time.toFixed(0) + ' ms' + (r.error ? ' - ' + r.error : '') + '\\n';
       });
-      txt += '---\nMoyenne: ' + data.data.average_ms.toFixed(0) + ' ms\nEchecs: ' + data.data.failures;
+      txt += '---\\nMoyenne: ' + data.data.average_ms.toFixed(0) + ' ms\\nEchecs: ' + data.data.failures;
       out.textContent = txt;
     });
   </script>
 </div>
 HTML;
+
 }
