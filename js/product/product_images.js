@@ -100,7 +100,7 @@ function renderCurrentGroup() {
 			tooltip.style.opacity = "0";
 		});
 
-		// ✅ Ajout du clic pour générer un mockup
+                // ✅ Ajout du clic pour générer un mockup
                 imgElement.addEventListener("click", function () {
                         // Démarre le chronomètre au clic sur l'image
                         mockupTimes.pending = Date.now();
@@ -111,11 +111,12 @@ function renderCurrentGroup() {
                                 variant_id: selectedVariant?.variant_id || null,
                                 placement: selectedVariant?.placement || null,
                                 technique: selectedVariant?.technique || null,
-				width: selectedVariant?.print_area_width || null,
-				height: selectedVariant?.print_area_height || null,
-				left: 0, 
-				top: 0    
-			};
+                                width: selectedVariant?.print_area_width || null,
+                                height: selectedVariant?.print_area_height || null,
+                                left: 0,
+                                top: 0
+                        };
+                        console.log('🖼️ Image selected for mockup', mockupData);
                         generateMockup(mockupData); // 🚀 Envoi du vrai objet complet
                 });
 
@@ -132,6 +133,8 @@ function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
         productData = buildProductData(mockupData);
 
+        console.log('📤 Preparing mockup request', mockupData);
+
         if (Date.now() < mockupCooldownUntil) {
                 const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
                 showRateLimitMessage(remain);
@@ -144,7 +147,6 @@ function generateMockup(mockupData) {
                 return;
         }
 
-        const styleIds = selectedVariant.mockups.map(m => m.mockup_id);
         const mainProductImage = document.getElementById("product-main-image");
 
         // Mesure du temps écoulé depuis le clic
@@ -185,40 +187,23 @@ function generateMockup(mockupData) {
         const form = new FormData();
         form.append("action", "generate_mockup");
         form.append("image_url", mockupData.image_url);
-        form.append("product_id", mockupData.product_id);
         form.append("variant_id", mockupData.variant_id);
-        form.append("placement", mockupData.placement);
-        form.append("technique", mockupData.technique);
         form.append("width", mockupData.width);
         form.append("height", mockupData.height);
         form.append("left", mockupData.left);
         form.append("top", mockupData.top);
-        form.append("style_ids", JSON.stringify(styleIds));
+
+        const styleId = getFirstMockup(selectedVariant)?.mockup_id;
 
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
-                        if (typeof data.data?.rate_limit_remaining !== 'undefined') {
-                                console.log(`📊 Rate limit: ${data.data.rate_limit_remaining} remaining, reset ${data.data.rate_limit_reset}`);
-                                if (parseInt(data.data.rate_limit_remaining, 10) === 0) {
-                                        mockupCooldownUntil = Date.now() + 60000;
-                                }
-                        }
-                        if (data.success && data.data?.task_id) {
-                                const taskId = data.data.task_id;
-                                const now = Date.now();
-                                mockupTimes[taskId] = {
-                                        click: mockupTimes.pending || requestStart,
-                                        request: requestStart,
-                                        taskCreated: now
-                                };
-                                const creation = ((now - requestStart) / 1000).toFixed(1);
-                                const total = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
-                                console.log(`⏱ Task created in ${creation}s (total ${total}s)`);
+                        console.log('📥 Mockup response', data);
+                        if (data.success && data.data?.mockup_url && styleId) {
                                 mockupTimes.pending = null;
-                                pollMockupStatus(taskId);
+                                updateMockupThumbnail(styleId, data.data.mockup_url);
                         } else {
-                                console.error("❌ Erreur création tâche :", data.message);
+                                console.error("❌ Erreur création mockup :", data.message);
                         }
                 })
                 .catch(err => {
@@ -324,6 +309,8 @@ function showRateLimitMessage(seconds) {
 
 function updateMockupThumbnail(styleId, mockupUrl) {
 
+        console.log('🆕 Updating mockup thumbnail', { styleId, mockupUrl });
+
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
 	if (!thumbnailsContainer) {
 		console.error("❌ Impossible de trouver le conteneur des thumbnails !");
@@ -392,50 +379,6 @@ function updateMockupThumbnail(styleId, mockupUrl) {
         }
 }
 
-function pollMockupStatus(taskId, attempts = 0) {
-        fetch(`/wp-json/customiizer/v1/mockup-status?task_id=${taskId}`)
-                .then(res => res.json())
-                .then(data => {
-                        if (data.success && Array.isArray(data.mockups) && data.mockups.length) {
-                                data.mockups.forEach(m => {
-                                        updateMockupThumbnail(m.style_id, m.mockup_url);
-                                });
-                                if (mockupTimes[taskId]) {
-                                        const now = Date.now();
-                                        const total = ((now - mockupTimes[taskId].click) / 1000).toFixed(1);
-                                        const postTask = ((now - mockupTimes[taskId].taskCreated) / 1000).toFixed(1);
-                                        console.log(`⏱ Mockup displayed in ${total}s (after task ${postTask}s)`);
-                                        delete mockupTimes[taskId];
-                                        setTimeout(triggerSelectedThumbnail, 0);
-                                }
-                        } else if (attempts < 20) {
-                                setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
-                        } else {
-                                if (currentLoadingOverlay) {
-                                        currentLoadingOverlay.remove();
-                                        currentLoadingOverlay = null;
-                                }
-                                if (overlayInterval) {
-                                        clearInterval(overlayInterval);
-                                        overlayInterval = null;
-                                }
-                        }
-                })
-                .catch(() => {
-                        if (attempts < 20) {
-                                setTimeout(() => pollMockupStatus(taskId, attempts + 1), 3000);
-                        } else {
-                                if (currentLoadingOverlay) {
-                                        currentLoadingOverlay.remove();
-                                        currentLoadingOverlay = null;
-                                }
-                                if (overlayInterval) {
-                                        clearInterval(overlayInterval);
-                                        overlayInterval = null;
-                                }
-                        }
-                });
-}
 
 function showNextGroup() {
         if ((currentGroupIndex + 1) * IMAGES_PER_GROUP >= bottomBarImages.length) return;
