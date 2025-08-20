@@ -199,6 +199,7 @@ function generateMockup(mockupData) {
                 .then(res => res.json())
                 .then(data => {
                         console.log('📥 Mockup response', data);
+
                         if (data.success && data.data?.mockup_url && styleId) {
                                 mockupTimes.pending = null;
                                 updateMockupThumbnail(styleId, data.data.mockup_url);
