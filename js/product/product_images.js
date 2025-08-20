@@ -100,7 +100,7 @@ function renderCurrentGroup() {
 			tooltip.style.opacity = "0";
 		});
 
-		// ✅ Ajout du clic pour générer un mockup
+                // ✅ Ajout du clic pour générer un mockup
                 imgElement.addEventListener("click", function () {
                         // Démarre le chronomètre au clic sur l'image
                         mockupTimes.pending = Date.now();
@@ -111,11 +111,12 @@ function renderCurrentGroup() {
                                 variant_id: selectedVariant?.variant_id || null,
                                 placement: selectedVariant?.placement || null,
                                 technique: selectedVariant?.technique || null,
-				width: selectedVariant?.print_area_width || null,
-				height: selectedVariant?.print_area_height || null,
-				left: 0, 
-				top: 0    
-			};
+                                width: selectedVariant?.print_area_width || null,
+                                height: selectedVariant?.print_area_height || null,
+                                left: 0,
+                                top: 0
+                        };
+                        console.log('🖼️ Image selected for mockup', mockupData);
                         generateMockup(mockupData); // 🚀 Envoi du vrai objet complet
                 });
 
@@ -131,6 +132,8 @@ function renderCurrentGroup() {
 function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
         productData = buildProductData(mockupData);
+
+        console.log('📤 Preparing mockup request', mockupData);
 
         if (Date.now() < mockupCooldownUntil) {
                 const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
@@ -195,6 +198,8 @@ function generateMockup(mockupData) {
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
+                        console.log('📥 Mockup response', data);
+
                         if (data.success && data.data?.mockup_url && styleId) {
                                 mockupTimes.pending = null;
                                 updateMockupThumbnail(styleId, data.data.mockup_url);
@@ -304,6 +309,8 @@ function showRateLimitMessage(seconds) {
 
 
 function updateMockupThumbnail(styleId, mockupUrl) {
+
+        console.log('🆕 Updating mockup thumbnail', { styleId, mockupUrl });
 
 	const thumbnailsContainer = document.querySelector(".image-thumbnails");
 	if (!thumbnailsContainer) {

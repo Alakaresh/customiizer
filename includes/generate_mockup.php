@@ -15,6 +15,15 @@ function handle_generate_mockup() {
     $left_in    = isset($_POST['left']) ? floatval($_POST['left']) : 0;
     $top_in     = isset($_POST['top']) ? floatval($_POST['top']) : 0;
 
+    error_log('[Mockup] Params: ' . wp_json_encode([
+        'image_url' => $image_url,
+        'variant_id' => $variant_id,
+        'width_in' => $width_in,
+        'height_in' => $height_in,
+        'left_in' => $left_in,
+        'top_in' => $top_in,
+    ]));
+
     if (!$image_url || !$variant_id) {
         wp_send_json_error(['message' => 'Paramètres manquants.']);
     }
@@ -28,6 +37,8 @@ function handle_generate_mockup() {
         'imgH'      => $height_in * 2.54,
     ];
 
+    error_log('[Mockup] Payload: ' . wp_json_encode($payload));
+
     $response = wp_remote_post('https://mockup.customiizer.com/render', [
         'headers' => ['Content-Type' => 'application/json'],
         'body'    => wp_json_encode($payload),
@@ -35,16 +46,24 @@ function handle_generate_mockup() {
     ]);
 
     if (is_wp_error($response)) {
+        error_log('[Mockup] HTTP error: ' . $response->get_error_message());
         wp_send_json_error(['message' => $response->get_error_message()]);
     }
 
-    $body = json_decode(wp_remote_retrieve_body($response), true);
+    $raw_body = wp_remote_retrieve_body($response);
+    error_log('[Mockup] Response: ' . $raw_body);
+
+    $body = json_decode($raw_body, true);
     if (!is_array($body) || empty($body['mockupUrl'])) {
+        error_log('[Mockup] Invalid response');
         wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
     }
 
+    $mockup_url = esc_url_raw($body['mockupUrl']);
+    error_log('[Mockup] Success: ' . $mockup_url);
+
     wp_send_json_success([
-        'mockup_url' => esc_url_raw($body['mockupUrl']),
+        'mockup_url' => $mockup_url,
     ]);
 }
 function convert_webp_to_png_server($image_url) {
