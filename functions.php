@@ -100,6 +100,7 @@ add_action( 'init', function() {
                 '/admin/loyalty/admin-loyalty.php',
                 '/admin/update/admin-update.php',
                 '/admin/products/admin-products.php',
+                '/admin/loadtest/admin-loadtest.php',
         ];
 
         $includes = [
@@ -145,8 +146,9 @@ add_action( 'init', function() {
                 '/includes/set_default_country.php',
                 '/includes/add_to_cart.php',
                 '/includes/cart_actions.php',
+                '/includes/render_loadtest.php',
 
-	];
+        ];
         if (is_dir(get_stylesheet_directory() . '/admin')) {
                 $includes = array_merge($admin_includes, $includes);
         }
