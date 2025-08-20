@@ -9,10 +9,6 @@ function customiizer_handle_render_loadtest() {
     $payload = json_encode([
         'variantId' => $variantId,
         'imageUrl'  => $imageUrl,
-        'imgX' => 0,
-        'imgY' => 0,
-        'imgW' => 10,
-        'imgH' => 10,
     ]);
 
     $mh = curl_multi_init();
