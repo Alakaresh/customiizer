@@ -1,188 +1,51 @@
 <?php
 
-
-function generate_mockups_printful($image_url, $product_id, $variant_id, array $style_ids, $placement, $technique, $width, $height, $top, $left) {
-        if (!defined('PRINTFUL_API_KEY')) {
-                return ['success' => false, 'error' => 'PRINTFUL_API_KEY undefined'];
-        }
-
-        $api_key = PRINTFUL_API_KEY;
-        $url = 'https://api.printful.com/v2/mockup-tasks';
-        $start = microtime(true);
-
-        $data = [
-                "format" => "png",
-                "products" => [
-                        [
-                                "source" => "catalog",
-                                "mockup_style_ids" => array_map('intval', $style_ids),
-                                "catalog_product_id" => (int)$product_id,
-                                "catalog_variant_ids" => [$variant_id],
-                                "placements" => [
-                                        [
-                                                "placement" => $placement,
-                                                "technique" => $technique,
-                                                "layers" => [
-                                                        [
-                                                                "type" => "file",
-                                                                "url" => $image_url,
-                                                                "position" => [
-                                                                        "width" => $width,
-                                                                        "height" => $height,
-                                                                        "top" => $top,
-                                                                        "left" => $left
-                                                                ]
-                                                        ]
-                                                ]
-                                        ]
-                                ]
-                        ]
-                ]
-        ];
-
-
-        $ch = curl_init($url);
-        $headers = [
-                'Content-Type: application/json',
-                "Authorization: Bearer $api_key"
-        ];
-        if (defined('PRINTFUL_STORE_ID')) {
-                $headers[] = 'X-PF-Store-Id: ' . PRINTFUL_STORE_ID;
-        }
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-
-        $resp_headers = [];
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($curl, $header) use (&$resp_headers) {
-                $len = strlen($header);
-                $parts = explode(':', $header, 2);
-                if (count($parts) < 2) {
-                        return $len;
-                }
-                $name = strtolower(trim($parts[0]));
-                $value = trim($parts[1]);
-                $resp_headers[$name] = $value;
-                return $len;
-        });
-
-        $result = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if (curl_errno($ch)) {
-                $error_msg = curl_error($ch);
-                customiizer_log("Erreur cURL Printful: $error_msg");
-                curl_close($ch);
-                return ['success' => false, 'error' => $error_msg];
-        }
-
-        curl_close($ch);
-
-        $remaining = isset($resp_headers['x-ratelimit-remaining']) ? (int)$resp_headers['x-ratelimit-remaining'] : (isset($resp_headers['x-rate-limit-remaining']) ? (int)$resp_headers['x-rate-limit-remaining'] : null);
-        $reset     = isset($resp_headers['x-ratelimit-reset']) ? (int)$resp_headers['x-ratelimit-reset'] : (isset($resp_headers['x-rate-limit-reset']) ? (int)$resp_headers['x-rate-limit-reset'] : null);
-
-        if ($httpCode !== 200) {
-                customiizer_log("Erreur Printful $httpCode: $result");
-                return [
-                        'success' => false,
-                        'error'   => "Erreur HTTP {$httpCode}",
-                        'printful_response' => $result,
-                        'rate_limit_remaining' => $remaining,
-                        'rate_limit_reset' => $reset
-                ];
-        }
-
-        $decoded = json_decode($result, true);
-        if (is_array($decoded)) {
-                $decoded['rate_limit_remaining'] = $remaining;
-                $decoded['rate_limit_reset'] = $reset;
-        }
-        return $decoded;
-}
-
-
 add_action('wp_ajax_generate_mockup', 'handle_generate_mockup');
 add_action('wp_ajax_nopriv_generate_mockup', 'handle_generate_mockup');
 
+/**
+ * Appelle le service de rendu de mockup Customiizer.
+ * Reçoit les dimensions en pouces et les convertit en centimètres.
+ */
 function handle_generate_mockup() {
-    $overall_start = microtime(true);
-    if (!isset($_POST['image_url'])) {
-        $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_error(['message' => 'URL de l\'image manquante.']);
+    $image_url  = sanitize_text_field($_POST['image_url'] ?? '');
+    $variant_id = isset($_POST['variant_id']) ? intval($_POST['variant_id']) : 0;
+    $width_in   = isset($_POST['width']) ? floatval($_POST['width']) : 0;
+    $height_in  = isset($_POST['height']) ? floatval($_POST['height']) : 0;
+    $left_in    = isset($_POST['left']) ? floatval($_POST['left']) : 0;
+    $top_in     = isset($_POST['top']) ? floatval($_POST['top']) : 0;
+
+    if (!$image_url || !$variant_id) {
+        wp_send_json_error(['message' => 'Paramètres manquants.']);
     }
 
+    $payload = [
+        'variantId' => $variant_id,
+        'imageUrl'  => $image_url,
+        'imgX'      => $left_in * 2.54,
+        'imgY'      => $top_in * 2.54,
+        'imgW'      => $width_in * 2.54,
+        'imgH'      => $height_in * 2.54,
+    ];
 
-    $webp_url   = sanitize_text_field($_POST['image_url']);
-    $product_id = intval($_POST['product_id']);
-    $variant_id = intval($_POST['variant_id']);
+    $response = wp_remote_post('https://mockup.customiizer.com/render', [
+        'headers' => ['Content-Type' => 'application/json'],
+        'body'    => wp_json_encode($payload),
+        'timeout' => 60,
+    ]);
 
-    if (isset($_POST['style_ids'])) {
-        $decoded = is_array($_POST['style_ids']) ? $_POST['style_ids'] : json_decode(stripslashes($_POST['style_ids']), true);
-        $style_ids = array_map('intval', (array) $decoded);
-    } else {
-        $style_ids = [intval($_POST['style_id'])];
+    if (is_wp_error($response)) {
+        wp_send_json_error(['message' => $response->get_error_message()]);
     }
 
-    $placement  = sanitize_text_field($_POST['placement']);
-    $technique  = sanitize_text_field($_POST['technique']);
-
-    $width_in  = floatval($_POST['width']);
-    $height_in = floatval($_POST['height']);
-    $left_in   = floatval($_POST['left']);
-    $top_in    = floatval($_POST['top']);
-
-    if ($width_in < 0.3 || $height_in < 0.3) {
-        $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_error(['message' => 'La largeur et la hauteur doivent être ≥ 0.3 pouce.']);
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+    if (!is_array($body) || empty($body['mockupUrl'])) {
+        wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
     }
 
-
-    $step_start = microtime(true);
-    $conversion_result = convert_webp_to_png_server($webp_url);
-    $elapsed = round(microtime(true) - $step_start, 3);
-    if (!$conversion_result['success']) {
-        $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_error(['message' => $conversion_result['message']]);
-    }
-    $png_url   = $conversion_result['png_url'];
-    $file_path = $conversion_result['file_path'];
-
-
-
-    $response = generate_mockups_printful(
-        $png_url,
-        $product_id,
-        $variant_id,
-        $style_ids,
-        $placement,
-        $technique,
-        $width_in,
-        $height_in,
-        $top_in,
-        $left_in
-    );
-
-    if (isset($response['data'][0]['id'])) {
-        $task_id = $response['data'][0]['id'];
-        customiizer_store_mockup_file($task_id, $file_path);
-        $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_success([
-            'task_id' => $task_id,
-            'rate_limit_remaining' => $response['rate_limit_remaining'] ?? null,
-            'rate_limit_reset' => $response['rate_limit_reset'] ?? null
-        ]);
-    } else {
-        if (!unlink($file_path)) {
-        } else {
-        }
-        $total = round(microtime(true) - $overall_start, 3);
-        wp_send_json_error([
-            'message' => $response['error'] ?? 'Erreur inconnue',
-            'rate_limit_remaining' => $response['rate_limit_remaining'] ?? null,
-            'rate_limit_reset' => $response['rate_limit_reset'] ?? null
-        ]);
-    }
+    wp_send_json_success([
+        'mockup_url' => esc_url_raw($body['mockupUrl']),
+    ]);
 }
 function convert_webp_to_png_server($image_url) {
         $parts = wp_parse_url($image_url);
