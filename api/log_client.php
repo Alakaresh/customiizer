@@ -1,72 +1,116 @@
 <?php
+// Handle direct calls to this file
+if (php_sapi_name() !== 'cli' && basename(__FILE__) === basename($_SERVER['SCRIPT_FILENAME'])) {
+    $wpLoad = dirname(__DIR__, 4) . '/wp-load.php';
+    if (file_exists($wpLoad)) {
+        require_once $wpLoad;
+    } else {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'wp-load.php not found']);
+        exit;
+    }
+
+    $body    = file_get_contents('php://input');
+    $data    = json_decode($body, true) ?: [];
+    $headers = function_exists('getallheaders') ? array_change_key_case(getallheaders(), CASE_LOWER) : [];
+
+    $response = customiizer_process_log_client($data, $headers);
+    $status   = $response instanceof WP_REST_Response ? $response->get_status() : 200;
+    $output   = $response instanceof WP_REST_Response ? $response->get_data() : $response;
+
+    header('Content-Type: application/json');
+    http_response_code($status);
+    echo json_encode($output);
+    exit;
+}
+
+// Register REST route when loaded through WordPress
 register_rest_route('api/v1', '/log_client', [
-	'methods' => 'POST',
-	'callback' => 'customiizer_api_log_client',
-	'permission_callback' => '__return_true',
+    'methods'             => 'POST',
+    'callback'            => 'customiizer_api_log_client',
+    'permission_callback' => '__return_true',
 ]);
 
 function customiizer_api_log_client( WP_REST_Request $request ) {
-	// Security: check WordPress nonce or secret header
-	$authorized = false;
-	$nonce = $request->get_header( 'x-wp-nonce' );
-	if ( $nonce && wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-		$authorized = true;
-	} else {
-		$secret_header = $request->get_header( 'x-customiizer-secret' );
-		if ( $secret_header && defined( 'CUSTOMIIZER_LOG_SECRET' ) ) {
-			$authorized = hash_equals( CUSTOMIIZER_LOG_SECRET, $secret_header );
-		}
-	}
-
-	if ( ! $authorized ) {
-		return new WP_REST_Response( [ 'error' => 'Unauthorized' ], 403 );
-	}
-
-	$data = $request->get_json_params();
-	$userId    = $data['userId'] ?? null;
-	$sessionId = $data['sessionId'] ?? null;
-        $level     = $data['level'] ?? null;
-        $message   = $data['message'] ?? null;
-        $extra     = $data['extra'] ?? [];
-        $requestId = $data['requestId'] ?? null;
-
-	// Validate userId
-	if ( ! is_numeric( $userId ) || intval( $userId ) < 0 ) {
-		return new WP_REST_Response( [ 'error' => 'Invalid userId' ], 400 );
-	}
-	$userId = intval( $userId );
-
-	// Validate sessionId (alphanumeric + _-)
-	if ( ! is_string( $sessionId ) || $sessionId === '' || ! preg_match( '/^[A-Za-z0-9_-]+$/', $sessionId ) ) {
-		return new WP_REST_Response( [ 'error' => 'Invalid sessionId' ], 400 );
-	}
-
-	// Validate level
-	$allowed_levels = [ 'debug', 'info', 'warn', 'error' ];
-	if ( ! is_string( $level ) || ! in_array( strtolower( $level ), $allowed_levels, true ) ) {
-		return new WP_REST_Response( [ 'error' => 'Invalid level' ], 400 );
-	}
-	$level = strtoupper( $level );
-
-	// Validate message
-	if ( ! is_string( $message ) || $message === '' ) {
-		return new WP_REST_Response( [ 'error' => 'Invalid message' ], 400 );
-	}
-
-        // Validate extra
-        if ( ! is_array( $extra ) ) {
-                return new WP_REST_Response( [ 'error' => 'Invalid extra' ], 400 );
-        }
-
-        // Validate requestId if provided
-        if ( $requestId !== null ) {
-                if ( ! is_string( $requestId ) || ! wp_is_uuid( $requestId ) ) {
-                        return new WP_REST_Response( [ 'error' => 'Invalid requestId' ], 400 );
-                }
-        }
-
-        // Log
-        customiizer_log( 'front', $userId, $sessionId, $level, $message, $extra, $requestId );
-
-	return [ 'status' => 'ok' ];
+    return customiizer_process_log_client(
+        $request->get_json_params(),
+        [
+            'x-wp-nonce'          => $request->get_header('x-wp-nonce'),
+            'x-customiizer-secret' => $request->get_header('x-customiizer-secret'),
+        ]
+    );
 }
+
+/**
+ * Core handler shared by direct calls and REST requests.
+ *
+ * @param array $data    Decoded JSON payload.
+ * @param array $headers Lower-cased request headers.
+ * @return array|WP_REST_Response
+ */
+function customiizer_process_log_client(array $data, array $headers) {
+    // Security: check WordPress nonce or secret header
+    $authorized = false;
+    $nonce      = $headers['x-wp-nonce'] ?? null;
+    if ($nonce && wp_verify_nonce($nonce, 'wp_rest')) {
+        $authorized = true;
+    } else {
+        $secret_header = $headers['x-customiizer-secret'] ?? null;
+        if ($secret_header && defined('CUSTOMIIZER_LOG_SECRET')) {
+            $authorized = hash_equals(CUSTOMIIZER_LOG_SECRET, $secret_header);
+        }
+    }
+
+    if (!$authorized) {
+        return new WP_REST_Response(['error' => 'Unauthorized'], 403);
+    }
+
+    $userId    = $data['userId'] ?? null;
+    $sessionId = $data['sessionId'] ?? null;
+    $level     = $data['level'] ?? null;
+    $message   = $data['message'] ?? null;
+    $extra     = $data['extra'] ?? [];
+    $requestId = $data['requestId'] ?? null;
+
+    // Validate userId
+    if (!is_numeric($userId) || intval($userId) < 0) {
+        return new WP_REST_Response(['error' => 'Invalid userId'], 400);
+    }
+    $userId = intval($userId);
+
+    // Validate sessionId (alphanumeric + _-)
+    if (!is_string($sessionId) || $sessionId === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $sessionId)) {
+        return new WP_REST_Response(['error' => 'Invalid sessionId'], 400);
+    }
+
+    // Validate level
+    $allowed_levels = ['debug', 'info', 'warn', 'error'];
+    if (!is_string($level) || !in_array(strtolower($level), $allowed_levels, true)) {
+        return new WP_REST_Response(['error' => 'Invalid level'], 400);
+    }
+    $level = strtoupper($level);
+
+    // Validate message
+    if (!is_string($message) || $message === '') {
+        return new WP_REST_Response(['error' => 'Invalid message'], 400);
+    }
+
+    // Validate extra
+    if (!is_array($extra)) {
+        return new WP_REST_Response(['error' => 'Invalid extra'], 400);
+    }
+
+    // Validate requestId if provided
+    if ($requestId !== null) {
+        if (!is_string($requestId) || !wp_is_uuid($requestId)) {
+            return new WP_REST_Response(['error' => 'Invalid requestId'], 400);
+        }
+    }
+
+    // Log
+    customiizer_log('front', $userId, $sessionId, $level, $message, $extra, $requestId);
+
+    return ['status' => 'ok'];
+}
+
