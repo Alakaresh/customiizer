@@ -44,7 +44,7 @@ function startProductTour() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-	console.log("test" + userLevel);
+	logger.log("test" + userLevel);
 	// Récupération des éléments du DOM
 	var introScreen = document.getElementById("introScreen");
 	var startTutorialBtn = document.getElementById("startTutorial");
@@ -75,7 +75,7 @@ function hideIntroScreen() {
 }
 
 $(document).on('userDetailsLoaded', function() {
-	console.log("test235")
+	logger.log("test235")
     if (userLevel == 0) {
         showIntroScreen();
     }

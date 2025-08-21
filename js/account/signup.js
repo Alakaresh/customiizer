@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 	function processSignup(username, email, password, confirmPassword) {
-		console.log("signup");
+		logger.log("signup");
 		const params = new URLSearchParams();
 		params.append('action', 'user_signup');
 		params.append('username', username);
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			.then(response => response.json())
 			.then(data => {
 			if (data.success) {
-				console.log("[✅] Inscription réussie");
+				logger.log("[✅] Inscription réussie");
 
 				const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
 

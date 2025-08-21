@@ -7,12 +7,12 @@ function initProfileForm() {
 	}
 
 	if (form.dataset.initialized === "true") {
-		console.log("🔁 Formulaire déjà initialisé.");
+		logger.log("🔁 Formulaire déjà initialisé.");
 		return;
 	}
 
 	form.dataset.initialized = "true";
-	console.log("🟢 Submit form initialisé.");
+	logger.log("🟢 Submit form initialisé.");
 
 	form.addEventListener('submit', function (e) {
 		e.preventDefault();
@@ -35,7 +35,7 @@ function initProfileForm() {
 		})
 			.then(res => res.json())
 			.then(data => {
-			console.log("🧾 Réponse serveur :", data);
+			logger.log("🧾 Réponse serveur :", data);
                         if (data.success) {
                                 showToast("toast-notification", "✅ Profil mis à jour avec succès.");
                                 const nicknameSpan = document.getElementById('nickname');

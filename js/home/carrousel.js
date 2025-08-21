@@ -8,7 +8,7 @@ jQuery(document).ready(function() {
 		.then(response => response.json())
 		.then(data => {
 		if (data.success && Array.isArray(data.images)) {
-			console.log("✅ Images reçues depuis REST API :", data.images);
+			logger.log("✅ Images reçues depuis REST API :", data.images);
 			prepareImagesByFormat(data.images);
 			afficherImage(0);
 			demarrerDefilementAuto();
@@ -63,7 +63,7 @@ function prepareImagesByFormat(images) {
 	}
 
 	imagesByFormat = groupedImages; // Stocker les groupes d'images mélangées
-	console.log("Images triées par format :", imagesByFormat);
+	logger.log("Images triées par format :", imagesByFormat);
 }
 
 

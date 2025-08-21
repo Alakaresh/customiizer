@@ -75,7 +75,7 @@ async function fetchMissions(options = {}) {
                     sessionStorage.setItem(versionKey, version);
                 }
                 if (!prefetch) {
-                    console.log('Missions récupérées:', list);
+                    logger.log('Missions récupérées:', list);
                     renderMissions(list);
                     updateMissionTotal(list);
                     refreshMissionCache();

@@ -166,7 +166,7 @@ jQuery(function($) {
 
 	// Fonction pour vérifier le statut de la génération d'image
 	const checkStatus = async () => {
-		console.log('[🔍 checkStatus] Lancement du check de génération...');
+		logger.log('[🔍 checkStatus] Lancement du check de génération...');
 
 		try {
 			const response = await jQuery.ajax({
@@ -180,7 +180,7 @@ jQuery(function($) {
 
 			if (response.success) {
 				const statusData = response.data;
-				console.log('[✅ checkStatus] Réponse reçue :', statusData);
+				logger.log('[✅ checkStatus] Réponse reçue :', statusData);
 
 				let url = statusData.result?.url || null;
 				let displayedUrl = url;
@@ -195,7 +195,7 @@ jQuery(function($) {
 				const $existing = $container.find('img.centered-image');
 
 				if ($existing.length > 0) {
-					console.log('[🧹] Suppression de', $existing.length, 'ancienne(s) image(s)');
+					logger.log('[🧹] Suppression de', $existing.length, 'ancienne(s) image(s)');
 					$existing.each(function() {
 						jQuery.removeData(this); // Supprime les data() jQuery
 					});
@@ -203,7 +203,7 @@ jQuery(function($) {
 				}
 
 				if (url && statusData.progress > 0) {
-					console.log('[🖼️] Insertion de la nouvelle image générée');
+					logger.log('[🖼️] Insertion de la nouvelle image générée');
 
                                         const promptText = typeof prompt === 'object'
                                             ? (prompt.text || prompt.prompt || JSON.stringify(prompt))
@@ -220,15 +220,15 @@ jQuery(function($) {
                                         .addClass('centered-image preview-enlarge');
 
 					$container.append($newImage);
-					console.log('[✅] Image insérée avec attributs :');
-					console.log('[data-display_name]:', $newImage.attr('data-display_name'));
-					console.log('[data-user-id]:', $newImage.attr('data-user-id'));
-					console.log('[data-format-image]:', $newImage.attr('data-format-image'));
-					console.log('[data-prompt]:', $newImage.attr('data-prompt'));
+					logger.log('[✅] Image insérée avec attributs :');
+					logger.log('[data-display_name]:', $newImage.attr('data-display_name'));
+					logger.log('[data-user-id]:', $newImage.attr('data-user-id'));
+					logger.log('[data-format-image]:', $newImage.attr('data-format-image'));
+					logger.log('[data-prompt]:', $newImage.attr('data-prompt'));
 
 					$('#image-grid').hide();
 				} else {
-					console.log('[🕐] Image pas encore prête, affichage d’attente');
+					logger.log('[🕐] Image pas encore prête, affichage d’attente');
 					$container.append(`
 					<img src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png"
 						alt="En cours..."
@@ -238,13 +238,13 @@ jQuery(function($) {
 
 				// 💡 Mise à jour de la barre de chargement
 				if (statusData.progress > 0) {
-					console.log('[📶] Progression :', statusData.progress, '%');
+					logger.log('[📶] Progression :', statusData.progress, '%');
 					updateLoading(statusData.progress);
 				}
 
 				// ✅ Si fini → upscale
 				if (statusData.status === "done") {
-					console.log('[🎉] Génération terminée ! Lancement des upscales...');
+					logger.log('[🎉] Génération terminée ! Lancement des upscales...');
 					updateLoading(100);
 					$('#validate-button').prop('disabled', false);
 
@@ -265,7 +265,7 @@ jQuery(function($) {
 
 							const upscaleData = await upscaleResponse.json();
 							if (upscaleData.status === 'success') {
-								console.log(`[🆙] Upscale #${choice} lancé :`, upscaleData.data.hash);
+								logger.log(`[🆙] Upscale #${choice} lancé :`, upscaleData.data.hash);
 								imageHashes[choice] = upscaleData.data.hash;
 							}
 						} catch (upscaleError) {
@@ -284,7 +284,7 @@ jQuery(function($) {
 		}
 
 		// ⏱️ Re-vérifie après un petit délai
-		console.log('[🔁] Re-vérification dans 500ms...');
+		logger.log('[🔁] Re-vérification dans 500ms...');
 		setTimeout(() => checkStatus(id_image), 500);
 	};
 
@@ -365,7 +365,7 @@ jQuery(function($) {
                         });
                         if (!response.ok) throw new Error('Échec de décrémentation côté serveur');
                         const data = await response.json();
-                        console.log("✅ Crédits décrémentés côté serveur");
+                        logger.log("✅ Crédits décrémentés côté serveur");
                         if (data.missions_completed && data.missions_completed.length) {
                                 // Notifications are handled elsewhere
                         }

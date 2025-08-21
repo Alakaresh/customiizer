@@ -110,7 +110,7 @@ function displayOrders(orders, maxNumPages) {
 		const trackingInfoCell = document.createElement('td');
 		trackingInfoCell.className = "tracking-cell";
 
-		console.log("🔍 Vérification tracking pour commande", order.number, {
+		logger.log("🔍 Vérification tracking pour commande", order.number, {
 			tracking_number: order.tracking_number,
 			tracking_url: order.tracking_url,
 			orderObject: order
@@ -261,7 +261,7 @@ function displayOrderDetails(orderId) {
 			const tbodyProducts = document.createElement('tbody');
 			orderDetails.items.forEach(item => {
 				const row = tbodyProducts.insertRow();
-				console.log(item)
+				logger.log(item)
 
 				const cellItem = row.insertCell();
 				const image = document.createElement('img');

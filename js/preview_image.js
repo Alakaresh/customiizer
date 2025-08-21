@@ -47,7 +47,7 @@ function handleImageClick(event) {
 
 	// Sélection active ➔ charger dans le cropper
 	if (typeof isSelectingImage !== 'undefined' && isSelectingImage) {
-		console.log("✅ Mode sélection actif ➔ Insert dans cropper");
+		logger.log("✅ Mode sélection actif ➔ Insert dans cropper");
 
 		const src = image.getAttribute('src');
 
@@ -297,7 +297,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
                         .then(res => res.json())
                         .then(data => {
-                                console.log("📦 API produits/format :", data);
+                                logger.log("📦 API produits/format :", data);
                                 window.previewFormatCache[formatImage] = data;
                                 persistPreviewCache();
 
@@ -338,7 +338,7 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
 		white: "Blanc",
 	};
 
-	console.log("🧩 [Overlay] Affichage des variantes compatibles :");
+	logger.log("🧩 [Overlay] Affichage des variantes compatibles :");
 	console.table(choices.map(choice => ({
 		variant_id: choice.variant_id,
 		product_id: choice.product_id,

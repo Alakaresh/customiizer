@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Fonction pour rediriger vers la page produit
     window.goToProductPage = function(product) {
         if (product.product_id && /^\d+$/.test(product.product_id)) {
-            console.log("Redirection vers le produit:", product);
+            logger.log("Redirection vers le produit:", product);
 
             persistCache();
 
@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     };
 
-    console.log("Chargement des produits...");
+    logger.log("Chargement des produits...");
 
     let productsPromise;
     if (window.customizerCache.products && window.customizerCache.products.length > 0) {
-        console.log('[Cache] Liste produits chargée depuis le cache');
+        logger.log('[Cache] Liste produits chargée depuis le cache');
         productsPromise = Promise.resolve(window.customizerCache.products);
     } else {
         productsPromise = fetch('/wp-json/api/v1/products/list')
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     productsPromise
         .then(async products => {
             if (products && products.length > 0) {
-                console.log("Produits récupérés:", products);
+                logger.log("Produits récupérés:", products);
                 displayProducts(products);
                 await preloadVariants(products);
             } else {

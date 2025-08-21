@@ -116,7 +116,7 @@ function renderCurrentGroup() {
                                 left: 0,
                                 top: 0
                         };
-                        console.log('🖼️ Image selected for mockup', mockupData);
+                        logger.log('🖼️ Image selected for mockup', mockupData);
                         generateMockup(mockupData); // 🚀 Envoi du vrai objet complet
                 });
 
@@ -133,7 +133,7 @@ function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
         productData = buildProductData(mockupData);
 
-        console.log('📤 Preparing mockup request', mockupData);
+        logger.log('📤 Preparing mockup request', mockupData);
 
         if (Date.now() < mockupCooldownUntil) {
                 const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
@@ -153,7 +153,7 @@ function generateMockup(mockupData) {
         const requestStart = Date.now();
         if (mockupTimes.pending) {
                 const delay = ((requestStart - mockupTimes.pending) / 1000).toFixed(1);
-                console.log(`⌛ Request sent after ${delay}s`);
+                logger.log(`⌛ Request sent after ${delay}s`);
         }
 
         document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
@@ -198,7 +198,7 @@ function generateMockup(mockupData) {
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
                 .then(data => {
-                        console.log('📥 Mockup response', data);
+                        logger.log('📥 Mockup response', data);
 
                         if (data.success && Array.isArray(data.data?.files)) {
                                 mockupTimes.pending = null;
@@ -313,7 +313,7 @@ function showRateLimitMessage(seconds) {
 
 function updateMockupThumbnail(viewName, mockupUrl) {
 
-        console.log('🆕 Updating mockup thumbnail', { viewName, mockupUrl });
+        logger.log('🆕 Updating mockup thumbnail', { viewName, mockupUrl });
 
         const thumbnailsContainer = document.querySelector(".image-thumbnails");
         if (!thumbnailsContainer) {
