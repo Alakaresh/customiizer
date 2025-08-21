@@ -1,4 +1,5 @@
 let productData = null;
+const logger = window.logger || { log: (...args) => console.log(...args) };
 window.currentProductId = window.currentProductId || null;
 window.generatedProductId = window.generatedProductId || null;
 window.productCreationPromise = window.productCreationPromise || null;
