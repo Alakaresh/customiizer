@@ -28,6 +28,9 @@ $display_name   = $current_user->display_name;
                 window.USER_ID = "<?php echo esc_js($user_id); ?>";
                 window.SESSION_ID = "<?php echo esc_js(session_id()); ?>";
                 window.THEME_URI = "<?php echo esc_url(get_stylesheet_directory_uri()); ?>";
+                <?php if (defined('CUSTOMIIZER_LOG_SECRET')): ?>
+                window.CUSTOMIIZER_LOG_SECRET = "<?php echo esc_js(CUSTOMIIZER_LOG_SECRET); ?>";
+                <?php endif; ?>
                 window.logger = window.logger || { log: (...args) => console.log(...args) };
                 </script>
                 <script src="<?php echo esc_url(get_stylesheet_directory_uri()); ?>/js/logger.js"></script>
