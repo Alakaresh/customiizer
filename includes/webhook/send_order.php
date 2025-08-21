@@ -4,10 +4,13 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 $wpLoadPath = __DIR__ . '/../../../../../wp-load.php';
 if (!file_exists($wpLoadPath)) {
-	customiizer_log("❌ wp-load.php introuvable à $wpLoadPath");
-	exit(1);
+        customiizer_log('send_order', get_current_user_id(), customiizer_session_id(), 'ERROR', "❌ wp-load.php introuvable à $wpLoadPath");
+        exit(1);
 }
 require_once $wpLoadPath;
+
+$userId    = get_current_user_id();
+$sessionId = customiizer_session_id();
 
 foreach (['PRINTFUL_API_KEY', 'PRINTFUL_STORE_ID', 'PRINTFUL_API_BASE', 'RABBIT_HOST', 'QUEUE_NAME'] as $const) {
     if (!defined($const)) {
@@ -23,7 +26,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 function startConsumerLoop() {
-	global $callback;
+        global $callback, $userId, $sessionId;
 
 	while (true) {
 		try {
@@ -43,24 +46,24 @@ function startConsumerLoop() {
 			$channel->queue_declare(QUEUE_NAME, false, true, false, false);
 			$channel->basic_consume(QUEUE_NAME, '', false, false, false, false, 'handleMessage');
 
-			customiizer_log("👂 Connexion RabbitMQ active — en attente de messages");
+                        customiizer_log('send_order', $userId, $sessionId, 'INFO', "👂 Connexion RabbitMQ active — en attente de messages");
 
 			while ($channel->is_consuming()) {
 				try {
 					$channel->wait();
 				} catch (AMQPTimeoutException $e) {
-					customiizer_log("⏳ Timeout RabbitMQ : " . $e->getMessage());
+                                        customiizer_log('send_order', $userId, $sessionId, 'ERROR', "⏳ Timeout RabbitMQ : " . $e->getMessage());
 				}
 			}
 		} catch (\Throwable $e) {
-			customiizer_log("❌ Erreur dans la boucle principale : " . $e->getMessage());
+                        customiizer_log('send_order', $userId, $sessionId, 'ERROR', "❌ Erreur dans la boucle principale : " . $e->getMessage());
 			sleep(5);
 		}
 
 		try { $channel?->close(); } catch (\Throwable) {}
 		try { $connection?->close(); } catch (\Throwable) {}
 
-		customiizer_log("🔄 Tentative de reconnexion dans 5 secondes...");
+                customiizer_log('send_order', $userId, $sessionId, 'INFO', "🔄 Tentative de reconnexion dans 5 secondes...");
 		sleep(5);
 	}
 }
@@ -71,9 +74,10 @@ function handleMessage(AMQPMessage &$msg) {
 }
 
 $callback = function(AMQPMessage &$msg) {
-	$commande = json_decode($msg->body, true);
-	customiizer_log("🔎 Dump de la commande : " . json_encode($commande));
-	customiizer_log("📥 Received order #{$commande['number']}");
+        global $userId, $sessionId;
+        $commande = json_decode($msg->body, true);
+        customiizer_log('send_order', $userId, $sessionId, 'INFO', "🔎 Dump de la commande : " . json_encode($commande));
+        customiizer_log('send_order', $userId, $sessionId, 'INFO', "📥 Received order #{$commande['number']}");
 
 	$payload = preparer_commande_pour_printful($commande);
 	$ok = envoyer_commande_printful($payload);
@@ -86,11 +90,11 @@ $callback = function(AMQPMessage &$msg) {
 		$msg->ack();
 		@unlink($fail_path);
 		@unlink(__DIR__ . "/pf_alert_sent_{$order_id}.txt");
-		customiizer_log("✅ Order sent and acked");
+                customiizer_log('send_order', $userId, $sessionId, 'INFO', "✅ Order sent and acked");
 	} else {
 		$fail_count++;
 		file_put_contents($fail_path, $fail_count);
-		customiizer_log("⚠️ Failed to send (attempt $fail_count), message not acked");
+                customiizer_log('send_order', $userId, $sessionId, 'ERROR', "⚠️ Failed to send (attempt $fail_count), message not acked");
 
 		$alert_path = __DIR__ . "/alertes_commandes.txt";
 		$alert_line = "Commande #$order_id échouée deux fois";
@@ -98,11 +102,11 @@ $callback = function(AMQPMessage &$msg) {
 
 		if ($fail_count >= 2) {
 			if (!$already_listed) {
-				customiizer_log("🚨 2 échecs pour la commande $order_id — ajout au fichier d'alerte");
+                                customiizer_log('send_order', $userId, $sessionId, 'ERROR', "🚨 2 échecs pour la commande $order_id — ajout au fichier d'alerte");
 				file_put_contents($alert_path, $alert_line . "\n", FILE_APPEND);
 				send_failure_alert_email_with_file($alert_path);
 			} else {
-				customiizer_log("ℹ️ Commande #$order_id déjà signalée, pas de nouvel envoi d'alerte");
+                                customiizer_log('send_order', $userId, $sessionId, 'INFO', "ℹ️ Commande #$order_id déjà signalée, pas de nouvel envoi d'alerte");
 			}
 		} else {
 			$msg->nack(false, true);
@@ -112,8 +116,9 @@ $callback = function(AMQPMessage &$msg) {
 
 // ——— Envoi du payload à Printful ———
 function envoyer_commande_printful(array $payload): bool {
-	customiizer_log("📤 Envoi à Printful");
-	customiizer_log("   Payload: " . json_encode($payload));
+        global $userId, $sessionId;
+        customiizer_log('send_order', $userId, $sessionId, 'INFO', "📤 Envoi à Printful");
+        customiizer_log('send_order', $userId, $sessionId, 'INFO', "   Payload: " . json_encode($payload));
 
 	$ch = curl_init(PRINTFUL_API_BASE . '/orders');
 	curl_setopt_array($ch, [
@@ -131,8 +136,8 @@ function envoyer_commande_printful(array $payload): bool {
 	$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 	curl_close($ch);
 
-	customiizer_log("📬 HTTP $code, réponse: $resp");
-	return ($code >= 200 && $code < 300);
+        customiizer_log('send_order', $userId, $sessionId, 'INFO', "📬 HTTP $code, réponse: $resp");
+        return ($code >= 200 && $code < 300);
 }
 
 // Previous versions converted WebP images here before sending orders.
@@ -145,26 +150,28 @@ if (!function_exists('convert_webp_to_png_server')) {
 }
 
 function ensure_png_for_order(string $url): string {
+        global $userId, $sessionId;
         $parts = wp_parse_url($url);
         $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
         if ($ext === 'png') {
-                customiizer_log("ℹ️ Image déjà PNG : $url");
+                customiizer_log('send_order', $userId, $sessionId, 'INFO', "ℹ️ Image déjà PNG : $url");
                 return $url;
         }
 
         $result = convert_webp_to_png_server($url);
         if ($result['success']) {
-                customiizer_log("✅ WebP converti en PNG : " . $result['png_url']);
+                customiizer_log('send_order', $userId, $sessionId, 'INFO', "✅ WebP converti en PNG : " . $result['png_url']);
                 return $result['png_url'];
         }
 
-        customiizer_log("⚠️ Conversion WebP échouée, utilisation de l'URL d'origine");
+        customiizer_log('send_order', $userId, $sessionId, 'ERROR', "⚠️ Conversion WebP échouée, utilisation de l'URL d'origine");
         return $url;
 }
 
 // ——— Préparation du payload ———
 function preparer_commande_pour_printful(array $commande): array {
-	$items = [];
+        global $userId, $sessionId;
+        $items = [];
 	foreach ($commande['line_items'] as $item) {
 		$product_id = $item['product_id'];
 		$meta = [
@@ -177,10 +184,10 @@ function preparer_commande_pour_printful(array $commande): array {
 			'placement'        => get_post_meta($product_id, 'placement', true),
 			'technique'        => get_post_meta($product_id, 'technique', true)
 		];
-		customiizer_log("🔍 Produit #$product_id – données meta : " . json_encode($meta));
+                customiizer_log('send_order', $userId, $sessionId, 'INFO', "🔍 Produit #$product_id – données meta : " . json_encode($meta));
 
 		if (empty($meta['design_image_url']) || empty($meta['variant_id'])) {
-			customiizer_log("⚠️ Données manquantes pour le produit #$product_id");
+                        customiizer_log('send_order', $userId, $sessionId, 'ERROR', "⚠️ Données manquantes pour le produit #$product_id");
 			continue;
 		}
 
@@ -211,7 +218,7 @@ function preparer_commande_pour_printful(array $commande): array {
 
 	$b = $commande['billing'];
 
-	customiizer_log("📦 Commande prête pour Printful avec " . count($items) . " article(s)");
+        customiizer_log('send_order', $userId, $sessionId, 'INFO', "📦 Commande prête pour Printful avec " . count($items) . " article(s)");
 
 	return [
 		'external_id' => ENV_PREFIX . $commande['number'],
@@ -245,7 +252,7 @@ function send_failure_alert_email_with_file(string $filepath): void {
 		$mail->Body    = "Voici la liste mise à jour des commandes ayant échoué deux fois.\n\nMerci de vérifier les cas suivants dans le fichier joint.";
 		$mail->addAttachment($filepath, 'commandes_en_echec.txt');
 		$mail->send();
-		customiizer_log("📧 Mail d'alerte envoyé avec fichier joint");
+                customiizer_log('send_order', $userId, $sessionId, 'INFO', "📧 Mail d'alerte envoyé avec fichier joint");
 	} catch (Exception $e) {
 		error_log("❌ Échec envoi mail alerte avec pièce jointe : " . $mail->ErrorInfo);
 	}

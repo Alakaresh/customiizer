@@ -3,17 +3,19 @@
 // Fonction principale pour gérer l'image
 function save_image_from_url() {
         try {
+                $userId    = get_current_user_id();
+                $sessionId = customiizer_session_id();
                 // Récupération et validation
                 $url = sanitize_text_field($_POST['url']);
                 $name = sanitize_text_field($_POST['name']);
                 $prefix = sanitize_text_field($_POST['prefix']);
                 $ratio = sanitize_text_field($_POST['ratio']);
 
-                customiizer_log('save_image_from_url', "Params url=$url name=$name prefix=$prefix ratio=$ratio");
+                customiizer_log('save_image_from_url', $userId, $sessionId, 'INFO', "Params url=$url name=$name prefix=$prefix ratio=$ratio");
 
                 if (empty($url) || empty($name) || empty($prefix) || empty($ratio)) {
                         $msg = "❌ Paramètre(s) manquant(s)";
-                        customiizer_log('save_image_from_url', $msg);
+                        customiizer_log('save_image_from_url', $userId, $sessionId, 'ERROR', $msg);
                         wp_send_json_error(['message' => $msg]);
                 }
 
@@ -24,7 +26,7 @@ function save_image_from_url() {
                 $tmpFile = ajusterEtSauvegarderImageWebP($url, $blobName, $ratio);
                 if ($tmpFile === false) {
                         $msg = "❌ Erreur pendant le traitement de l'image";
-                        customiizer_log('save_image_from_url', $msg);
+                        customiizer_log('save_image_from_url', $userId, $sessionId, 'ERROR', $msg);
                         wp_send_json_error(['message' => $msg, 'source_url' => $url]);
                 }
 
@@ -32,7 +34,7 @@ function save_image_from_url() {
                 $blobClient = azure_get_blob_client();
                 if (!$blobClient) {
                         $msg = "❌ Erreur de connexion Azure";
-                        customiizer_log('save_image_from_url', $msg);
+                        customiizer_log('save_image_from_url', $userId, $sessionId, 'ERROR', $msg);
                         wp_send_json_error(['message' => $msg]);
                 }
 
@@ -40,15 +42,15 @@ function save_image_from_url() {
 		$containerName = "imageclient";
                 if (azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
                         unlink($tmpFile);
-                        customiizer_log('save_image_from_url', "Image uploadée: $blobName");
+                        customiizer_log('save_image_from_url', $userId, $sessionId, 'INFO', "Image uploadée: $blobName");
                         wp_send_json_success(['message' => "Image uploadée", 'blob' => $blobName]);
                 } else {
                         $msg = "❌ Échec de l'upload Azure";
-                        customiizer_log('save_image_from_url', $msg);
+                        customiizer_log('save_image_from_url', $userId, $sessionId, 'ERROR', $msg);
                         wp_send_json_error(['message' => $msg]);
                 }
         } catch (Throwable $e) {
-                customiizer_log('save_image_from_url', 'Exception: ' . $e->getMessage());
+                customiizer_log('save_image_from_url', $userId, $sessionId, 'ERROR', 'Exception: ' . $e->getMessage());
                 wp_send_json_error([
                         'message' => "Erreur fatale attrapée",
                         'exception' => $e->getMessage()
@@ -60,13 +62,15 @@ add_action('wp_ajax_nopriv_save_image_from_url', 'save_image_from_url');
 
 // Fonction pour ajuster et convertir une image en WebP
 function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
-        customiizer_log('ajusterEtSauvegarderImageWebP', "Start source=$sourceUrl ratio=$ratio");
+        $userId    = get_current_user_id();
+        $sessionId = customiizer_session_id();
+        customiizer_log('ajusterEtSauvegarderImageWebP', $userId, $sessionId, 'INFO', "Start source=$sourceUrl ratio=$ratio");
 
         if (strpos($ratio, ':') !== false) {
                 list($w, $h) = explode(':', $ratio);
                 $ratioNumerique = floatval($w) / floatval($h);
         } else {
-                customiizer_log('ajusterEtSauvegarderImageWebP', 'Ratio invalide');
+                customiizer_log('ajusterEtSauvegarderImageWebP', $userId, $sessionId, 'ERROR', 'Ratio invalide');
                 return false;
         }
 
@@ -84,13 +88,13 @@ function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
         curl_close($ch);
 
         if (!$data || $httpCode >= 400) {
-                customiizer_log('ajusterEtSauvegarderImageWebP', "Téléchargement échoué code=$httpCode erreur=$error");
+                customiizer_log('ajusterEtSauvegarderImageWebP', $userId, $sessionId, 'ERROR', "Téléchargement échoué code=$httpCode erreur=$error");
                 return false;
         }
 
         $source = imagecreatefromstring($data);
         if (!$source) {
-                customiizer_log('ajusterEtSauvegarderImageWebP', 'imagecreatefromstring a échoué');
+                customiizer_log('ajusterEtSauvegarderImageWebP', $userId, $sessionId, 'ERROR', 'imagecreatefromstring a échoué');
                 return false;
         }
 
@@ -101,7 +105,7 @@ function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
 
 	$tmpFile = tempnam(sys_get_temp_dir(), 'webp_');
         imagewebp($dest, $tmpFile);
-        customiizer_log('ajusterEtSauvegarderImageWebP', "Fichier temporaire: $tmpFile");
+        customiizer_log('ajusterEtSauvegarderImageWebP', $userId, $sessionId, 'INFO', "Fichier temporaire: $tmpFile");
 
 	imagedestroy($source);
 	imagedestroy($dest);
@@ -113,6 +117,8 @@ function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
 // Fonction pour sauvegarder les métadonnées d'une image dans la base de données
 function save_image_data() {
         global $wpdb;
+        $userId    = get_current_user_id();
+        $sessionId = customiizer_session_id();
 
         $data = array(
                 'user_id' => sanitize_text_field($_POST['customer_id']),
@@ -126,21 +132,21 @@ function save_image_data() {
                 'image_date' => current_time('mysql'),
         );
 
-        customiizer_log('save_image_data', 'image_url=' . $data['image_url']);
+        customiizer_log('save_image_data', $userId, $sessionId, 'INFO', 'image_url=' . $data['image_url']);
 
         $existingImage = $wpdb->get_row(
                 $wpdb->prepare("SELECT * FROM WPC_generated_image WHERE image_url = %s", $data['image_url'])
         );
 
         if ($existingImage) {
-                customiizer_log('save_image_data', "Image déjà existante: " . $data['image_url']);
+                customiizer_log('save_image_data', $userId, $sessionId, 'ERROR', "Image déjà existante: " . $data['image_url']);
                 wp_send_json_error("L'image existe déjà.");
         } else {
                 $lastNumber = intval($wpdb->get_var("SELECT MAX(image_number) FROM WPC_generated_image")) + 1;
                 $data['image_number'] = $lastNumber;
 
                 $wpdb->insert('WPC_generated_image', $data);
-                customiizer_log('save_image_data', "Données enregistrées pour image_number=$lastNumber");
+                customiizer_log('save_image_data', $userId, $sessionId, 'INFO', "Données enregistrées pour image_number=$lastNumber");
                 wp_send_json_success("Données enregistrées avec succès.");
         }
 }

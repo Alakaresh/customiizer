@@ -1,14 +1,16 @@
 <?php
 
 function customiizer_generate_product() {
+        $userId    = get_current_user_id();
+        $sessionId = customiizer_session_id();
         if (empty($_POST['product_data'])) {
-                customiizer_log('❌ create_product : données manquantes');
+                customiizer_log('create_product', $userId, $sessionId, 'ERROR', '❌ create_product : données manquantes');
                 wp_send_json_error('Données produit manquantes');
         }
 
         $data = json_decode(stripslashes($_POST['product_data']), true);
         if (!$data) {
-                customiizer_log('❌ create_product : JSON invalide');
+                customiizer_log('create_product', $userId, $sessionId, 'ERROR', '❌ create_product : JSON invalide');
                 wp_send_json_error('Format JSON invalide');
         }
         // Nettoyage des données
@@ -16,7 +18,7 @@ function customiizer_generate_product() {
         $product_price = floatval($data['product_price'] ?? 0);
         $mockup_url = esc_url_raw($data['mockup_url'] ?? '');
 
-        customiizer_log("➡️ create_product : {$product_name} ({$product_price}€)");
+        customiizer_log('create_product', $userId, $sessionId, 'INFO', "➡️ create_product : {$product_name} ({$product_price}€)");
 
         // Provide a fallback image if none supplied
         if (empty($mockup_url)) {
@@ -35,7 +37,7 @@ function customiizer_generate_product() {
         $product->save();
 
         $product_id = $product->get_id();
-        customiizer_log("✅ produit créé ID={$product_id}");
+        customiizer_log('create_product', $userId, $sessionId, 'INFO', "✅ produit créé ID={$product_id}");
 
 	// Sauvegarde les meta indispensables
 	update_post_meta($product_id, 'custom_shipping_cost', floatval($data['delivery_price'] ?? 0));
@@ -62,7 +64,7 @@ function customiizer_generate_product() {
 		}
 	}
 
-        customiizer_log("🛒 produit $product_id prêt, renvoi JSON");
+        customiizer_log('create_product', $userId, $sessionId, 'INFO', "🛒 produit $product_id prêt, renvoi JSON");
         wp_send_json_success(['product_id' => $product_id]);
 }
 

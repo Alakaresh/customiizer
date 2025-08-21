@@ -10,16 +10,19 @@ $wp_load_path = dirname(__FILE__) . '/../../../../../wp-load.php';
 if (file_exists($wp_load_path)) {
     require_once($wp_load_path);
 } else {
-    customiizer_log("Erreur : wp-load.php introuvable.");
+    customiizer_log('WEBHOOK_UPSCALE', get_current_user_id(), customiizer_session_id(), 'ERROR', "Erreur : wp-load.php introuvable.");
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => 'wp-load.php not found']);
     exit;
 }
 
+$userId    = get_current_user_id();
+$sessionId = customiizer_session_id();
+
 // Lire le corps de la requête JSON
 $inputJSON = file_get_contents('php://input');
 if ($inputJSON === false) {
-    customiizer_log("Erreur : Impossible de lire l'entrée JSON.");
+    customiizer_log('WEBHOOK_UPSCALE', $userId, $sessionId, 'ERROR', "Erreur : Impossible de lire l'entrée JSON.");
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => "Impossible de lire l'entrée JSON."]);
     exit;
@@ -28,7 +31,7 @@ if ($inputJSON === false) {
 $input = json_decode($inputJSON, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
-    customiizer_log("Erreur JSON: " . json_last_error_msg());
+    customiizer_log('WEBHOOK_UPSCALE', $userId, $sessionId, 'ERROR', "Erreur JSON: " . json_last_error_msg());
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'JSON mal formé.']);
     exit;
@@ -36,7 +39,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
 // Traitement des données reçues
 if (!isset($input['status']) || !isset($input['result']) || !isset($input['choice']) || !isset($input['hash'])) {
-    customiizer_log("Données manquantes dans la requête.");
+    customiizer_log('WEBHOOK_UPSCALE', $userId, $sessionId, 'ERROR', "Données manquantes dans la requête.");
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Données manquantes dans la requête.']);
     exit;
@@ -73,7 +76,7 @@ if ($query->have_posts()) {
     ));
 
     if (is_wp_error($post_id)) {
-        customiizer_log("Erreur lors de la création du post: " . $post_id->get_error_message());
+        customiizer_log('WEBHOOK_UPSCALE', $userId, $sessionId, 'ERROR', "Erreur lors de la création du post: " . $post_id->get_error_message());
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => 'Failed to create post']);
         exit;

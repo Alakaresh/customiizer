@@ -171,21 +171,24 @@ add_action('init', function () {
 		isset($_GET['order_id']) &&
 		isset($_GET['order_key'])
 	) {
-		add_action('template_redirect', function () {
-			$order_id = intval($_GET['order_id']);
-			$order = wc_get_order($order_id);
+                add_action('template_redirect', function () {
+                        $order_id = intval($_GET['order_id']);
+                        $order = wc_get_order($order_id);
 
-			if (!$order) {
-				customiizer_log("❌ Commande introuvable : $order_id");
-				wp_die('Commande introuvable');
-			}
+                        $userId    = get_current_user_id();
+                        $sessionId = customiizer_session_id();
 
-			if ($_GET['order_key'] !== $order->get_order_key()) {
-				customiizer_log("❌ Mauvais order_key pour $order_id");
-				wp_die('Clé incorrecte');
-			}
+                        if (!$order) {
+                                customiizer_log('functions', $userId, $sessionId, 'ERROR', "❌ Commande introuvable : $order_id");
+                                wp_die('Commande introuvable');
+                        }
 
-			customiizer_log("📥 Tentative de création directe de facture pour order_id=$order_id");
+                        if ($_GET['order_key'] !== $order->get_order_key()) {
+                                customiizer_log('functions', $userId, $sessionId, 'ERROR', "❌ Mauvais order_key pour $order_id");
+                                wp_die('Clé incorrecte');
+                        }
+
+                        customiizer_log('functions', $userId, $sessionId, 'INFO', "📥 Tentative de création directe de facture pour order_id=$order_id");
 
 			try {
 				if (class_exists('\WPO\WC\PDF_Invoices\Documents\Invoice')) {
@@ -202,21 +205,21 @@ add_action('init', function () {
 						header('Content-Length: ' . strlen($pdf_data));
 						echo $pdf_data;
 						
-						customiizer_log("✅ Facture générée directement et envoyée : $filename");
+                                                customiizer_log('functions', $userId, $sessionId, 'INFO', "✅ Facture générée directement et envoyée : $filename");
 						exit;
 					} else {
-						customiizer_log("❌ Erreur lors création du document PDF direct");
+                                                customiizer_log('functions', $userId, $sessionId, 'ERROR', "❌ Erreur lors création du document PDF direct");
 						wp_die('Erreur création document direct');
 					}
 				} else {
-					customiizer_log("❌ Classe Invoice non disponible (plugin trop modifié ?)");
+                                        customiizer_log('functions', $userId, $sessionId, 'ERROR', "❌ Classe Invoice non disponible (plugin trop modifié ?)");
 					wp_die('Classe Invoice indisponible');
 				}
 			} catch (Throwable $e) {
-				customiizer_log("❌ Exception : " . $e->getMessage());
-				wp_die('Erreur : ' . $e->getMessage());
-			}
-		});
+                                customiizer_log('functions', $userId, $sessionId, 'ERROR', "❌ Exception : " . $e->getMessage());
+                                wp_die('Erreur : ' . $e->getMessage());
+                        }
+                });
 	}
 });
 

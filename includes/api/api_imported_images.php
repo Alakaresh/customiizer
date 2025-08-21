@@ -18,7 +18,9 @@ add_action('rest_api_init', function () {
  * 📤 Téléverse une image sur Azure Blob Storage
  */
 function customiizer_upload_image(WP_REST_Request $request) {
-	global $wpdb;
+        global $wpdb;
+        $userSessionId = customiizer_session_id();
+        $currentUser   = get_current_user_id();
 
 	// Récupération des données envoyées
 	$params = $request->get_json_params();
@@ -27,7 +29,7 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	$size = isset($params['size']) ? intval($params['size']) : 0;
 
 	if (empty($url) || empty($name)) {
-		customiizer_log("❌ Paramètre manquant lors de l'upload.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Paramètre manquant lors de l'upload.");
 		return new WP_REST_Response(["error" => "Paramètre manquant."], 400);
 	}
 
@@ -49,12 +51,12 @@ function customiizer_upload_image(WP_REST_Request $request) {
         $blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
         $blobFullUrl = $blobBaseUrl . $blobName;
 
-	customiizer_log("📤 Début de l'upload par UserID: $user_id, Nom: $name");
+        customiizer_log('api_imported_images', $currentUser, $userSessionId, 'INFO', "📤 Début de l'upload par UserID: $user_id, Nom: $name");
 
 	// Décodage Base64
 	$decodedData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $url));
 	if (!$decodedData) {
-		customiizer_log("❌ Erreur de décodage de l'image.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Erreur de décodage de l'image.");
 		return new WP_REST_Response(["error" => "Erreur lors du décodage de l'image."], 400);
 	}
 
@@ -64,14 +66,14 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	finfo_close($finfo);
 
 	if (!in_array($mimeType, ['image/jpeg', 'image/png'])) {
-		customiizer_log("❌ Type MIME non pris en charge: $mimeType");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Type MIME non pris en charge: $mimeType");
 		return new WP_REST_Response(["error" => "Seuls les fichiers PNG et JPG sont acceptés."], 400);
 	}
 
 	// Conversion en WebP
 	$sourceImage = imagecreatefromstring($decodedData);
 	if (!$sourceImage) {
-		customiizer_log("❌ Erreur lors du chargement de l'image.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Erreur lors du chargement de l'image.");
 		return new WP_REST_Response(["error" => "Erreur lors du chargement de l'image."], 500);
 	}
 
@@ -83,22 +85,22 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	$tmpFile = sys_get_temp_dir() . '/' . uniqid() . ".webp";
 	if (!imagewebp($sourceImage, $tmpFile)) {
 		imagedestroy($sourceImage);
-		customiizer_log("❌ Erreur lors de la conversion en WebP.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Erreur lors de la conversion en WebP.");
 		return new WP_REST_Response(["error" => "Erreur lors de la conversion en WebP."], 500);
 	}
 	imagedestroy($sourceImage);
 
-	customiizer_log("✅ Conversion en WebP réussie: $tmpFile");
+        customiizer_log('api_imported_images', $currentUser, $userSessionId, 'INFO', "✅ Conversion en WebP réussie: $tmpFile");
 
 	// Téléversement sur Azure
 	$blobClient = azure_get_blob_client();
 	if (!$blobClient || !azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
 		unlink($tmpFile);
-		customiizer_log("❌ Échec du téléversement sur Azure.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Échec du téléversement sur Azure.");
 		return new WP_REST_Response(["error" => "Erreur de téléversement sur Azure."], 500);
 	}
 	unlink($tmpFile); // Suppression du fichier temporaire
-	customiizer_log("✅ Téléversement sur Azure réussi: $blobFullUrl");
+        customiizer_log('api_imported_images', $currentUser, $userSessionId, 'INFO', "✅ Téléversement sur Azure réussi: $blobFullUrl");
 
         $image_date = current_time('mysql');
 
@@ -126,10 +128,10 @@ function customiizer_upload_image(WP_REST_Request $request) {
                 );
 
                 if ($result === false) {
-                        customiizer_log("❌ Erreur insertion BDD: " . $wpdb->last_error);
+                        customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Erreur insertion BDD: " . $wpdb->last_error);
                         return new WP_REST_Response(["error" => "Erreur d'insertion en base de données."], 500);
                 }
-                customiizer_log("✅ Image enregistrée en base de données pour UserID: $user_id");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'INFO', "✅ Image enregistrée en base de données pour UserID: $user_id");
                 $db_status = 'Enregistré en base de données.';
         }
 
@@ -147,16 +149,18 @@ function customiizer_upload_image(WP_REST_Request $request) {
  */
 function customiizer_get_user_images(WP_REST_Request $request) {
         global $wpdb;
+        $userSessionId = customiizer_session_id();
+        $currentUser   = get_current_user_id();
 
         // Récupération brute pour préserver l'ID 0 (invité)
         $user_id_param = $request->get_param('user_id');
         if ($user_id_param === null || $user_id_param === '') {
-                customiizer_log("❌ Paramètre 'user_id' manquant.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "❌ Paramètre 'user_id' manquant.");
                 return new WP_REST_Response(["error" => "Le paramètre 'user_id' est requis."], 400);
         }
         $user_id = intval($user_id_param);
 
-        customiizer_log("📥 Demande de récupération des images pour UserID: $user_id");
+        customiizer_log('api_imported_images', $currentUser, $userSessionId, 'INFO', "📥 Demande de récupération des images pour UserID: $user_id");
 
         if ($user_id === 0) {
                 if (session_status() === PHP_SESSION_NONE) {
@@ -173,10 +177,10 @@ function customiizer_get_user_images(WP_REST_Request $request) {
         ), ARRAY_A);
 
         if (!$results) {
-                customiizer_log("⚠️ Aucune image trouvée pour UserID: $user_id.");
+                customiizer_log('api_imported_images', $currentUser, $userSessionId, 'ERROR', "⚠️ Aucune image trouvée pour UserID: $user_id.");
                 return new WP_REST_Response([], 200);
         }
 
-        customiizer_log("✅ Images récupérées avec succès pour UserID: $user_id.");
+        customiizer_log('api_imported_images', $currentUser, $userSessionId, 'INFO', "✅ Images récupérées avec succès pour UserID: $user_id.");
         return new WP_REST_Response($results, 200);
 }

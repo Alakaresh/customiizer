@@ -12,13 +12,13 @@ function toggle_image_favorite(WP_REST_Request $request) {
 	$user_id = intval($request->get_param('user_id'));
 	$image_id = intval($request->get_param('image_id'));
 
-	if (!$user_id || !$image_id) {
-		customiizer_log('Erreur : paramètres manquants', [
-			'user_id' => $user_id,
-			'image_id' => $image_id,
-		]);
-		return new WP_REST_Response(['success' => false, 'message' => 'Missing parameters'], 400);
-	}
+        if (!$user_id || !$image_id) {
+                customiizer_log('images_favorites', get_current_user_id(), customiizer_session_id(), 'ERROR', 'Erreur : paramètres manquants', [
+                        'user_id' => $user_id,
+                        'image_id' => $image_id,
+                ]);
+                return new WP_REST_Response(['success' => false, 'message' => 'Missing parameters'], 400);
+        }
 
 	$table = 'WPC_image_favorites';
 
@@ -29,11 +29,11 @@ function toggle_image_favorite(WP_REST_Request $request) {
 	));
 
 	if ($existing) {
-		$wpdb->delete($table, ['id' => $existing]);
-		customiizer_log('Image retirée des favoris', [
-			'image_id' => $image_id,
-			'user_id' => $user_id,
-		]);
+                $wpdb->delete($table, ['id' => $existing]);
+                customiizer_log('images_favorites', get_current_user_id(), customiizer_session_id(), 'INFO', 'Image retirée des favoris', [
+                        'image_id' => $image_id,
+                        'user_id' => $user_id,
+                ]);
 		return ['success' => true, 'favorited' => false];
 	} else {
 		$wpdb->insert($table, [
