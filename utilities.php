@@ -77,6 +77,15 @@ function customiizer_log($source, $userId, $sessionId, $level, $message, $extra 
     file_put_contents($logFile, json_encode($entry, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND | LOCK_EX);
 }
 
+/**
+ * Retrieve the current session identifier, falling back to session_id().
+ *
+ * @return string
+ */
+function customiizer_session_id() {
+    return $_COOKIE[session_name()] ?? session_id();
+}
+
 
 /**
  * Get the frontend version defined in version.json for cache busting.

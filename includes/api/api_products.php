@@ -23,8 +23,10 @@ add_action('rest_api_init', function() {
  * Fonction pour récupérer les produits avec l'image de la première variante, le nom et le prix le plus bas
  */
 function get_products_summary() {
-	global $wpdb;
-	customiizer_log('Appel API : get_products_summary()');
+        global $wpdb;
+        $userId    = get_current_user_id();
+        $sessionId = customiizer_session_id();
+        customiizer_log('api_products', $userId, $sessionId, 'INFO', 'Appel API : get_products_summary()');
 	// Utiliser explicitement le préfixe personnalisé WPC_
 	$prefix = 'WPC_';  // Préfixe personnalisé
 
@@ -47,11 +49,11 @@ function get_products_summary() {
     ";
 
 	// Exécution de la requête
-	$results = $wpdb->get_results($query, ARRAY_A);
-	customiizer_log('Résultats produits : ' . count($results));
+        $results = $wpdb->get_results($query, ARRAY_A);
+        customiizer_log('api_products', $userId, $sessionId, 'INFO', 'Résultats produits : ' . count($results));
 	// Si aucune donnée n'est trouvée
 	if (empty($results)) {
-		customiizer_log('Aucun produit trouvé dans get_products_summary');
+                customiizer_log('api_products', $userId, $sessionId, 'ERROR', 'Aucun produit trouvé dans get_products_summary');
 		return new WP_REST_Response('Aucun produit trouvé', 404);
 	}
 

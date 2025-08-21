@@ -60,7 +60,7 @@ function user_signup() {
         $user_id = wp_insert_user($userdata);
 
         if ( function_exists( 'customiizer_log' ) ) {
-                customiizer_log( 'signup', "wp_insert_user returned {$user_id}" );
+                customiizer_log('signup', get_current_user_id(), customiizer_session_id(), 'INFO', "wp_insert_user returned {$user_id}");
         }
 
 	if (is_wp_error($user_id)) {
@@ -87,7 +87,7 @@ function user_signup() {
         );
 
         if ( function_exists( 'customiizer_log' ) ) {
-                customiizer_log( 'signup', "inserted WPC_users for {$user_id}" );
+                customiizer_log('signup', get_current_user_id(), customiizer_session_id(), 'INFO', "inserted WPC_users for {$user_id}");
         }
 
         // Enregistrer le parrain dans la table WPC_referrals
@@ -105,7 +105,7 @@ function user_signup() {
                 );
 
                 if ( function_exists( 'customiizer_log' ) ) {
-                        customiizer_log( 'signup', "inserted referral {$referrer_id} -> {$user_id}" );
+                        customiizer_log('signup', get_current_user_id(), customiizer_session_id(), 'INFO', "inserted referral {$referrer_id} -> {$user_id}");
                 }
 
                 if (function_exists('customiizer_add_loyalty_points')) {
@@ -122,7 +122,7 @@ function user_signup() {
         wp_set_auth_cookie($user_id);
 
         if ( function_exists( 'customiizer_log' ) ) {
-                customiizer_log( 'signup', "login user {$user_id}" );
+                customiizer_log('signup', get_current_user_id(), customiizer_session_id(), 'INFO', "login user {$user_id}");
         }
 
         wp_send_json_success();

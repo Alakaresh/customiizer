@@ -10,19 +10,21 @@ function customiizer_delete_mockup_file($task_id, $logger = null) {
     if (!isset($pending[$task_id])) {
         return false;
     }
+    $userId    = get_current_user_id();
+    $sessionId = customiizer_session_id();
     $file = $pending[$task_id];
     if (file_exists($file)) {
         if (unlink($file)) {
             if ($logger) {
                 $logger->log("🗑️ Fichier temporaire supprimé : $file");
             } else {
-                customiizer_log("🗑️ Fichier temporaire supprimé : $file");
+                customiizer_log('mockup_tasks', $userId, $sessionId, 'INFO', "🗑️ Fichier temporaire supprimé : $file");
             }
         } else {
             if ($logger) {
                 $logger->log("⚠️ Erreur lors de la suppression du fichier temporaire $file");
             } else {
-                customiizer_log("⚠️ Erreur lors de la suppression du fichier temporaire $file");
+                customiizer_log('mockup_tasks', $userId, $sessionId, 'ERROR', "⚠️ Erreur lors de la suppression du fichier temporaire $file");
             }
         }
     }

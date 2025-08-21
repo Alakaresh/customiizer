@@ -56,7 +56,7 @@ function customiizer_process_mission_action( $action, $user_id, $quantity = 1 ) 
     }
 
     if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'mission', "process_mission_action {$action} for user_id={$user_id} qty={$quantity}" );
+        customiizer_log('mission', get_current_user_id(), customiizer_session_id(), 'INFO', "process_mission_action {$action} for user_id={$user_id} qty={$quantity}");
     }
 
     // Make sure the totals table exists before updating it
@@ -191,7 +191,7 @@ function customiizer_update_mission_progress( $user_id, $mission_id, $quantity =
         return false;
     }
     if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'mission', "update_progress mission_id={$mission_id} user_id={$user_id} qty={$quantity}" );
+        customiizer_log('mission', get_current_user_id(), customiizer_session_id(), 'INFO', "update_progress mission_id={$mission_id} user_id={$user_id} qty={$quantity}");
     }
     $wpdb->query( $wpdb->prepare(
         "INSERT INTO WPC_user_missions (user_id, mission_id, progress)
@@ -225,7 +225,7 @@ function customiizer_complete_mission( $user_id, $mission_id ) {
         return false;
     }
     if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'mission', "complete_mission mission_id={$mission_id} user_id={$user_id}" );
+        customiizer_log('mission', get_current_user_id(), customiizer_session_id(), 'INFO', "complete_mission mission_id={$mission_id} user_id={$user_id}");
     }
     $goal = intval( $wpdb->get_var( $wpdb->prepare( "SELECT goal FROM WPC_missions WHERE mission_id=%d", $mission_id ) ) );
     $wpdb->query( $wpdb->prepare(
@@ -357,7 +357,7 @@ add_action( 'wp_ajax_customiizer_update_mission_progress', 'customiizer_update_m
 
 add_action( 'user_register', function( $user_id ) {
     if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'mission', "user_register hook for user_id={$user_id} scheduling delayed mission" );
+        customiizer_log('mission', get_current_user_id(), customiizer_session_id(), 'INFO', "user_register hook for user_id={$user_id} scheduling delayed mission");
     }
     if ( ! wp_next_scheduled( 'customiizer_delayed_user_register_mission', array( $user_id ) ) ) {
         wp_schedule_single_event( time() + 1, 'customiizer_delayed_user_register_mission', array( $user_id ) );
@@ -366,7 +366,7 @@ add_action( 'user_register', function( $user_id ) {
 
 add_action( 'customiizer_delayed_user_register_mission', function( $user_id ) {
     if ( function_exists( 'customiizer_log' ) ) {
-        customiizer_log( 'mission', "running delayed mission for user_id={$user_id}" );
+        customiizer_log('mission', get_current_user_id(), customiizer_session_id(), 'INFO', "running delayed mission for user_id={$user_id}");
     }
     customiizer_process_mission_action( 'user_register', $user_id, 1 );
 } );

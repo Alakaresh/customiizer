@@ -3,7 +3,9 @@
  * AJAX handler pour création produit avec mockup en thumbnail et design en métadonnées
  */
 function custom_add_to_cart() {
-        customiizer_log('➡️ add_to_cart start');
+        $userId    = get_current_user_id();
+        $sessionId = customiizer_session_id();
+        customiizer_log('add_to_cart', $userId, $sessionId, 'INFO', '➡️ add_to_cart start');
 
 	// Récupération des données POST
         $product_name       = isset($_POST['product_name'])       ? sanitize_text_field($_POST['product_name'])       : 'Produit Personnalisé ' . time();
@@ -16,7 +18,7 @@ function custom_add_to_cart() {
 	$placement = isset($_POST['placement']) ? sanitize_text_field($_POST['placement']) : 'default';
         $technique = isset($_POST['technique']) ? sanitize_text_field($_POST['technique']) : 'digital';
 
-        customiizer_log("add_to_cart données : nom={$product_name}, qty={$quantity}, variant={$variant_id}");
+        customiizer_log('add_to_cart', $userId, $sessionId, 'INFO', "add_to_cart données : nom={$product_name}, qty={$quantity}, variant={$variant_id}");
 
 	$design_image_url   = isset($_POST['design_image_url'])   ? esc_url_raw($_POST['design_image_url'])           : '';
 	$design_width_in    = isset($_POST['width'])              ? floatval($_POST['width'])                         : 0;
@@ -40,10 +42,10 @@ function custom_add_to_cart() {
 		],
         ]);
         if (is_wp_error($post_id) || ! $post_id) {
-                customiizer_log('❌ add_to_cart : échec creation produit');
+                customiizer_log('add_to_cart', $userId, $sessionId, 'ERROR', '❌ add_to_cart : échec creation produit');
                 wp_send_json_error('Échec de création du produit.');
         }
-        customiizer_log("✅ produit temporaire créé ID={$post_id}");
+        customiizer_log('add_to_cart', $userId, $sessionId, 'INFO', "✅ produit temporaire créé ID={$post_id}");
 
 	// Attacher l'image mockup comme vignette si fournie
         if ($mockup_image_url) {
@@ -60,13 +62,13 @@ function custom_add_to_cart() {
                         $attach_id = media_handle_sideload($file_array, $post_id);
                         if (!is_wp_error($attach_id)) {
                                 set_post_thumbnail($post_id, $attach_id);
-                                customiizer_log('🖼️ vignette mockup attachée');
+                                customiizer_log('add_to_cart', $userId, $sessionId, 'INFO', '🖼️ vignette mockup attachée');
                         } else {
-                                customiizer_log('❌ erreur vignette : ' . $attach_id->get_error_message());
+                                customiizer_log('add_to_cart', $userId, $sessionId, 'ERROR', '❌ erreur vignette : ' . $attach_id->get_error_message());
                                 @unlink($tmp_file);
                         }
                 } else {
-                        customiizer_log('❌ téléchargement mockup échoué');
+                        customiizer_log('add_to_cart', $userId, $sessionId, 'ERROR', '❌ téléchargement mockup échoué');
                 }
         }
 
@@ -88,12 +90,12 @@ function custom_add_to_cart() {
 	// Ajout au panier du produit temporaire avec metas si existantes
         $cart_item_key = WC()->cart->add_to_cart($post_id, $quantity, 0, [], $cart_item_data);
         if ($cart_item_key) {
-                customiizer_log("✅ item ajouté au panier key={$cart_item_key}");
+                customiizer_log('add_to_cart', $userId, $sessionId, 'INFO', "✅ item ajouté au panier key={$cart_item_key}");
                 wp_send_json_success(['cart_item_key' => $cart_item_key]);
         } else {
                 $errors = WC()->cart->get_errors();
                 if (!empty($errors)) {
-                        customiizer_log('❌ erreur panier : ' . json_encode($errors));
+                        customiizer_log('add_to_cart', $userId, $sessionId, 'ERROR', '❌ erreur panier : ' . json_encode($errors));
                 }
                 wp_send_json_error('Échec de l’ajout au panier.');
         }
