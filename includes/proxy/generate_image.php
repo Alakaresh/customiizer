@@ -10,6 +10,8 @@ function customiizer_log($message, $level = 'INFO') {
 }
 
 $inputJSON = file_get_contents('php://input');
+$truncatedInput = substr($inputJSON, 0, 1000);
+customiizer_log("Payload reçu: $truncatedInput");
 $input = json_decode($inputJSON, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -26,6 +28,8 @@ if (isset($input['prompt']) && !empty($input['prompt'])) {
         'webhook_type' => $input['webhook_type'] ?? 'progress',
         'is_disable_prefilter' => $input['is_disable_prefilter'] ?? false,
     ];
+
+    customiizer_log('Données envoyées à l\'API: ' . json_encode($data));
 
     $ch = curl_init(API_URL);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -49,6 +53,7 @@ if (isset($input['prompt']) && !empty($input['prompt'])) {
 
     curl_close($ch);
 
+    customiizer_log('Réponse brute API: ' . substr($response, 0, 1000));
     $responseData = json_decode($response, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         customiizer_log("Erreur JSON API: " . json_last_error_msg(), 'ERROR');

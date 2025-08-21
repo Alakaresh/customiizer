@@ -27,6 +27,8 @@ if ($inputJSON === false) {
     exit;
 }
 
+customiizer_log('WEBHOOK_IMAGINE', 'Payload brut: ' . substr($inputJSON, 0, 1000));
+
 $input = json_decode($inputJSON, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     customiizer_log("Erreur de décodage JSON: " . json_last_error_msg());
