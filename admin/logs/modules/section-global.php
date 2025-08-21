@@ -10,6 +10,7 @@ $date = $_GET['date'] ?? '';
 $user = $_GET['user'] ?? '';
 $session = $_GET['session'] ?? '';
 $level = $_GET['level'] ?? 'ERROR';
+$source = $_GET['source'] ?? 'ALL';
 $requestId = trim($_GET['requestId'] ?? '');
 
 $dates = array_map('basename', array_filter(glob($logsRoot . '*', GLOB_ONLYDIR)));
@@ -52,12 +53,23 @@ if ($requestId !== '') {
 }
 
 $availableLevels = [];
+$availableSources = [];
 foreach ($entries as $e) {
     if (!empty($e['level']) && !in_array($e['level'], $availableLevels, true)) {
         $availableLevels[] = $e['level'];
     }
+    if (!empty($e['source']) && !in_array($e['source'], $availableSources, true)) {
+        $availableSources[] = $e['source'];
+    }
 }
 sort($availableLevels);
+sort($availableSources);
+
+if ($source !== 'ALL') {
+    $entries = array_filter($entries, function ($e) use ($source) {
+        return ($e['source'] ?? '') === $source;
+    });
+}
 
 if ($level !== 'ALL') {
     $entries = array_filter($entries, function ($e) use ($level) {
@@ -66,7 +78,7 @@ if ($level !== 'ALL') {
 }
 
 usort($entries, function ($a, $b) {
-    return strtotime($b['timestamp'] ?? '') <=> strtotime($a['timestamp'] ?? '');
+    return strtotime($b['date'] ?? '') <=> strtotime($a['date'] ?? '');
 });
 
 echo '<form method="get">';
@@ -97,6 +109,14 @@ if ($sessions) {
     echo '</select></label> ';
 }
 
+echo '<label>Source: <select name="source" onchange="this.form.submit()">';
+echo '<option value="ALL">Toutes</option>';
+foreach ($availableSources as $src) {
+    $sel = $src === $source ? 'selected' : '';
+    echo '<option value="' . esc_attr($src) . '" ' . $sel . '>' . esc_html($src) . '</option>';
+}
+echo '</select></label> ';
+
 echo '<label>Niveau: <select name="level" onchange="this.form.submit()">';
 echo '<option value="ALL">Tous</option>';
 foreach ($availableLevels as $lvl) {
@@ -116,10 +136,11 @@ if (empty($entries)) {
 }
 
 echo '<table style="width:100%; border-collapse: collapse;" border="1">';
-echo '<thead><tr><th style="width:200px;">Date</th><th style="width:100px;">Level</th><th style="width:200px;">requestId</th><th>Message</th></tr></thead><tbody>';
+echo '<thead><tr><th style="width:200px;">Date</th><th style="width:150px;">Source</th><th style="width:100px;">Level</th><th style="width:200px;">requestId</th><th>Message</th></tr></thead><tbody>';
 foreach ($entries as $e) {
     echo '<tr>';
-    echo '<td>' . esc_html($e['timestamp'] ?? '') . '</td>';
+    echo '<td>' . esc_html($e['date'] ?? '') . '</td>';
+    echo '<td>' . esc_html($e['source'] ?? '') . '</td>';
     echo '<td>' . esc_html($e['level'] ?? '') . '</td>';
     echo '<td>' . esc_html($e['requestId'] ?? '') . '</td>';
     echo '<td>' . esc_html($e['message'] ?? '') . '</td>';
