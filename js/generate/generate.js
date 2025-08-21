@@ -49,11 +49,14 @@ jQuery(function($) {
 	}
 
 	// Écouteur d'événements pour le bouton de validation
-	validateButton.addEventListener('click', async function(e) {
-		e.preventDefault();
+                validateButton.addEventListener('click', async function(e) {
+                e.preventDefault();
 
-		resetGenerationState();
-		resetLoadingState();
+                resetGenerationState();
+                resetLoadingState();
+                if (window.logger && window.logger.setRequestId) {
+                        window.logger.setRequestId(null);
+                }
 
 		settings = ' --ar ' + selectedRatio;
 		prompt = customTextInput.textContent.trim();  // Récupère le texte de l'input
@@ -98,26 +101,31 @@ jQuery(function($) {
 
 
 		try {
-			const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					prompt: fullprompt,
-					webhook_url: baseUrl + '/wp-content/themes/customiizer/includes/webhook/imagine.php',
-					webhook_type: 'progress',
-					is_disable_prefilter: false
-				})
-			});
+                        const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                        prompt: fullprompt,
+                                        webhook_url: baseUrl + '/wp-content/themes/customiizer/includes/webhook/imagine.php',
+                                        webhook_type: 'progress',
+                                        is_disable_prefilter: false
+                                })
+                        });
 
 			if (!response.ok) throw new Error("Échec de la récupération du statut de l'image");
 
-			const data = await response.json();
+                        const data = await response.json();
 
-			if (data.status === 'success') {
-				id_image = data.data.hash;
-				setTimeout(() => checkStatus(), 1000);
+                        if (data.requestId && window.logger && window.logger.setRequestId) {
+                                window.logger.setRequestId(data.requestId);
+                                logger.log('info', 'Requête génération acceptée', {requestId: data.requestId});
+                        }
+
+                        if (data.status === 'success') {
+                                id_image = data.data.hash;
+                                setTimeout(() => checkStatus(), 1000);
 
 				// 💳 Décrémentation des crédits si succès
 				const creditsEl = document.getElementById('userCredits');
@@ -263,11 +271,11 @@ jQuery(function($) {
 								})
 							});
 
-							const upscaleData = await upscaleResponse.json();
-							if (upscaleData.status === 'success') {
-								logger.log(`[🆙] Upscale #${choice} lancé :`, upscaleData.data.hash);
-								imageHashes[choice] = upscaleData.data.hash;
-							}
+                                                        const upscaleData = await upscaleResponse.json();
+                                                        if (upscaleData.status === 'success') {
+                                                                logger.log(`[🆙] Upscale #${choice} lancé :`, upscaleData.data.hash, {requestId: upscaleData.requestId});
+                                                                imageHashes[choice] = upscaleData.data.hash;
+                                                        }
 						} catch (upscaleError) {
 							console.error(`❌ Upscale ${choice} échoué :`, upscaleError);
 						}
