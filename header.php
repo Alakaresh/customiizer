@@ -28,6 +28,7 @@ $display_name   = $current_user->display_name;
                 window.USER_ID = "<?php echo esc_js($user_id); ?>";
                 window.SESSION_ID = "<?php echo esc_js(session_id()); ?>";
                 window.THEME_URI = "<?php echo esc_url(get_template_directory_uri()); ?>";
+                window.logger = window.logger || { log: (...args) => console.log(...args) };
                 </script>
                 <script src="<?php echo get_template_directory_uri(); ?>/js/logger.js"></script>
                 <header id="header">
