@@ -25,9 +25,10 @@ function customiizer_api_log_client( WP_REST_Request $request ) {
 	$data = $request->get_json_params();
 	$userId    = $data['userId'] ?? null;
 	$sessionId = $data['sessionId'] ?? null;
-	$level     = $data['level'] ?? null;
-	$message   = $data['message'] ?? null;
-	$extra     = $data['extra'] ?? [];
+        $level     = $data['level'] ?? null;
+        $message   = $data['message'] ?? null;
+        $extra     = $data['extra'] ?? [];
+        $requestId = $data['requestId'] ?? null;
 
 	// Validate userId
 	if ( ! is_numeric( $userId ) || intval( $userId ) < 0 ) {
@@ -52,13 +53,20 @@ function customiizer_api_log_client( WP_REST_Request $request ) {
 		return new WP_REST_Response( [ 'error' => 'Invalid message' ], 400 );
 	}
 
-	// Validate extra
-	if ( ! is_array( $extra ) ) {
-		return new WP_REST_Response( [ 'error' => 'Invalid extra' ], 400 );
-	}
+        // Validate extra
+        if ( ! is_array( $extra ) ) {
+                return new WP_REST_Response( [ 'error' => 'Invalid extra' ], 400 );
+        }
 
-	// Log
-	customiizer_log( 'front', $userId, $sessionId, $message, $level, $extra );
+        // Validate requestId if provided
+        if ( $requestId !== null ) {
+                if ( ! is_string( $requestId ) || ! wp_is_uuid( $requestId ) ) {
+                        return new WP_REST_Response( [ 'error' => 'Invalid requestId' ], 400 );
+                }
+        }
+
+        // Log
+        customiizer_log( 'front', $userId, $sessionId, $message, $level, $extra, $requestId );
 
 	return [ 'status' => 'ok' ];
 }
