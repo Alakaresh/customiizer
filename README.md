@@ -96,6 +96,28 @@ The response lists all `mockup_url` values stored for the task:
 }
 ```
 
+## Système de logs
+
+Les événements côté client et serveur sont enregistrés dans des fichiers au format JSON (une entrée par ligne) afin de conserver un historique structuré.
+
+Les fichiers sont stockés dans `wp-content/uploads/customiizer/logs/YYYY-MM-DD/<userId>/<sessionId>.log`.
+
+L’API `/api/log_client.php` nécessite l’en-tête `x-customiizer-secret` défini par la variable d’environnement `CUSTOMIIZER_LOG_SECRET`.
+
+### Logger côté client
+
+Le script `js/logger.js` expose une méthode `logger.log(level, message, extra)`. Exemple :
+
+```js
+logger.log('ERROR', 'message')
+```
+
+### Analyse
+
+Une page d’administration « 🧾 Logs » permet de filtrer les entrées par date, utilisateur, session, niveau et `requestId`.
+
+Un script CLI `bin/analyze-logs.php` lit ces fichiers et génère des statistiques.
+
 ## Loyalty points
 
 Users earn 5 points for every euro spent before tax once an order is completed.
