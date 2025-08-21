@@ -39,18 +39,42 @@ if (!defined('REMOTE_IMAGE_MAX_BYTES')) {
     define('REMOTE_IMAGE_MAX_BYTES', 5 * 1024 * 1024);
 }
 
-function customiizer_log($context, $message = '') {
-    $log_file = __DIR__ . '/customiizer.log';
-    $date = date('Y-m-d H:i:s');
+/**
+ * Log structured information to a daily JSON log file.
+ *
+ * @param string      $source    Source identifier.
+ * @param int|string  $userId    User identifier.
+ * @param string      $sessionId Session identifier.
+ * @param string      $level     Log level.
+ * @param string      $message   Message to log.
+ * @param array       $extra     Additional context data.
+ * @param string|null $requestId Optional request identifier.
+ */
+function customiizer_log($source, $userId, $sessionId, $level, $message, $extra = [], $requestId = null) {
+    $uploads = wp_upload_dir();
+    $baseDir = trailingslashit($uploads['basedir']);
+    $dateDir = date('Y-m-d');
 
-    // Si un seul argument est donné, on le considère comme le message complet
-    if ($message === '') {
-        $line = "[$date] $context\n";
-    } else {
-        $line = "[$date] [$context] $message\n";
+    $logDir = $baseDir . 'customiizer/logs/' . $dateDir . '/' . $userId;
+    wp_mkdir_p($logDir);
+
+    $logFile = $logDir . '/' . $sessionId . '.log';
+
+    $entry = [
+        'date'      => date('c'),
+        'source'    => $source,
+        'userId'    => $userId,
+        'sessionId' => $sessionId,
+        'level'     => $level,
+        'message'   => $message,
+        'extra'     => $extra,
+    ];
+
+    if ($requestId !== null) {
+        $entry['requestId'] = $requestId;
     }
 
-    file_put_contents($log_file, $line, FILE_APPEND);
+    file_put_contents($logFile, json_encode($entry, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND | LOCK_EX);
 }
 
 
