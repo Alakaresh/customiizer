@@ -66,7 +66,7 @@ function customiizer_api_log_client( WP_REST_Request $request ) {
         }
 
         // Log
-        customiizer_log( 'front', $userId, $sessionId, $message, $level, $extra, $requestId );
+        customiizer_log( 'front', $userId, $sessionId, $level, $message, $extra, $requestId );
 
 	return [ 'status' => 'ok' ];
 }
