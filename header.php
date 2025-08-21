@@ -23,9 +23,15 @@ $display_name   = $current_user->display_name;
 		<?php wp_head(); ?>
                <!-- logo styles moved to header.css -->
 	</head>
-	<body <?php body_class(); ?>>
-		<header id="header">
-			<div class="header-content">
+        <body <?php body_class(); ?>>
+                <script>
+                window.USER_ID = "<?php echo esc_js($user_id); ?>";
+                window.SESSION_ID = "<?php echo esc_js(session_id()); ?>";
+                window.THEME_URI = "<?php echo esc_url(get_template_directory_uri()); ?>";
+                </script>
+                <script src="<?php echo get_template_directory_uri(); ?>/js/logger.js"></script>
+                <header id="header">
+                        <div class="header-content">
 				<div class="logo-container">
 
 					<div class="logo">

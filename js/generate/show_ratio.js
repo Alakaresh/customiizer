@@ -6,7 +6,7 @@ let selectedProduct = '';
 let globalProducts = [];
 
 document.addEventListener('DOMContentLoaded', function () {
-	console.log('[Init] DOM entièrement chargé');
+	logger.log('[Init] DOM entièrement chargé');
 	loadProductData();
 	addRatioButtonsEventListeners();
 });
@@ -18,7 +18,7 @@ function toggleRatioMenu() {
 	const isMenuOpen = ratioMenu && ratioMenu.style.display === 'block';
 	if (ratioMenu) {
 		ratioMenu.style.display = isMenuOpen ? 'none' : 'block';
-		console.log(`[Menu] Ratio menu ${isMenuOpen ? 'fermé' : 'ouvert'}`);
+		logger.log(`[Menu] Ratio menu ${isMenuOpen ? 'fermé' : 'ouvert'}`);
 	}
 	if (arrowIcon) {
 		arrowIcon.classList.toggle('open', !isMenuOpen);
@@ -31,9 +31,9 @@ function addRatioButtonsEventListeners() {
 			clearAllSelections();
 			selectedRatio = this.getAttribute('data-ratio');
 			selectedProduct = '';
-			console.log(`[Ratio] Bouton sélectionné : ${selectedRatio}`);
+			logger.log(`[Ratio] Bouton sélectionné : ${selectedRatio}`);
 			if (typeof loadImages === 'function') {
-				console.log('[loadImages] Appelé après sélection ratio');
+				logger.log('[loadImages] Appelé après sélection ratio');
 				loadImages();
 			}
 			document.getElementById('selected-info').textContent = selectedRatio;
@@ -60,7 +60,7 @@ function addProductButtons(products) {
 				clearAllSelections();
 				selectedProduct = product.product_id;
 				selectedRatio = '';
-				console.log(`[Produit] Bouton cliqué pour : ${key}`);
+				logger.log(`[Produit] Bouton cliqué pour : ${key}`);
 				displayVariantsForProduct(key);
 				document.getElementById('selected-info').textContent = product.product_name;
 			});
@@ -70,7 +70,7 @@ function addProductButtons(products) {
 }
 
 function loadProductData() {
-	console.log('[Data] Chargement des produits...');
+	logger.log('[Data] Chargement des produits...');
 	jQuery.ajax({
 		url: ajaxurl,
 		method: 'POST',
@@ -78,8 +78,8 @@ function loadProductData() {
 		success: function (products) {
 			if (Array.isArray(products)) {
 				globalProducts = products;
-				console.log(`[Data] ${products.length} produits reçus`);
-				console.log(`products`,products);
+				logger.log(`[Data] ${products.length} produits reçus`);
+				logger.log(`products`,products);
 				addProductButtons(products);
 			} else {
 				console.error('[Erreur] Réponse invalide :', products);
@@ -101,7 +101,7 @@ function displayVariantsForProduct(normalizedName) {
 	container.innerHTML = '';
 
 	const filtered = globalProducts.filter(v => (v.product_name.includes("Clear Case") ? "Clear Case" : v.product_name) === normalizedName && isValidMockupImage(v.image));
-	console.log(`[Filtrage] ${filtered.length} variantes trouvées pour ${normalizedName}`);
+	logger.log(`[Filtrage] ${filtered.length} variantes trouvées pour ${normalizedName}`);
 
 	filtered.forEach(variant => {
 		const item = document.createElement('div');
@@ -121,12 +121,12 @@ function displayVariantsForProduct(normalizedName) {
 		item.addEventListener('click', () => {
 			highlightSelection(item);
 			selectedVariant = variant.variant_id;
-			console.log(`[Sélection] Variante sélectionnée : ${variant.size}`);
+			logger.log(`[Sélection] Variante sélectionnée : ${variant.size}`);
 			selectedRatio = variant.ratio_image ? variant.ratio_image : '';
-			console.log(`[Update] selectedRatio mis à jour avec : ${selectedRatio}`);
+			logger.log(`[Update] selectedRatio mis à jour avec : ${selectedRatio}`);
 
 			if (typeof loadImages === 'function') {
-				console.log('[loadImages] Appelé après sélection variant');
+				logger.log('[loadImages] Appelé après sélection variant');
 				loadImages();
 			}
 		});
@@ -136,7 +136,7 @@ function displayVariantsForProduct(normalizedName) {
 	// ✅ Sélection automatique de la première variante si elle existe
 	const firstItem = container.querySelector('.product-item');
 	if (firstItem) {
-		console.log('[AutoSélection] Première variante sélectionnée automatiquement');
+		logger.log('[AutoSélection] Première variante sélectionnée automatiquement');
 		firstItem.click();
 	}
 
@@ -147,12 +147,12 @@ function highlightSelection(selectedElement) {
 		el.classList.remove('selected');
 	});
 	selectedElement.classList.add('selected');
-	console.log('[UI] Mise en surbrillance de la sélection');
+	logger.log('[UI] Mise en surbrillance de la sélection');
 }
 
 function clearAllSelections() {
 	document.querySelectorAll('.product-item.selected').forEach(el => {
 		el.classList.remove('selected');
 	});
-	console.log('[UI] Sélections précédentes effacées');
+	logger.log('[UI] Sélections précédentes effacées');
 }
