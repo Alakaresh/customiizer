@@ -101,6 +101,7 @@ add_action( 'init', function() {
                 '/admin/update/admin-update.php',
                 '/admin/products/admin-products.php',
                 '/admin/loadtest/admin-loadtest.php',
+                '/admin/logs/admin-logs.php',
         ];
 
         $includes = [
