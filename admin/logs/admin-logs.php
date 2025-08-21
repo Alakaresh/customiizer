@@ -14,8 +14,8 @@ add_action('admin_menu', function () {
 function customiizer_render_logs_page() {
     echo '<div class="wrap">';
     echo '<h1>🧾 Logs – Send Order</h1>';
-    //include __DIR__ . '/modules/section-send_order.php';
+    include __DIR__ . '/modules/section-send_order.php';
     echo '<hr><h1>🧾 Logs – Global</h1>';
-    //include __DIR__ . '/modules/section-global.php';
+    include __DIR__ . '/modules/section-global.php';
     echo '</div>';
 }
