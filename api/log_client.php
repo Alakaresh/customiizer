@@ -36,8 +36,7 @@ function customiizer_api_log_client( WP_REST_Request $request ) {
     return customiizer_process_log_client(
         $request->get_json_params(),
         [
-            'x-wp-nonce'          => $request->get_header('x-wp-nonce'),
-            'x-customiizer-secret' => $request->get_header('x-customiizer-secret'),
+            'x-wp-nonce' => $request->get_header('x-wp-nonce'),
         ]
     );
 }
@@ -46,25 +45,12 @@ function customiizer_api_log_client( WP_REST_Request $request ) {
  * Core handler shared by direct calls and REST requests.
  *
  * @param array $data    Decoded JSON payload.
- * @param array $headers Lower-cased request headers.
+ * @param array $headers Lower-cased request headers (unused).
  * @return array|WP_REST_Response
  */
 function customiizer_process_log_client(array $data, array $headers) {
-    // Security: check WordPress nonce or secret header
-    $authorized = false;
-    $nonce      = $headers['x-wp-nonce'] ?? null;
-    if ($nonce && wp_verify_nonce($nonce, 'wp_rest')) {
-        $authorized = true;
-    } else {
-        $secret_header = $headers['x-customiizer-secret'] ?? null;
-        if ($secret_header && defined('CUSTOMIIZER_LOG_SECRET')) {
-            $authorized = hash_equals(CUSTOMIIZER_LOG_SECRET, $secret_header);
-        }
-    }
-
-    if (!$authorized) {
-        return new WP_REST_Response(['error' => 'Unauthorized'], 403);
-    }
+    // Previously enforced a secret header for authorization. This check has been removed to
+    // simplify log collection.
 
     $userId    = $data['userId'] ?? null;
     $sessionId = $data['sessionId'] ?? null;
