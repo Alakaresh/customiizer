@@ -10,7 +10,6 @@
     return window.SESSION_ID || localStorage.getItem('sessionId') || getCookie('sessionId');
   }
   const apiUrl = (window.THEME_URI || '') + '/api/log_client.php';
-  const logSecret = window.CUSTOMIIZER_LOG_SECRET;
   let currentRequestId = null;
 
   function send(level, message, extra){
@@ -32,9 +31,6 @@
     }
     try {
       const headers = { 'Content-Type': 'application/json' };
-      if (logSecret) {
-        headers['x-customiizer-secret'] = logSecret;
-      }
       fetch(apiUrl, {
         method: 'POST',
         headers: headers,

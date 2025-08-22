@@ -102,7 +102,7 @@ Les événements côté client et serveur sont enregistrés dans des fichiers au
 
 Les fichiers sont stockés dans `wp-content/uploads/customiizer/logs/YYYY-MM-DD/<userId>/<sessionId>.log`.
 
-L’API `/api/log_client.php` nécessite l’en-tête `x-customiizer-secret` défini par la variable d’environnement `CUSTOMIIZER_LOG_SECRET`.
+L’API `/api/log_client.php` accepte désormais les requêtes sans en-tête secret.
 
 ### Logger côté client
 
