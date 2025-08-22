@@ -9,6 +9,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
+add_filter('woocommerce_order_actions', function($actions) {
+    $actions['test_action'] = '🚀 Test bouton';
+    return $actions;
+});
+
 // Log la valeur brute renvoyée par wc_get_customer_default_location
 add_filter('woocommerce_customer_default_location', function($location) {
     error_log('wc_get_customer_default_location() returned: ' . print_r($location, true));
