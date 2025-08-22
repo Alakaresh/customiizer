@@ -59,15 +59,20 @@ function customiizer_process_log_client(array $data, array $headers) {
     $extra     = $data['extra'] ?? [];
     $requestId = $data['requestId'] ?? null;
 
-    // Validate userId
+    // Validate userId, allow anonymous (0) if missing or invalid
     if (!is_numeric($userId) || intval($userId) < 0) {
-        return new WP_REST_Response(['error' => 'Invalid userId'], 400);
+        $userId = 0;
+    } else {
+        $userId = intval($userId);
     }
-    $userId = intval($userId);
 
-    // Validate sessionId (alphanumeric + _-)
+    // Validate sessionId (alphanumeric + _-). Generate UUID if invalid
     if (!is_string($sessionId) || $sessionId === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $sessionId)) {
-        return new WP_REST_Response(['error' => 'Invalid sessionId'], 400);
+        if (function_exists('wp_generate_uuid4')) {
+            $sessionId = wp_generate_uuid4();
+        } else {
+            $sessionId = uniqid('sess_', true);
+        }
     }
 
     // Validate level
