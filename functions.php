@@ -146,6 +146,7 @@ add_action( 'init', function() {
                 '/includes/set_default_country.php',
                 '/includes/add_to_cart.php',
                 '/includes/cart_actions.php',
+                '/includes/rabbitmq_resend_order.php',
                 '/includes/render_loadtest.php',
 
         ];
