@@ -28,6 +28,20 @@ function handle_generate_mockup() {
         wp_send_json_error(['message' => 'Paramètres manquants.']);
     }
 
+    // Convertit l'image en PNG si nécessaire avant l'envoi au service externe.
+    $parts = wp_parse_url($image_url);
+    $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+    if ($ext !== 'png') {
+        $conversion = convert_webp_to_png_server($image_url);
+        if (!empty($conversion['success'])) {
+            $image_url = $conversion['png_url'];
+            error_log('[Mockup] Image convertie en PNG: ' . $image_url);
+        } else {
+            $message = $conversion['message'] ?? "Conversion PNG échouée.";
+            wp_send_json_error(['message' => $message]);
+        }
+    }
+
     $payload = [
         'variantId' => $variant_id,
         'imageUrl'  => $image_url,
