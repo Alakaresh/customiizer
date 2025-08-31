@@ -35,6 +35,7 @@ window.mockupTimes = window.mockupTimes || {};
 const mockupTimes = window.mockupTimes;
 // Stocke temporairement le dernier clic avant l'appel à generateMockup
 mockupTimes.pending = null;
+mockupTimes.requestSent = null;
 let currentLoadingOverlay = null;
 let mockupCooldownUntil = 0;
 let cooldownInterval = null;
@@ -155,6 +156,7 @@ function generateMockup(mockupData) {
                 const delay = ((requestStart - mockupTimes.pending) / 1000).toFixed(1);
                 console.log(`⌛ Request sent after ${delay}s`);
         }
+        mockupTimes.requestSent = requestStart;
 
         document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
         mainProductImage?.classList.add("loading");
@@ -216,6 +218,7 @@ function generateMockup(mockupData) {
                 .finally(() => {
                         document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove("processing"));
                         mainProductImage?.classList.remove("loading");
+                        mockupTimes.requestSent = null;
                 });
 }
 
@@ -314,6 +317,13 @@ function showRateLimitMessage(seconds) {
 function updateMockupThumbnail(viewName, mockupUrl) {
 
         console.log('🆕 Updating mockup thumbnail', { viewName, mockupUrl });
+
+        // 🕒 Log du temps entre l'envoi de la requête et l'affichage de l'image
+        if (mockupTimes.requestSent) {
+                const elapsed = ((Date.now() - mockupTimes.requestSent) / 1000).toFixed(1);
+                console.log(`⏱️ Mockup displayed after ${elapsed}s`);
+                mockupTimes.requestSent = null;
+        }
 
         const thumbnailsContainer = document.querySelector(".image-thumbnails");
         if (!thumbnailsContainer) {
