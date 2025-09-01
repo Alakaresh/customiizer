@@ -34,6 +34,8 @@ function handle_generate_mockup_from_canvas() {
         'imgH'         => $height_in * 2.54,
     ];
 
+    error_log('[generate_mockup_from_canvas] Payload to mockup service: ' . sprintf('variantId=%d, imageBase64_length=%d, imgX=%.2f, imgY=%.2f, imgW=%.2f, imgH=%.2f',
+        $payload['variantId'], strlen($payload['imageBase64']), $payload['imgX'], $payload['imgY'], $payload['imgW'], $payload['imgH']));
     $response = wp_remote_post('https://mockup.customiizer.com/render', [
         'headers' => ['Content-Type' => 'application/json'],
         'body'    => wp_json_encode($payload),
