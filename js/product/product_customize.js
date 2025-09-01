@@ -59,7 +59,6 @@ jQuery(document).ready(function ($) {
                 formData.append('height', selectedVariant.print_area_height);
                 formData.append('left', 0);
                 formData.append('top', 0);
-
                 const requestStart = Date.now();
                 if (window.mockupTimes.pending) {
                         const delay = ((requestStart - window.mockupTimes.pending) / 1000).toFixed(1);
