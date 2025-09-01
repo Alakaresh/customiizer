@@ -10,13 +10,25 @@ function customiizer_handle_render_loadtest() {
     $url = 'https://mockup.customiizer.com/render';
     $variantId = isset($_POST['variantId']) ? intval($_POST['variantId']) : 1320;
     $imageUrl = isset($_POST['imageUrl']) ? esc_url_raw($_POST['imageUrl']) : 'https://customiizer.blob.core.windows.net/imageclient/1/4_54f189c6-4f5f-4cd1-a4b2-ac3fc0d4b21d.webp';
+
+    // Convertit l'image fournie en base64 pour le service de mockup
+    $conversion = convert_webp_to_png_server($imageUrl);
+    if (!empty($conversion['success']) && !empty($conversion['file_path'])) {
+        $image_path   = $conversion['file_path'];
+        $image_base64 = base64_encode(file_get_contents($image_path));
+        @unlink($image_path);
+    } else {
+        $msg = $conversion['message'] ?? 'Conversion PNG échouée.';
+        wp_send_json_error($msg);
+    }
+
     $payload = json_encode([
-        'variantId' => $variantId,
-        'imageUrl'  => $imageUrl,
+        'variantId'   => $variantId,
+        'imageBase64' => $image_base64,
     ]);
 
     $interval = 60 / $total; // seconds between requests
-    error_log("Render load test start: variantId=$variantId imageUrl=$imageUrl total=$total interval=" . round($interval, 3) . "s");
+    error_log("Render load test start: variantId=$variantId imageBase64_len=" . strlen($image_base64) . " total=$total interval=" . round($interval, 3) . "s");
 
     $results = [];
     for ($i = 0; $i < $total; $i++) {
