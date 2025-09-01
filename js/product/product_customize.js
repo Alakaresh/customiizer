@@ -33,22 +33,6 @@ function filterAndDisplayImages(images) {
         }
         displayGeneratedImages(filtered);
 }
-function uploadBase64ToServer(base64Data, debugId) {
-        if (!debugId) {
-                debugId = `image_${Date.now()}`;
-        }
-        const filename = `${debugId}.png`;
-
-	const formData = new FormData();
-	formData.append('action', 'save_image_from_base64');
-	formData.append('image_base64', base64Data);
-	formData.append('filename', filename);
-
-	return fetch(ajaxurl, {
-		method: 'POST',
-		body: formData
-	}).then(res => res.json());
-}
 
 
 
@@ -64,27 +48,41 @@ jQuery(document).ready(function ($) {
                 }
 
                 const base64 = CanvasManager.exportPrintAreaPNG();
-                uploadBase64ToServer(base64).then(response => {
-                        if (!response.success) {
-                                alert("Erreur lors de l'envoi de l’image : " + response.message);
-                                return;
-                        }
+                const formData = new FormData();
+                formData.append('action', 'generate_mockup_from_canvas');
+                formData.append('image_base64', base64);
+                formData.append('product_id', window.currentProductId || '');
+                formData.append('variant_id', selectedVariant?.variant_id || '');
+                formData.append('placement', selectedVariant?.placement || selectedVariant?.zone_3d_name || '');
+                formData.append('technique', selectedVariant?.technique || '');
+                formData.append('width', selectedVariant.print_area_width);
+                formData.append('height', selectedVariant.print_area_height);
+                formData.append('left', 0);
+                formData.append('top', 0);
 
-                        const publicImageUrl = response.data.image_url + '?v=' + Date.now();
-                        const mockupData = {
-                                image_url: publicImageUrl,
-                                product_id: window.currentProductId || null,
-                                variant_id: selectedVariant?.variant_id || null,
-                                placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
-                                technique: selectedVariant?.technique || null,
-                                width: selectedVariant.print_area_width,
-                                height: selectedVariant.print_area_height,
-                                left: 0,
-                                top: 0
-                        };
+                const firstViewName = getFirstMockup(selectedVariant)?.view_name;
 
-                        generateMockup(mockupData);
-                });
+                fetch(ajaxurl, { method: 'POST', body: formData })
+                        .then(res => res.json())
+                        .then(data => {
+                                if (data.success && Array.isArray(data.data?.files)) {
+                                        window.mockupTimes.pending = null;
+                                        data.data.files.forEach(f => updateMockupThumbnail(f.name, f.url));
+                                } else if (data.success && data.data?.mockup_url && firstViewName) {
+                                        window.mockupTimes.pending = null;
+                                        updateMockupThumbnail(firstViewName, data.data.mockup_url);
+                                } else {
+                                        alert("Erreur lors de la génération du mockup");
+                                }
+                        })
+                        .catch(err => {
+                                console.error("❌ Erreur réseau :", err.message);
+                        })
+                        .finally(() => {
+                                if (typeof window.hideLoadingOverlay === 'function') {
+                                        window.hideLoadingOverlay();
+                                }
+                        });
 
         });
 });
