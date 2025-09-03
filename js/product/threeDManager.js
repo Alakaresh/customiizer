@@ -62,9 +62,13 @@ function parseColorToHex(color) {
 function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'threeDCanvas') {
         const container = document.getElementById(containerId);
         show3DLoader(container);
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-	const modelName = modelUrl.split('/').pop().toLowerCase();
+        const rect = container.getBoundingClientRect();
+        let width = rect.width;
+        let height = rect.height;
+        if (!height) {
+                height = width;
+        }
+        const modelName = modelUrl.split('/').pop().toLowerCase();
 
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -107,18 +111,20 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
                 alpha: true,
                 antialias: true
         });
-        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(width, height, false);
         renderer.outputEncoding = THREE.sRGBEncoding;
 
         if (resizeObserver3D) {
                 resizeObserver3D.disconnect();
         }
-        resizeObserver3D = new ResizeObserver(() => {
-                const w = container.clientWidth;
-                const h = container.clientHeight;
-                renderer.setSize(w, h);
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
+        resizeObserver3D = new ResizeObserver((entries) => {
+                const { width: w, height: h } = entries[0].contentRect;
+                if (w > 0 && h > 0) {
+                        renderer.setSize(w, h, false);
+                        camera.aspect = w / h;
+                        camera.updateProjectionMatrix();
+                }
         });
         resizeObserver3D.observe(container);
 

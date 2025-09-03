@@ -410,9 +410,12 @@ jQuery(document).ready(function ($) {
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         mainProductImage.hide();
-                                        jQuery('#productMain3DContainer').show();
+                                        const container = jQuery('#productMain3DContainer');
+                                        container.show();
                                         if (!main3DInitialized) {
-                                                init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
+                                                requestAnimationFrame(() => {
+                                                        init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
+                                                });
                                                 main3DInitialized = true;
                                         }
                                 });
