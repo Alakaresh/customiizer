@@ -1,3 +1,4 @@
+
 var mockupUtils = window.mockupUtils || {};
 var buildProductData = mockupUtils.buildProductData;
 var getFirstMockup = mockupUtils.getFirstMockup;
@@ -214,7 +215,6 @@ async function generateMockup(mockupData) {
 }
 
 window.generateMockup = generateMockup;
-
 
 // Réactive le thumbnail actuellement sélectionné
 function triggerSelectedThumbnail() {
