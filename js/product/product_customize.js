@@ -1,3 +1,4 @@
+
 const { buildProductData, getFirstMockup, updateMockupThumbnail } = window.mockupUtils || {};
 
 window.currentProductId = window.currentProductId || null;

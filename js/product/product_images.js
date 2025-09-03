@@ -212,7 +212,6 @@ async function generateMockup(mockupData) {
 
 window.generateMockup = generateMockup;
 
-
 // Réactive le thumbnail actuellement sélectionné
 function triggerSelectedThumbnail() {
         const activeThumb = document.querySelector('.image-thumbnails .thumbnail.selected');
