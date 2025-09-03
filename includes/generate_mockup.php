@@ -8,6 +8,7 @@ add_action('wp_ajax_nopriv_generate_mockup', 'handle_generate_mockup');
  * Reçoit les dimensions en pouces et les convertit en centimètres.
  */
 function handle_generate_mockup() {
+    $image_base64 = $_POST['image_base64'] ?? '';
     $image_url  = sanitize_text_field($_POST['image_url'] ?? '');
     $variant_id = isset($_POST['variant_id']) ? intval($_POST['variant_id']) : 0;
     $width_in   = isset($_POST['width']) ? floatval($_POST['width']) : 0;
@@ -16,6 +17,7 @@ function handle_generate_mockup() {
     $top_in     = isset($_POST['top']) ? floatval($_POST['top']) : 0;
 
     error_log('[Mockup] Params: ' . wp_json_encode([
+        'has_base64' => $image_base64 ? true : false,
         'image_url' => $image_url,
         'variant_id' => $variant_id,
         'width_in' => $width_in,
@@ -24,20 +26,28 @@ function handle_generate_mockup() {
         'top_in' => $top_in,
     ]));
 
-    if (!$image_url || !$variant_id) {
+    if ((!$image_base64 && !$image_url) || !$variant_id) {
         wp_send_json_error(['message' => 'Paramètres manquants.']);
     }
 
-    // Convertit l'image et récupère son contenu en base64 pour l'appel au service externe.
-    $conversion = convert_webp_to_png_server($image_url);
-    if (!empty($conversion['success']) && !empty($conversion['file_path'])) {
-        $image_path   = $conversion['file_path'];
-        $image_base64 = base64_encode(file_get_contents($image_path));
-        @unlink($image_path);
-        error_log('[Mockup] Image convertie en base64');
+    if ($image_base64) {
+        $clean = preg_replace('#^data:image/\w+;base64,#i', '', $image_base64);
+        $decoded = base64_decode($clean);
+        if ($decoded === false) {
+            wp_send_json_error(['message' => 'Données base64 invalides.']);
+        }
+        $image_base64 = $clean;
     } else {
-        $message = $conversion['message'] ?? "Conversion PNG échouée.";
-        wp_send_json_error(['message' => $message]);
+        $conversion = convert_webp_to_png_server($image_url);
+        if (!empty($conversion['success']) && !empty($conversion['file_path'])) {
+            $image_path   = $conversion['file_path'];
+            $image_base64 = base64_encode(file_get_contents($image_path));
+            @unlink($image_path);
+            error_log('[Mockup] Image convertie en base64');
+        } else {
+            $message = $conversion['message'] ?? "Conversion PNG échouée.";
+            wp_send_json_error(['message' => $message]);
+        }
     }
 
     $payload = [
