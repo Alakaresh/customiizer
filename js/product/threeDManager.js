@@ -79,19 +79,19 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
 	let lookAtY = 0;
 
 	// Ajustements spécifiques
-       if (modelName.includes("tumbler")) {
+       if (modelName.includes("Tumbler")) {
                camY = 0;
                camZ = 0.7;
                lookAtY = 0; // recentre verticalement
-       } else if (modelName.includes("waterbottle")) {
+       } else if (modelName.includes("Bottle")) {
                camY = 0;
                camZ = 0.7;
                lookAtY = -0.1; // recentre verticalement
-	} else if (modelName.includes("mug15oz")) {
+	} else if (modelName.includes("Mug15oz")) {
 		camY = 0;
 		camZ = 0.5;
 		lookAtY = 0;
-	} else if (modelName.includes("mug20oz")) {
+	} else if (modelName.includes("Mug20oz")) {
 		camY = 0;
 		camZ = 0.5;
 		lookAtY = 0;
