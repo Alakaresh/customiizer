@@ -48,6 +48,28 @@ const overlayMessages = [
 let overlayInterval = null;
 let overlayIndex = 0;
 
+function imageUrlToBase64(url) {
+        return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        try {
+                                const dataUrl = canvas.toDataURL('image/png');
+                                resolve(dataUrl);
+                        } catch (err) {
+                                reject(err);
+                        }
+                };
+                img.onerror = reject;
+                img.src = url;
+        });
+}
+
 function getLatestMockup(variant) {
     return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
 }
@@ -130,7 +152,7 @@ function renderCurrentGroup() {
 }
 
 
-function generateMockup(mockupData) {
+async function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
         productData = buildProductData(mockupData);
 
@@ -165,7 +187,10 @@ function generateMockup(mockupData) {
         if (!loadingOverlay) {
                 loadingOverlay = document.createElement("div");
                 loadingOverlay.classList.add("loading-overlay");
-                loadingOverlay.innerHTML = `<div class="loading-spinner"></div><div class="loading-text">${overlayMessages[0]}</div>`;
+                loadingOverlay.innerHTML =
+                        '<div class="loading-spinner"></div><div class="loading-text">' +
+                        overlayMessages[0] +
+                        '</div>';
                 mainProductImage?.parentNode.appendChild(loadingOverlay);
         } else {
                 const textEl = loadingOverlay.querySelector('.loading-text');
@@ -186,9 +211,17 @@ function generateMockup(mockupData) {
                 }
         }, 4000);
 
+        let base64Image;
+        try {
+                base64Image = await imageUrlToBase64(mockupData.image_url);
+        } catch (err) {
+                console.error('❌ Impossible de convertir l\'image en base64', err);
+                return;
+        }
+
         const form = new FormData();
         form.append("action", "generate_mockup");
-        form.append("image_url", mockupData.image_url);
+        form.append("image_base64", base64Image);
         form.append("variant_id", mockupData.variant_id);
         form.append("width", mockupData.width);
         form.append("height", mockupData.height);
