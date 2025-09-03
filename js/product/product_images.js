@@ -123,29 +123,8 @@ function renderCurrentGroup() {
 			tooltip.style.opacity = "0";
 		});
 
-                // ✅ Ajout du clic pour générer un mockup
-                imgElement.addEventListener("click", function () {
-                        // Démarre le chronomètre au clic sur l'image
-                        mockupTimes.pending = Date.now();
-
-                        const mockupData = {
-                                image_url: image.image_url,
-                                product_id: window.currentProductId || null,
-                                variant_id: selectedVariant?.variant_id || null,
-                                placement: selectedVariant?.placement || null,
-                                technique: selectedVariant?.technique || null,
-                                width: selectedVariant?.print_area_width || null,
-                                height: selectedVariant?.print_area_height || null,
-                                left: 0,
-                                top: 0
-                        };
-                        console.log('🖼️ Image selected for mockup', mockupData);
-                        generateMockup(mockupData); // 🚀 Envoi du vrai objet complet
-                });
-
-
-		contentDiv.appendChild(imgElement);
-	});
+                contentDiv.appendChild(imgElement);
+        });
 
         // Ajoute un petit effet de défilement pour montrer que la barre est scrollable
         contentDiv.scrollLeft = 0;
