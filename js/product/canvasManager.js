@@ -165,7 +165,8 @@ const CanvasManager = {
                fabric.Image.fromURL(data.design_image_url, function (img) {
                         const scaleX = data.design_width / img.width;
                         const scaleY = data.design_height / img.height;
-                        img.set({
+
+                       img.set({
                                 left: template.print_area_left + data.design_left,
                                 top: template.print_area_top + data.design_top,
                                 scaleX: scaleX,
@@ -177,6 +178,8 @@ const CanvasManager = {
                                 lockRotation: false,
                                 lockUniScaling: true,
                                 hasRotatingPoint: true,
+                                angle: data.design_angle || 0,
+                                flipX: data.design_flipX || false,
                         });
                         img.setControlsVisibility({
                                 tl: true,
@@ -299,6 +302,20 @@ const CanvasManager = {
        hasImage: function () {
                if (!canvas) return false;
                return canvas.getObjects().some(obj => obj.type === 'image');
+       },
+
+       getCurrentImageData: function () {
+               if (!canvas) return null;
+               const img = canvas.getObjects().find(obj => obj.type === 'image');
+               if (!img) return null;
+               return {
+                       left: img.left - template.print_area_left,
+                       top: img.top - template.print_area_top,
+                       width: img.width * img.scaleX,
+                       height: img.height * img.scaleY,
+                       angle: img.angle || 0,
+                       flipX: !!img.flipX
+               };
        },
 
        syncTo3D: function () {

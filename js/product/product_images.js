@@ -283,6 +283,8 @@ function buildProductData(mockupData) {
                 design_height: mockupData.height,
                 design_left: mockupData.left,
                 design_top: mockupData.top,
+                design_angle: mockupData.angle || 0,
+                design_flipX: mockupData.flipX || false,
                 variant_id: mockupData.variant_id,
                 placement: mockupData.placement,
                 technique: mockupData.technique

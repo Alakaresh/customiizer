@@ -67,20 +67,23 @@ jQuery(document).ready(function ($) {
                 window.mockupTimes.requestSent = requestStart;
 
                 // Mise en cache locale de la personnalisation pour réouverture future
+                const placement = CanvasManager.getCurrentImageData() || {};
                 const productData = {
                         product_name: jQuery('.product-name').text().trim(),
                         product_price: selectedVariant.price,
                         delivery_price: selectedVariant?.delivery_price,
                         mockup_url: '',
                         design_image_url: base64,
-                        design_width: selectedVariant.print_area_width,
-                        design_height: selectedVariant.print_area_height,
-                        design_left: 0,
-                        design_top: 0,
-                        variant_id: selectedVariant?.variant_id,
-                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
-                        technique: selectedVariant?.technique || ''
-                };
+                       design_width: placement.width || selectedVariant.print_area_width,
+                       design_height: placement.height || selectedVariant.print_area_height,
+                       design_left: placement.left || 0,
+                       design_top: placement.top || 0,
+                       design_angle: placement.angle || 0,
+                       design_flipX: placement.flipX || false,
+                       variant_id: selectedVariant?.variant_id,
+                       placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
+                       technique: selectedVariant?.technique || ''
+               };
                 if (window.customizerCache) {
                         window.customizerCache.designs = window.customizerCache.designs || {};
                         window.customizerCache.designs[window.currentProductId] = productData;
