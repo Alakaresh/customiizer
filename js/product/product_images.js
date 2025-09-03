@@ -2,6 +2,7 @@ let productData = null;
 window.currentProductId = window.currentProductId || null;
 window.generatedProductId = window.generatedProductId || null;
 window.productCreationPromise = window.productCreationPromise || null;
+window.customizerPreloaded = window.customizerPreloaded || false;
 
 window.createProduct = function(pd) {
     return fetch('/wp-admin/admin-ajax.php?action=generate_custom_product', {
@@ -119,9 +120,56 @@ function renderCurrentGroup() {
 			tooltip.style.top = `${event.pageY + 10}px`;
 		});
 
-		imgElement.addEventListener("mouseleave", () => {
-			tooltip.style.opacity = "0";
-		});
+                imgElement.addEventListener("mouseleave", () => {
+                        tooltip.style.opacity = "0";
+                });
+
+                // 👉 Clique sur une image de la bottom-bar
+                imgElement.addEventListener('click', () => {
+                        console.log('🖱️ Bottom-bar image clicked', image.image_url);
+                        const addImageToCustomizer = () => {
+                                console.log('🧩 addImageToCustomizer invoked');
+                                if (typeof CanvasManager !== 'undefined') {
+                                        console.log('CanvasManager available, adding image');
+                                        CanvasManager.addImage(image.image_url, () => {
+                                                console.log('Image added to CanvasManager, syncing 3D view');
+                                                // Synchronise plusieurs fois pour laisser le temps au modèle 3D de charger
+                                                let attempts = 0;
+                                                const maxAttempts = 10;
+                                                const sync3D = () => {
+                                                        attempts++;
+                                                        console.log(`sync3D attempt ${attempts}`);
+                                                        if (typeof CanvasManager.syncTo3D === 'function') {
+                                                                CanvasManager.syncTo3D();
+                                                        }
+                                                        if (attempts < maxAttempts) {
+                                                                setTimeout(sync3D, 300);
+                                                        }
+                                                };
+                                                sync3D();
+                                        });
+                                } else {
+                                        console.error('CanvasManager is not defined');
+                                }
+                        };
+
+                        if (window.jQuery && jQuery('#customizeModal').is(':visible')) {
+                                console.log('Customizer modal already open, adding image directly');
+                                addImageToCustomizer();
+                        } else if (window.jQuery) {
+                                if (window.customizerPreloaded) {
+                                        console.log('Showing preloaded customizer modal');
+                                        jQuery('.design-button').trigger('click');
+                                        addImageToCustomizer();
+                                } else {
+                                        console.log('Opening customizer modal and waiting for variantReady');
+                                        jQuery(document).one('variantReady', addImageToCustomizer);
+                                        jQuery('.design-button').trigger('click');
+                                }
+                        } else {
+                                console.warn('jQuery not available, cannot open customizer modal');
+                        }
+                });
 
                 contentDiv.appendChild(imgElement);
         });

@@ -1,6 +1,7 @@
 window.currentProductId = window.currentProductId || null;
 // Objet partagé pour mesurer les temps de génération de mockup
 window.mockupTimes = window.mockupTimes || {};
+window.customizerPreloaded = window.customizerPreloaded || false;
 function displayGeneratedImages(images) {
         const siteFilesList = jQuery('#siteFilesList');
         siteFilesList.empty();
@@ -299,44 +300,39 @@ jQuery(document).ready(function ($) {
 
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function () {
-                threeDInitialized = false;
-                fetchUserImages(); // images perso si besoin
+                fetchUserImages();
                 customizeModal.show();
-                const productImageSrc = jQuery("#product-main-image").attr("src");
-                jQuery("#footerProductImage").attr("src", productImageSrc);
-                const productName = jQuery(".product-name").text().trim();
-                jQuery("#customizeModalTitle").text(productName);
-                jQuery(".summary-name").text(productName);
-                const productPrice = jQuery(".price-value span").text().trim();
-                jQuery(".summary-price").text(productPrice);
+                const productImageSrc = jQuery('#product-main-image').attr('src');
+                jQuery('#footerProductImage').attr('src', productImageSrc);
+                const productName = jQuery('.product-name').text().trim();
+                jQuery('#customizeModalTitle').text(productName);
+                jQuery('.summary-name').text(productName);
+                const productPrice = jQuery('.price-value span').text().trim();
+                jQuery('.summary-price').text(productPrice);
+                trapFocus(customizeModal);
+                if (window.customizerPreloaded) {
+                        updateAddImageButtonVisibility();
+                        return;
+                }
+                threeDInitialized = false;
                 imageControls.hide();
                 visualHeader.css('display', 'none');
                 $('.visual-zone').removeClass('with-header');
-                trapFocus(customizeModal);
-
                 try {
-                        // 1. Charger le template depuis le cache ou l'API
-                        let template = window.customizerCache.templates[selectedVariant.variant_id];
-                        if (!template) {
-                                const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
-                                const data = await res.json();
-
-                                if (!data.success || !data.template) {
-                                        console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
-                                        $('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
-                                        return;
-                                }
-
-                                template = data.template;
-                                window.customizerCache.templates[selectedVariant.variant_id] = template;
-                        } else {
-                        }
-
-                        // 2. Lancer Fabric.js dans le container
+let template = window.customizerCache.templates[selectedVariant.variant_id];
+if (!template) {
+const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
+const data = await res.json();
+if (!data.success || !data.template) {
+console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
+$('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
+return;
+}
+template = data.template;
+window.customizerCache.templates[selectedVariant.variant_id] = template;
+}
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
-
-                        // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
                                 init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
@@ -344,11 +340,10 @@ jQuery(document).ready(function ($) {
                         } else {
                                 $('#product3DContainer').hide();
                         }
-		} catch (error) {
-			console.error("[UI] ❌ Erreur de chargement template :", error);
-		}
-	});
-
+                } catch (error) {
+                        console.error('[UI] ❌ Erreur de chargement template :', error);
+                }
+        });
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
@@ -645,10 +640,26 @@ jQuery(document).ready(function ($) {
                         jQuery(this).toggle(altText.toLowerCase().includes(searchValue));
                 });
 
-                jQuery('#pcFilesList .site-image').each(function () {
-                        const fileUrl = jQuery(this).find('.image-thumbnail').attr('src') || '';
-                        const fileName = fileUrl.split('/').pop().split('.').slice(0, -1).join('.').toLowerCase();
-                        jQuery(this).toggle(fileName.includes(searchValue));
-                });
+        jQuery('#pcFilesList .site-image').each(function () {
+                const fileUrl = jQuery(this).find('.image-thumbnail').attr('src') || '';
+                const fileName = fileUrl.split('/').pop().split('.').slice(0, -1).join('.').toLowerCase();
+                jQuery(this).toggle(fileName.includes(searchValue));
         });
+});
+
+// Marque le customizer comme prêt une fois la variante chargée
+$(document).one('variantReady', () => {
+        window.customizerPreloaded = true;
+});
+
+// Précharge le modal de personnalisation au chargement de la page
+if (!window.customizerPreloaded && customizeButton.length) {
+        $(document).one('variantReady', () => {
+                customizeModal.hide();
+                releaseFocus(customizeModal);
+        });
+        customizeButton.trigger('click');
+        customizeModal.hide();
+        releaseFocus(customizeModal);
+}
 });
