@@ -125,14 +125,20 @@ function renderCurrentGroup() {
 
                 // 👉 Clique sur une image de la bottom-bar
                 imgElement.addEventListener('click', () => {
+
+                        console.log('🖱️ Bottom-bar image clicked', image.image_url);
                         const addImageToCustomizer = () => {
+                                console.log('🧩 addImageToCustomizer invoked');
                                 if (typeof CanvasManager !== 'undefined') {
+                                        console.log('CanvasManager available, adding image');
                                         CanvasManager.addImage(image.image_url, () => {
+                                                console.log('Image added to CanvasManager, syncing 3D view');
                                                 // Synchronise plusieurs fois pour laisser le temps au modèle 3D de charger
                                                 let attempts = 0;
                                                 const maxAttempts = 10;
                                                 const sync3D = () => {
                                                         attempts++;
+                                                        console.log(`sync3D attempt ${attempts}`);
                                                         if (typeof CanvasManager.syncTo3D === 'function') {
                                                                 CanvasManager.syncTo3D();
                                                         }
@@ -142,14 +148,21 @@ function renderCurrentGroup() {
                                                 };
                                                 sync3D();
                                         });
+                                } else {
+                                        console.error('CanvasManager is not defined');
                                 }
                         };
 
                         if (window.jQuery && jQuery('#customizeModal').is(':visible')) {
+
+                                console.log('Customizer modal already open, adding image directly');
                                 addImageToCustomizer();
                         } else if (window.jQuery) {
+                                console.log('Opening customizer modal and waiting for variantReady');
                                 jQuery(document).one('variantReady', addImageToCustomizer);
                                 jQuery('.design-button').trigger('click');
+                        } else {
+                                console.warn('jQuery not available, cannot open customizer modal');
                         }
                 });
 
