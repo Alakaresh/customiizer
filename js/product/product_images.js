@@ -119,9 +119,44 @@ function renderCurrentGroup() {
 			tooltip.style.top = `${event.pageY + 10}px`;
 		});
 
-		imgElement.addEventListener("mouseleave", () => {
-			tooltip.style.opacity = "0";
-		});
+                imgElement.addEventListener("mouseleave", () => {
+                        tooltip.style.opacity = "0";
+                });
+
+                imgElement.addEventListener("click", () => {
+                        const url = image.image_url;
+
+                        const addToCanvas = () => {
+                                if (typeof CanvasManager === 'undefined') return;
+                                CanvasManager.addImage(url, () => {
+                                        const addImageButton = jQuery('#addImageButton');
+                                        const imageControls = jQuery('.image-controls');
+                                        const visualHeader = jQuery('.visual-header');
+
+                                        addImageButton.hide();
+                                        imageControls.css('display', 'flex').show();
+                                        visualHeader.css('display', 'flex');
+                                        jQuery('.visual-zone').addClass('with-header');
+                                        CanvasManager.resizeToContainer('product2DContainer');
+                                });
+                        };
+
+                        if (jQuery('#customizeModal').is(':visible')) {
+                                addToCanvas();
+                        } else {
+                                const designButton = document.querySelector('.design-button');
+                                if (designButton) {
+                                        designButton.click();
+                                        const interval = setInterval(() => {
+                                                if (document.getElementById('productCanvas')) {
+                                                        clearInterval(interval);
+                                                        addToCanvas();
+                                                }
+                                        }, 100);
+                                        setTimeout(() => clearInterval(interval), 10000);
+                                }
+                        }
+                });
 
                 contentDiv.appendChild(imgElement);
         });
