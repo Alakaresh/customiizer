@@ -59,7 +59,7 @@ function parseColorToHex(color) {
         return 0xfafafa;
 }
 
-function init3DScene(containerId, modelUrl, productColor = null) {
+function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'threeDCanvas') {
         const container = document.getElementById(containerId);
         show3DLoader(container);
         const width = container.clientWidth;
@@ -102,11 +102,11 @@ function init3DScene(containerId, modelUrl, productColor = null) {
 	camera.lookAt(0, lookAtY, 0); // 👁️ fait pointer la caméra plus bas
 
 	// Rendu
-	renderer = new THREE.WebGLRenderer({
-		canvas: document.getElementById("threeDCanvas"),
-		alpha: true,
-		antialias: true
-	});
+        renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById(canvasId),
+                alpha: true,
+                antialias: true
+        });
         renderer.setSize(width, height);
         renderer.outputEncoding = THREE.sRGBEncoding;
 
