@@ -1,4 +1,5 @@
-import { buildProductData, getFirstMockup, updateMockupThumbnail } from './mockup_utils.js';
+
+const { buildProductData, getFirstMockup, updateMockupThumbnail } = window.mockupUtils || {};
 
 window.currentProductId = window.currentProductId || null;
 // Objet partagé pour mesurer les temps de génération de mockup
@@ -10,17 +11,19 @@ function displayGeneratedImages(images) {
 		siteFilesList.append('<div class="no-images">Aucune image trouvée.</div>');
 		return;
 	}
-	images.forEach(image => {
-		siteFilesList.append(`
-				<div class="site-image">
-					<img src="${image.image_url}" 
-						 alt="${image.prompt || 'Image générée'}" 
-						 class="image-thumbnail" 
-						 data-image-url="${image.image_url}">
-				</div>
-			`);
+        images.forEach(image => {
+                siteFilesList.append(`
+                                <div class="site-image">
+                                        <img src="${image.image_url}"
+                                                 alt="${image.prompt || 'Image générée'}"
+                                                 class="image-thumbnail"
+                                                 data-image-url="${image.image_url}">
+                                </div>
+                        `);
         });
 }
+
+window.displayGeneratedImages = displayGeneratedImages;
 
 let currentRatio = '';
 let filterFavorites = false;

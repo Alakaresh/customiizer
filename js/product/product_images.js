@@ -1,4 +1,4 @@
-import { buildProductData, getFirstMockup, updateMockupThumbnail } from './mockup_utils.js';
+const { buildProductData, getFirstMockup, updateMockupThumbnail } = window.mockupUtils || {};
 
 window.currentProductId = window.currentProductId || null;
 window.generatedProductId = window.generatedProductId || null;
@@ -39,6 +39,8 @@ function displayImagesInBottomBar(images) {
         renderCurrentGroup();
         updateArrows();
 }
+
+window.displayImagesInBottomBar = displayImagesInBottomBar;
 
 function renderCurrentGroup() {
         const contentDiv = document.querySelector(".bottom-bar .content");
@@ -208,6 +210,7 @@ async function generateMockup(mockupData) {
                 });
 }
 
+window.generateMockup = generateMockup;
 
 // Réactive le thumbnail actuellement sélectionné
 function triggerSelectedThumbnail() {
