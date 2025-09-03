@@ -1,4 +1,5 @@
-let selectedVariant = null;
+window.selectedVariant = window.selectedVariant || null;
+let selectedVariant = window.selectedVariant;
 let myGeneratedImages = [];
 let communityImages = [];
 window.currentProductId = window.currentProductId || null;
@@ -21,9 +22,10 @@ function dedupeMockups(mockups) {
 }
 
 function getFirstMockup(variant) {
-    if (!variant.mockups || !variant.mockups.length) return null;
-    const unique = dedupeMockups(variant.mockups);
-    return unique[0];
+    if (window.mockupUtils && typeof window.mockupUtils.getFirstMockup === 'function') {
+        return window.mockupUtils.getFirstMockup(variant);
+    }
+    return null;
 }
 
 // 🌐 Cache global pour les templates et modèles 3D préchargés
@@ -172,6 +174,7 @@ jQuery(document).ready(function ($) {
                 const urlParams = new URLSearchParams(window.location.search);
 		const variantParam = urlParams.get('variant');
                 selectedVariant = variants[0];
+                window.selectedVariant = selectedVariant;
 
                 updateColors(variants);
                 updateSizes(variants);
@@ -190,7 +193,8 @@ jQuery(document).ready(function ($) {
 		if (variantParam) {
 			const foundVariant = variants.find(v => v.variant_id == variantParam);
 			if (foundVariant) {
-				selectedVariant = foundVariant;
+                                selectedVariant = foundVariant;
+                                window.selectedVariant = selectedVariant;
 
 				// 👉 Sélectionne automatiquement les bonnes options dans l'interface
 				$('.color-option').removeClass('selected');
@@ -228,7 +232,8 @@ jQuery(document).ready(function ($) {
 											   );
 
 		if (newVariant) {
-			selectedVariant = newVariant;
+                    selectedVariant = newVariant;
+                    window.selectedVariant = selectedVariant;
 
 			// 🔄 Mise à jour de l'URL
 			const url = new URL(window.location.href);

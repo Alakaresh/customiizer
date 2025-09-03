@@ -1,3 +1,22 @@
+function buildProductData(data) {
+    return window.mockupUtils && typeof window.mockupUtils.buildProductData === 'function'
+        ? window.mockupUtils.buildProductData(data)
+        : data;
+}
+
+function getFirstMockup(variant) {
+    if (window.mockupUtils && typeof window.mockupUtils.getFirstMockup === 'function') {
+        return window.mockupUtils.getFirstMockup(variant);
+    }
+    return null;
+}
+
+function updateMockupThumbnail(viewName, mockupUrl) {
+    if (window.mockupUtils && typeof window.mockupUtils.updateMockupThumbnail === 'function') {
+        window.mockupUtils.updateMockupThumbnail(viewName, mockupUrl);
+    }
+}
+
 window.currentProductId = window.currentProductId || null;
 // Objet partagé pour mesurer les temps de génération de mockup
 window.mockupTimes = window.mockupTimes || {};
@@ -8,17 +27,19 @@ function displayGeneratedImages(images) {
 		siteFilesList.append('<div class="no-images">Aucune image trouvée.</div>');
 		return;
 	}
-	images.forEach(image => {
-		siteFilesList.append(`
-				<div class="site-image">
-					<img src="${image.image_url}" 
-						 alt="${image.prompt || 'Image générée'}" 
-						 class="image-thumbnail" 
-						 data-image-url="${image.image_url}">
-				</div>
-			`);
+        images.forEach(image => {
+                siteFilesList.append(`
+                                <div class="site-image">
+                                        <img src="${image.image_url}"
+                                                 alt="${image.prompt || 'Image générée'}"
+                                                 class="image-thumbnail"
+                                                 data-image-url="${image.image_url}">
+                                </div>
+                        `);
         });
 }
+
+window.displayGeneratedImages = displayGeneratedImages;
 
 let currentRatio = '';
 let filterFavorites = false;
@@ -48,15 +69,25 @@ jQuery(document).ready(function ($) {
                 }
 
                 const base64 = CanvasManager.exportPrintAreaPNG();
+                const mockupData = {
+                        image_base64: base64,
+                        product_id: window.currentProductId || null,
+                        variant_id: window.selectedVariant?.variant_id || null,
+                        placement: window.selectedVariant?.placement || window.selectedVariant?.zone_3d_name || null,
+                        technique: window.selectedVariant?.technique || null,
+                        width: window.selectedVariant?.print_area_width,
+                        height: window.selectedVariant?.print_area_height,
+                        left: 0,
+                        top: 0
+                };
+                buildProductData(mockupData);
+
                 const formData = new FormData();
-                formData.append('action', 'generate_mockup_from_canvas');
+                formData.append('action', 'generate_mockup');
                 formData.append('image_base64', base64);
-                formData.append('product_id', window.currentProductId || '');
-                formData.append('variant_id', selectedVariant?.variant_id || '');
-                formData.append('placement', selectedVariant?.placement || selectedVariant?.zone_3d_name || '');
-                formData.append('technique', selectedVariant?.technique || '');
-                formData.append('width', selectedVariant.print_area_width);
-                formData.append('height', selectedVariant.print_area_height);
+                formData.append('variant_id', window.selectedVariant?.variant_id || '');
+                formData.append('width', window.selectedVariant?.print_area_width);
+                formData.append('height', window.selectedVariant?.print_area_height);
                 formData.append('left', 0);
                 formData.append('top', 0);
                 const requestStart = Date.now();
@@ -66,7 +97,7 @@ jQuery(document).ready(function ($) {
                 }
                 window.mockupTimes.requestSent = requestStart;
 
-                const firstViewName = getFirstMockup(selectedVariant)?.view_name;
+                const firstViewName = getFirstMockup(window.selectedVariant)?.view_name;
 
                 fetch(ajaxurl, { method: 'POST', body: formData })
                         .then(res => res.json())
@@ -145,7 +176,7 @@ jQuery(document).ready(function ($) {
         let sidebarVariants = [];
         let threeDInitialized = false;
 
-        currentRatio = selectedVariant?.ratio_image || '';
+        currentRatio = window.selectedVariant?.ratio_image || '';
         ratioFilter.val('current');
         favoriteFilter.val('all');
         filterFavorites = false;
@@ -290,7 +321,7 @@ jQuery(document).ready(function ($) {
                        (!selectedSize || v.size === selectedSize)
                );
                if (variant) {
-                       selectedVariant = variant;
+                       window.selectedVariant = variant;
                        loadVariantInCustomizer(variant);
                        $(document).trigger('variantReady', [variant]);
                        productSidebar.removeClass('open');
@@ -316,34 +347,34 @@ jQuery(document).ready(function ($) {
 
                 try {
                         // 1. Charger le template depuis le cache ou l'API
-                        let template = window.customizerCache.templates[selectedVariant.variant_id];
-                        if (!template) {
-                                const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
-                                const data = await res.json();
+                          let template = window.customizerCache.templates[window.selectedVariant.variant_id];
+                          if (!template) {
+                                  const res = await fetch(`/wp-json/custom-api/v1/variant-template/${window.selectedVariant.variant_id}`);
+                                  const data = await res.json();
 
-                                if (!data.success || !data.template) {
-                                        console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
-                                        $('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
-                                        return;
-                                }
+                                  if (!data.success || !data.template) {
+                                          console.error("[UI] ❌ Template introuvable pour la variante", window.selectedVariant.variant_id);
+                                          $('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
+                                          return;
+                                  }
 
-                                template = data.template;
-                                window.customizerCache.templates[selectedVariant.variant_id] = template;
-                        } else {
-                        }
+                                  template = data.template;
+                                  window.customizerCache.templates[window.selectedVariant.variant_id] = template;
+                          } else {
+                          }
 
                         // 2. Lancer Fabric.js dans le container
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
 
                         // 3. Lancer Three.js si disponible
-                        if (selectedVariant.url_3d) {
-                                $('#product3DContainer').show();
-                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
-                                threeDInitialized = true;
-                        } else {
-                                $('#product3DContainer').hide();
-                        }
+                          if (window.selectedVariant.url_3d) {
+                                  $('#product3DContainer').show();
+                                  init3DScene('product3DContainer', window.selectedVariant.url_3d, window.selectedVariant.color);
+                                  threeDInitialized = true;
+                          } else {
+                                  $('#product3DContainer').hide();
+                          }
 		} catch (error) {
 			console.error("[UI] ❌ Erreur de chargement template :", error);
 		}
@@ -381,7 +412,7 @@ jQuery(document).ready(function ($) {
         // Afficher le bouton lors du changement de produit et mettre à jour le ratio
         $(document).on('productSelected', function () {
                 updateAddImageButtonVisibility();
-                currentRatio = selectedVariant?.ratio_image || '';
+                currentRatio = window.selectedVariant?.ratio_image || '';
                 ratioFilter.val('current');
 
                 favoriteFilter.val('all');
@@ -427,7 +458,7 @@ jQuery(document).ready(function ($) {
                                 }
                         }
                         sidebarVariants = Array.isArray(data.variants) ? data.variants : [];
-                        renderSidebarOptions(sidebarVariants, selectedVariant);
+                        renderSidebarOptions(sidebarVariants, window.selectedVariant);
                         productSidebar.addClass('open');
                 } catch (e) {
                         console.error('[Sidebar] Failed to load variants', e);
@@ -461,7 +492,7 @@ jQuery(document).ready(function ($) {
                 if (val === 'all') {
                         currentRatio = '';
                 } else if (val === 'current') {
-                        currentRatio = selectedVariant?.ratio_image || '';
+                        currentRatio = window.selectedVariant?.ratio_image || '';
                 } else {
                         currentRatio = val;
                 }
