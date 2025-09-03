@@ -98,7 +98,7 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
 	} else {
 		// mug11oz ou fallback
 		camY = 0.0;
-		camZ = 0.5;
+		camZ = 0.25;
 		lookAtY = 0;
 	}
 
