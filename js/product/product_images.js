@@ -1,30 +1,10 @@
-let productData = null;
+import { buildProductData, getFirstMockup, updateMockupThumbnail } from './mockup_utils.js';
+
 window.currentProductId = window.currentProductId || null;
 window.generatedProductId = window.generatedProductId || null;
 window.productCreationPromise = window.productCreationPromise || null;
-
-window.createProduct = function(pd) {
-    return fetch('/wp-admin/admin-ajax.php?action=generate_custom_product', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'product_data=' + encodeURIComponent(JSON.stringify(pd))
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                window.generatedProductId = data.data.product_id;
-                pd.product_id = data.data.product_id;
-                if (window.customizerCache?.designs?.[window.currentProductId]) {
-                    window.customizerCache.designs[window.currentProductId].product_id = data.data.product_id;
-                    if (typeof persistCache === 'function') {
-                        persistCache();
-                    }
-                }
-                return data.data.product_id;
-            }
-            throw new Error(data.data);
-        });
-};
+window.currentLoadingOverlay = window.currentLoadingOverlay || null;
+window.overlayInterval = window.overlayInterval || null;
 
 // Gestion des groupes d'images de la bottom-bar
 const IMAGES_PER_GROUP = 12;
@@ -36,7 +16,6 @@ const mockupTimes = window.mockupTimes;
 // Stocke temporairement le dernier clic avant l'appel à generateMockup
 mockupTimes.pending = null;
 mockupTimes.requestSent = null;
-let currentLoadingOverlay = null;
 let mockupCooldownUntil = 0;
 let cooldownInterval = null;
 const overlayMessages = [
@@ -45,16 +24,7 @@ const overlayMessages = [
     "\uD83D\uDDBC\uFE0F Construction de l'aper\u00E7u...",
     "\uD83D\uDE80 Finalisation..."
 ];
-let overlayInterval = null;
 let overlayIndex = 0;
-
-function getLatestMockup(variant) {
-    return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
-}
-
-function getFirstMockup(variant) {
-    return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id)[0];
-}
 
 // Création de l'info-bulle globale
 const tooltip = document.createElement("div");
@@ -130,9 +100,9 @@ function renderCurrentGroup() {
 }
 
 
-function generateMockup(mockupData) {
+async function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
-        productData = buildProductData(mockupData);
+        buildProductData(mockupData);
 
         console.log('📤 Preparing mockup request', mockupData);
 
@@ -171,24 +141,40 @@ function generateMockup(mockupData) {
                 const textEl = loadingOverlay.querySelector('.loading-text');
                 if (textEl) textEl.textContent = overlayMessages[0];
         }
-        currentLoadingOverlay = loadingOverlay;
+        window.currentLoadingOverlay = loadingOverlay;
         overlayIndex = 0;
-        if (overlayInterval) clearInterval(overlayInterval);
-        overlayInterval = setInterval(() => {
+        if (window.overlayInterval) clearInterval(window.overlayInterval);
+        window.overlayInterval = setInterval(() => {
                 const textEl = loadingOverlay.querySelector('.loading-text');
                 if (!textEl) return;
                 if (overlayIndex + 1 < overlayMessages.length) {
                         overlayIndex++;
                         textEl.textContent = overlayMessages[overlayIndex];
                 } else {
-                        clearInterval(overlayInterval);
-                        overlayInterval = null;
+                        clearInterval(window.overlayInterval);
+                        window.overlayInterval = null;
                 }
         }, 4000);
 
+        let imageBase64 = '';
+        try {
+                const response = await fetch(mockupData.image_url);
+                const blob = await response.blob();
+                imageBase64 = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                });
+        } catch (err) {
+                console.error('❌ Conversion base64 échouée :', err);
+                alert("Impossible de charger l'image sélectionnée.");
+                return;
+        }
+
         const form = new FormData();
         form.append("action", "generate_mockup");
-        form.append("image_url", mockupData.image_url);
+        form.append("image_base64", imageBase64);
         form.append("variant_id", mockupData.variant_id);
         form.append("width", mockupData.width);
         form.append("height", mockupData.height);
@@ -222,64 +208,6 @@ function generateMockup(mockupData) {
                 });
 }
 
-function buildProductData(mockupData) {
-	const productName = jQuery('.product-name').text().trim();
-	const productPrice = selectedVariant.price;
-
-        const productData = {
-                product_name: productName,
-                product_price: productPrice,
-                delivery_price: selectedVariant?.delivery_price,
-                mockup_url: mockupData.generated_mockup_url || "",
-                design_image_url: mockupData.image_url,
-                design_width: mockupData.width,
-                design_height: mockupData.height,
-                design_left: mockupData.left,
-                design_top: mockupData.top,
-                variant_id: mockupData.variant_id,
-                placement: mockupData.placement,
-                technique: mockupData.technique
-        };
-
-        if (window.customizerCache) {
-                window.customizerCache.designs = window.customizerCache.designs || {};
-                window.customizerCache.designs[window.currentProductId] = productData;
-                if (typeof persistCache === 'function') {
-                        persistCache();
-                }
-        }
-
-        return productData;
-}
-
-function cacheUpdatedMockup(viewName, mockupUrl) {
-        if (!selectedVariant) return;
-
-        let mockup = selectedVariant.mockups.find(m => m.view_name == viewName);
-        if (mockup) {
-                mockup.mockup_image = mockupUrl;
-        } else {
-                mockup = { view_name: viewName, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
-                selectedVariant.mockups.push(mockup);
-        }
-
-        const cache = window.customizerCache?.variants?.[window.currentProductId];
-        if (cache && Array.isArray(cache.variants)) {
-                const v = cache.variants.find(v => v.variant_id == selectedVariant.variant_id);
-                if (v) {
-                        let cachedMockup = v.mockups.find(m => m.view_name == viewName);
-                        if (cachedMockup) {
-                                cachedMockup.mockup_image = mockupUrl;
-                        } else {
-                                cachedMockup = { view_name: viewName, mockup_image: mockupUrl, position_top: 0, position_left: 0 };
-                                v.mockups.push(cachedMockup);
-                        }
-                        if (typeof persistCache === 'function') {
-                                persistCache();
-                        }
-                }
-        }
-}
 
 // Réactive le thumbnail actuellement sélectionné
 function triggerSelectedThumbnail() {
@@ -314,83 +242,6 @@ function showRateLimitMessage(seconds) {
 }
 
 
-function updateMockupThumbnail(viewName, mockupUrl) {
-
-        console.log('🆕 Updating mockup thumbnail', { viewName, mockupUrl });
-
-        // 🕒 Log du temps entre l'envoi de la requête et l'affichage de l'image
-        if (mockupTimes.requestSent) {
-                const elapsed = ((Date.now() - mockupTimes.requestSent) / 1000).toFixed(1);
-                console.log(`⏱️ Mockup displayed after ${elapsed}s`);
-                mockupTimes.requestSent = null;
-        }
-
-        const thumbnailsContainer = document.querySelector(".image-thumbnails");
-        if (!thumbnailsContainer) {
-                console.error("❌ Impossible de trouver le conteneur des thumbnails !");
-                return;
-        }
-
-        cacheUpdatedMockup(viewName, mockupUrl);
-        const mockup = selectedVariant.mockups.find(m => m.view_name === viewName);
-
-        let thumbnailToUpdate = document.querySelector(`.thumbnail[data-view-name="${viewName}"]`);
-
-        if (thumbnailToUpdate) {
-                // ✅ Met à jour l'image du thumbnail existant
-                thumbnailToUpdate.src = mockupUrl;
-                thumbnailToUpdate.classList.remove("processing");
-
-        } else {
-                console.warn(`⚠️ Aucun thumbnail trouvé pour la vue ${viewName}, ajout en cours...`);
-
-                // ✅ Création d'un nouveau thumbnail si aucun existant
-                thumbnailToUpdate = document.createElement("img");
-                thumbnailToUpdate.src = mockupUrl;
-                thumbnailToUpdate.alt = `Mockup ${viewName}`;
-                thumbnailToUpdate.classList.add("thumbnail");
-                thumbnailToUpdate.dataset.viewName = viewName;
-                if (mockup?.mockup_id) thumbnailToUpdate.dataset.styleId = mockup.mockup_id;
-
-                // ⚡ Ajoute le gestionnaire de clic comme dans updateThumbnails
-                thumbnailToUpdate.addEventListener('click', function () {
-                        const mainProductImage = document.getElementById('product-main-image');
-                        if (!mainProductImage) return;
-                        if (typeof currentMockup !== 'undefined') currentMockup = mockup;
-                        window.currentMockup = mockup;
-                        mainProductImage.src = this.src;
-                        document.querySelectorAll('.image-thumbnails .thumbnail').forEach(el => el.classList.remove('selected'));
-                        this.classList.add('selected');
-                        if (window.jQuery) jQuery(document).trigger('mockupSelected', [typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant, mockup]);
-                });
-
-                thumbnailsContainer.appendChild(thumbnailToUpdate);
-        }
-
-        // Conserve l'URL du mockup généré pour la création du produit
-        if (productData && viewName === getFirstMockup(selectedVariant)?.view_name) {
-                productData.mockup_url = mockupUrl;
-                if (!window.generatedProductId && !window.productCreationPromise) {
-                        window.productCreationPromise = window.createProduct(productData)
-                                .catch(err => console.error('❌ Product creation failed:', err))
-                                .finally(() => { window.productCreationPromise = null; });
-                }
-        }
-
-        // ✅ Simuler un clic pour mettre à jour l'image principale
-        if (viewName === getFirstMockup(selectedVariant)?.view_name || (window.currentMockup && window.currentMockup.view_name == viewName)) {
-                thumbnailToUpdate.click();
-        }
-
-        if (currentLoadingOverlay) {
-                currentLoadingOverlay.remove();
-                currentLoadingOverlay = null;
-        }
-        if (overlayInterval) {
-                clearInterval(overlayInterval);
-                overlayInterval = null;
-        }
-}
 
 
 function showNextGroup() {
