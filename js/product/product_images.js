@@ -127,7 +127,21 @@ function renderCurrentGroup() {
                 imgElement.addEventListener('click', () => {
                         const addImageToCustomizer = () => {
                                 if (typeof CanvasManager !== 'undefined') {
-                                        CanvasManager.addImage(image.image_url);
+                                        CanvasManager.addImage(image.image_url, () => {
+                                                // Synchronise plusieurs fois pour laisser le temps au modèle 3D de charger
+                                                let attempts = 0;
+                                                const maxAttempts = 10;
+                                                const sync3D = () => {
+                                                        attempts++;
+                                                        if (typeof CanvasManager.syncTo3D === 'function') {
+                                                                CanvasManager.syncTo3D();
+                                                        }
+                                                        if (attempts < maxAttempts) {
+                                                                setTimeout(sync3D, 300);
+                                                        }
+                                                };
+                                                sync3D();
+                                        });
                                 }
                         };
 
