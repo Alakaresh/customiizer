@@ -166,6 +166,7 @@ function renderCurrentGroup() {
                                         jQuery(document).one('variantReady', addImageToCustomizer);
                                         jQuery('.design-button').trigger('click');
                                 }
+
                         } else {
                                 console.warn('jQuery not available, cannot open customizer modal');
                         }
