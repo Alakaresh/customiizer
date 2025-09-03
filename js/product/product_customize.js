@@ -313,7 +313,7 @@ jQuery(document).ready(function ($) {
                        updateAddImageButtonVisibility();
                        if (variant.url_3d) {
                                $('#product3DContainer').show();
-                               init3DScene('product3DContainer', variant.url_3d, variant.color);
+                               init3DScene('product3DContainer', variant.url_3d, variant.color, 'threeDCanvas', false);
                                threeDInitialized = true;
                        } else {
                                $('#product3DContainer').hide();
@@ -386,7 +386,7 @@ jQuery(document).ready(function ($) {
                         // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
-                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color);
+                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color, 'threeDCanvas', false);
                                 threeDInitialized = true;
                         } else {
                                 $('#product3DContainer').hide();
