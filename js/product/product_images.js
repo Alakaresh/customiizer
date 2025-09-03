@@ -125,6 +125,7 @@ function renderCurrentGroup() {
 
                 // 👉 Clique sur une image de la bottom-bar
                 imgElement.addEventListener('click', () => {
+
                         console.log('🖱️ Bottom-bar image clicked', image.image_url);
                         const addImageToCustomizer = () => {
                                 console.log('🧩 addImageToCustomizer invoked');
@@ -153,6 +154,7 @@ function renderCurrentGroup() {
                         };
 
                         if (window.jQuery && jQuery('#customizeModal').is(':visible')) {
+
                                 console.log('Customizer modal already open, adding image directly');
                                 addImageToCustomizer();
                         } else if (window.jQuery) {
