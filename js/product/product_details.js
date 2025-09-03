@@ -433,9 +433,21 @@ jQuery(document).ready(function ($) {
                 loadProductDetails(productId);
         });
 	// ✅ Permet d'ouvrir ou fermer la description détaillée du produit
-$(document).on('click', '.toggle-description', function () {
+        $(document).on('click', '.toggle-description', function () {
         $('.description-content').toggleClass('open');
 });
+
+        $(document).on('mockupSelected', function (e, variant, mockup) {
+                let designUrl = null;
+                if (typeof productData !== 'undefined' && productData?.design_image_url) {
+                        designUrl = productData.design_image_url;
+                } else if (window.customizerCache?.designs?.[window.currentProductId]?.design_image_url) {
+                        designUrl = window.customizerCache.designs[window.currentProductId].design_image_url;
+                }
+                if (designUrl && typeof window.update3DTextureFromImageURL === 'function') {
+                        window.update3DTextureFromImageURL(designUrl, variant?.zone_3d_name || null);
+                }
+        });
 
        function mobileReorder() {
         const isMobile = window.innerWidth <= 1024;

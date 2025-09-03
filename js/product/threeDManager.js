@@ -59,7 +59,7 @@ function parseColorToHex(color) {
         return 0xfafafa;
 }
 
-function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'threeDCanvas') {
+function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'threeDCanvas', restrictVertical = true) {
         const container = document.getElementById(containerId);
         show3DLoader(container);
         const rect = container.getBoundingClientRect();
@@ -132,6 +132,10 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
         controls.enableDamping = true;
         controls.enableZoom = false;
         controls.enablePan = false;
+        if (restrictVertical) {
+                controls.minPolarAngle = Math.PI / 2;
+                controls.maxPolarAngle = Math.PI / 2;
+        }
         // ensure orbit controls keep the chosen vertical offset
         controls.target.set(0, lookAtY, 0);
         controls.update();
@@ -277,6 +281,23 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
         mesh.material.map = texture;
         mesh.material.color.setHex(0xffffff);
         mesh.material.needsUpdate = true;
+};
+
+window.update3DTextureFromImageURL = function (url, zoneName = null) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function () {
+                const offscreen = document.createElement('canvas');
+                offscreen.width = img.width;
+                offscreen.height = img.height;
+                const ctx = offscreen.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                window.update3DTextureFromCanvas(offscreen, zoneName);
+        };
+        img.onerror = function () {
+                console.warn('[3D] ❌ Échec du chargement de la texture :', url);
+        };
+        img.src = url;
 };
 
 // Permet de supprimer la texture appliquée sur le modèle 3D
