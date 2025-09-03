@@ -294,9 +294,23 @@ body {
 
 /* Style pour l'image du produit */
 .product-image {
-	position: absolute;
-	transform: translateX(-50%);
-	width: 40%;
+        position: absolute;
+        transform: translateX(-50%);
+        width: 40%;
+}
+
+/* 🆕 Conteneur principal pour l'affichage 3D du produit */
+#productMain3DContainer {
+        position: absolute;
+        transform: translateX(-50%);
+        width: 40%;
+        aspect-ratio: 1/1;
+        display: none;
+}
+
+#productMain3DContainer canvas {
+        width: 100%;
+        height: 100%;
 }
 
 /* Position et style des bulles d'images */
@@ -310,13 +324,23 @@ body {
 }
 
 .thumbnail {
-	width: 80px;
-	height: 80px;
-	border-radius: 50%;
-	cursor: pointer;
-	border: 2px solid #fff;
-	transition: border-color 0.3s ease;
-	object-fit: cover;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #fff;
+        transition: border-color 0.3s ease;
+        object-fit: cover;
+}
+
+/* 🆕 Vignette dédiée à l'affichage 3D */
+.thumbnail.three-d-thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eee;
+        font-weight: bold;
+        color: #333;
 }
 
 .thumbnail:hover {

@@ -51,6 +51,7 @@ jQuery(document).ready(function ($) {
         const mainProductImage = $('#product-main-image');
 
         let currentVariants = [];
+        let main3DInitialized = false;
 
         // Préchargement du template et du modèle 3D pour une variante
         async function preloadVariantAssets(variant) {
@@ -213,6 +214,11 @@ jQuery(document).ready(function ($) {
                                 'top': `${currentMockup.position_top}%`,
                                 'left': `${currentMockup.position_left}%`
                         });
+                        // 🆕 Aligne le conteneur 3D sur l'image principale
+                        jQuery('#productMain3DContainer').css({
+                                'top': `${currentMockup.position_top}%`,
+                                'left': `${currentMockup.position_left}%`
+                        });
                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
 
                 }
@@ -358,6 +364,10 @@ jQuery(document).ready(function ($) {
 
         function updateThumbnails(variants) {
                 const thumbnailsContainer = $('.image-thumbnails').empty();
+                // 🧹 Réinitialise l'affichage 3D
+                jQuery('#productMain3DContainer').hide();
+                mainProductImage.show();
+                main3DInitialized = false;
 
                 const hideExtra = shouldShowSingleMockup();
 
@@ -377,6 +387,8 @@ jQuery(document).ready(function ($) {
                                                 'top': `${mockup.position_top}%`,
                                                 'left': `${mockup.position_left}%`
                                         });
+                                        jQuery('#productMain3DContainer').hide();
+                                        mainProductImage.show();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
@@ -387,6 +399,28 @@ jQuery(document).ready(function ($) {
                                 if (index === 0) imgElement.addClass('selected');
                         });
                 });
+
+                // 🆕 Ajoute une vignette pour l'affichage 3D si disponible
+                const variant = variants[0];
+                if (variant && variant.url_3d) {
+                        const threeDThumb = $('<div>')
+                                .addClass('thumbnail three-d-thumb')
+                                .text('3D')
+                                .on('click', function () {
+                                        $('.image-thumbnails .thumbnail').removeClass('selected');
+                                        $(this).addClass('selected');
+                                        mainProductImage.hide();
+                                        const container = jQuery('#productMain3DContainer');
+                                        container.show();
+                                        if (!main3DInitialized) {
+                                                requestAnimationFrame(() => {
+                                                        init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
+                                                });
+                                                main3DInitialized = true;
+                                        }
+                                });
+                        thumbnailsContainer.append(threeDThumb);
+                }
 
                 // 🚀 S'assure que le thumbnail sélectionné déclenche bien ses évènements
                 const selectedThumb = thumbnailsContainer.find('.thumbnail.selected');
