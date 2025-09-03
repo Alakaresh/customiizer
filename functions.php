@@ -129,7 +129,6 @@ add_action( 'init', function() {
                 '/includes/mockup_tasks.php',
                 '/includes/get_user_details.php',
                 '/includes/generate_mockup.php',
-                '/includes/generate_mockup_from_canvas.php',
                 '/includes/signin.php',
                 '/includes/signup.php',
                 '/includes/google_login.php',

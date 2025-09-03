@@ -49,7 +49,7 @@ jQuery(document).ready(function ($) {
 
                 const base64 = CanvasManager.exportPrintAreaPNG();
                 const formData = new FormData();
-                formData.append('action', 'generate_mockup_from_canvas');
+                formData.append('action', 'generate_mockup');
                 formData.append('image_base64', base64);
                 formData.append('product_id', window.currentProductId || '');
                 formData.append('variant_id', selectedVariant?.variant_id || '');
