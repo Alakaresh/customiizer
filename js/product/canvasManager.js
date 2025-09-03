@@ -94,8 +94,8 @@ const CanvasManager = {
 
        addImage: function (url, callback) {
                fabric.Image.fromURL(url, function (img) {
-			const drawX = template.print_area_left;
-			const drawY = template.print_area_top;
+                        const drawX = template.print_area_left;
+                        const drawY = template.print_area_top;
 
 			const scale = Math.min(
 				template.print_area_width / img.width,
@@ -157,6 +157,63 @@ const CanvasManager = {
                        }, 0);
 
 
+               }, { crossOrigin: 'anonymous' });
+       },
+
+       restoreFromProductData: function (data, callback) {
+               if (!data || !data.design_image_url) return;
+               fabric.Image.fromURL(data.design_image_url, function (img) {
+                        const scaleX = data.design_width / img.width;
+                        const scaleY = data.design_height / img.height;
+                       img.set({
+                                left: template.print_area_left + data.design_left,
+                                top: template.print_area_top + data.design_top,
+                                scaleX: scaleX,
+                                scaleY: scaleY,
+                                originX: 'left',
+                                originY: 'top',
+                                selectable: true,
+                                hasControls: true,
+                                lockRotation: false,
+                                lockUniScaling: true,
+                                hasRotatingPoint: true,
+                                angle: data.design_angle || 0,
+                                flipX: data.design_flipX || false,
+                        });
+                        img.setControlsVisibility({
+                                tl: true,
+                                tr: true,
+                                bl: true,
+                                br: true,
+                                mt: false,
+                                mb: false,
+                                ml: false,
+                                mr: false,
+                                mtr: true
+                        });
+                        img.clipPath = new fabric.Rect({
+                                left: template.print_area_left,
+                                top: template.print_area_top,
+                                width: template.print_area_width,
+                                height: template.print_area_height,
+                                originX: 'left',
+                                originY: 'top',
+                                absolutePositioned: true
+                        });
+                        canvas.add(img);
+                        img.setCoords();
+                        canvas.bringToFront(productOverlay);
+                        canvas.bringToFront(guideGroup);
+                        canvas.renderAll();
+
+                        setTimeout(() => {
+                                canvas.setActiveObject(img);
+                                canvas.renderAll();
+                                if (typeof callback === 'function') {
+                                        callback();
+                                }
+                                CanvasManager.syncTo3D();
+                        }, 0);
                }, { crossOrigin: 'anonymous' });
        },
 
@@ -244,6 +301,20 @@ const CanvasManager = {
        hasImage: function () {
                if (!canvas) return false;
                return canvas.getObjects().some(obj => obj.type === 'image');
+       },
+
+       getCurrentImageData: function () {
+               if (!canvas) return null;
+               const img = canvas.getObjects().find(obj => obj.type === 'image');
+               if (!img) return null;
+               return {
+                       left: img.left - template.print_area_left,
+                       top: img.top - template.print_area_top,
+                       width: img.width * img.scaleX,
+                       height: img.height * img.scaleY,
+                       angle: img.angle || 0,
+                       flipX: !!img.flipX
+               };
        },
 
        syncTo3D: function () {

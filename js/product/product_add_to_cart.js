@@ -46,14 +46,16 @@ jQuery(document).ready(function($) {
                                 mockup_url: getAbsoluteUrl(getLatestMockup(selectedVariant)?.mockup_image || ''),
 				design_image_url: '',
 				design_width: selectedVariant.print_area_width || 0,
-				design_height: selectedVariant.print_area_height || 0,
-				design_left: 0,
-				design_top: 0,
-				variant_id: selectedVariant.variant_id,
-				placement: selectedVariant.placement || 'default',
-				technique: selectedVariant.technique || 'sublimation'
-			};
-		} else {
+                                design_height: selectedVariant.print_area_height || 0,
+                                design_left: 0,
+                                design_top: 0,
+                                design_angle: 0,
+                                design_flipX: false,
+                                variant_id: selectedVariant.variant_id,
+                                placement: selectedVariant.placement || 'default',
+                                technique: selectedVariant.technique || 'sublimation'
+                        };
+                } else {
 			alert("Erreur : Aucun produit ou variante sélectionné !");
 			console.error("❌ Aucun produit ou variante sélectionné.");
 			return;
