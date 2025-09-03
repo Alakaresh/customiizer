@@ -114,14 +114,51 @@ function renderCurrentGroup() {
 			tooltip.style.pointerEvents = "none"; // Empêche l'info-bulle d'interagir
 		});
 
-		imgElement.addEventListener("mousemove", (event) => {
-			tooltip.style.left = `${event.pageX + 10}px`;
-			tooltip.style.top = `${event.pageY + 10}px`;
-		});
+                imgElement.addEventListener("mousemove", (event) => {
+                        tooltip.style.left = `${event.pageX + 10}px`;
+                        tooltip.style.top = `${event.pageY + 10}px`;
+                });
 
-		imgElement.addEventListener("mouseleave", () => {
-			tooltip.style.opacity = "0";
-		});
+                imgElement.addEventListener("mouseleave", () => {
+                        tooltip.style.opacity = "0";
+                });
+
+                imgElement.addEventListener("click", () => {
+                        if (!selectedVariant) return;
+                        mockupTimes.pending = Date.now();
+
+                        if (window.CanvasManager) {
+                                CanvasManager.addImage(image.image_url, () => {
+                                        const base64 = CanvasManager.exportPrintAreaPNG();
+                                        const mockupData = {
+                                                image_url: image.image_url,
+                                                image_base64: base64,
+                                                product_id: window.currentProductId,
+                                                variant_id: selectedVariant.variant_id,
+                                                placement: selectedVariant.placement,
+                                                technique: selectedVariant.technique,
+                                                width: selectedVariant.print_area_width,
+                                                height: selectedVariant.print_area_height,
+                                                left: 0,
+                                                top: 0
+                                        };
+                                        generateMockup(mockupData);
+                                });
+                        } else {
+                                const mockupData = {
+                                        image_url: image.image_url,
+                                        product_id: window.currentProductId,
+                                        variant_id: selectedVariant.variant_id,
+                                        placement: selectedVariant.placement,
+                                        technique: selectedVariant.technique,
+                                        width: selectedVariant.print_area_width,
+                                        height: selectedVariant.print_area_height,
+                                        left: 0,
+                                        top: 0
+                                };
+                                generateMockup(mockupData);
+                        }
+                });
 
                 contentDiv.appendChild(imgElement);
         });
@@ -190,12 +227,14 @@ async function generateMockup(mockupData) {
                 }
         }, 4000);
 
-        let base64Image;
-        try {
-                base64Image = await imageUrlToBase64(mockupData.image_url);
-        } catch (err) {
-                console.error('❌ Impossible de convertir l\'image en base64', err);
-                return;
+        let base64Image = mockupData.image_base64;
+        if (!base64Image) {
+                try {
+                        base64Image = await imageUrlToBase64(mockupData.image_url);
+                } catch (err) {
+                        console.error('❌ Impossible de convertir l\'image en base64', err);
+                        return;
+                }
         }
 
         const form = new FormData();
