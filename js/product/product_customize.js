@@ -1,3 +1,5 @@
+import { buildProductData, getFirstMockup, updateMockupThumbnail } from './mockup_utils.js';
+
 window.currentProductId = window.currentProductId || null;
 // Objet partagé pour mesurer les temps de génération de mockup
 window.mockupTimes = window.mockupTimes || {};
@@ -48,13 +50,23 @@ jQuery(document).ready(function ($) {
                 }
 
                 const base64 = CanvasManager.exportPrintAreaPNG();
+                const mockupData = {
+                        image_base64: base64,
+                        product_id: window.currentProductId || null,
+                        variant_id: selectedVariant?.variant_id || null,
+                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || null,
+                        technique: selectedVariant?.technique || null,
+                        width: selectedVariant.print_area_width,
+                        height: selectedVariant.print_area_height,
+                        left: 0,
+                        top: 0
+                };
+                buildProductData(mockupData);
+
                 const formData = new FormData();
-                formData.append('action', 'generate_mockup_from_canvas');
+                formData.append('action', 'generate_mockup');
                 formData.append('image_base64', base64);
-                formData.append('product_id', window.currentProductId || '');
                 formData.append('variant_id', selectedVariant?.variant_id || '');
-                formData.append('placement', selectedVariant?.placement || selectedVariant?.zone_3d_name || '');
-                formData.append('technique', selectedVariant?.technique || '');
                 formData.append('width', selectedVariant.print_area_width);
                 formData.append('height', selectedVariant.print_area_height);
                 formData.append('left', 0);
