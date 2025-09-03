@@ -165,6 +165,7 @@ const CanvasManager = {
                fabric.Image.fromURL(data.design_image_url, function (img) {
                         const scaleX = data.design_width / img.width;
                         const scaleY = data.design_height / img.height;
+
                        img.set({
                                 left: template.print_area_left + data.design_left,
                                 top: template.print_area_top + data.design_top,
