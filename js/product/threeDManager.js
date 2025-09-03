@@ -75,7 +75,7 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
 
 	// Position par défaut
 	let camY = 0;
-	let camZ = 0.5;
+	let camZ = 0.25;
 	let lookAtY = 0;
 
 	// Ajustements spécifiques
