@@ -66,6 +66,29 @@ jQuery(document).ready(function ($) {
                 }
                 window.mockupTimes.requestSent = requestStart;
 
+                // Mise en cache locale de la personnalisation pour réouverture future
+                const productData = {
+                        product_name: jQuery('.product-name').text().trim(),
+                        product_price: selectedVariant.price,
+                        delivery_price: selectedVariant?.delivery_price,
+                        mockup_url: '',
+                        design_image_url: base64,
+                        design_width: selectedVariant.print_area_width,
+                        design_height: selectedVariant.print_area_height,
+                        design_left: 0,
+                        design_top: 0,
+                        variant_id: selectedVariant?.variant_id,
+                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
+                        technique: selectedVariant?.technique || ''
+                };
+                if (window.customizerCache) {
+                        window.customizerCache.designs = window.customizerCache.designs || {};
+                        window.customizerCache.designs[window.currentProductId] = productData;
+                        if (typeof persistCache === 'function') {
+                                persistCache();
+                        }
+                }
+
                 const firstViewName = getFirstMockup(selectedVariant)?.view_name;
 
                 fetch(ajaxurl, { method: 'POST', body: formData })
@@ -73,12 +96,27 @@ jQuery(document).ready(function ($) {
                         .then(data => {
                                 if (data.success && Array.isArray(data.data?.files)) {
                                         window.mockupTimes.pending = null;
+                                        const designFile = data.data.files.find(f => f.name === 'design');
+                                        const mockupFile = data.data.files.find(f => f.name !== 'design') || data.data.files[0];
+                                        if (designFile) {
+                                                productData.design_image_url = designFile.url;
+                                        }
+                                        if (mockupFile) {
+                                                productData.mockup_url = mockupFile.url;
+                                        }
                                         data.data.files.forEach(f => updateMockupThumbnail(f.name, f.url));
                                 } else if (data.success && data.data?.mockup_url && firstViewName) {
                                         window.mockupTimes.pending = null;
+                                        productData.mockup_url = data.data.mockup_url;
                                         updateMockupThumbnail(firstViewName, data.data.mockup_url);
                                 } else {
                                         alert("Erreur lors de la génération du mockup");
+                                }
+                                if (window.customizerCache?.designs?.[window.currentProductId]) {
+                                        window.customizerCache.designs[window.currentProductId] = productData;
+                                        if (typeof persistCache === 'function') {
+                                                persistCache();
+                                        }
                                 }
                         })
                         .catch(err => {
@@ -335,6 +373,12 @@ jQuery(document).ready(function ($) {
                         // 2. Lancer Fabric.js dans le container
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
+                        const savedDesign = window.customizerCache?.designs?.[window.currentProductId];
+                        if (savedDesign && savedDesign.design_image_url) {
+                                CanvasManager.restoreFromProductData(savedDesign, () => {
+                                        updateAddImageButtonVisibility();
+                                });
+                        }
 
                         // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {
