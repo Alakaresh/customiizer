@@ -6,12 +6,12 @@
 
     function buildProductData(mockupData) {
         const productName = jQuery('.product-name').text().trim();
-        const productPrice = selectedVariant.price;
+        const productPrice = window.selectedVariant?.price;
 
         window.productData = {
             product_name: productName,
             product_price: productPrice,
-            delivery_price: selectedVariant?.delivery_price,
+            delivery_price: window.selectedVariant?.delivery_price,
             mockup_url: mockupData.generated_mockup_url || '',
             design_image_url: mockupData.image_base64 || mockupData.image_url,
             design_width: mockupData.width,
@@ -35,6 +35,7 @@
     }
 
     function cacheUpdatedMockup(viewName, mockupUrl) {
+        const selectedVariant = window.selectedVariant;
         if (!selectedVariant) return;
 
         let mockup = selectedVariant.mockups.find(m => m.view_name == viewName);
@@ -89,7 +90,14 @@
     window.createProduct = createProduct;
 
     function getFirstMockup(variant) {
-        return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id)[0];
+        if (!variant?.mockups?.length) return null;
+        const seen = new Set();
+        const unique = variant.mockups.filter(m => {
+            if (seen.has(m.mockup_image)) return false;
+            seen.add(m.mockup_image);
+            return true;
+        });
+        return unique.slice().sort((a, b) => a.mockup_id - b.mockup_id)[0];
     }
 
     function updateMockupThumbnail(viewName, mockupUrl) {
@@ -108,7 +116,8 @@
         }
 
         cacheUpdatedMockup(viewName, mockupUrl);
-        const mockup = selectedVariant.mockups.find(m => m.view_name === viewName);
+        const selectedVariant = window.selectedVariant;
+        const mockup = selectedVariant?.mockups.find(m => m.view_name === viewName);
 
         let thumbnailToUpdate = document.querySelector(`.thumbnail[data-view-name="${viewName}"]`);
 
@@ -131,7 +140,7 @@
                 mainProductImage.src = this.src;
                 document.querySelectorAll('.image-thumbnails .thumbnail').forEach(el => el.classList.remove('selected'));
                 this.classList.add('selected');
-                if (window.jQuery) jQuery(document).trigger('mockupSelected', [typeof selectedVariant !== 'undefined' ? selectedVariant : window.selectedVariant, mockup]);
+                if (window.jQuery) jQuery(document).trigger('mockupSelected', [window.selectedVariant, mockup]);
             });
             thumbnailsContainer.appendChild(thumbnailToUpdate);
         }

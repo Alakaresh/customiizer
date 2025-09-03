@@ -1,4 +1,8 @@
-const { buildProductData, getFirstMockup, updateMockupThumbnail } = window.mockupUtils || {};
+
+var mockupUtils = window.mockupUtils || {};
+var buildProductData = mockupUtils.buildProductData;
+var getFirstMockup = mockupUtils.getFirstMockup;
+var updateMockupThumbnail = mockupUtils.updateMockupThumbnail;
 
 window.currentProductId = window.currentProductId || null;
 window.generatedProductId = window.generatedProductId || null;
@@ -81,11 +85,11 @@ function renderCurrentGroup() {
                         const mockupData = {
                                 image_url: image.image_url,
                                 product_id: window.currentProductId || null,
-                                variant_id: selectedVariant?.variant_id || null,
-                                placement: selectedVariant?.placement || null,
-                                technique: selectedVariant?.technique || null,
-                                width: selectedVariant?.print_area_width || null,
-                                height: selectedVariant?.print_area_height || null,
+                                variant_id: window.selectedVariant?.variant_id || null,
+                                placement: window.selectedVariant?.placement || null,
+                                technique: window.selectedVariant?.technique || null,
+                                width: window.selectedVariant?.print_area_width || null,
+                                height: window.selectedVariant?.print_area_height || null,
                                 left: 0,
                                 top: 0
                         };
@@ -114,7 +118,7 @@ async function generateMockup(mockupData) {
                 return;
         }
 
-        if (!mockupData || !selectedVariant?.mockups?.length) {
+        if (!mockupData || !window.selectedVariant?.mockups?.length) {
                 console.error("❌ Données insuffisantes pour générer un mockup.");
                 alert("Impossible de générer le mockup. Données manquantes.");
                 return;
@@ -183,7 +187,7 @@ async function generateMockup(mockupData) {
         form.append("left", mockupData.left);
         form.append("top", mockupData.top);
 
-        const firstViewName = getFirstMockup(selectedVariant)?.view_name;
+        const firstViewName = getFirstMockup(window.selectedVariant)?.view_name;
 
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
