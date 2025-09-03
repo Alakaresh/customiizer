@@ -119,9 +119,25 @@ function renderCurrentGroup() {
 			tooltip.style.top = `${event.pageY + 10}px`;
 		});
 
-		imgElement.addEventListener("mouseleave", () => {
-			tooltip.style.opacity = "0";
-		});
+                imgElement.addEventListener("mouseleave", () => {
+                        tooltip.style.opacity = "0";
+                });
+
+                // 👉 Clique sur une image de la bottom-bar
+                imgElement.addEventListener('click', () => {
+                        const addImageToCustomizer = () => {
+                                if (typeof CanvasManager !== 'undefined') {
+                                        CanvasManager.addImage(image.image_url);
+                                }
+                        };
+
+                        if (window.jQuery && jQuery('#customizeModal').is(':visible')) {
+                                addImageToCustomizer();
+                        } else if (window.jQuery) {
+                                jQuery(document).one('variantReady', addImageToCustomizer);
+                                jQuery('.design-button').trigger('click');
+                        }
+                });
 
                 contentDiv.appendChild(imgElement);
         });
