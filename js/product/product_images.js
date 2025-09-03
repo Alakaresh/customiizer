@@ -1,3 +1,4 @@
+
 function buildProductData(data) {
     return window.mockupUtils && typeof window.mockupUtils.buildProductData === 'function'
         ? window.mockupUtils.buildProductData(data)
@@ -16,6 +17,7 @@ function updateMockupThumbnail(viewName, mockupUrl) {
         window.mockupUtils.updateMockupThumbnail(viewName, mockupUrl);
     }
 }
+
 
 window.currentProductId = window.currentProductId || null;
 window.generatedProductId = window.generatedProductId || null;
@@ -228,7 +230,6 @@ async function generateMockup(mockupData) {
 }
 
 window.generateMockup = generateMockup;
-
 
 // Réactive le thumbnail actuellement sélectionné
 function triggerSelectedThumbnail() {
