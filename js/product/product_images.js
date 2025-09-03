@@ -119,9 +119,39 @@ function renderCurrentGroup() {
 			tooltip.style.top = `${event.pageY + 10}px`;
 		});
 
-		imgElement.addEventListener("mouseleave", () => {
-			tooltip.style.opacity = "0";
-		});
+                imgElement.addEventListener("mouseleave", () => {
+                        tooltip.style.opacity = "0";
+                });
+
+                // 👉 Clique sur une image de la bottom-bar
+                imgElement.addEventListener('click', () => {
+                        const addImageToCustomizer = () => {
+                                if (typeof CanvasManager !== 'undefined') {
+                                        CanvasManager.addImage(image.image_url, () => {
+                                                // Synchronise plusieurs fois pour laisser le temps au modèle 3D de charger
+                                                let attempts = 0;
+                                                const maxAttempts = 10;
+                                                const sync3D = () => {
+                                                        attempts++;
+                                                        if (typeof CanvasManager.syncTo3D === 'function') {
+                                                                CanvasManager.syncTo3D();
+                                                        }
+                                                        if (attempts < maxAttempts) {
+                                                                setTimeout(sync3D, 300);
+                                                        }
+                                                };
+                                                sync3D();
+                                        });
+                                }
+                        };
+
+                        if (window.jQuery && jQuery('#customizeModal').is(':visible')) {
+                                addImageToCustomizer();
+                        } else if (window.jQuery) {
+                                jQuery(document).one('variantReady', addImageToCustomizer);
+                                jQuery('.design-button').trigger('click');
+                        }
+                });
 
                 contentDiv.appendChild(imgElement);
         });
