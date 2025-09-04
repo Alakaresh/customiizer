@@ -162,14 +162,15 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 
     mesh.material.map = texture;
 
-    // ✅ On garde la couleur de base comme fond
+    // ✅ garder la couleur de base pour les zones transparentes
     if (mesh.material.userData?.baseColor !== undefined) {
         mesh.material.color.setHex(mesh.material.userData.baseColor);
     } else {
         mesh.material.color.set(0xffffff);
     }
 
-    mesh.material.transparent = true;
+    mesh.material.transparent = false;   // pas de full transparence
+    mesh.material.alphaTest = 0.01;      // coupe les pixels vraiment transparents
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
@@ -189,14 +190,14 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
 
         mesh.material.map = texture;
 
-        // ✅ Restaure couleur de fond
         if (mesh.material.userData?.baseColor !== undefined) {
             mesh.material.color.setHex(mesh.material.userData.baseColor);
         } else {
             mesh.material.color.set(0xffffff);
         }
 
-        mesh.material.transparent = true;
+        mesh.material.transparent = false;
+        mesh.material.alphaTest = 0.01;
         mesh.material.needsUpdate = true;
 
         console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
@@ -204,6 +205,7 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
 };
+
 
 
 window.clear3DTexture = function (zoneName = null) {
