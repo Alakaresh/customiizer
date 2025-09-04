@@ -148,41 +148,19 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 
     console.log("[3D Debug] mesh.material", mesh.material);
     console.log("[3D Debug] baseColor", mesh.userData?.baseColor);
-    console.log("[3D Debug] baseMap", mesh.userData?.baseMap);
 
-    let baseColor = mesh.userData?.baseColor ?? null;
-    let baseMap = mesh.userData?.baseMap ?? null;
-
-    const offscreen = document.createElement("canvas");
-    offscreen.width = canvas.width;
-    offscreen.height = canvas.height;
-    const ctx = offscreen.getContext("2d");
-
-    if (baseMap?.image) {
-        ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
-        console.log("[3D Debug] Fond → baseMap dessinée");
-    } else if (baseColor) {
-        ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
-        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-        console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
-    } else {
-        console.log("[3D Debug] Aucun fond d'origine, fallback blanc");
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-    }
-
-    ctx.drawImage(canvas, 0, 0);
-    console.log("[3D Debug] Canvas personnalisé dessiné");
-
-    const texture = new THREE.CanvasTexture(offscreen);
+    const texture = new THREE.CanvasTexture(canvas);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    mesh.material = new THREE.MeshBasicMaterial({ map: texture });
+    // 👉 On garde le même matériau et on injecte la texture
+    mesh.material.map = texture;
+    mesh.material.color.setHex(mesh.userData?.baseColor ?? 0xffffff);
+    mesh.material.transparent = false;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée sans perdre la couleur de base sur", mesh.name);
 };
 
 // 📌 Nettoyer la texture et restaurer la couleur
