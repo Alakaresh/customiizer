@@ -95,17 +95,34 @@ function loadModel(modelUrl) {
             const name = child.name.toLowerCase();
 
             if (name.startsWith("impression")) {
-                printableMeshes[child.name] = child;
+    printableMeshes[child.name] = child;
 
-                // 👉 Sauvegarde la couleur de base
-                child.material.userData.baseColor = child.material.color.getHex();
+    // Sauvegarde pour restauration ultérieure
+    child.userData.baseColor    = (child.material?.color?.getHex?.() ?? 0xffffff);
+    child.userData.origMaterial = child.material;
 
-                // ⚡ On NE change pas le matériau, donc il reste visible par défaut
-                // On s'assure juste qu'il ne soit pas transparent
-                child.material.transparent = false;
-                child.material.opacity = 1.0;
-                child.material.needsUpdate = true;
-            }
+    // Rendre visible par défaut et éviter le z-fighting
+    child.material.transparent   = false;
+    child.material.opacity       = 1.0;
+    child.material.alphaTest     = 0;
+    child.material.blending      = THREE.NormalBlending;
+    child.material.depthWrite    = true;
+    child.material.colorWrite    = true;
+
+    // Pousse très légèrement la zone vers la caméra
+    child.material.polygonOffset       = true;
+    child.material.polygonOffsetFactor = -2;
+    child.material.polygonOffsetUnits  = -2;
+
+    // S’assure que ça passe au-dessus si nécessaire
+    child.renderOrder = 999;
+
+    // Si jamais les normales sont bizarres :
+    // child.material.side = THREE.DoubleSide;
+
+    child.material.needsUpdate = true;
+}
+
         });
 
         scene.add(gltf.scene);
