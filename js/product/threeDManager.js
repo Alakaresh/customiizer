@@ -181,23 +181,29 @@ function loadModel(modelUrl, productColor = null) {
 
         const glbElements = [];
         gltf.scene.traverse((child) => {
-            if (!child.isMesh) return;
+		    if (!child.isMesh) return;
+		
+		    const name = child.name.toLowerCase();
+		
+		    // ⚡ désactive toujours la transparence par défaut
+		    if (child.material) {
+		        child.material.transparent = false;   // pas de transparence
+		        child.material.opacity = 1.0;         // 100% opaque
+		        child.material.depthWrite = true;     // évite les bugs de rendu
+		        child.material.needsUpdate = true;
+		    }
+		
+		    if (name.startsWith("impression")) {
+		        printableMeshes[child.name] = child;
+		
+		        if (child.material && child.material.userData?.baseColor === undefined) {
+		            child.material.userData.baseColor = child.material.color.getHex();
+		        }
+		
+		        console.log("[3D] Zone imprimable détectée :", child.name);
+		    }
+		});
 
-            const name = child.name.toLowerCase();
-            glbElements.push(name);
-
-            // 🎯 Zones imprimables uniquement
-            if (name.startsWith("impression")) {
-                printableMeshes[child.name] = child;
-
-                // Sauvegarde la couleur GLB d’origine pour pouvoir la restaurer plus tard
-                if (child.material && child.material.userData?.baseColor === undefined) {
-                    child.material.userData.baseColor = child.material.color.getHex();
-                }
-
-                console.log("[3D] Zone imprimable détectée :", child.name);
-            }
-        });
 
         console.log('[3D Debug] GLB elements:', glbElements);
         scene.add(gltf.scene);
