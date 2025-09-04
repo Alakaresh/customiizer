@@ -129,23 +129,7 @@ function animate() {
     }
 }
 
-// --- API globale ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
-    if (!canvas) return;
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
-    texture.needsUpdate = true;
 
-    let mesh = zoneName ? printableMeshes[zoneName] : Object.values(printableMeshes)[0];
-    if (!mesh) {
-        console.warn("[3D] ❌ Zone imprimable non trouvée :", zoneName);
-        return;
-    }
-
-    mesh.material.map = texture;
-    mesh.material.color.setHex(0xffffff); // neutraliser la teinte
-    mesh.material.needsUpdate = true;
-};
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
     const img = new Image();
