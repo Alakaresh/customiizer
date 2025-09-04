@@ -128,33 +128,3 @@ function animate() {
         renderer.render(scene, camera);
     }
 }
-
-
-
-window.update3DTextureFromImageURL = function (url, zoneName = null) {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function () {
-        const offscreen = document.createElement('canvas');
-        offscreen.width = img.width;
-        offscreen.height = img.height;
-        const ctx = offscreen.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        window.update3DTextureFromCanvas(offscreen, zoneName);
-    };
-    img.onerror = () => console.warn('[3D] ❌ Échec du chargement texture :', url);
-    img.src = url;
-};
-
-window.clear3DTexture = function (zoneName = null) {
-    let mesh = zoneName ? printableMeshes[zoneName] : Object.values(printableMeshes)[0];
-    if (!mesh) {
-        console.warn("[3D] ❌ Zone imprimable non trouvée pour :", zoneName);
-        return;
-    }
-    mesh.material.map = null;
-    if (mesh.material.userData?.baseColor !== undefined) {
-        mesh.material.color.setHex(mesh.material.userData.baseColor);
-    }
-    mesh.material.needsUpdate = true;
-};
