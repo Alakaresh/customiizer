@@ -130,6 +130,8 @@ function loadModel(modelUrl) {
                 printableMeshes[child.name] = child;
 
                 // Sauvegarde couleur + map d’origine
+                // Sauvegarde complète du matériau original
+                child.userData.originalMaterial = child.material.clone();
                 child.userData.baseColor = child.material.color.getHex();
                 if (child.material.map) {
                     child.userData.baseMap = child.material.map.clone();
