@@ -95,6 +95,12 @@ function loadModel(modelUrl) {
         printableMeshes = {};
 
         gltf.scene.traverse((child) => {
+            if (child.isMesh && child.material) {
+                child.material.transparent = false;
+                child.material.opacity = 1.0;
+                child.material.depthWrite = true;
+                child.material.needsUpdate = true;
+            }
             if (!child.isMesh) return;
             const name = child.name.toLowerCase();
 
