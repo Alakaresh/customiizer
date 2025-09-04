@@ -233,9 +233,12 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     // 👉 Le matériau doit être blanc pour ne pas altérer la texture
     mesh.material.map = texture;
     mesh.material.color.setHex(0xffffff);
-    mesh.material.transparent = false;
-    mesh.material.needsUpdate = true;
+    mesh.material.transparent = true; // autoriser transparence si besoin
+    mesh.material.opacity = 1.0;
 
+    // 👉 Empêcher l'éclairage d’assombrir les couleurs
+    mesh.material.toneMapped = false;  // désactive la correction tonemapping
+    mesh.material.needsUpdate = true;
     console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
 };
 
