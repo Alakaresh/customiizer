@@ -151,6 +151,7 @@ function customiizer_enqueue_customize_assets() {
                 wp_enqueue_script('fabric-js', 'https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js', [], $ver, true);
                 wp_enqueue_script('three-js', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', [], $ver, true);
                 wp_enqueue_script('gltf-loader', get_stylesheet_directory_uri() . '/assets/GLTFLoader.js', ['three-js'], $ver, true);
+                wp_enqueue_script('rgbe-loader', get_stylesheet_directory_uri() . '/assets/RGBELoader.js', ['three-js'], $ver, true);
                 wp_enqueue_script('orbit-controls', get_stylesheet_directory_uri() . '/assets/OrbitControls.js', ['three-js'], $ver, true);
 
 		// --- JS internes ---
