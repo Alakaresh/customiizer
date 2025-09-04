@@ -59,7 +59,7 @@ const CanvasManager = {
 		});
 
 		// 📷 Image de fond (template Printful)
-		ffabric.Image.fromURL(template.image_url, function (img) {
+		fabric.Image.fromURL(template.image_url, function (img) {
     const scaleX = template.template_width / img.width;
     const scaleY = template.template_height / img.height;
 
