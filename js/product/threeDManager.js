@@ -209,7 +209,8 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 }
 
 // --- Appliquer une texture depuis Canvas ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
+// --- Appliquer une texture depuis Canvas ---
+window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = false) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
@@ -218,11 +219,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // 🎨 Fond noir pur (zones sans image)
-    //ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-
-    // 🎨 Dessine l'image par-dessus
+    ctx.clearRect(0, 0, offscreen.width, offscreen.height);
     ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
@@ -230,17 +227,31 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
-    mesh.material.map = texture;
-    mesh.material.color.setHex(0xffffff);
-    mesh.material.transparent = true; // autoriser transparence si besoin
-    mesh.material.opacity = 1.0;
+    if (isFull) {
+        // 🟢 Image pleine → MeshBasicMaterial (pas de reflets HDR, fidèle à l'image)
+        mesh.material = new THREE.MeshBasicMaterial({
+            map: texture,
+            color: 0xffffff,
+            transparent: false,
+            opacity: 1.0
+        });
+    } else {
+        // 🟢 Image partielle → MeshStandardMaterial (zones vides = mesh noir visible)
+        mesh.material = new THREE.MeshStandardMaterial({
+            map: texture,
+            color: 0x000000,
+            transparent: true,
+            opacity: 1.0,
+            roughness: 1.0,
+            metalness: 0.0,
+            toneMapped: false
+        });
+    }
 
-    // 👉 Empêcher l'éclairage d’assombrir les couleurs
-    mesh.material.toneMapped = false;  // désactive la correction tonemapping
     mesh.material.needsUpdate = true;
-    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
+    console.log(`[3D] ✅ Texture appliquée sur ${mesh.name}, mode ${isFull ? "PLEIN" : "PARTIEL"}`);
 };
+
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
