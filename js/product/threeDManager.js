@@ -162,7 +162,8 @@ function loadModel(modelUrl, productColor = null) {
                         if (!child.isMesh) return;
 
                         glbElements.push(child.name);
-                        child.geometry.computeVertexNormals();
+                        // child.geometry.computeVertexNormals();  // ❌ à désactiver si le modèle a déjà ses normales
+
 
                         const name = child.name.toLowerCase();
 
