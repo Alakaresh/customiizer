@@ -178,7 +178,7 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         mesh.material = new THREE.MeshBasicMaterial({
             map: texture,
             color: mesh.material.userData?.baseColor || 0xffffff,
-            transparent: true,
+            transparent: false,
             alphaTest: 0.01
         });
         mesh.material.needsUpdate = true;
