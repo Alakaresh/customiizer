@@ -157,12 +157,14 @@ function loadModel(modelUrl, productColor = null) {
 
                 const baseColorHex = parseColorToHex(productColor);
 
-		gltf.scene.traverse((child) => {
-			if (!child.isMesh) return;
+               const glbElements = [];
+               gltf.scene.traverse((child) => {
+                        if (!child.isMesh) return;
 
-			child.geometry.computeVertexNormals();
+                        glbElements.push(child.name);
+                        child.geometry.computeVertexNormals();
 
-			const name = child.name.toLowerCase();
+                        const name = child.name.toLowerCase();
 
                         // 🎯 Zones d’impression personnalisables
                         if (name.startsWith("impression")) {
@@ -215,12 +217,13 @@ function loadModel(modelUrl, productColor = null) {
                                 });
                         }
 
-			child.material.needsUpdate = true;
-		});
+                        child.material.needsUpdate = true;
+               });
 
-                scene.add(gltf.scene);
-                hide3DLoader(renderer.domElement.parentElement);
-        };
+               console.log('[3D Debug] GLB elements:', glbElements);
+               scene.add(gltf.scene);
+               hide3DLoader(renderer.domElement.parentElement);
+       };
 
         if (window.customizerCache?.models?.[modelUrl]) {
                 handleModel(window.customizerCache.models[modelUrl]);
