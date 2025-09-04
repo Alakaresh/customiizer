@@ -130,8 +130,6 @@ function loadModel(modelUrl) {
                 printableMeshes[child.name] = child;
 
                 // Sauvegarde couleur + map d’origine
-                // Sauvegarde complète du matériau original
-                child.userData.originalMaterial = child.material.clone();
                 child.userData.baseColor = child.material.color.getHex();
                 if (child.material.map) {
                     child.userData.baseMap = child.material.map.clone();
@@ -211,7 +209,7 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 }
 
 // --- Appliquer une texture depuis Canvas ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = false) {
+window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
@@ -220,7 +218,11 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+    // 🎨 Fond noir pur (zones sans image)
+    //ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+    // 🎨 Dessine l'image par-dessus
     ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
@@ -228,27 +230,17 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
     mesh.material.map = texture;
-
-    if (isFull) {
-        // Image pleine → opaque
-        mesh.material.color.setHex(0xffffff);
-        mesh.material.transparent = false;
-    } else {
-        // Image partielle → noir visible dans les trous
-        mesh.material.color.setHex(0x000000);
-        mesh.material.transparent = true;
-    }
-
+    mesh.material.color.setHex(0xffffff);
+    mesh.material.transparent = true; // autoriser transparence si besoin
     mesh.material.opacity = 1.0;
-    mesh.material.roughness = 1.0;
-    mesh.material.metalness = 0.0;
-    mesh.material.toneMapped = false;
+
+    // 👉 Empêcher l'éclairage d’assombrir les couleurs
+    mesh.material.toneMapped = false;  // désactive la correction tonemapping
     mesh.material.needsUpdate = true;
-
-    console.log(`[3D] ✅ Texture appliquée sur ${mesh.name}, mode ${isFull ? "PLEIN" : "PARTIEL"}`);
+    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
 };
-
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
@@ -256,17 +248,12 @@ window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
 
-    if (mesh.userData.originalMaterial) {
-        mesh.material = mesh.userData.originalMaterial.clone();
-    } else {
-        mesh.material.map = null;
-        mesh.material.color.setHex(0x000000);
-    }
-
+    mesh.material.map = null;
+    mesh.material.color.setHex(mesh.userData?.baseColor || 0xffffff);
     mesh.material.needsUpdate = true;
-    console.log("[3D] 🧹 Texture retirée, matériau restauré :", mesh.name);
-};
 
+    console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
+};
 
 // --- Debug ---
 window.logPrintableMeshPosition = function (zoneName = null) {
