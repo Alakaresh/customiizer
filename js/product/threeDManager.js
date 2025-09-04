@@ -83,8 +83,6 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     animate();
 }
 
-// --- Load GLB ---
-// --- Load GLB ---
 function loadModel(modelUrl) {
     const loader = new THREE.GLTFLoader();
     loader.load(modelUrl, (gltf) => {
@@ -97,13 +95,16 @@ function loadModel(modelUrl) {
             if (name.startsWith("impression")) {
                 printableMeshes[child.name] = child;
 
-                // 👉 Sauvegarde l’état d’origine
+                // 👉 Sauvegarde d'origine
                 if (child.material.map) {
                     child.userData.baseMap = child.material.map.clone();
+                    console.log(`[3D] 🎨 ${child.name} → Texture d'origine détectée`, child.material.map);
                 } else {
                     child.userData.baseColor = child.material.color.getHex();
+                    console.log(`[3D] 🎨 ${child.name} → Couleur d'origine détectée`, "#" + child.userData.baseColor.toString(16).padStart(6, "0"));
                 }
 
+                // Forcer visible
                 child.material.transparent = false;
                 child.material.opacity = 1.0;
                 child.material.needsUpdate = true;
@@ -118,8 +119,6 @@ function loadModel(modelUrl) {
         hide3DLoader(renderer.domElement.parentElement);
     });
 }
-
-
 
 // --- Render loop ---
 function animate() {
@@ -147,40 +146,43 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
+    console.log("[3D Debug] mesh.material", mesh.material);
+    console.log("[3D Debug] baseColor", mesh.userData?.baseColor);
+    console.log("[3D Debug] baseMap", mesh.userData?.baseMap);
+
     let baseColor = mesh.userData?.baseColor ?? null;
     let baseMap = mesh.userData?.baseMap ?? null;
 
-    // 🖌️ Fusion dans un offscreen
     const offscreen = document.createElement("canvas");
     offscreen.width = canvas.width;
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    if (baseMap) {
-        // Cas 1 : la zone avait une texture d’origine
-        const img = baseMap.image;
-        if (img) ctx.drawImage(img, 0, 0, offscreen.width, offscreen.height);
+    if (baseMap?.image) {
+        ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
+        console.log("[3D Debug] Fond → baseMap dessinée");
     } else if (baseColor) {
-        // Cas 2 : fond uni d’origine
         ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+        console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
+    } else {
+        console.log("[3D Debug] Aucun fond d'origine, fallback blanc");
+        ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, offscreen.width, offscreen.height);
     }
 
-    // Dessin de la personnalisation par-dessus
     ctx.drawImage(canvas, 0, 0);
+    console.log("[3D Debug] Canvas personnalisé dessiné");
 
-    // ➡️ Création de la nouvelle texture
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    mesh.material = new THREE.MeshBasicMaterial({
-        map: texture
-    });
+    mesh.material = new THREE.MeshBasicMaterial({ map: texture });
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée (base + overlay) sur", mesh.name);
+    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name);
 };
 
 // 📌 Nettoyer la texture et restaurer la couleur
