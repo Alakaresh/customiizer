@@ -107,7 +107,7 @@ function loadModel(modelUrl) {
                 child.material.needsUpdate = true;
             }
         });
-
+        gltf.scene.scale.set(1.2, 1.2, 1.2);
         scene.add(gltf.scene);
         fitCameraToObject(camera, gltf.scene, controls, renderer);
         hide3DLoader(renderer.domElement.parentElement);
@@ -141,7 +141,7 @@ function getPrintableMesh(zoneName) {
     return key ? printableMeshes[key] : null;
 }
 
-function fitCameraToObject(camera, object, controls, renderer, offset = 1.25) {
+function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
     const box = new THREE.Box3().setFromObject(object);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
