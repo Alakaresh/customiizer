@@ -313,7 +313,7 @@ jQuery(document).ready(function ($) {
                        updateAddImageButtonVisibility();
                        if (variant.url_3d) {
                                $('#product3DContainer').show();
-                               init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas', variant.color, false);
+                               init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
                                threeDInitialized = true;
                        } else {
                                $('#product3DContainer').hide();
