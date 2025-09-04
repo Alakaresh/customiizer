@@ -162,7 +162,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 
     mesh.material = new THREE.MeshBasicMaterial({
         map: texture,
-        transparent: true
+        transparent: false
     });
     mesh.material.needsUpdate = true;
 
@@ -182,7 +182,7 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
 
         mesh.material = new THREE.MeshBasicMaterial({
             map: texture,
-            transparent: true
+            transparent: false
         });
         mesh.material.needsUpdate = true;
 
