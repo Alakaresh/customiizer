@@ -160,10 +160,8 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    mesh.material = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: false
-    });
+    mesh.material.map = texture;              // ➡️ On remplace la map
+    mesh.material.color.set(0xffffff);        // ➡️ Neutralise la teinte
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
@@ -179,11 +177,10 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
 
         texture.flipY = false;
         texture.encoding = THREE.sRGBEncoding;
+        texture.needsUpdate = true;
 
-        mesh.material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: false
-        });
+        mesh.material.map = texture;          // ➡️ On remplace la map
+        mesh.material.color.set(0xffffff);    // ➡️ Neutralise la teinte
         mesh.material.needsUpdate = true;
 
         console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
@@ -191,6 +188,7 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
 };
+
 
 
 window.clear3DTexture = function (zoneName = null) {
