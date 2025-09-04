@@ -219,46 +219,31 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // 🎨 Si la zone est pleine -> on force fond noir
     if (isFull) {
+        // 🟢 Zone pleine : on force un fond noir + image
         ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+        ctx.drawImage(canvas, 0, 0);
     } else {
-        // sinon on laisse la transparence pour voir le mesh derrière
+        // 🟢 Zone pas pleine : on laisse la transparence
         ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+        ctx.drawImage(canvas, 0, 0);
     }
-
-    // 🎨 Dessine l'image par-dessus
-    ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // 🔥 Mesh reste noir, texture est juste un sticker
     mesh.material.map = texture;
-    mesh.material.color.setHex(0xffffff); // neutre
-    mesh.material.transparent = true;
+    mesh.material.color.setHex(0x000000); // noir de base
+    mesh.material.transparent = true;     // permettre trous
     mesh.material.opacity = 1.0;
     mesh.material.toneMapped = false;
     mesh.material.needsUpdate = true;
 
-    console.log(`[3D] ✅ Texture appliquée sur ${mesh.name}, mode ${isFull ? "plein" : "partiel"}`);
-
-    // 👉 Si c’est une zone pleine, on repeint aussi toutes les AUTRES zones en noir
-    if (isFull) {
-        for (const otherName in printableMeshes) {
-            if (otherName !== mesh.name) {
-                const otherMesh = printableMeshes[otherName];
-                if (otherMesh) {
-                    otherMesh.material.map = null;
-                    otherMesh.material.color.setHex(0x000000); // noir pur
-                    otherMesh.material.needsUpdate = true;
-                    console.log(`[3D] 🖤 Zone ${otherName} remise en noir (pleine appliquée)`);
-                }
-            }
-        }
-    }
+    console.log(`[3D] ✅ Texture appliquée (${isFull ? "pleine" : "partielle"}) sur`, mesh.name);
 };
 
 
