@@ -76,6 +76,7 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     // Contrôles
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    controls.enableZoom = false;
 
     // Charger modèle
     loadModel(modelUrl);
