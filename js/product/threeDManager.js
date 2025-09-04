@@ -144,44 +144,54 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
-    console.log("[3D Debug] mesh.material", mesh.material);
-    console.log("[3D Debug] baseColor", mesh.userData?.baseColor);
-    console.log("[3D Debug] baseMap", mesh.userData?.baseMap);
-
     let baseColor = mesh.userData?.baseColor ?? 0xffffff;
     let baseMap = mesh.userData?.baseMap ?? null;
 
-    // Offscreen
+    // --- Vérifier si le canvas contient de la transparence ---
+    const ctxCheck = canvas.getContext("2d");
+    const pixels = ctxCheck.getImageData(0, 0, canvas.width, canvas.height).data;
+    let hasTransparency = false;
+    for (let i = 3; i < pixels.length; i += 4) { // on regarde les alpha
+        if (pixels[i] < 255) {
+            hasTransparency = true;
+            break;
+        }
+    }
+
+    // --- Offscreen ---
     const offscreen = document.createElement("canvas");
     offscreen.width = canvas.width;
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // Fond = map d’origine si dispo, sinon couleur
-    if (baseMap?.image) {
-        ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
-        console.log("[3D Debug] Fond → baseMap dessinée");
+    if (hasTransparency) {
+        // Fond = baseMap si dispo, sinon couleur
+        if (baseMap?.image) {
+            ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
+            console.log("[3D Debug] Fond → baseMap dessinée");
+        } else {
+            ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+            ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+            console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
+        }
     } else {
-        ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
-        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-        console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
+        console.log("[3D Debug] Aucun fond appliqué (canvas opaque)");
     }
 
-    // Dessine la personnalisation par-dessus
+    // Dessine la personnalisation
     ctx.drawImage(canvas, 0, 0);
     console.log("[3D Debug] Canvas personnalisé dessiné");
 
-    // Texture finale
+    // --- Texture finale ---
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ⚡ On garde le matériau existant
     mesh.material.map = texture;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name);
+    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name, "(transparency:", hasTransparency, ")");
 };
 
 
