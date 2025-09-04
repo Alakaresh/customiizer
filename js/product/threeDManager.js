@@ -109,6 +109,7 @@ function loadModel(modelUrl) {
         });
 
         scene.add(gltf.scene);
+        fitCameraToObject(camera, gltf.scene, controls);
         hide3DLoader(renderer.domElement.parentElement);
         console.log("[3D] ✅ Modèle chargé :", modelUrl);
     }, undefined, (error) => {
@@ -139,6 +140,26 @@ function getPrintableMesh(zoneName) {
     );
     return key ? printableMeshes[key] : null;
 }
+
+function fitCameraToObject(camera, object, controls, offset = 1.25) {
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    let cameraZ = Math.abs(maxDim / (2 * Math.tan(fov / 2)));
+
+    cameraZ *= offset; // petit recul
+    camera.position.set(center.x, center.y, cameraZ);
+    camera.lookAt(center);
+
+    if (controls) {
+        controls.target.copy(center);
+        controls.update();
+    }
+}
+
 // --- Appliquer une texture depuis Canvas ---
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
