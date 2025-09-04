@@ -151,19 +151,21 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ✅ On ne recrée PAS de matériau, on garde MeshStandardMaterial
+    // ⚡ Garde MeshStandardMaterial
     mesh.material.map = texture;
+
+    // Assure-toi que la couleur d’origine est utilisée comme fond
     mesh.material.color.setHex(mesh.userData?.baseColor ?? 0xffffff);
 
-    // Important : dire à Three.js de combiner couleur * texture
-    mesh.material.combine = THREE.MultiplyOperation;
-
+    // Active l’alpha pour que la couleur apparaisse là où la texture est vide
     mesh.material.transparent = true;
     mesh.material.alphaTest = 0.01;
+
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée avec mix sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée, fond couleur d'origine conservé :", mesh.name);
 };
+
 
 
 // 📌 Nettoyer la texture et restaurer la couleur
