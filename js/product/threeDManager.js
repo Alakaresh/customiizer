@@ -84,7 +84,6 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
 }
 
 // --- Load GLB ---
-// --- Load GLB ---
 function loadModel(modelUrl) {
     const loader = new THREE.GLTFLoader();
     loader.load(modelUrl, (gltf) => {
@@ -97,11 +96,9 @@ function loadModel(modelUrl) {
             if (name.startsWith("impression")) {
                 printableMeshes[child.name] = child;
 
-                // 👉 Sauvegarde la couleur de base
-                child.material.userData.baseColor = child.material.color.getHex();
+                // 👉 Sauvegarde définitive de la couleur d'origine
+                child.userData.baseColor = child.material.color.getHex();
 
-                // ⚡ On NE change pas le matériau, donc il reste visible par défaut
-                // On s'assure juste qu'il ne soit pas transparent
                 child.material.transparent = false;
                 child.material.opacity = 1.0;
                 child.material.needsUpdate = true;
@@ -145,8 +142,8 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
-    // 🎨 Récupérer couleur de base
-    const baseColor = mesh.material.userData?.baseColor ?? 0xffffff;
+    // 🎨 Lire la couleur d'origine sauvegardée
+    const baseColor = mesh.userData?.baseColor ?? 0xffffff;
 
     // 🖌️ Offscreen pour fusionner couleur + image
     const offscreen = document.createElement("canvas");
@@ -167,15 +164,16 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ➡️ Appliquer sans transparence noire
+    // ✅ Matériau avec fond couleur d'origine
     mesh.material = new THREE.MeshBasicMaterial({
         map: texture,
-        transparent: false   // ⚠️ très important pour garder la zone visible
+        transparent: false
     });
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée (fond + image) sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec fond couleur d'origine sur", mesh.name);
 };
+
 
 
 // 📌 Nettoyer la texture et restaurer la couleur
