@@ -109,22 +109,13 @@ function loadModel(modelUrl) {
         printableMeshes[child.name] = child;
     
         // On récupère la couleur de base avant remplacement
-        const baseColor = child.material.color?.getHex() ?? 0xffffff;
+        child.material.userData.baseColor = child.material.color.getHex();
     
         // ⚡ Remplace par un MeshBasicMaterial pour garantir visibilité
-        child.material = new THREE.MeshBasicMaterial({
-            color: baseColor,
-            transparent: false,
-            opacity: 1.0
-        });
-
-    child.material.userData.baseColor = baseColor;
-    child.material.needsUpdate = true;
-
-    console.log("[3D] 🎨 Zone impression forcée visible :", child.name, child.material);
+        child.material.transparent = false;
+        child.material.opacity = 1.0;
+        child.material.needsUpdate = true; 
 }
-
-
     // 🔍 Debug log ici (à chaque mesh)
     console.log("[3D] 🔍 Mesh trouvé :", child.name, {
         isMesh: child.isMesh,
