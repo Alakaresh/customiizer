@@ -5,9 +5,9 @@ let printableMeshes = {};
 let resizeObserver3D = null;
 
 const productScales = {
-    Mug: [1.2, 1.2, 1.2],
-    Tumbler: [1.5, 1.5, 1.5],
-    Bottle: [1.5, 1.5, 1.5],
+    mug: [1.2, 1.2, 1.2],
+    tumbler: [1.5, 1.5, 1.5],
+    bottle: [1.5, 1.5, 1.5],
 };
 
 // --- Détection du scale par URL ---
