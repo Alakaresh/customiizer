@@ -151,6 +151,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.flipY = false;
 
     mesh.material.map = texture;
+    mesh.material.needsUpdate = true;
 };
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
@@ -163,11 +164,11 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
 
         texture.flipY = false;
         mesh.material.map = texture;
+        mesh.material.needsUpdate = true;
     }, undefined, (err) => {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
 };
-
 window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
