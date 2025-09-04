@@ -140,6 +140,7 @@ function getPrintableMesh(zoneName) {
     return key ? printableMeshes[key] : null;
 }
 // --- Appliquer une texture depuis Canvas ---
+// --- Appliquer une texture depuis Canvas ---
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
@@ -151,10 +152,11 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const ctxCheck = canvas.getContext("2d");
     const pixels = ctxCheck.getImageData(0, 0, canvas.width, canvas.height).data;
     let hasTransparency = false;
-    let fullyOpaque = true;
     for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] < 255) hasTransparency = true;
-        if (pixels[i] !== 255) fullyOpaque = false;
+        if (pixels[i] < 255) {
+            hasTransparency = true;
+            break;
+        }
     }
 
     // --- Offscreen ---
@@ -164,28 +166,17 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const ctx = offscreen.getContext("2d");
 
     if (hasTransparency) {
-        // Cas 1 : image avec zones transparentes → on garde la couleur de fond
+        // Fond = baseMap si dispo, sinon couleur
         if (baseMap?.image) {
             ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
-            console.log("[3D Debug] Fond → baseMap dessinée");
         } else {
             ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
             ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-            console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
         }
-    } else if (!fullyOpaque) {
-        // Cas 2 : pas transparent mais le design ne couvre pas tout → fond couleur
-        ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
-        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-        console.log("[3D Debug] Fond → couleur appliquée (zone non remplie)");
-    } else {
-        // Cas 3 : image totalement opaque et couvrant tout → pas de fond
-        console.log("[3D Debug] Aucun fond appliqué (canvas plein)");
     }
 
-    // Dessin de l'image par-dessus
+    // Dessine la personnalisation
     ctx.drawImage(canvas, 0, 0);
-    console.log("[3D Debug] Canvas personnalisé dessiné");
 
     // --- Texture finale ---
     const texture = new THREE.CanvasTexture(offscreen);
@@ -193,11 +184,12 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // ⚡ On garde le matériau original, on modifie juste la map
     mesh.material.map = texture;
+    mesh.material.transparent = false;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name, 
-                "(hasTransparency:", hasTransparency, "fullyOpaque:", fullyOpaque, ")");
+    console.log("[3D] ✅ Texture appliquée sur", mesh.name);
 };
 
 
@@ -206,13 +198,14 @@ window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
 
-    mesh.material = new THREE.MeshBasicMaterial({
-        color: mesh.material.userData?.baseColor || 0xffffff
-    });
+    // ⚡ On garde le matériau original et on retire juste la map
+    mesh.material.map = null;
+    mesh.material.color.setHex(mesh.userData?.baseColor || 0xffffff);
     mesh.material.needsUpdate = true;
 
     console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
 };
+
 
 // 📌 Debug
 window.logPrintableMeshPosition = function (zoneName = null) {
