@@ -64,19 +64,23 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     camera.lookAt(0, 0, 0);
 
     // HDR Environment
-    new THREE.RGBELoader()
-        .load('https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_4k.hdr', function (texture) {
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            scene.environment = texture;
-            scene.background = texture;
-        });
+    // HDR Environment
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+pmremGenerator.compileEquirectangularShader();
 
-    // Rendu
-    renderer = new THREE.WebGLRenderer({
-        canvas: canvas,
-        alpha: true,
-        antialias: true
+new THREE.RGBELoader()
+    .load('https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_4k.hdr', function (hdrEquirect) {
+        const envMap = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
+
+        scene.environment = envMap; // sert pour éclairage/réflexions
+        scene.background = null;    // fond neutre
+
+        hdrEquirect.dispose();
+        pmremGenerator.dispose();
+
+        console.log("✅ HDR chargé sans background, éclairage actif !");
     });
+
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
     renderer.outputEncoding = THREE.sRGBEncoding;
