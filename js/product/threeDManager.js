@@ -227,26 +227,25 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // ⚡ Au lieu de remplacer le matériau → on le met à jour
+    mesh.material.map = texture;
+
     if (isFull) {
-        // 🟢 Image pleine → MeshBasicMaterial (pas de reflets HDR, fidèle à l'image)
-        mesh.material = new THREE.MeshBasicMaterial({
-            map: texture,
-            color: 0xffffff,
-            transparent: false,
-            opacity: 1.0
-        });
+        // Image pleine → opaque
+        mesh.material.color.setHex(0xffffff);
+        mesh.material.transparent = false;
+        mesh.material.opacity = 1.0;
     } else {
-        // 🟢 Image partielle → MeshStandardMaterial (zones vides = mesh noir visible)
-        mesh.material = new THREE.MeshStandardMaterial({
-            map: texture,
-            color: 0x000000,
-            transparent: true,
-            opacity: 1.0,
-            roughness: 1.0,
-            metalness: 0.0,
-            toneMapped: false
-        });
+        // Image partielle → zones vides = mesh noir
+        mesh.material.color.setHex(0x000000);
+        mesh.material.transparent = true;
+        mesh.material.opacity = 1.0;
     }
+
+    // Réduction des reflets parasites
+    mesh.material.roughness = 1.0;
+    mesh.material.metalness = 0.0;
+    mesh.material.toneMapped = false;
 
     mesh.material.needsUpdate = true;
     console.log(`[3D] ✅ Texture appliquée sur ${mesh.name}, mode ${isFull ? "PLEIN" : "PARTIEL"}`);
