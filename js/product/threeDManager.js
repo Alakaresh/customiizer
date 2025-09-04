@@ -254,12 +254,17 @@ window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
 
-    mesh.material.map = null;
-    mesh.material.color.setHex(mesh.userData?.baseColor || 0xffffff);
-    mesh.material.needsUpdate = true;
+    if (mesh.userData.originalMaterial) {
+        mesh.material = mesh.userData.originalMaterial.clone();
+    } else {
+        mesh.material.map = null;
+        mesh.material.color.setHex(0x000000);
+    }
 
-    console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
+    mesh.material.needsUpdate = true;
+    console.log("[3D] 🧹 Texture retirée, matériau restauré :", mesh.name);
 };
+
 
 // --- Debug ---
 window.logPrintableMeshPosition = function (zoneName = null) {
