@@ -218,51 +218,29 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // Récupère les pixels du canvas original
-    const srcCtx = canvas.getContext("2d");
-    const imgData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
+    // 🎨 Fond noir pur (zones sans image)
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
 
-    // Crée une nouvelle image avec transparence pour les zones vides
-    const newData = ctx.createImageData(imgData);
-
-    for (let i = 0; i < imgData.data.length; i += 4) {
-        const r = imgData.data[i];
-        const g = imgData.data[i + 1];
-        const b = imgData.data[i + 2];
-        const a = imgData.data[i + 3];
-
-        if (a === 0) {
-            // Zone non couverte → transparent
-            newData.data[i] = 0;
-            newData.data[i + 1] = 0;
-            newData.data[i + 2] = 0;
-            newData.data[i + 3] = 0;
-        } else {
-            // Zone couverte (même noir) → garder
-            newData.data[i] = r;
-            newData.data[i + 1] = g;
-            newData.data[i + 2] = b;
-            newData.data[i + 3] = a;
-        }
-    }
-
-    ctx.putImageData(newData, 0, 0);
+    // 🎨 Dessine l'image par-dessus
+    ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
     mesh.material.map = texture;
-    mesh.material.color.setHex(0x000000); // fond du mesh
-    mesh.material.transparent = true;
+    mesh.material.color.setHex(0xffffff);
+    mesh.material.transparent = true; // autoriser transparence si besoin
     mesh.material.opacity = 1.0;
-    mesh.material.toneMapped = false;
+
+    // 👉 Empêcher l'éclairage d’assombrir les couleurs
+    mesh.material.toneMapped = false;  // désactive la correction tonemapping
     mesh.material.needsUpdate = true;
-
-    console.log("[3D] ✅ Texture appliquée avec vrai noir conservé et zones vides transparentes :", mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
 };
-
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
