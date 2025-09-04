@@ -309,7 +309,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
         return;
     }
 
-    // ✅ Applique la texture seulement si le canvas contient des pixels opaques
+    // ✅ Vérifie si le canvas contient des pixels visibles
     const ctx = canvas.getContext("2d");
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let hasContent = false;
@@ -322,13 +322,16 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
         return;
     }
 
-    mesh.material.map = texture;
+    // 🔹 Sauvegarde la couleur de base si pas déjà fait
     if (mesh.material.userData?.baseColor === undefined) {
         mesh.material.userData.baseColor = mesh.material.color.getHex();
     }
-    mesh.material.color.setHex(0xffffff); // pour éviter que la couleur teinte la texture
+
+    // 🔹 Applique seulement la texture, sans changer la couleur
+    mesh.material.map = texture;
     mesh.material.needsUpdate = true;
 };
+
 
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
