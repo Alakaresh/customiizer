@@ -151,11 +151,10 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const ctxCheck = canvas.getContext("2d");
     const pixels = ctxCheck.getImageData(0, 0, canvas.width, canvas.height).data;
     let hasTransparency = false;
-    for (let i = 3; i < pixels.length; i += 4) { // on regarde les alpha
-        if (pixels[i] < 255) {
-            hasTransparency = true;
-            break;
-        }
+    let fullyOpaque = true;
+    for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] < 255) hasTransparency = true;
+        if (pixels[i] !== 255) fullyOpaque = false;
     }
 
     // --- Offscreen ---
@@ -165,7 +164,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const ctx = offscreen.getContext("2d");
 
     if (hasTransparency) {
-        // Fond = baseMap si dispo, sinon couleur
+        // Cas 1 : image avec zones transparentes → on garde la couleur de fond
         if (baseMap?.image) {
             ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
             console.log("[3D Debug] Fond → baseMap dessinée");
@@ -174,11 +173,17 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
             ctx.fillRect(0, 0, offscreen.width, offscreen.height);
             console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
         }
+    } else if (!fullyOpaque) {
+        // Cas 2 : pas transparent mais le design ne couvre pas tout → fond couleur
+        ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+        console.log("[3D Debug] Fond → couleur appliquée (zone non remplie)");
     } else {
-        console.log("[3D Debug] Aucun fond appliqué (canvas opaque)");
+        // Cas 3 : image totalement opaque et couvrant tout → pas de fond
+        console.log("[3D Debug] Aucun fond appliqué (canvas plein)");
     }
 
-    // Dessine la personnalisation
+    // Dessin de l'image par-dessus
     ctx.drawImage(canvas, 0, 0);
     console.log("[3D Debug] Canvas personnalisé dessiné");
 
@@ -191,7 +196,8 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     mesh.material.map = texture;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name, "(transparency:", hasTransparency, ")");
+    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name, 
+                "(hasTransparency:", hasTransparency, "fullyOpaque:", fullyOpaque, ")");
 };
 
 
