@@ -218,8 +218,9 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // 🔥 Fond noir pour les zones non couvertes par la texture
-    ctx.fillStyle = "#000000";
+    // 👉 Utilise la couleur du mesh comme fond, sinon noir
+    const baseColor = mesh.userData?.baseColor ?? 0x000000;
+    ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
     ctx.fillRect(0, 0, offscreen.width, offscreen.height);
 
     // 🔥 Dessine l'image par-dessus
