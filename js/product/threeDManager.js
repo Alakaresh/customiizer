@@ -176,96 +176,51 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
 
 
 function loadModel(modelUrl, productColor = null) {
-        const handleModel = (gltf) => {
-                printableMeshes = {};
+    const handleModel = (gltf) => {
+        printableMeshes = {}; // reset
 
-                const baseColorHex = parseColorToHex(productColor);
+        const glbElements = [];
+        gltf.scene.traverse((child) => {
+            if (!child.isMesh) return;
 
-               const glbElements = [];
-               gltf.scene.traverse((child) => {
-                        if (!child.isMesh) return;
+            const name = child.name.toLowerCase();
+            glbElements.push(name);
 
-                        glbElements.push(child.name);
-                        // child.geometry.computeVertexNormals();  // ❌ à désactiver si le modèle a déjà ses normales
+            // 🎯 Zones imprimables uniquement
+            if (name.startsWith("impression")) {
+                printableMeshes[child.name] = child;
 
-
-                        const name = child.name.toLowerCase();
-
-                        // 🎯 Zones d’impression personnalisables
-                        if (name.startsWith("impression")) {
-                               // child.material = new THREE.MeshStandardMaterial({
-                               //        color: baseColorHex,
-                               //        roughness: 0.3,
-                               //        metalness: 0.1,
-                               //        transparent: true
-                               // });
-                               // child.material.userData.baseColor = baseColorHex;
-                               printableMeshes[child.name] = child;
-                        }
-
-                        // 🎨 WaterBottle : couleur personnalisée + métal gris
-                        else if (name === "waterbottle") {
-                                // child.material = new THREE.MeshStandardMaterial({
-                                //        color: baseColorHex,
-                                //        roughness: 0.3,
-                                //        metalness: 0.1
-                                // });
-                        } else if (name === "waterbottlecap" || name === "waterbottlebottom") {
-                                // child.material = new THREE.MeshStandardMaterial({
-                                //        color: 0xaaaaaa,
-                                //        roughness: 0.2,
-                                //        metalness: 0.7
-                                // });
-                        }
-
-                        // 🧊 Tumbler : couleur personnalisée + métal gris
-                        else if (name === "tumbler") {
-                                // child.material = new THREE.MeshStandardMaterial({
-                                //        color: baseColorHex,
-                                //        roughness: 0.3,
-                                //        metalness: 0.1
-                                // });
-                        } else if (name === "tumblercap" || name === "tumblerbottom") {
-                                // child.material = new THREE.MeshStandardMaterial({
-                                //        color: 0xaaaaaa,
-                                //        roughness: 0.2,
-                                //        metalness: 0.7
-                                // });
-                        }
-
-                        // 🎭 Sinon, matériau par défaut
-                        else {
-                                // child.material = new THREE.MeshStandardMaterial({
-                                //        color: baseColorHex,
-                                //        roughness: 0.3,
-                                //        metalness: 0.1
-                                // });
-                        }
-
-                        // child.material.needsUpdate = true;
-               });
-
-               console.log('[3D Debug] GLB elements:', glbElements);
-               scene.add(gltf.scene);
-               hide3DLoader(renderer.domElement.parentElement);
-       };
-
-        if (window.customizerCache?.models?.[modelUrl]) {
-                handleModel(window.customizerCache.models[modelUrl]);
-                return;
-        }
-
-        const loader = new THREE.GLTFLoader();
-        loader.load(modelUrl, (gltf) => {
-                if (window.customizerCache) {
-                        window.customizerCache.models[modelUrl] = gltf;
+                // Sauvegarde la couleur GLB d’origine pour pouvoir la restaurer plus tard
+                if (child.material && child.material.userData?.baseColor === undefined) {
+                    child.material.userData.baseColor = child.material.color.getHex();
                 }
-                handleModel(gltf);
-        }, undefined, (error) => {
-                console.error("Erreur chargement modèle :", error);
-                hide3DLoader(renderer.domElement.parentElement);
+
+                console.log("[3D] Zone imprimable détectée :", child.name);
+            }
         });
+
+        console.log('[3D Debug] GLB elements:', glbElements);
+        scene.add(gltf.scene);
+        hide3DLoader(renderer.domElement.parentElement);
+    };
+
+    if (window.customizerCache?.models?.[modelUrl]) {
+        handleModel(window.customizerCache.models[modelUrl]);
+        return;
+    }
+
+    const loader = new THREE.GLTFLoader();
+    loader.load(modelUrl, (gltf) => {
+        if (window.customizerCache) {
+            window.customizerCache.models[modelUrl] = gltf;
+        }
+        handleModel(gltf);
+    }, undefined, (error) => {
+        console.error("Erreur chargement modèle :", error);
+        hide3DLoader(renderer.domElement.parentElement);
+    });
 }
+
 
 
 function animate() {
@@ -285,10 +240,7 @@ function getPrintableMeshes(scene) {
 
 // Exposé global
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
-    if (!canvas) {
-        console.warn("[3D] ⚠️ Canvas vide, texture non appliquée");
-        return;
-    }
+    if (!canvas) return;
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.encoding = THREE.sRGBEncoding;
@@ -309,28 +261,15 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
         return;
     }
 
-    // ✅ Vérifie si le canvas contient des pixels visibles
-    const ctx = canvas.getContext("2d");
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let hasContent = false;
-    for (let i = 3; i < pixels.length; i += 4) { // vérifie alpha
-        if (pixels[i] > 0) { hasContent = true; break; }
-    }
-
-    if (!hasContent) {
-        console.warn("[3D] ⚠️ Canvas transparent, on garde la couleur d’origine");
-        return;
-    }
-
-    // 🔹 Sauvegarde la couleur de base si pas déjà fait
-    if (mesh.material.userData?.baseColor === undefined) {
-        mesh.material.userData.baseColor = mesh.material.color.getHex();
-    }
-
-    // 🔹 Applique seulement la texture, sans changer la couleur
+    // applique seulement sur la zone imprimable
     mesh.material.map = texture;
+
+    // mettre en blanc uniquement cette zone pour ne pas teinter la texture
+    mesh.material.color.setHex(0xffffff);
+
     mesh.material.needsUpdate = true;
 };
+
 
 
 
