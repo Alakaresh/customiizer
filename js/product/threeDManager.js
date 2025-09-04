@@ -128,3 +128,23 @@ function animate() {
         renderer.render(scene, camera);
     }
 }
+window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
+    if (!canvas) return;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.needsUpdate = true;
+
+    let mesh = zoneName ? printableMeshes[zoneName] : Object.values(printableMeshes)[0];
+    if (!mesh) {
+        console.warn("[3D] ❌ Zone imprimable non trouvée :", zoneName);
+        return;
+    }
+
+    // 👉 Remplace le matériau par un MeshBasicMaterial
+    mesh.material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true
+    });
+
+    mesh.material.needsUpdate = true;
+};
