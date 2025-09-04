@@ -209,5 +209,3 @@ window.logPrintableMeshPosition = function (zoneName = null) {
         console.warn("[3D] 🚫 Aucune zone imprimable trouvée pour", zoneName);
     }
 };
-
-bon on a ça qui est quasi bon. sauf que la zone d'impression reste invisible 
