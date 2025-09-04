@@ -219,7 +219,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const ctx = offscreen.getContext("2d");
 
     // 🎨 Fond noir pur (zones sans image)
-    ctx.fillStyle = "#000000";
+    //ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, offscreen.width, offscreen.height);
 
     // 🎨 Dessine l'image par-dessus
