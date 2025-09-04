@@ -140,10 +140,27 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
         controls.target.set(0, lookAtY, 0);
         controls.update();
 
-	scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-	const light = new THREE.DirectionalLight(0xffffff, 0.8);
-	light.position.set(3, 5, 3);
-	scene.add(light);
+	const lightsConfig = [
+	  {"type":"ambient","intensity":0.40,"color":0xffffff},
+	  {"type":"directional","intensity":2.40,"color":0xffffff,"position":[5,6,6]},
+	  {"type":"directional","intensity":1.50,"color":0xffffff,"position":[-5,3,3]},
+	  {"type":"directional","intensity":1.50,"color":0xffffff,"position":[-6,6,-5]},
+	  {"type":"directional","intensity":0.80,"color":0xffffff,"position":[0,8,0]},
+	  {"type":"hemi","intensity":0.60,"sky":0xffffff,"ground":0x666666}
+	];
+	
+	lightsConfig.forEach(cfg => {
+	    let light;
+	    if (cfg.type === "ambient") {
+	        light = new THREE.AmbientLight(cfg.color, cfg.intensity);
+	    } else if (cfg.type === "directional") {
+	        light = new THREE.DirectionalLight(cfg.color, cfg.intensity);
+	        light.position.set(...cfg.position);
+	    } else if (cfg.type === "hemi") {
+	        light = new THREE.HemisphereLight(cfg.sky, cfg.ground, cfg.intensity);
+	    }
+	    if (light) scene.add(light);
+	});
 
         loadModel(modelUrl, productColor);
         animate();
