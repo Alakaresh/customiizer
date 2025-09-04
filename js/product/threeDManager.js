@@ -118,6 +118,11 @@ function loadModel(modelUrl) {
             }
 
         });
+        console.log("[3D] 🔍 Mesh trouvé :", child.name, {
+            isMesh: child.isMesh,
+            color: child.material?.color?.getHex?.(),
+            materialType: child.material?.type
+        });
 
         scene.add(gltf.scene);
         hide3DLoader(renderer.domElement.parentElement);
