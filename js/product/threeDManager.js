@@ -4,6 +4,21 @@ let scene, camera, renderer, controls;
 let printableMeshes = {};
 let resizeObserver3D = null;
 
+const productScales = {
+    mug11oz: [1.2, 1.2, 1.2],
+    mug15oz: [1.2, 1.2, 1.2],
+    tumbler: [1.5, 1.5, 1.5],
+    waterbottle: [1.5, 1.5, 1.5],
+};
+
+function getScaleForProduct(modelUrl) {
+    for (const key in productScales) {
+        if (modelUrl.toLowerCase().includes(key)) {
+            return productScales[key];
+        }
+    }
+    return [1, 1, 1]; // fallback
+}
 // --- Loader UI ---
 function show3DLoader(container) {
     let loader = container.querySelector('.loading-overlay');
@@ -108,7 +123,8 @@ function loadModel(modelUrl) {
                 child.material.needsUpdate = true;
             }
         });
-        gltf.scene.scale.set(1.2, 1.2, 1.2);
+        const scale = getScaleForProduct(modelUrl);
+        gltf.scene.scale.set(...scale);
         scene.add(gltf.scene);
         fitCameraToObject(camera, gltf.scene, controls, renderer);
         hide3DLoader(renderer.domElement.parentElement);
