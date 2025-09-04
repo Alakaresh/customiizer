@@ -127,7 +127,8 @@ function loadModel(modelUrl) {
             }
         });
         const scale = getScaleForProduct(modelUrl);
-        gltf.scene.scale.set(...scale);
+        gltf.scene.scale.set(scale[0], scale[1], scale[2]);
+        console.log(`[3D Debug] Scale appliqué: ${scale} à`, gltf.scene);
         scene.add(gltf.scene);
         fitCameraToObject(camera, gltf.scene, controls, renderer);
         hide3DLoader(renderer.domElement.parentElement);
