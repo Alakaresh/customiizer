@@ -146,22 +146,25 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
-    console.log("[3D Debug] mesh.material", mesh.material);
-    console.log("[3D Debug] baseColor", mesh.userData?.baseColor);
-
     const texture = new THREE.CanvasTexture(canvas);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // 👉 On garde le même matériau et on injecte la texture
+    // ✅ On ne recrée PAS de matériau, on garde MeshStandardMaterial
     mesh.material.map = texture;
     mesh.material.color.setHex(mesh.userData?.baseColor ?? 0xffffff);
-    mesh.material.transparent = false;
+
+    // Important : dire à Three.js de combiner couleur * texture
+    mesh.material.combine = THREE.MultiplyOperation;
+
+    mesh.material.transparent = true;
+    mesh.material.alphaTest = 0.01;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée sans perdre la couleur de base sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec mix sur", mesh.name);
 };
+
 
 // 📌 Nettoyer la texture et restaurer la couleur
 window.clear3DTexture = function (zoneName = null) {
