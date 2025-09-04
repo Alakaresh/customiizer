@@ -261,16 +261,22 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
         return;
     }
 
-    // applique seulement sur la zone imprimable
+    // ✅ Active le support alpha
+    mesh.material.transparent = true;
+    mesh.material.alphaTest = 0.01; // évite les artefacts noirs sur zones transparentes
     mesh.material.map = texture;
 
-    // mettre en blanc uniquement cette zone pour ne pas teinter la texture
-    mesh.material.color.setHex(0xffffff);
+    // ⚠️ On ne touche pas à la couleur d’origine du GLB
+    // (elle reste ce qu’elle était dans Blender)
+    // 👉 si tu veux que la texture s’affiche sans teinte, 
+    // mets seulement 0xffffff la toute première fois :
+    if (mesh.material.userData?.baseColor === undefined) {
+        mesh.material.userData.baseColor = mesh.material.color.getHex();
+        mesh.material.color.setHex(0xffffff);
+    }
 
     mesh.material.needsUpdate = true;
 };
-
-
 
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
