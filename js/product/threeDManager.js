@@ -209,7 +209,7 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 }
 
 // --- Appliquer une texture depuis Canvas ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
+window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = false) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
@@ -218,11 +218,16 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // 🎨 Fond noir pur (zones sans image)
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    if (isFull) {
+        // 🟢 Mode zone pleine → fond noir + image opaque
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    } else {
+        // 🟢 Mode zone pas pleine → transparence gardée
+        ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+    }
 
-    // 🎨 Dessine l'image par-dessus
+    // Dessine l'image par-dessus
     ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
@@ -230,16 +235,14 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
     mesh.material.map = texture;
-    mesh.material.color.setHex(0xffffff);
-    mesh.material.transparent = true; // autoriser transparence si besoin
+    mesh.material.color.setHex(isFull ? 0xffffff : 0x000000); // blanc neutre ou noir base
+    mesh.material.transparent = true;
     mesh.material.opacity = 1.0;
-
-    // 👉 Empêcher l'éclairage d’assombrir les couleurs
-    mesh.material.toneMapped = false;  // désactive la correction tonemapping
+    mesh.material.toneMapped = false;
     mesh.material.needsUpdate = true;
-    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
+
+    console.log(`[3D] ✅ Texture appliquée (${isFull ? "pleine" : "transparente"}) sur`, mesh.name);
 };
 
 
