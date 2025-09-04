@@ -128,3 +128,70 @@ function animate() {
         renderer.render(scene, camera);
     }
 }
+
+// --- Helpers ---
+function getPrintableMesh(zoneName) {
+    if (!zoneName) {
+        const firstKey = Object.keys(printableMeshes)[0];
+        return firstKey ? printableMeshes[firstKey] : null;
+    }
+
+    const key = Object.keys(printableMeshes).find(
+        name => name.toLowerCase() === zoneName.toLowerCase()
+    );
+    return key ? printableMeshes[key] : null;
+}
+
+// --- Public API ---
+window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
+    const mesh = getPrintableMesh(zoneName);
+    if (!mesh || !canvas) return;
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.flipY = false;
+
+    mesh.material.map = texture;
+    mesh.material.color.set(0xffffff);
+    mesh.material.needsUpdate = true;
+};
+
+window.update3DTextureFromImageURL = function (url, zoneName = null) {
+    if (!url) return;
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = "anonymous";
+    loader.load(url, (texture) => {
+        const mesh = getPrintableMesh(zoneName);
+        if (!mesh) return;
+
+        texture.flipY = false;
+        mesh.material.map = texture;
+        mesh.material.color.set(0xffffff);
+        mesh.material.needsUpdate = true;
+    }, undefined, (err) => {
+        console.error("[3D] ❌ Erreur chargement texture :", err);
+    });
+};
+
+window.clear3DTexture = function (zoneName = null) {
+    const mesh = getPrintableMesh(zoneName);
+    if (!mesh) return;
+
+    if (mesh.material.map) {
+        mesh.material.map.dispose();
+        mesh.material.map = null;
+    }
+    const baseColor = mesh.material.userData.baseColor;
+    if (baseColor !== undefined) {
+        mesh.material.color.setHex(baseColor);
+    }
+    mesh.material.needsUpdate = true;
+};
+
+window.logPrintableMeshPosition = function (zoneName = null) {
+    const mesh = getPrintableMesh(zoneName);
+    if (mesh) {
+        console.log("[3D] 🎯 Printable mesh:", mesh.name, mesh.position, mesh.rotation, mesh.scale);
+    } else {
+        console.warn("[3D] 🚫 Aucune zone imprimable trouvée pour", zoneName);
+    }
+};
