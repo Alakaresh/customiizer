@@ -213,15 +213,16 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
-    let baseColor = mesh.userData?.baseColor ?? 0xffffff;
-
     const offscreen = document.createElement("canvas");
     offscreen.width = canvas.width;
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+    // 🔥 Fond noir pour les zones non couvertes par la texture
+    ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+    // 🔥 Dessine l'image par-dessus
     ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
@@ -229,13 +230,15 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // Applique la texture sans modifier la couleur
     mesh.material.map = texture;
-    mesh.material.color.setHex(baseColor);
+    mesh.material.color.setHex(0xffffff); // important → pas d’assombrissement
     mesh.material.transparent = false;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée tout en gardant l’éclairage sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec fond noir sur", mesh.name);
 };
+
 
 // --- Nettoyer la texture et restaurer la couleur ---
 window.clear3DTexture = function (zoneName = null) {
