@@ -150,7 +150,7 @@ function getPrintableMesh(zoneName) {
     return key ? printableMeshes[key] : null;
 }
 
-// --- Public API ---
+// ✅ Depuis un canvas
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
@@ -160,22 +160,18 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    mesh.material.map = texture;
-
-    // ✅ garder la couleur de base pour les zones transparentes
-    if (mesh.material.userData?.baseColor !== undefined) {
-        mesh.material.color.setHex(mesh.material.userData.baseColor);
-    } else {
-        mesh.material.color.set(0xffffff);
-    }
-
-    mesh.material.transparent = false;   // pas de full transparence
-    mesh.material.alphaTest = 0.01;      // coupe les pixels vraiment transparents
+    mesh.material = new THREE.MeshBasicMaterial({
+        map: texture,
+        color: mesh.material.userData?.baseColor || 0xffffff, // garde la couleur de base si dispo
+        transparent: true
+    });
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
 };
 
+
+// ✅ Depuis une URL d’image
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
     if (!url) return;
     const loader = new THREE.TextureLoader();
@@ -188,16 +184,11 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         texture.encoding = THREE.sRGBEncoding;
         texture.needsUpdate = true;
 
-        mesh.material.map = texture;
-
-        if (mesh.material.userData?.baseColor !== undefined) {
-            mesh.material.color.setHex(mesh.material.userData.baseColor);
-        } else {
-            mesh.material.color.set(0xffffff);
-        }
-
-        mesh.material.transparent = false;
-        mesh.material.alphaTest = 0.01;
+        mesh.material = new THREE.MeshBasicMaterial({
+            map: texture,
+            color: mesh.material.userData?.baseColor || 0xffffff, // idem, fallback couleur
+            transparent: true
+        });
         mesh.material.needsUpdate = true;
 
         console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
@@ -205,7 +196,6 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
 };
-
 
 
 window.clear3DTexture = function (zoneName = null) {
