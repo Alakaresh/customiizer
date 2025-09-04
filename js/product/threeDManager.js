@@ -63,11 +63,13 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     camera.position.set(0, 0, 0.7);
     camera.lookAt(0, 0, 0);
 
-    // Lumières
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(3, 5, 3);
-    scene.add(light);
+    // HDR Environment
+    new THREE.RGBELoader()
+        .load('https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_4k.hdr', function (texture) {
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            scene.environment = texture;
+            scene.background = texture;
+        });
 
     // Rendu
     renderer = new THREE.WebGLRenderer({
@@ -78,6 +80,8 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
     renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1;
 
     // Resize auto
     if (resizeObserver3D) resizeObserver3D.disconnect();
