@@ -181,7 +181,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée (base + overlay) sur"
-
+};
 
 // 📌 Nettoyer la texture et restaurer la couleur
 window.clear3DTexture = function (zoneName = null) {
