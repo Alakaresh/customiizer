@@ -107,8 +107,16 @@ function loadModel(modelUrl) {
             // Marquer zones imprimables
             if (name.startsWith("impression")) {
                 printableMeshes[child.name] = child;
+            
+                // 👉 on garde la couleur de base du GLB
                 child.material.userData.baseColor = child.material.color.getHex();
+            
+                // pas de transparent => visible par défaut
+                child.material.transparent = false;
+                child.material.opacity = 1.0;
+                child.material.needsUpdate = true;
             }
+
         });
 
         scene.add(gltf.scene);
