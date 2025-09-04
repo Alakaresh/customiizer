@@ -1,7 +1,6 @@
 // 📁 threeDManager.js
 
 let scene, camera, renderer, controls;
-let printableMeshes = {};
 let resizeObserver3D = null;
 
 function show3DLoader(container) {
@@ -91,6 +90,7 @@ function loadModel(modelUrl) {
                                 if (child.name.toLowerCase().startsWith('impression')) {
                                         child.userData.baseColor = child.material?.color?.getHex();
                                         printableMeshes[child.name] = child;
+
                                 }
                         }
                 });
