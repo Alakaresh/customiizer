@@ -84,6 +84,7 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
 }
 
 // --- Load GLB ---
+// --- Load GLB ---
 function loadModel(modelUrl) {
     const loader = new THREE.GLTFLoader();
     loader.load(modelUrl, (gltf) => {
@@ -96,13 +97,14 @@ function loadModel(modelUrl) {
             if (name.startsWith("impression")) {
                 printableMeshes[child.name] = child;
 
-                // Sauvegarde couleur de base
+                // 👉 Sauvegarde la couleur de base
                 child.material.userData.baseColor = child.material.color.getHex();
 
-                // Rendre visible dès le départ
-                child.material = new THREE.MeshBasicMaterial({
-                    color: child.material.userData.baseColor || 0xffffff
-                });
+                // ⚡ On NE change pas le matériau, donc il reste visible par défaut
+                // On s'assure juste qu'il ne soit pas transparent
+                child.material.transparent = false;
+                child.material.opacity = 1.0;
+                child.material.needsUpdate = true;
             }
         });
 
@@ -114,6 +116,7 @@ function loadModel(modelUrl) {
         hide3DLoader(renderer.domElement.parentElement);
     });
 }
+
 
 // --- Render loop ---
 function animate() {
