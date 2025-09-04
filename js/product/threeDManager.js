@@ -151,8 +151,6 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.flipY = false;
 
     mesh.material.map = texture;
-    mesh.material.color.set(0xffffff);
-    mesh.material.needsUpdate = true;
 };
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
