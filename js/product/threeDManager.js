@@ -160,8 +160,16 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    mesh.material.map = texture;              // ➡️ On remplace la map
-    mesh.material.color.set(0xffffff);        // ➡️ Neutralise la teinte
+    mesh.material.map = texture;
+
+    // ✅ On garde la couleur de base comme fond
+    if (mesh.material.userData?.baseColor !== undefined) {
+        mesh.material.color.setHex(mesh.material.userData.baseColor);
+    } else {
+        mesh.material.color.set(0xffffff);
+    }
+
+    mesh.material.transparent = true;
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
@@ -179,8 +187,16 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         texture.encoding = THREE.sRGBEncoding;
         texture.needsUpdate = true;
 
-        mesh.material.map = texture;          // ➡️ On remplace la map
-        mesh.material.color.set(0xffffff);    // ➡️ Neutralise la teinte
+        mesh.material.map = texture;
+
+        // ✅ Restaure couleur de fond
+        if (mesh.material.userData?.baseColor !== undefined) {
+            mesh.material.color.setHex(mesh.material.userData.baseColor);
+        } else {
+            mesh.material.color.set(0xffffff);
+        }
+
+        mesh.material.transparent = true;
         mesh.material.needsUpdate = true;
 
         console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
@@ -188,7 +204,6 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
 };
-
 
 
 window.clear3DTexture = function (zoneName = null) {
