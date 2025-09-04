@@ -146,28 +146,14 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 
     let baseColor = mesh.userData?.baseColor ?? 0xffffff;
 
-    // --- Offscreen ---
+    // Fond mug
     const offscreen = document.createElement("canvas");
     offscreen.width = canvas.width;
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // Fond couleur du mug
     ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
     ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-
-    // --- Nettoyage du blanc dans l'image ---
-    const imgData = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
-    const data = imgData.data;
-    for (let i = 0; i < data.length; i += 4) {
-        if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) {
-            // blanc → transparent
-            data[i+3] = 0;
-        }
-    }
-    canvas.getContext("2d").putImageData(imgData, 0, 0);
-
-    // Dessin final
     ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
@@ -175,13 +161,14 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
+    // ⚡ Au lieu de remplacer, on garde MeshStandardMaterial
     mesh.material.map = texture;
+    mesh.material.color.setHex(baseColor); // garde la teinte
     mesh.material.transparent = false;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée sans voile noir sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée tout en gardant l’éclairage sur", mesh.name);
 };
-
 
 
 // 📌 Nettoyer la texture et restaurer la couleur
