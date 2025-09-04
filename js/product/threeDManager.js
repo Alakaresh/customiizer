@@ -209,7 +209,7 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 }
 
 // --- Appliquer une texture depuis Canvas ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = false) {
+window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
@@ -218,17 +218,35 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    if (isFull) {
-        // 🟢 Mode zone pleine → fond noir + image opaque
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-    } else {
-        // 🟢 Mode zone pas pleine → transparence gardée
-        ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+    // Récupère les pixels du canvas original
+    const srcCtx = canvas.getContext("2d");
+    const imgData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
+
+    // Crée une nouvelle image avec transparence pour les zones vides
+    const newData = ctx.createImageData(imgData);
+
+    for (let i = 0; i < imgData.data.length; i += 4) {
+        const r = imgData.data[i];
+        const g = imgData.data[i + 1];
+        const b = imgData.data[i + 2];
+        const a = imgData.data[i + 3];
+
+        if (a === 0) {
+            // Zone non couverte → transparent
+            newData.data[i] = 0;
+            newData.data[i + 1] = 0;
+            newData.data[i + 2] = 0;
+            newData.data[i + 3] = 0;
+        } else {
+            // Zone couverte (même noir) → garder
+            newData.data[i] = r;
+            newData.data[i + 1] = g;
+            newData.data[i + 2] = b;
+            newData.data[i + 3] = a;
+        }
     }
 
-    // Dessine l'image par-dessus
-    ctx.drawImage(canvas, 0, 0);
+    ctx.putImageData(newData, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
@@ -236,14 +254,15 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     texture.needsUpdate = true;
 
     mesh.material.map = texture;
-    mesh.material.color.setHex(isFull ? 0xffffff : 0x000000); // blanc neutre ou noir base
+    mesh.material.color.setHex(0x000000); // fond du mesh
     mesh.material.transparent = true;
     mesh.material.opacity = 1.0;
     mesh.material.toneMapped = false;
     mesh.material.needsUpdate = true;
 
-    console.log(`[3D] ✅ Texture appliquée (${isFull ? "pleine" : "transparente"}) sur`, mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec vrai noir conservé et zones vides transparentes :", mesh.name);
 };
+
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
