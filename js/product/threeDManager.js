@@ -209,7 +209,8 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 }
 
 // --- Appliquer une texture depuis Canvas ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
+// --- Appliquer une texture depuis Canvas ---
+window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = false) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
@@ -218,9 +219,14 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    // 🎨 Fond noir pur (zones sans image)
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    // 🎨 Si la zone est pleine -> on force fond noir
+    if (isFull) {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    } else {
+        // sinon on laisse la transparence pour voir le mesh derrière
+        ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+    }
 
     // 🎨 Dessine l'image par-dessus
     ctx.drawImage(canvas, 0, 0);
@@ -230,17 +236,31 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
     mesh.material.map = texture;
-    mesh.material.color.setHex(0xffffff);
-    mesh.material.transparent = true; // autoriser transparence si besoin
+    mesh.material.color.setHex(0xffffff); // neutre
+    mesh.material.transparent = true;
     mesh.material.opacity = 1.0;
-
-    // 👉 Empêcher l'éclairage d’assombrir les couleurs
-    mesh.material.toneMapped = false;  // désactive la correction tonemapping
+    mesh.material.toneMapped = false;
     mesh.material.needsUpdate = true;
-    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
+
+    console.log(`[3D] ✅ Texture appliquée sur ${mesh.name}, mode ${isFull ? "plein" : "partiel"}`);
+
+    // 👉 Si c’est une zone pleine, on repeint aussi toutes les AUTRES zones en noir
+    if (isFull) {
+        for (const otherName in printableMeshes) {
+            if (otherName !== mesh.name) {
+                const otherMesh = printableMeshes[otherName];
+                if (otherMesh) {
+                    otherMesh.material.map = null;
+                    otherMesh.material.color.setHex(0x000000); // noir pur
+                    otherMesh.material.needsUpdate = true;
+                    console.log(`[3D] 🖤 Zone ${otherName} remise en noir (pleine appliquée)`);
+                }
+            }
+        }
+    }
 };
+
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
