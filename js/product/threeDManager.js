@@ -149,10 +149,16 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.flipY = false;
+    texture.encoding = THREE.sRGBEncoding;
+    texture.needsUpdate = true;
 
-    mesh.material.map = texture;
-    mesh.material.color.set(0xffffff);
+    mesh.material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true
+    });
     mesh.material.needsUpdate = true;
+
+    console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
 };
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
@@ -164,13 +170,20 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         if (!mesh) return;
 
         texture.flipY = false;
-        mesh.material.map = texture;
-        mesh.material.color.set(0xffffff);
+        texture.encoding = THREE.sRGBEncoding;
+
+        mesh.material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true
+        });
         mesh.material.needsUpdate = true;
+
+        console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
     }, undefined, (err) => {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
 };
+
 
 window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
