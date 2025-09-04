@@ -5,10 +5,9 @@ let printableMeshes = {};
 let resizeObserver3D = null;
 
 const productScales = {
-    mug11oz: [1.2, 1.2, 1.2],
-    mug15oz: [1.2, 1.2, 1.2],
-    tumbler: [1.5, 1.5, 1.5],
-    waterbottle: [1.5, 1.5, 1.5],
+    Mug: [1.2, 1.2, 1.2],
+    Tumbler: [1.5, 1.5, 1.5],
+    Bottle: [1.5, 1.5, 1.5],
 };
 
 function getScaleForProduct(modelUrl) {
