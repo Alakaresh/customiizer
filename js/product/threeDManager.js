@@ -22,12 +22,21 @@ function hide3DLoader(container) {
 
 // --- Init scene ---
 function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
-    const container = document.getElementById(containerId);
-    if (!container) {
-        console.error("[3D] ❌ Conteneur introuvable :", containerId);
+    // Vérifie si le container et le canvas existent
+    let container = document.getElementById(containerId);
+    let canvas = document.getElementById(canvasId);
+
+    if (!container || !canvas) {
+        console.warn(`[3D] ⏳ Container ou canvas introuvable (${containerId}, ${canvasId}), nouvel essai...`);
+
+        // Réessaie dans 100ms tant que le DOM n’est pas prêt
+        setTimeout(() => {
+            init3DScene(containerId, modelUrl, canvasId);
+        }, 100);
         return;
     }
 
+    // Ici le container et le canvas existent 👍
     show3DLoader(container);
 
     const rect = container.getBoundingClientRect();
@@ -48,7 +57,7 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
 
     // Rendu
     renderer = new THREE.WebGLRenderer({
-        canvas: document.getElementById(canvasId),
+        canvas: canvas,
         alpha: true,
         antialias: true
     });
@@ -77,6 +86,7 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
 
     animate();
 }
+
 
 // --- Load GLB ---
 function loadModel(modelUrl) {
