@@ -7,7 +7,7 @@ let resizeObserver3D = null;
 const productScales = {
     mug: [1.2, 1.2, 1.2],
     tumbler: [1.5, 1.5, 1.5],
-    bottle: [1.5, 1.5, 1.5],
+    bottle: [2, 2, 2],
 };
 
 // --- Détection du scale par URL ---
@@ -209,8 +209,7 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 }
 
 // --- Appliquer une texture depuis Canvas ---
-// --- Appliquer une texture depuis Canvas ---
-window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = false) {
+window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
@@ -219,33 +218,29 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null, isFull = f
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    if (isFull) {
-        // 🟢 Zone pleine : on force un fond noir + image
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
-        ctx.drawImage(canvas, 0, 0);
-    } else {
-        // 🟢 Zone pas pleine : on laisse la transparence
-        ctx.clearRect(0, 0, offscreen.width, offscreen.height);
-        ctx.drawImage(canvas, 0, 0);
-    }
+    // 🎨 Fond noir pur (zones sans image)
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+    // 🎨 Dessine l'image par-dessus
+    ctx.drawImage(canvas, 0, 0);
 
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // 🔥 Mesh reste noir, texture est juste un sticker
+    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
     mesh.material.map = texture;
-    mesh.material.color.setHex(0x000000); // noir de base
-    mesh.material.transparent = true;     // permettre trous
+    mesh.material.color.setHex(0xffffff);
+    mesh.material.transparent = true; // autoriser transparence si besoin
     mesh.material.opacity = 1.0;
-    mesh.material.toneMapped = false;
+
+    // 👉 Empêcher l'éclairage d’assombrir les couleurs
+    mesh.material.toneMapped = false;  // désactive la correction tonemapping
     mesh.material.needsUpdate = true;
-
-    console.log(`[3D] ✅ Texture appliquée (${isFull ? "pleine" : "partielle"}) sur`, mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
 };
-
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
@@ -269,3 +264,5 @@ window.logPrintableMeshPosition = function (zoneName = null) {
         console.warn("[3D] 🚫 Aucune zone imprimable trouvée pour", zoneName);
     }
 };
+
+je repart de ça mais on peux juste quand l'image est pleine repeindre juste les autre zone que impression normalement noir
