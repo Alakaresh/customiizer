@@ -180,7 +180,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     });
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée (base + overlay) sur"
+    console.log("[3D] ✅ Texture appliquée (base + overlay) sur", mesh.name);
 };
 
 // 📌 Nettoyer la texture et restaurer la couleur
