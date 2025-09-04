@@ -264,5 +264,3 @@ window.logPrintableMeshPosition = function (zoneName = null) {
         console.warn("[3D] 🚫 Aucune zone imprimable trouvée pour", zoneName);
     }
 };
-
-je repart de ça mais on peux juste quand l'image est pleine repeindre juste les autre zone que impression normalement noir
