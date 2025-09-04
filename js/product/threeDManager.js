@@ -285,31 +285,51 @@ function getPrintableMeshes(scene) {
 
 // Exposé global
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
-	const texture = new THREE.CanvasTexture(canvas);
-	texture.encoding = THREE.sRGBEncoding;
-	texture.needsUpdate = true;
+    if (!canvas) {
+        console.warn("[3D] ⚠️ Canvas vide, texture non appliquée");
+        return;
+    }
 
-	// 🔍 Si on a un nom précis
-	let mesh = null;
-	if (zoneName) {
-		mesh = printableMeshes[zoneName];
-	} else {
-		// Sinon, on en prend un arbitraire (le premier)
-		const keys = Object.keys(printableMeshes);
-		if (keys.length > 0) {
-			mesh = printableMeshes[keys[0]];
-		}
-	}
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.needsUpdate = true;
 
-	if (!mesh) {
-		console.warn("[3D] ❌ Zone imprimable non trouvée pour :", zoneName);
-		return;
-	}
-		console.log("update3DTextureFromCanvas appelé")
-        mesh.material.map = texture;
-        mesh.material.color.setHex(0xffffff);
-        mesh.material.needsUpdate = true;
+    let mesh = null;
+    if (zoneName) {
+        mesh = printableMeshes[zoneName];
+    } else {
+        const keys = Object.keys(printableMeshes);
+        if (keys.length > 0) {
+            mesh = printableMeshes[keys[0]];
+        }
+    }
+
+    if (!mesh) {
+        console.warn("[3D] ❌ Zone imprimable non trouvée pour :", zoneName);
+        return;
+    }
+
+    // ✅ Applique la texture seulement si le canvas contient des pixels opaques
+    const ctx = canvas.getContext("2d");
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let hasContent = false;
+    for (let i = 3; i < pixels.length; i += 4) { // vérifie alpha
+        if (pixels[i] > 0) { hasContent = true; break; }
+    }
+
+    if (!hasContent) {
+        console.warn("[3D] ⚠️ Canvas transparent, on garde la couleur d’origine");
+        return;
+    }
+
+    mesh.material.map = texture;
+    if (mesh.material.userData?.baseColor === undefined) {
+        mesh.material.userData.baseColor = mesh.material.color.getHex();
+    }
+    mesh.material.color.setHex(0xffffff); // pour éviter que la couleur teinte la texture
+    mesh.material.needsUpdate = true;
 };
+
 
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
         const img = new Image();
