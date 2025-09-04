@@ -140,7 +140,6 @@ function getPrintableMesh(zoneName) {
     return key ? printableMeshes[key] : null;
 }
 
-// --- Public API ---
 // 📌 Appliquer une texture depuis un canvas
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
@@ -168,36 +167,14 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ➡️ Appliquer sans perdre la couleur
-    mesh.material.map = texture;
-    mesh.material.transparent = false;
-    mesh.material.needsUpdate = true;
-
-    console.log("[3D] ✅ Texture appliquée (fond + image) sur", mesh.name);
-};
-
-// 📌 Appliquer une texture depuis une URL
-window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
-    const mesh = getPrintableMesh(zoneName);
-    if (!mesh || !canvas) return;
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.flipY = false;
-    texture.encoding = THREE.sRGBEncoding;
-    texture.needsUpdate = true;
-
-    // 👉 On garde la couleur de base et on laisse l’alpha de la texture faire le boulot
-    const baseColor = mesh.material.userData?.baseColor ?? 0xffffff;
-
+    // ➡️ Appliquer sans transparence noire
     mesh.material = new THREE.MeshBasicMaterial({
         map: texture,
-        color: baseColor,     // ça colore le fond
-        transparent: true,    // permet à la couleur de base d’apparaître sous les zones transparentes
-        alphaTest: 0.01       // évite que les pixels totalement transparents deviennent noirs
+        transparent: false   // ⚠️ très important pour garder la zone visible
     });
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée avec fallback couleur de base sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée (fond + image) sur", mesh.name);
 };
 
 
