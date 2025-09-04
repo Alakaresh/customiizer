@@ -154,7 +154,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     mesh.material = new THREE.MeshBasicMaterial({
         map: texture,
         color: mesh.material.userData?.baseColor || 0xffffff,
-        transparent: true
+        transparent: false
     });
     mesh.material.needsUpdate = true;
 
