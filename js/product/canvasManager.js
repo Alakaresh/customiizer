@@ -59,25 +59,34 @@ const CanvasManager = {
 		});
 
 		// 📷 Image de fond (template Printful)
-		fabric.Image.fromURL(template.image_url, function (img) {
-			const scaleX = template.template_width / img.width;
-			const scaleY = template.template_height / img.height;
+		ffabric.Image.fromURL(template.image_url, function (img) {
+    const scaleX = template.template_width / img.width;
+    const scaleY = template.template_height / img.height;
 
-			img.set({
-				originX: 'left',
-				originY: 'top',
-				scaleX: scaleX,
-				scaleY: scaleY,
-				left: 0,
-				top: 0,
-				selectable: false,
-				evented: false
-			});
+    img.set({
+        originX: 'left',
+        originY: 'top',
+        scaleX: scaleX,
+        scaleY: scaleY,
+        left: 0,
+        top: 0,
+        selectable: false,
+        evented: false
+    });
 
-			productOverlay = img;
-                        canvas.add(productOverlay);
-                        canvas.bringToFront(productOverlay);
-		}, { crossOrigin: 'anonymous' });
+    productOverlay = img;
+    canvas.add(productOverlay);
+    canvas.bringToFront(productOverlay);
+
+    // 🔁 Forcer un premier rendu
+    canvas.renderAll();
+
+    // 🚀 Synchroniser directement la texture 3D
+    if (typeof CanvasManager.syncTo3D === "function") {
+        CanvasManager.syncTo3D();
+    }
+}, { crossOrigin: 'anonymous' });
+
 
                 // 🔁 Resize automatique au conteneur
 		CanvasManager.resizeToContainer(containerId);
