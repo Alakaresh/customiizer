@@ -10,12 +10,16 @@ const productScales = {
     Bottle: [1.5, 1.5, 1.5],
 };
 
+// --- Détection du scale par URL ---
 function getScaleForProduct(modelUrl) {
+    const lowerUrl = modelUrl.toLowerCase();
     for (const key in productScales) {
-        if (modelUrl.toLowerCase().includes(key)) {
+        if (lowerUrl.includes(key)) {
+            console.log(`[3D Debug] Produit détecté: "${key}" → Scale:`, productScales[key]);
             return productScales[key];
         }
     }
+    console.log(`[3D Debug] Aucun produit détecté dans "${modelUrl}", scale par défaut [1,1,1]`);
     return [1, 1, 1]; // fallback
 }
 // --- Loader UI ---
