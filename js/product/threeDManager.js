@@ -168,56 +168,56 @@ function loadModel(modelUrl, productColor = null) {
 
                         // 🎯 Zones d’impression personnalisables
                         if (name.startsWith("impression")) {
-                               child.material = new THREE.MeshStandardMaterial({
-                                       color: baseColorHex,
-                                       roughness: 0.3,
-                                       metalness: 0.1,
-                                       transparent: true
-                               });
-                               child.material.userData.baseColor = baseColorHex;
-                                printableMeshes[child.name] = child;
+                               // child.material = new THREE.MeshStandardMaterial({
+                               //        color: baseColorHex,
+                               //        roughness: 0.3,
+                               //        metalness: 0.1,
+                               //        transparent: true
+                               // });
+                               // child.material.userData.baseColor = baseColorHex;
+                               printableMeshes[child.name] = child;
                         }
 
                         // 🎨 WaterBottle : couleur personnalisée + métal gris
                         else if (name === "waterbottle") {
-                                child.material = new THREE.MeshStandardMaterial({
-                                        color: baseColorHex,
-                                        roughness: 0.3,
-                                        metalness: 0.1
-                                });
+                                // child.material = new THREE.MeshStandardMaterial({
+                                //        color: baseColorHex,
+                                //        roughness: 0.3,
+                                //        metalness: 0.1
+                                // });
                         } else if (name === "waterbottlecap" || name === "waterbottlebottom") {
-                                child.material = new THREE.MeshStandardMaterial({
-                                        color: 0xaaaaaa,
-                                        roughness: 0.2,
-                                        metalness: 0.7
-                                });
+                                // child.material = new THREE.MeshStandardMaterial({
+                                //        color: 0xaaaaaa,
+                                //        roughness: 0.2,
+                                //        metalness: 0.7
+                                // });
                         }
 
                         // 🧊 Tumbler : couleur personnalisée + métal gris
                         else if (name === "tumbler") {
-                                child.material = new THREE.MeshStandardMaterial({
-                                        color: baseColorHex,
-                                        roughness: 0.3,
-                                        metalness: 0.1
-                                });
+                                // child.material = new THREE.MeshStandardMaterial({
+                                //        color: baseColorHex,
+                                //        roughness: 0.3,
+                                //        metalness: 0.1
+                                // });
                         } else if (name === "tumblercap" || name === "tumblerbottom") {
-                                child.material = new THREE.MeshStandardMaterial({
-                                        color: 0xaaaaaa,
-                                        roughness: 0.2,
-                                        metalness: 0.7
-                                });
+                                // child.material = new THREE.MeshStandardMaterial({
+                                //        color: 0xaaaaaa,
+                                //        roughness: 0.2,
+                                //        metalness: 0.7
+                                // });
                         }
 
                         // 🎭 Sinon, matériau par défaut
                         else {
-                                child.material = new THREE.MeshStandardMaterial({
-                                        color: baseColorHex,
-                                        roughness: 0.3,
-                                        metalness: 0.1
-                                });
+                                // child.material = new THREE.MeshStandardMaterial({
+                                //        color: baseColorHex,
+                                //        roughness: 0.3,
+                                //        metalness: 0.1
+                                // });
                         }
 
-                        child.material.needsUpdate = true;
+                        // child.material.needsUpdate = true;
                });
 
                console.log('[3D Debug] GLB elements:', glbElements);
