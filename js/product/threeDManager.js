@@ -177,30 +177,29 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 };
 
 // 📌 Appliquer une texture depuis une URL
-window.update3DTextureFromImageURL = function (url, zoneName = null) {
-    if (!url) return;
-    const loader = new THREE.TextureLoader();
-    loader.crossOrigin = "anonymous";
-    loader.load(url, (texture) => {
-        const mesh = getPrintableMesh(zoneName);
-        if (!mesh) return;
+window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
+    const mesh = getPrintableMesh(zoneName);
+    if (!mesh || !canvas) return;
 
-        texture.flipY = false;
-        texture.encoding = THREE.sRGBEncoding;
-        texture.needsUpdate = true;
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.flipY = false;
+    texture.encoding = THREE.sRGBEncoding;
+    texture.needsUpdate = true;
 
-        mesh.material = new THREE.MeshBasicMaterial({
-            map: texture,
-            color: mesh.material.userData?.baseColor || 0xffffff,
-            transparent: false,
-        });
-        mesh.material.needsUpdate = true;
+    // 👉 On garde la couleur de base et on laisse l’alpha de la texture faire le boulot
+    const baseColor = mesh.material.userData?.baseColor ?? 0xffffff;
 
-        console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
-    }, undefined, (err) => {
-        console.error("[3D] ❌ Erreur chargement texture :", err);
+    mesh.material = new THREE.MeshBasicMaterial({
+        map: texture,
+        color: baseColor,     // ça colore le fond
+        transparent: true,    // permet à la couleur de base d’apparaître sous les zones transparentes
+        alphaTest: 0.01       // évite que les pixels totalement transparents deviennent noirs
     });
+    mesh.material.needsUpdate = true;
+
+    console.log("[3D] ✅ Texture appliquée avec fallback couleur de base sur", mesh.name);
 };
+
 
 // 📌 Nettoyer la texture et restaurer la couleur
 window.clear3DTexture = function (zoneName = null) {
