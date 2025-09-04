@@ -2,10 +2,9 @@
 
 let scene, camera, renderer, controls;
 let printableMeshes = {};
-let printableEdges  = {};
 let resizeObserver3D = null;
 
-/* ---------------- Loader UI ---------------- */
+// --- Loader UI ---
 function show3DLoader(container) {
     let loader = container.querySelector('.loading-overlay');
     if (!loader) {
@@ -21,25 +20,27 @@ function hide3DLoader(container) {
     if (loader) loader.remove();
 }
 
-/* ---------------- Init scene ---------------- */
+// --- Init scene ---
 function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
-    const container = document.getElementById(containerId);
-    const canvas    = document.getElementById(canvasId);
+    let container = document.getElementById(containerId);
+    let canvas = document.getElementById(canvasId);
 
     if (!container || !canvas) {
         console.warn(`[3D] ⏳ Container ou canvas introuvable (${containerId}, ${canvasId}), nouvel essai...`);
-        setTimeout(() => init3DScene(containerId, modelUrl, canvasId), 100);
+        setTimeout(() => {
+            init3DScene(containerId, modelUrl, canvasId);
+        }, 100);
         return;
     }
 
     show3DLoader(container);
 
     const rect = container.getBoundingClientRect();
-    let width  = rect.width;
+    let width = rect.width;
     let height = rect.height || width;
 
     // Scène & caméra
-    scene  = new THREE.Scene();
+    scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.set(0, 0, 0.7);
     camera.lookAt(0, 0, 0);
@@ -51,10 +52,13 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     scene.add(light);
 
     // Rendu
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true
+    });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
-    // Compatible anciennes versions de three
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Resize auto
@@ -79,46 +83,12 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     animate();
 }
 
-/* ---------------- Utils: dispose ---------------- */
-function disposeMaterial(mat) {
-    if (!mat) return;
-    if (mat.map) { mat.map.dispose(); mat.map = null; }
-    if (mat.alphaMap) { mat.alphaMap.dispose(); mat.alphaMap = null; }
-    mat.dispose?.();
-}
-
-/* ---------------- Création matériaux ---------------- */
-// Matériau d’aperçu: semi-transparent, au-dessus de la surface, visible sans lumière
-function makePreviewMaterial() {
-    return new THREE.MeshBasicMaterial({
-        color: 0x00e5ff,          // cyan/bleu lisible
-        transparent: true,
-        opacity: 0.18,
-        depthWrite: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -1,  // tire vers la caméra pour éviter le z-fight
-        polygonOffsetUnits: -1
-    });
-}
-
-// Matériau texturé pour la zone d’impression
-function makeTexturedMaterial(texture) {
-    return new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        alphaTest: 0.01,          // meilleure coupe des pixels 100% transparents
-        polygonOffset: true,
-        polygonOffsetFactor: -1,
-        polygonOffsetUnits: -1
-    });
-}
-
-/* ---------------- Load GLB ---------------- */
+// --- Load GLB ---
+// --- Load GLB ---
 function loadModel(modelUrl) {
     const loader = new THREE.GLTFLoader();
     loader.load(modelUrl, (gltf) => {
         printableMeshes = {};
-        printableEdges  = {};
 
         gltf.scene.traverse((child) => {
             if (!child.isMesh) return;
@@ -127,58 +97,50 @@ function loadModel(modelUrl) {
             if (name.startsWith("impression")) {
                 printableMeshes[child.name] = child;
 
-                // Sauvegarde de l'original (au cas où)
-                child.userData.originalMaterial = child.material;
-                child.material = makePreviewMaterial(); // ► visible tout de suite
+                // 👉 Sauvegarde la couleur de base
+                child.material.userData.baseColor = child.material.color.getHex();
 
-                // Contour lisible
-                const edgeGeom = new THREE.EdgesGeometry(child.geometry, 40); // thresholdAngle
-                const edgeMat  = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.8 });
-                const edges    = new THREE.LineSegments(edgeGeom, edgeMat);
-                edges.name = `${child.name}_edges`;
-                edges.renderOrder = (child.renderOrder || 0) + 1;
-
-                // Attache au mesh pour suivre les transforms
-                child.add(edges);
-                printableEdges[child.name] = edges;
+                // ⚡ On NE change pas le matériau, donc il reste visible par défaut
+                // On s'assure juste qu'il ne soit pas transparent
+                child.material.transparent = false;
+                child.material.opacity = 1.0;
+                child.material.needsUpdate = true;
             }
         });
 
         scene.add(gltf.scene);
         hide3DLoader(renderer.domElement.parentElement);
         console.log("[3D] ✅ Modèle chargé :", modelUrl);
-
     }, undefined, (error) => {
         console.error("[3D] ❌ Erreur chargement modèle :", error);
         hide3DLoader(renderer.domElement.parentElement);
     });
 }
 
-/* ---------------- Render loop ---------------- */
+
+// --- Render loop ---
 function animate() {
     requestAnimationFrame(animate);
-    controls?.update();
-    if (renderer && scene && camera) renderer.render(scene, camera);
+    if (controls) controls.update();
+    if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+    }
 }
 
-/* ---------------- Helpers ---------------- */
+// --- Helpers ---
 function getPrintableMesh(zoneName) {
     if (!zoneName) {
         const firstKey = Object.keys(printableMeshes)[0];
         return firstKey ? printableMeshes[firstKey] : null;
     }
+
     const key = Object.keys(printableMeshes).find(
         name => name.toLowerCase() === zoneName.toLowerCase()
     );
     return key ? printableMeshes[key] : null;
 }
 
-function setEdgesVisible(mesh, visible) {
-    const edges = printableEdges[mesh.name];
-    if (edges) edges.visible = visible;
-}
-
-/* ---------------- Public API ---------------- */
+// --- Public API ---
 // 📌 Appliquer une texture depuis un canvas
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
@@ -189,13 +151,12 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // Nettoie l'ancien matériau si on re-applique
-    if (mesh.material && mesh.material !== mesh.userData.originalMaterial && mesh.material !== mesh.userData.previewMaterial) {
-        disposeMaterial(mesh.material);
-    }
-
-    mesh.material = makeTexturedMaterial(texture);
-    setEdgesVisible(mesh, true); // garde le contour
+    mesh.material = new THREE.MeshBasicMaterial({
+        map: texture,
+        color: mesh.material.userData?.baseColor || 0xffffff,
+        transparent: true
+    });
+    mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
 };
@@ -213,12 +174,12 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
         texture.encoding = THREE.sRGBEncoding;
         texture.needsUpdate = true;
 
-        if (mesh.material && mesh.material !== mesh.userData.originalMaterial && mesh.material !== mesh.userData.previewMaterial) {
-            disposeMaterial(mesh.material);
-        }
-
-        mesh.material = makeTexturedMaterial(texture);
-        setEdgesVisible(mesh, true);
+        mesh.material = new THREE.MeshBasicMaterial({
+            map: texture,
+            color: mesh.material.userData?.baseColor || 0xffffff,
+            transparent: true
+        });
+        mesh.material.needsUpdate = true;
 
         console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
     }, undefined, (err) => {
@@ -226,41 +187,17 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
     });
 };
 
-// 📌 Nettoyer la texture et restaurer l'aperçu
+// 📌 Nettoyer la texture et restaurer la couleur
 window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
 
-    // Dispose le matériau texturé courant si nécessaire
-    if (mesh.material && mesh.material.map) {
-        disposeMaterial(mesh.material);
-    }
-
-    // (Re)crée le matériau d’aperçu si besoin puis réassigne
-    if (!mesh.userData.previewMaterial) {
-        mesh.userData.previewMaterial = makePreviewMaterial();
-    }
-    mesh.material = mesh.userData.previewMaterial ?? makePreviewMaterial();
-    setEdgesVisible(mesh, true);
-
-    console.log("[3D] 🧹 Texture retirée, aperçu restauré :", mesh.name);
-};
-
-// 📌 Afficher / masquer l’aperçu des zones d’impression (teinte + contour)
-window.setPrintAreaVisibility = function (visible = true) {
-    Object.values(printableMeshes).forEach(mesh => {
-        // si aucune texture n’est posée, on met le preview; sinon on garde tel quel mais on peut cacher le contour
-        if (!mesh.material?.map) {
-            if (visible) {
-                if (!mesh.userData.previewMaterial) mesh.userData.previewMaterial = makePreviewMaterial();
-                mesh.material = mesh.userData.previewMaterial;
-            } else {
-                // Matériau invisible mais laisse le mesh intact (on pourrait aussi .visible=false)
-                mesh.material.visible = false;
-            }
-        }
-        setEdgesVisible(mesh, visible);
+    mesh.material = new THREE.MeshBasicMaterial({
+        color: mesh.material.userData?.baseColor || 0xffffff
     });
+    mesh.material.needsUpdate = true;
+
+    console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
 };
 
 // 📌 Debug
