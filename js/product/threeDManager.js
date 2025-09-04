@@ -22,6 +22,7 @@ function getScaleForProduct(modelUrl) {
     console.log(`[3D Debug] Aucun produit détecté dans "${modelUrl}", scale par défaut [1,1,1]`);
     return [1, 1, 1]; // fallback
 }
+
 // --- Loader UI ---
 function show3DLoader(container) {
     let loader = container.querySelector('.loading-overlay');
@@ -63,31 +64,36 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     camera.position.set(0, 0, 0.7);
     camera.lookAt(0, 0, 0);
 
-    // HDR Environment
-    // HDR Environment
-const pmremGenerator = new THREE.PMREMGenerator(renderer);
-pmremGenerator.compileEquirectangularShader();
-
-new THREE.RGBELoader()
-    .load('https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_4k.hdr', function (hdrEquirect) {
-        const envMap = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
-
-        scene.environment = envMap; // sert pour éclairage/réflexions
-        scene.background = null;    // fond neutre
-
-        hdrEquirect.dispose();
-        pmremGenerator.dispose();
-
-        console.log("✅ HDR chargé sans background, éclairage actif !");
+    // --- Renderer ---
+    renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true
     });
-
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
 
-    // Resize auto
+    // --- HDR Environment ---
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+
+    new THREE.RGBELoader()
+        .load('https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_4k.hdr', function (hdrEquirect) {
+            const envMap = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
+
+            scene.environment = envMap; // sert pour l’éclairage et reflets
+            scene.background = null;    // fond neutre (pas d’HDR visible)
+
+            hdrEquirect.dispose();
+            pmremGenerator.dispose();
+
+            console.log("✅ HDR chargé sans background, éclairage actif !");
+        });
+
+    // --- Resize auto ---
     if (resizeObserver3D) resizeObserver3D.disconnect();
     resizeObserver3D = new ResizeObserver(entries => {
         const { width: w, height: h } = entries[0].contentRect;
@@ -134,7 +140,7 @@ function loadModel(modelUrl) {
                 child.material.needsUpdate = true;
             }
         });
-        
+
         scene.add(gltf.scene);
         fitCameraToObject(camera, gltf.scene, controls, renderer);
         const scale = getScaleForProduct(modelUrl);
@@ -147,7 +153,6 @@ function loadModel(modelUrl) {
         hide3DLoader(renderer.domElement.parentElement);
     });
 }
-
 
 // --- Render loop ---
 function animate() {
@@ -203,7 +208,6 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
     }
 }
 
-
 // --- Appliquer une texture depuis Canvas ---
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
@@ -211,7 +215,6 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 
     let baseColor = mesh.userData?.baseColor ?? 0xffffff;
 
-    // Fond mug
     const offscreen = document.createElement("canvas");
     offscreen.width = canvas.width;
     offscreen.height = canvas.height;
@@ -226,22 +229,19 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ⚡ Au lieu de remplacer, on garde MeshStandardMaterial
     mesh.material.map = texture;
-    mesh.material.color.setHex(baseColor); // garde la teinte
+    mesh.material.color.setHex(baseColor);
     mesh.material.transparent = false;
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée tout en gardant l’éclairage sur", mesh.name);
 };
 
-
-// 📌 Nettoyer la texture et restaurer la couleur
+// --- Nettoyer la texture et restaurer la couleur ---
 window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
 
-    // ⚡ On garde le matériau original et on retire juste la map
     mesh.material.map = null;
     mesh.material.color.setHex(mesh.userData?.baseColor || 0xffffff);
     mesh.material.needsUpdate = true;
@@ -249,8 +249,7 @@ window.clear3DTexture = function (zoneName = null) {
     console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
 };
 
-
-// 📌 Debug
+// --- Debug ---
 window.logPrintableMeshPosition = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (mesh) {
