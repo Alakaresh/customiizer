@@ -414,7 +414,7 @@ jQuery(document).ready(function ($) {
                                         container.show();
                                         if (!main3DInitialized) {
                                                 requestAnimationFrame(() => {
-                                                        init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
+                                                        init3DScene('productMain3DContainer', variant.url_3d, 'productMain3DCanvas');
                                                 });
                                                 main3DInitialized = true;
                                         }
