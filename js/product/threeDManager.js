@@ -95,34 +95,36 @@ function loadModel(modelUrl) {
         printableMeshes = {};
 
         gltf.scene.traverse((child) => {
-            if (child.isMesh && child.material) {
-                child.material.transparent = false;
-                child.material.opacity = 1.0;
-                child.material.depthWrite = true;
-                child.material.needsUpdate = true;
-            }
-            if (!child.isMesh) return;
-            const name = child.name.toLowerCase();
+    if (child.isMesh && child.material) {
+        child.material.transparent = false;
+        child.material.opacity = 1.0;
+        child.material.depthWrite = true;
+        child.material.needsUpdate = true;
+    }
+    if (!child.isMesh) return;
+    const name = child.name.toLowerCase();
 
-            // Marquer zones imprimables
-            if (name.startsWith("impression")) {
-                printableMeshes[child.name] = child;
-            
-                // 👉 on garde la couleur de base du GLB
-                child.material.userData.baseColor = child.material.color.getHex();
-            
-                // pas de transparent => visible par défaut
-                child.material.transparent = false;
-                child.material.opacity = 1.0;
-                child.material.needsUpdate = true;
-            }
+    // Marquer zones imprimables
+    if (name.startsWith("impression")) {
+        printableMeshes[child.name] = child;
 
-        });
-        console.log("[3D] 🔍 Mesh trouvé :", child.name, {
-            isMesh: child.isMesh,
-            color: child.material?.color?.getHex?.(),
-            materialType: child.material?.type
-        });
+        // 👉 on garde la couleur de base du GLB
+        child.material.userData.baseColor = child.material.color.getHex();
+
+        // pas de transparent => visible par défaut
+        child.material.transparent = false;
+        child.material.opacity = 1.0;
+        child.material.needsUpdate = true;
+    }
+
+    // 🔍 Debug log ici (à chaque mesh)
+    console.log("[3D] 🔍 Mesh trouvé :", child.name, {
+        isMesh: child.isMesh,
+        color: child.material?.color?.getHex?.(),
+        materialType: child.material?.type
+    });
+});
+
 
         scene.add(gltf.scene);
         hide3DLoader(renderer.domElement.parentElement);
