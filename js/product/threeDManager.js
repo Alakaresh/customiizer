@@ -6,7 +6,7 @@ let resizeObserver3D = null;
 
 const productScales = {
     mug: [1.2, 1.2, 1.2],
-    tumbler: [2, 2, 2],
+    tumbler: [1.5, 1.5, 1.5],
     bottle: [2, 2, 2],
 };
 
