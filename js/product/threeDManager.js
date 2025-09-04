@@ -113,7 +113,7 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
         });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(width, height, false);
-        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.outputEncoding = THREE.LinearEncoding;
 
         if (resizeObserver3D) {
                 resizeObserver3D.disconnect();
@@ -140,6 +140,13 @@ function init3DScene(containerId, modelUrl, productColor = null, canvasId = 'thr
         controls.target.set(0, lookAtY, 0);
         controls.update();
 
+	// supprime ou commente ça
+	// scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+	// const light = new THREE.DirectionalLight(0xffffff, 0.8);
+	// light.position.set(3, 5, 3);
+	// scene.add(light);
+	
+	// ✅ nouveau setup basé sur ton JSON
 	const lightsConfig = [
 	  {"type":"ambient","intensity":0.40,"color":0xffffff},
 	  {"type":"directional","intensity":2.40,"color":0xffffff,"position":[5,6,6]},
@@ -298,7 +305,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
 		console.warn("[3D] ❌ Zone imprimable non trouvée pour :", zoneName);
 		return;
 	}
-
+		console.log("update3DTextureFromCanvas appelé")
         mesh.material.map = texture;
         mesh.material.color.setHex(0xffffff);
         mesh.material.needsUpdate = true;
