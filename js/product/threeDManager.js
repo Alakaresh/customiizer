@@ -146,21 +146,36 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
-    const texture = new THREE.CanvasTexture(canvas);
+    const baseColor = mesh.material.userData?.baseColor || 0xffffff;
+
+    // 🎨 Création d’un canvas temporaire
+    const offscreen = document.createElement("canvas");
+    offscreen.width = canvas.width;
+    offscreen.height = canvas.height;
+    const ctx = offscreen.getContext("2d");
+
+    // 👇 Remplir avec la couleur de base
+    ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+    // 👇 Dessiner l’image par-dessus
+    ctx.drawImage(canvas, 0, 0);
+
+    // 👉 Créer la texture finale
+    const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
     mesh.material = new THREE.MeshBasicMaterial({
         map: texture,
-        color: mesh.material.userData?.baseColor || 0xffffff,
-        transparent: false,
-        alphaTest: 0.01
+        transparent: false
     });
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée avec fond sur", mesh.name);
 };
+
 
 // 📌 Appliquer une texture depuis une URL
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
@@ -179,7 +194,6 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
             map: texture,
             color: mesh.material.userData?.baseColor || 0xffffff,
             transparent: false,
-            alphaTest: 0.01
         });
         mesh.material.needsUpdate = true;
 
