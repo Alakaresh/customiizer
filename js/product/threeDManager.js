@@ -165,8 +165,6 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
 
         texture.flipY = false;
         mesh.material.map = texture;
-        mesh.material.color.set(0xffffff);
-        mesh.material.needsUpdate = true;
     }, undefined, (err) => {
         console.error("[3D] ❌ Erreur chargement texture :", err);
     });
