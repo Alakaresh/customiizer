@@ -158,44 +158,59 @@ function getPrintableMesh(zoneName) {
 }
 
 // --- Public API ---
-// 📌 Appliquer une texture depuis un canvas
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
     const texture = new THREE.CanvasTexture(canvas);
-    texture.flipY = false;
+    texture.flipY    = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    mesh.material = new THREE.MeshBasicMaterial({
+    const mat = new THREE.MeshBasicMaterial({
         map: texture,
-        color: mesh.material.userData?.baseColor || 0xffffff,
-        transparent: true
+        color: 0xffffff,          // pas de teinte
+        transparent: true,        // respecte l’alpha de l’image
+        toneMapped: false         // évite la désaturation par tone mapping
     });
+
+    // Anti z-fighting + priorité d’affichage
+    mat.polygonOffset       = true;
+    mat.polygonOffsetFactor = -2;
+    mat.polygonOffsetUnits  = -2;
+
+    mesh.material   = mat;
+    mesh.renderOrder = 999;
     mesh.material.needsUpdate = true;
 
     console.log("[3D] ✅ Texture appliquée depuis Canvas sur", mesh.name);
 };
 
-// 📌 Appliquer une texture depuis une URL
 window.update3DTextureFromImageURL = function (url, zoneName = null) {
     if (!url) return;
+    const mesh = getPrintableMesh(zoneName);
+    if (!mesh) return;
+
     const loader = new THREE.TextureLoader();
     loader.crossOrigin = "anonymous";
     loader.load(url, (texture) => {
-        const mesh = getPrintableMesh(zoneName);
-        if (!mesh) return;
-
-        texture.flipY = false;
+        texture.flipY    = false;
         texture.encoding = THREE.sRGBEncoding;
         texture.needsUpdate = true;
 
-        mesh.material = new THREE.MeshBasicMaterial({
+        const mat = new THREE.MeshBasicMaterial({
             map: texture,
-            color: mesh.material.userData?.baseColor || 0xffffff,
-            transparent: true
+            color: 0xffffff,
+            transparent: true,
+            toneMapped: false
         });
+
+        mat.polygonOffset       = true;
+        mat.polygonOffsetFactor = -2;
+        mat.polygonOffsetUnits  = -2;
+
+        mesh.material   = mat;
+        mesh.renderOrder = 999;
         mesh.material.needsUpdate = true;
 
         console.log("[3D] ✅ Texture appliquée depuis URL sur", mesh.name);
@@ -204,18 +219,41 @@ window.update3DTextureFromImageURL = function (url, zoneName = null) {
     });
 };
 
-// 📌 Nettoyer la texture et restaurer la couleur
+
 window.clear3DTexture = function (zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh) return;
 
-    mesh.material = new THREE.MeshBasicMaterial({
-        color: mesh.material.userData?.baseColor || 0xffffff
-    });
-    mesh.material.needsUpdate = true;
+    // Si on a remplacé le matériau par un Basic, on libère proprement
+    if (mesh.material && mesh.material !== mesh.userData.origMaterial) {
+        if (mesh.material.map) {
+            mesh.material.map.dispose();
+        }
+        mesh.material.dispose();
+    }
 
-    console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
+    // Restore matériau GLB (couleur visible par défaut)
+    if (mesh.userData.origMaterial) {
+        mesh.material = mesh.userData.origMaterial;
+
+        mesh.material.transparent   = false;
+        mesh.material.opacity       = 1.0;
+        mesh.material.alphaTest     = 0;
+        mesh.material.blending      = THREE.NormalBlending;
+        mesh.material.depthWrite    = true;
+        mesh.material.colorWrite    = true;
+
+        mesh.material.polygonOffset       = true;
+        mesh.material.polygonOffsetFactor = -2;
+        mesh.material.polygonOffsetUnits  = -2;
+
+        mesh.renderOrder = 999;
+        mesh.material.needsUpdate = true;
+    }
+
+    console.log("[3D] 🧹 Texture retirée, matériau d’origine restauré :", mesh.name);
 };
+
 
 // 📌 Debug
 window.logPrintableMeshPosition = function (zoneName = null) {
