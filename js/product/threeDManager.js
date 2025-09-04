@@ -146,24 +146,43 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
-    const texture = new THREE.CanvasTexture(canvas);
+    console.log("[3D Debug] mesh.material", mesh.material);
+    console.log("[3D Debug] baseColor", mesh.userData?.baseColor);
+    console.log("[3D Debug] baseMap", mesh.userData?.baseMap);
+
+    let baseColor = mesh.userData?.baseColor ?? null;
+    let baseMap = mesh.userData?.baseMap ?? null;
+
+    const offscreen = document.createElement("canvas");
+    offscreen.width = canvas.width;
+    offscreen.height = canvas.height;
+    const ctx = offscreen.getContext("2d");
+
+    if (baseMap?.image) {
+        ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
+        console.log("[3D Debug] Fond → baseMap dessinée");
+    } else if (baseColor) {
+        ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+        console.log("[3D Debug] Fond → couleur appliquée", ctx.fillStyle);
+    } else {
+        console.log("[3D Debug] Aucun fond d'origine, fallback blanc");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    }
+
+    ctx.drawImage(canvas, 0, 0);
+    console.log("[3D Debug] Canvas personnalisé dessiné");
+
+    const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ⚡ Garde MeshStandardMaterial
-    mesh.material.map = texture;
-
-    // Assure-toi que la couleur d’origine est utilisée comme fond
-    mesh.material.color.setHex(mesh.userData?.baseColor ?? 0xffffff);
-
-    // Active l’alpha pour que la couleur apparaisse là où la texture est vide
-    mesh.material.transparent = true;
-    mesh.material.alphaTest = 0.01;
-
+    mesh.material = new THREE.MeshBasicMaterial({ map: texture });
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée, fond couleur d'origine conservé :", mesh.name);
+    console.log("[3D] ✅ Texture finale appliquée sur", mesh.name);
 };
 
 
