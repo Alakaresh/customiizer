@@ -7,7 +7,7 @@ let resizeObserver3D = null;
 const productScales = {
     mug: [1.2, 1.2, 1.2],
     tumbler: [1.5, 1.5, 1.5],
-    bottle: [2, 2, 2],
+    bottle: [3, 3, 3],
 };
 
 // --- Détection du scale par URL ---
