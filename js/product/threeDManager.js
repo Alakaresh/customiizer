@@ -140,24 +140,11 @@ function getPrintableMesh(zoneName) {
     return key ? printableMeshes[key] : null;
 }
 // --- Appliquer une texture depuis Canvas ---
-// --- Appliquer une texture depuis Canvas ---
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     const mesh = getPrintableMesh(zoneName);
     if (!mesh || !canvas) return;
 
     let baseColor = mesh.userData?.baseColor ?? 0xffffff;
-    let baseMap = mesh.userData?.baseMap ?? null;
-
-    // --- Vérifier si le canvas contient de la transparence ---
-    const ctxCheck = canvas.getContext("2d");
-    const pixels = ctxCheck.getImageData(0, 0, canvas.width, canvas.height).data;
-    let hasTransparency = false;
-    for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] < 255) {
-            hasTransparency = true;
-            break;
-        }
-    }
 
     // --- Offscreen ---
     const offscreen = document.createElement("canvas");
@@ -165,32 +152,36 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
     offscreen.height = canvas.height;
     const ctx = offscreen.getContext("2d");
 
-    if (hasTransparency) {
-        // Fond = baseMap si dispo, sinon couleur
-        if (baseMap?.image) {
-            ctx.drawImage(baseMap.image, 0, 0, offscreen.width, offscreen.height);
-        } else {
-            ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
-            ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+    // Fond couleur du mug
+    ctx.fillStyle = "#" + baseColor.toString(16).padStart(6, "0");
+    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+    // --- Nettoyage du blanc dans l'image ---
+    const imgData = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) {
+            // blanc → transparent
+            data[i+3] = 0;
         }
     }
+    canvas.getContext("2d").putImageData(imgData, 0, 0);
 
-    // Dessine la personnalisation
+    // Dessin final
     ctx.drawImage(canvas, 0, 0);
 
-    // --- Texture finale ---
     const texture = new THREE.CanvasTexture(offscreen);
     texture.flipY = false;
     texture.encoding = THREE.sRGBEncoding;
     texture.needsUpdate = true;
 
-    // ⚡ On garde le matériau original, on modifie juste la map
     mesh.material.map = texture;
     mesh.material.transparent = false;
     mesh.material.needsUpdate = true;
 
-    console.log("[3D] ✅ Texture appliquée sur", mesh.name);
+    console.log("[3D] ✅ Texture appliquée sans voile noir sur", mesh.name);
 };
+
 
 
 // 📌 Nettoyer la texture et restaurer la couleur
