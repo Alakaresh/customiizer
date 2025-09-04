@@ -386,7 +386,7 @@ jQuery(document).ready(function ($) {
                         // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
-                                init3DScene('product3DContainer', selectedVariant.url_3d, selectedVariant.color, 'threeDCanvas', false);
+                                init3DScene('product3DContainer', selectedVariant.url_3d, 'threeDCanvas');
                                 threeDInitialized = true;
                         } else {
                                 $('#product3DContainer').hide();
