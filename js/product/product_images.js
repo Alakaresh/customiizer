@@ -248,10 +248,15 @@ async function generateMockup(mockupData) {
                 .then(res => res.json())
                 .then(data => {
                         console.log('📥 Mockup response', data);
+                        if (data.data?.timings) {
+                                console.log('⏱ Render timings', data.data.timings);
+                        }
 
                         if (data.success && Array.isArray(data.data?.files)) {
                                 mockupTimes.pending = null;
-                                data.data.files.forEach(f => updateMockupThumbnail(f.name, f.url));
+                                data.data.files
+                                        .filter(f => f.name !== 'texture')
+                                        .forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
                         } else if (data.success && data.data?.mockup_url && firstViewName) {
                                 mockupTimes.pending = null;
                                 updateMockupThumbnail(firstViewName, data.data.mockup_url);
