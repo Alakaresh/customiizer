@@ -129,6 +129,17 @@ function handle_generate_mockup() {
         wp_send_json_success($result);
     }
 
+    // Réponse simplifiée avec une clé url
+    if (!empty($body['url'])) {
+        $mockup_url = esc_url_raw($body['url']);
+        error_log('[Mockup] Success: ' . $mockup_url);
+        $result = ['mockup_url' => $mockup_url];
+        if (!empty($body['timings'])) {
+            $result['timings'] = $body['timings'];
+        }
+        wp_send_json_success($result);
+    }
+
     error_log('[Mockup] Invalid response format');
     wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
 }
