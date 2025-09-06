@@ -73,7 +73,6 @@ function handle_generate_mockup() {
     }
 
     $raw_body = wp_remote_retrieve_body($response);
-    error_log('[Mockup] Response: ' . $raw_body);
 
     $body = json_decode($raw_body, true);
     if (!is_array($body)) {
@@ -81,12 +80,19 @@ function handle_generate_mockup() {
         wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
     }
 
+    if (!empty($body['timings'])) {
+        error_log('[Mockup] Timings: ' . wp_json_encode($body['timings']));
+    }
     // Nouvelle API : retourne plusieurs fichiers avec base64
     if (!empty($body['files']) && is_array($body['files'])) {
         $files = [];
         foreach ($body['files'] as $f) {
+            if (empty($f['name']) || $f['name'] === 'texture') {
+                continue; // n'expose pas la texture
+            }
+
             // Priorité au nouveau champ base64
-            if (!empty($f['base64']) && !empty($f['name'])) {
+            if (!empty($f['base64'])) {
                 $files[] = [
                     'base64' => $f['base64'],
                     'name'   => sanitize_text_field($f['name']),
@@ -95,7 +101,7 @@ function handle_generate_mockup() {
             }
 
             // Compatibilité : ancien champ url
-            if (!empty($f['url']) && !empty($f['name'])) {
+            if (!empty($f['url'])) {
                 $files[] = [
                     'url'  => esc_url_raw($f['url']),
                     'name' => sanitize_text_field($f['name']),
@@ -104,7 +110,11 @@ function handle_generate_mockup() {
         }
         if ($files) {
             error_log('[Mockup] Success: multiple files');
-            wp_send_json_success(['files' => $files]);
+            $result = ['files' => $files];
+            if (!empty($body['timings'])) {
+                $result['timings'] = $body['timings'];
+            }
+            wp_send_json_success($result);
         }
     }
 
@@ -112,9 +122,11 @@ function handle_generate_mockup() {
     if (!empty($body['mockupUrl'])) {
         $mockup_url = esc_url_raw($body['mockupUrl']);
         error_log('[Mockup] Success: ' . $mockup_url);
-        wp_send_json_success([
-            'mockup_url' => $mockup_url,
-        ]);
+        $result = ['mockup_url' => $mockup_url];
+        if (!empty($body['timings'])) {
+            $result['timings'] = $body['timings'];
+        }
+        wp_send_json_success($result);
     }
 
     error_log('[Mockup] Invalid response format');

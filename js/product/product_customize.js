@@ -97,17 +97,24 @@ jQuery(document).ready(function ($) {
                 fetch(ajaxurl, { method: 'POST', body: formData })
                         .then(res => res.json())
                         .then(data => {
+                                if (data.data?.timings) {
+                                        console.log('⏱ Render timings', data.data.timings);
+                                }
+
                                 if (data.success && Array.isArray(data.data?.files)) {
                                         window.mockupTimes.pending = null;
                                         const designFile = data.data.files.find(f => f.name === 'design');
-                                        const mockupFile = data.data.files.find(f => f.name !== 'design') || data.data.files[0];
+                                        const mockupFile = data.data.files.find(f => f.name !== 'design' && f.name !== 'texture') || data.data.files[0];
                                         if (designFile) {
                                                 productData.design_image_url = designFile.base64 || designFile.url;
                                         }
                                         if (mockupFile) {
                                                 productData.mockup_url = mockupFile.base64 || mockupFile.url;
                                         }
-                                        data.data.files.forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
+                                        data.data.files
+                                                .filter(f => f.name !== 'texture')
+                                                .forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
+
                                 } else if (data.success && data.data?.mockup_url && firstViewName) {
                                         window.mockupTimes.pending = null;
                                         productData.mockup_url = data.data.mockup_url;
