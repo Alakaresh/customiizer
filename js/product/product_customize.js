@@ -102,12 +102,12 @@ jQuery(document).ready(function ($) {
                                         const designFile = data.data.files.find(f => f.name === 'design');
                                         const mockupFile = data.data.files.find(f => f.name !== 'design') || data.data.files[0];
                                         if (designFile) {
-                                                productData.design_image_url = designFile.url;
+                                                productData.design_image_url = designFile.base64 || designFile.url;
                                         }
                                         if (mockupFile) {
-                                                productData.mockup_url = mockupFile.url;
+                                                productData.mockup_url = mockupFile.base64 || mockupFile.url;
                                         }
-                                        data.data.files.forEach(f => updateMockupThumbnail(f.name, f.url));
+                                        data.data.files.forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
                                 } else if (data.success && data.data?.mockup_url && firstViewName) {
                                         window.mockupTimes.pending = null;
                                         productData.mockup_url = data.data.mockup_url;

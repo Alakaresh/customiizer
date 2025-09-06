@@ -251,7 +251,7 @@ async function generateMockup(mockupData) {
 
                         if (data.success && Array.isArray(data.data?.files)) {
                                 mockupTimes.pending = null;
-                                data.data.files.forEach(f => updateMockupThumbnail(f.name, f.url));
+                                data.data.files.forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
                         } else if (data.success && data.data?.mockup_url && firstViewName) {
                                 mockupTimes.pending = null;
                                 updateMockupThumbnail(firstViewName, data.data.mockup_url);

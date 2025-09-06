@@ -81,17 +81,26 @@ function handle_generate_mockup() {
         wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
     }
 
-    // Nouvelle API : retourne plusieurs fichiers
+    // Nouvelle API : retourne plusieurs fichiers avec base64
     if (!empty($body['files']) && is_array($body['files'])) {
         $files = [];
         foreach ($body['files'] as $f) {
-            if (empty($f['url']) || empty($f['name'])) {
+            // Priorité au nouveau champ base64
+            if (!empty($f['base64']) && !empty($f['name'])) {
+                $files[] = [
+                    'base64' => $f['base64'],
+                    'name'   => sanitize_text_field($f['name']),
+                ];
                 continue;
             }
-            $files[] = [
-                'url'  => esc_url_raw($f['url']),
-                'name' => sanitize_text_field($f['name'])
-            ];
+
+            // Compatibilité : ancien champ url
+            if (!empty($f['url']) && !empty($f['name'])) {
+                $files[] = [
+                    'url'  => esc_url_raw($f['url']),
+                    'name' => sanitize_text_field($f['name']),
+                ];
+            }
         }
         if ($files) {
             error_log('[Mockup] Success: multiple files');
