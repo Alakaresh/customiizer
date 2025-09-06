@@ -114,6 +114,7 @@ jQuery(document).ready(function ($) {
                                         data.data.files
                                                 .filter(f => f.name !== 'texture')
                                                 .forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
+
                                 } else if (data.success && data.data?.mockup_url && firstViewName) {
                                         window.mockupTimes.pending = null;
                                         productData.mockup_url = data.data.mockup_url;

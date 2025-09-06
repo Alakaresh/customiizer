@@ -83,7 +83,6 @@ function handle_generate_mockup() {
     if (!empty($body['timings'])) {
         error_log('[Mockup] Timings: ' . wp_json_encode($body['timings']));
     }
-
     // Nouvelle API : retourne plusieurs fichiers avec base64
     if (!empty($body['files']) && is_array($body['files'])) {
         $files = [];
