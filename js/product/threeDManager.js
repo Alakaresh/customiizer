@@ -81,7 +81,7 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
     pmremGenerator.compileEquirectangularShader();
 
     new THREE.RGBELoader()
-        .load('https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_4k.hdr', function (hdrEquirect) {
+        .load('https://customiizer.blob.core.windows.net/assets/Hdr/brown_photostudio_01_1k.hdr', function (hdrEquirect) {
             const envMap = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
 
             scene.environment = envMap; // sert pour l’éclairage et reflets
