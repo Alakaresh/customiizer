@@ -162,13 +162,22 @@ jQuery(document).ready(function ($) {
         const addImageButton = $('#addImageButton');
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
-        const imageToggle = $('#imageToggle');
-        const ratioFilter = $('#ratioFilter');
-        const pcImageDropzone = new Dropzone('#pcImageDropzone', {
-                url: '#',
-                autoProcessQueue: false,
-                dictDefaultMessage: 'Déposez vos fichiers ou cliquez pour importer'
-        });
+       const imageToggle = $('#imageToggle');
+       const ratioFilter = $('#ratioFilter');
+
+       // Prevent Dropzone from automatically attaching to elements with the
+       // `dropzone` class. Auto discovery can attempt to instantiate the
+       // dropzone before we configure it, resulting in "No URL provided" and
+       // "Dropzone already attached" errors.
+       Dropzone.autoDiscover = false;
+
+       const pcImageDropzone = new Dropzone('#pcImageDropzone', {
+               // URL is required by Dropzone even if files are handled manually.
+               // A placeholder endpoint avoids initialization errors.
+               url: '/',
+               autoProcessQueue: false,
+               dictDefaultMessage: 'Déposez vos fichiers ou cliquez pour importer'
+       });
 
         // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
         window.addEventListener('beforeunload', function (e) {
