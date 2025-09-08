@@ -23,7 +23,7 @@ function azure_get_blob_client() {
     }
 }
 
-// Fonction pour téléverser un fichier sur Azure
+// Fonction pour importer un fichier sur Azure
 function azure_upload_blob($blobClient, $containerName, $blobName, $filePath) {
     try {
         // Vérification de l'existence du fichier temporaire
@@ -39,7 +39,7 @@ function azure_upload_blob($blobClient, $containerName, $blobName, $filePath) {
             return false;
         }
 
-        // Ouvrir le fichier pour téléversement
+        // Ouvrir le fichier pour importation
         $content = fopen($filePath, "r");
         if (!$content) {
             customiizer_log("Erreur : Impossible d'ouvrir le fichier $filePath.");
@@ -50,10 +50,10 @@ function azure_upload_blob($blobClient, $containerName, $blobName, $filePath) {
         
         return true;
     } catch (\MicrosoftAzure\Storage\Common\Exceptions\ServiceException $e) {
-        customiizer_log("Erreur du service Azure Blob lors du téléversement : " . $e->getMessage(), 'ERROR');
+        customiizer_log("Erreur du service Azure Blob lors de l'importation : " . $e->getMessage(), 'ERROR');
         return false;
     } catch (Exception $e) {
-        customiizer_log("Erreur générale lors du téléversement : " . $e->getMessage(), 'ERROR');
+        customiizer_log("Erreur générale lors de l'importation : " . $e->getMessage(), 'ERROR');
         return false;
     }
 }
