@@ -88,7 +88,9 @@
                 <!-- Section recherche et upload -->
                 <div class="search-upload">
                         <input type="text" id="searchInput" placeholder="Rechercher un fichier..." class="search-bar">
-                       <button id="uploadPcImageButton" class="source-button">Téléverser</button>
+                       <form id="pcImageDropzone" class="source-dropzone dropzone">
+                               <div class="dz-message">Déposez vos fichiers ou cliquez pour importer</div>
+                       </form>
                 </div>
 
 		<!-- Contenu principal du modal -->

@@ -23,6 +23,8 @@ function displayGeneratedImages(images) {
 let currentRatio = '';
 let filterFavorites = false;
 
+Dropzone.autoDiscover = false; // prevent auto init without URL
+
 function filterAndDisplayImages(images) {
         let filtered = images;
         if (currentRatio) {
@@ -162,9 +164,13 @@ jQuery(document).ready(function ($) {
         const addImageButton = $('#addImageButton');
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
-        const uploadPcImageButton = $('#uploadPcImageButton');
         const imageToggle = $('#imageToggle');
         const ratioFilter = $('#ratioFilter');
+        const pcImageDropzone = new Dropzone('#pcImageDropzone', {
+                url: '/wp-json/customiizer/v1/upload-image/',
+                autoProcessQueue: false,
+                dictDefaultMessage: 'Déposez vos fichiers ou cliquez pour importer'
+        });
 
         // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
         window.addEventListener('beforeunload', function (e) {
@@ -648,25 +654,6 @@ jQuery(document).ready(function ($) {
 		});
 	}
 
-	uploadPcImageButton.on('click', function () {
-		const input = $('<input type="file" accept="image/png, image/jpeg">');
-		input.on('change', async function (e) {
-			const file = e.target.files[0];
-			if (!file) return;
-
-			const reader = new FileReader();
-			reader.onload = async function (evt) {
-				await uploadFileToServer({
-					name: file.name,
-					size: file.size,
-					url: evt.target.result
-				});
-			};
-			reader.readAsDataURL(file);
-		});
-		input.click();
-	});
-
         async function uploadFileToServer(fileData) {
                 try {
                         const response = await fetch("/wp-json/customiizer/v1/upload-image/", {
@@ -686,13 +673,26 @@ jQuery(document).ready(function ($) {
                         if (result.success) {
                                 fetchUserImages();
                         } else {
-                                alert("Erreur lors du téléversement.");
+                                alert("Erreur lors de l'importation.");
                         }
                 } catch (error) {
-                        console.error("[Upload] Erreur serveur :", error);
-                        alert("Erreur lors du téléversement.");
+                        console.error("[Import] Erreur serveur :", error);
+                        alert("Erreur lors de l'importation.");
                 }
         }
+
+        pcImageDropzone.on('addedfile', async function (file) {
+                const reader = new FileReader();
+                reader.onload = async function (evt) {
+                        await uploadFileToServer({
+                                name: file.name,
+                                size: file.size,
+                                url: evt.target.result
+                        });
+                        pcImageDropzone.removeFile(file);
+                };
+                reader.readAsDataURL(file);
+        });
 
         // Recherche dans les listes d'images
         jQuery('#searchInput').on('input', function () {

@@ -15,7 +15,7 @@ add_action('rest_api_init', function () {
 });
 
 /**
- * 📤 Téléverse une image sur Azure Blob Storage
+ * 📤 Importe une image sur Azure Blob Storage
  */
 function customiizer_upload_image(WP_REST_Request $request) {
 	global $wpdb;
@@ -26,10 +26,10 @@ function customiizer_upload_image(WP_REST_Request $request) {
 	$name = isset($params['name']) ? sanitize_text_field($params['name']) : '';
 	$size = isset($params['size']) ? intval($params['size']) : 0;
 
-	if (empty($url) || empty($name)) {
-		customiizer_log("❌ Paramètre manquant lors de l'upload.");
-		return new WP_REST_Response(["error" => "Paramètre manquant."], 400);
-	}
+        if (empty($url) || empty($name)) {
+                customiizer_log("❌ Paramètre manquant lors de l'import.");
+                return new WP_REST_Response(["error" => "Paramètre manquant."], 400);
+        }
 
         $user_id = isset($params['user_id']) ? intval($params['user_id']) : get_current_user_id();
         $containerName = "imageclient";
@@ -49,7 +49,7 @@ function customiizer_upload_image(WP_REST_Request $request) {
         $blobBaseUrl = "https://customiizer.blob.core.windows.net/$containerName/";
         $blobFullUrl = $blobBaseUrl . $blobName;
 
-	customiizer_log("📤 Début de l'upload par UserID: $user_id, Nom: $name");
+        customiizer_log("📤 Début de l'import par UserID: $user_id, Nom: $name");
 
 	// Décodage Base64
 	$decodedData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $url));
@@ -90,15 +90,15 @@ function customiizer_upload_image(WP_REST_Request $request) {
 
 	customiizer_log("✅ Conversion en WebP réussie: $tmpFile");
 
-	// Téléversement sur Azure
-	$blobClient = azure_get_blob_client();
-	if (!$blobClient || !azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
-		unlink($tmpFile);
-		customiizer_log("❌ Échec du téléversement sur Azure.");
-		return new WP_REST_Response(["error" => "Erreur de téléversement sur Azure."], 500);
-	}
-	unlink($tmpFile); // Suppression du fichier temporaire
-	customiizer_log("✅ Téléversement sur Azure réussi: $blobFullUrl");
+        // Importation vers Azure
+        $blobClient = azure_get_blob_client();
+        if (!$blobClient || !azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
+                unlink($tmpFile);
+                customiizer_log("❌ Échec de l'import sur Azure.");
+                return new WP_REST_Response(["error" => "Erreur d'import sur Azure."], 500);
+        }
+        unlink($tmpFile); // Suppression du fichier temporaire
+        customiizer_log("✅ Import sur Azure réussi: $blobFullUrl");
 
         $image_date = current_time('mysql');
 
@@ -135,7 +135,7 @@ function customiizer_upload_image(WP_REST_Request $request) {
 
         return new WP_REST_Response([
                 'success' => true,
-                'message' => 'Image téléchargée avec succès.',
+                'message' => 'Image importée avec succès.',
                 'blob_path' => $blobName,
                 'db_status' => $db_status,
         ], 200);
