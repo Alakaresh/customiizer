@@ -156,8 +156,6 @@ function customiizer_get_user_images(WP_REST_Request $request) {
         }
         $user_id = intval($user_id_param);
 
-        customiizer_log("📥 Demande de récupération des images pour UserID: $user_id");
-
         if ($user_id === 0) {
                 if (session_status() === PHP_SESSION_NONE) {
                         session_start();
