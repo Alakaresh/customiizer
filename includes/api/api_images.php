@@ -16,21 +16,21 @@ function get_generated_images($request) {
     $prefix = 'WPC_'; // Préfixe de la base de données
 
     // Filtres dynamiques
-    $customer_id = isset($_GET['customer_id']) ? intval($_GET['customer_id']) : null;
+    $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
     $format_image = isset($_GET['format_image']) ? sanitize_text_field($_GET['format_image']) : null;
     $date_from = isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : null;
     $date_to = isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : null;
 	$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 100;
 
     // Construction de la requête SQL
-    $query = "SELECT image_number, customer_id, user_login, upscaled_id, source_id, image_date, 
+    $query = "SELECT image_number, user_id, user_login, upscaled_id, source_id, image_date,
                      image_prefix, image_url, picture_likes_nb, format_image, prompt, settings
               FROM {$prefix}generated_image
               WHERE 1=1";
 
     // Ajout des filtres dynamiques
-    if ($customer_id) {
-        $query .= " AND customer_id = $customer_id";
+    if ($user_id) {
+        $query .= " AND user_id = $user_id";
     }
     if ($format_image) {
         $query .= $wpdb->prepare(" AND format_image = %s", $format_image);
@@ -39,10 +39,10 @@ function get_generated_images($request) {
         $query .= $wpdb->prepare(" AND image_date BETWEEN %s AND %s", $date_from, $date_to);
     }
 	
-	if ($customer_id) {
+        if ($user_id) {
         $query .= " ORDER BY image_date DESC"; // Récupérer les plus récentes d'abord
     } else {
-        $query .= " ORDER BY RAND() LIMIT $limit"; // 100 images aléatoires si pas de `customer_id`
+        $query .= " ORDER BY RAND() LIMIT $limit"; // 100 images aléatoires si pas de `user_id`
     }
 	
     // Exécution de la requête

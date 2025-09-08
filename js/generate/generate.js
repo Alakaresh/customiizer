@@ -390,14 +390,14 @@ jQuery(function($) {
 					])
 						.then(() => {
 						// Préparer les données à ajouter à allImages
-						const newImageInfo = {
-							image_url: savedImageUrl,
-							user_login: currentUser.display_name,
-							customer_id: currentUser.ID,
-							upscaled_id: choiceData.hash,
-							format_image: selectedRatio,
-							prompt: prompt
-						};
+                                                const newImageInfo = {
+                                                        image_url: savedImageUrl,
+                                                        user_login: currentUser.display_name,
+                                                        user_id: currentUser.ID,
+                                                        upscaled_id: choiceData.hash,
+                                                        format_image: selectedRatio,
+                                                        prompt: prompt
+                                                };
 						// Mettre à jour allImages avec les nouvelles informations
 						allImages.push(newImageInfo);
 						return { imageUrl: savedImageUrl, index: index };
@@ -486,12 +486,12 @@ jQuery(function($) {
 
 	// Fonction pour sauvegarder les données de l'image
 	async function saveImageData(savedImageUrl, imagePrefix, hash) {
-		const requestBody = `customer_id=${encodeURIComponent(currentUser.ID)}&` +
-			  `image_url=${encodeURIComponent(savedImageUrl)}&` +
-			  `source_id=${encodeURIComponent(id_image)}&` +
-			  `upscaled_id=${encodeURIComponent(hash)}&` +
-			  `image_prefix=${encodeURIComponent(imagePrefix)}&` +
-			  `prompt=${encodeURIComponent(prompt)}&` +
+                const requestBody = `user_id=${encodeURIComponent(currentUser.ID)}&` +
+                          `image_url=${encodeURIComponent(savedImageUrl)}&` +
+                          `source_id=${encodeURIComponent(id_image)}&` +
+                          `upscaled_id=${encodeURIComponent(hash)}&` +
+                          `image_prefix=${encodeURIComponent(imagePrefix)}&` +
+                          `prompt=${encodeURIComponent(prompt)}&` +
 			  `format_image=${encodeURIComponent(selectedRatio)}&` +
 			  `settings=${encodeURIComponent(settings)}`;
 		const response = await fetch(baseUrl + '/wp-admin/admin-ajax.php?action=save_image_data', {

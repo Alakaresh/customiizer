@@ -118,7 +118,7 @@ function customiizer_upload_image(WP_REST_Request $request) {
                 $result = $wpdb->insert(
                         $table_name,
                         [
-                                'customer_id' => $user_id,
+                                'user_id' => $user_id,
                                 'image_url' => $blobFullUrl,
                                 'image_date' => $image_date,
                         ],
@@ -166,7 +166,7 @@ function customiizer_get_user_images(WP_REST_Request $request) {
 
         $table_name = 'WPC_imported_image';
         $results = $wpdb->get_results($wpdb->prepare(
-                "SELECT image_url, image_date FROM $table_name WHERE customer_id = %d ORDER BY image_date DESC",
+                "SELECT image_url, image_date FROM $table_name WHERE user_id = %d ORDER BY image_date DESC",
                 $user_id
         ), ARRAY_A);
 

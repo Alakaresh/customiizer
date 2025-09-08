@@ -10,7 +10,7 @@ function get_all_generated_images() {
 		$current_user_id = get_current_user_id();
         // Requête pour obtenir les images de l'utilisateur spécifique
         $results = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE customer_id = %d",
+            "SELECT * FROM $table_name WHERE user_id = %d",
             $current_user_id
         ));
     } else {

@@ -112,7 +112,7 @@ function save_imported_image_from_url() {
         $result = $wpdb->insert(
             $table_name,
             [
-                'customer_id' => $user_id,
+                'user_id' => $user_id,
                 'image_url' => $blobFullUrl,
                 'image_date' => $image_date,
             ],
@@ -142,7 +142,7 @@ function get_saved_images() {
         $table_name = 'WPC_imported_image';
 
         $results = $wpdb->get_results($wpdb->prepare(
-            "SELECT image_url, image_date FROM $table_name WHERE customer_id = %d ORDER BY image_date DESC",
+            "SELECT image_url, image_date FROM $table_name WHERE user_id = %d ORDER BY image_date DESC",
             $user_id
         ), ARRAY_A);
 
