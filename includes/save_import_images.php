@@ -79,10 +79,10 @@ function save_imported_image_from_url() {
         return;
     }
 
-    // Téléverser dans Azure
+    // Importer vers Azure
     if (!azure_upload_blob($blobClient, $containerName, $blobName, $tmpFile)) {
         unlink($tmpFile);
-        wp_send_json_error("Erreur lors du téléversement de l'image.");
+        wp_send_json_error("Erreur lors de l'import de l'image.");
         return;
     }
 
@@ -100,7 +100,7 @@ function save_imported_image_from_url() {
         ];
 
         wp_send_json_success([
-            "message" => "L'image a été téléchargée et enregistrée en session.",
+            "message" => "L'image a été importée et enregistrée en session.",
             "blob_path" => $blobFullUrl,
             "db_status" => "Enregistré en session."
         ]);
@@ -125,7 +125,7 @@ function save_imported_image_from_url() {
         }
 
         wp_send_json_success([
-            "message" => "L'image a été téléchargée et enregistrée avec succès.",
+            "message" => "L'image a été importée et enregistrée avec succès.",
             "blob_path" => $blobFullUrl,
             "db_status" => "Enregistré dans la base de données."
         ]);

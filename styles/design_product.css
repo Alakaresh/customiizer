@@ -367,6 +367,21 @@
     background-color: #666;
 }
 
+.source-dropzone {
+    width: 150px;
+    padding: 10px;
+    border: 2px dashed #444;
+    border-radius: 4px;
+    background-color: #222;
+    color: #fff;
+    cursor: pointer;
+}
+
+.source-dropzone .dz-message {
+    margin: 0;
+    font-size: 14px;
+}
+
 /* Titre de sections */
 h4 {
     margin-bottom: 8px;
