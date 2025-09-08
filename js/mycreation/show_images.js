@@ -51,7 +51,7 @@ jQuery(document).ready(function($) {
         try {
             // Assurez-vous que la réponse n'est pas déjà un objet JavaScript
             var filteredImages = response.filter(function(image) {
-                return image.customer_id === userId.toString(); // Assurez-vous que les IDs sont comparés comme des chaînes
+                return image.user_id === userId.toString(); // Assurez-vous que les IDs sont comparés comme des chaînes
             });
             displayImages(filteredImages);
         } catch (e) {

@@ -102,7 +102,7 @@ function save_image_data() {
 	global $wpdb;
 
 	$data = array(
-		'user_id' => sanitize_text_field($_POST['customer_id']),
+                'user_id' => sanitize_text_field($_POST['user_id']),
 		'image_url' => esc_url_raw($_POST['image_url']),
 		'source_id' => sanitize_text_field($_POST['source_id']),
 		'image_prefix' => sanitize_text_field($_POST['image_prefix']),

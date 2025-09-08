@@ -8,7 +8,7 @@ function get_images() {
     $imagesPerPage = isset($_GET['images_per_page']) ? (int)$_GET['images_per_page'] : 10;
     $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($pageNumber - 1) * $imagesPerPage;
-    $results = $wpdb->get_results($wpdb->prepare("SELECT image_url FROM WPC_generated_image WHERE customer_id = %d ORDER BY image_date DESC LIMIT %d OFFSET %d", $userId, $imagesPerPage, $offset));
+    $results = $wpdb->get_results($wpdb->prepare("SELECT image_url FROM WPC_generated_image WHERE user_id = %d ORDER BY image_date DESC LIMIT %d OFFSET %d", $userId, $imagesPerPage, $offset));
     $output = '<div class="image-container">';
     foreach ($results as $row) {
         $output .= '<img class="custom-image" src="' . $row->image_url . '" alt="Image générée">';
@@ -53,7 +53,7 @@ function save_user_image() {
 			var_dump($image_url); // Vérifier l'URL de l'image
             
 			// Requête de mise à jour pour mettre à jour la colonne user_logo
-            $wpdb->update('WPC_client', ['user_logo' => $image_url], ['customer_id' => $user_id]);
+            $wpdb->update('WPC_client', ['user_logo' => $image_url], ['user_id' => $user_id]);
            
             var_dump($result); // Vérifier le résultat de la requête de mise à jour
 
@@ -79,14 +79,14 @@ function get_user_profile_image_url() {
 
         // Requête pour récupérer l'URL de l'image de profil
         $image_url = $wpdb->get_var($wpdb->prepare(
-            "SELECT user_logo FROM WPC_client WHERE customer_id = %d",
+            "SELECT user_logo FROM WPC_client WHERE user_id = %d",
             $user_id
         ));
 
         if ($image_url) {
             wp_send_json_success(['image_url' => $image_url]);
         } else {
-            wp_send_json_error('Aucune image de profil trouvée.', ['user_id' => $user_id, 'query' => "SELECT user_logo FROM {$table_name} WHERE customer_id = $user_id"]);
+            wp_send_json_error('Aucune image de profil trouvée.', ['user_id' => $user_id, 'query' => "SELECT user_logo FROM {$table_name} WHERE user_id = $user_id"]);
         }
     } else {
         wp_send_json_error('Utilisateur non connecté.');
