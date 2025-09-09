@@ -191,50 +191,48 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh || !canvas) return;
 
-  // Texture depuis le canvas (avec alpha)
+  // Texture depuis canvas avec alpha
   const tex = new THREE.CanvasTexture(canvas);
   tex.flipY = false;
   if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
   else tex.encoding = THREE.sRGBEncoding;
+  tex.premultiplyAlpha = true;                // alpha propre
   tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
-  tex.premultiplyAlpha = true; // important pour un alpha propre
   tex.needsUpdate = true;
 
-  // Base PBR de la bouteille (ou du mesh impression original)
+  // Base pour harmoniser le "look" (rough/metal)
   const base = mesh.userData.baseMaterial || mesh.material;
 
-  // Clone du matériau en conservant le “look” PBR de base
-  const mat = mesh.material.clone();
-  // albédo blanc pour ne pas teinter l'image, mais on ne montre QUE l'image grâce à l'alpha
-  mat.color.set(0xffffff);
-  mat.map = tex;
+  // Matériau overlay : on ne montre QUE l'image (alpha), le reste est transparent
+  const m = mesh.material.clone();
+  m.map = tex;
+  m.color.set(0xffffff);                      // pas de teinte sur la texture
+  m.transparent = true;
 
-  // NE montrer que les pixels de l’image : le reste doit être transparent
-  mat.transparent = true;
-  mat.alphaTest = 0.01;       // coupe les pixels totalement transparents (évite halo)
-  mat.depthTest = true;
-  mat.depthWrite = false;     // overlay propre sans “boucher” la bouteille
-  mat.polygonOffset = true;   // évite tout z-fighting
-  mat.polygonOffsetFactor = -2;
-  mat.polygonOffsetUnits  = -2;
-  mat.side = THREE.FrontSide; // DoubleSide si besoin
+  // ⚠️ clé pour éviter la zone cachée :
+  m.depthTest = false;                        // ne teste PAS la profondeur
+  m.depthWrite = false;                       // n'écrit pas dans le z-buffer
+  // (du coup, plus besoin de polygonOffset)
 
-  // Harmonise la réponse lumineuse avec le corps
-  if ('roughness' in base)  mat.roughness  = base.roughness;
-  if ('metalness' in base)  mat.metalness  = base.metalness;
-  if ('envMapIntensity' in base) mat.envMapIntensity = base.envMapIntensity;
+  // coupe les pixels 100% transparents (évite halo)
+  m.alphaTest = 0.01;
+  m.side = THREE.FrontSide;                   // DoubleSide si besoin
 
-  mat.needsUpdate = true;
-  mesh.material = mat;
+  // même réponse PBR que la bouteille pour la cohérence de specular/reflets
+  if ('roughness' in base)  m.roughness  = base.roughness;
+  if ('metalness' in base)  m.metalness  = base.metalness;
+  if ('envMapIntensity' in base) m.envMapIntensity = base.envMapIntensity;
 
-  // Rendre après le corps
-  mesh.renderOrder = 2000;
+  m.needsUpdate = true;
+  mesh.material = m;
 
-  // Repeint
+  // rendu après la bouteille, pour être bien "par-dessus"
+  mesh.renderOrder = 999;
+
   if (renderer && scene && camera) renderer.render(scene, camera);
-
-  console.log('🖼️ Texture (avec alpha) appliquée sur', mesh.name, `(canvas ${canvas.width}×${canvas.height})`);
+  console.log('🖼️ Texture (overlay sans depthTest) sur', mesh.name, `(canvas ${canvas.width}×${canvas.height})`);
 };
+
 
 // ————————————————— Retirer texture = reset matériau d’origine —————————————————
 window.clear3DTexture = function (zoneName = null) {
