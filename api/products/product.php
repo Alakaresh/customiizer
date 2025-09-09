@@ -90,6 +90,7 @@ function product($request) {
                        ];
                }
 
+
 		if (!empty($row['mockup_id'])) {
 			$variants[$variant_id]['mockups'][] = [
                                 'mockup_id' => $row['mockup_id'],
