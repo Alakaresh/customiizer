@@ -99,10 +99,9 @@ function init3DScene(containerId, modelUrl, canvasId = "threeDCanvas") {
 
 // ---------------- Impression state ----------------
 function setImpressionState(mesh, hasTexture) {
-  const m = mesh.material;
-
   if (hasTexture) {
-    // --- état overlay avec texture ---
+    // --- overlay avec texture ---
+    const m = mesh.material;
     m.transparent = true;
     m.opacity = 1.0;
     m.alphaTest = 0.01;
@@ -114,33 +113,18 @@ function setImpressionState(mesh, hasTexture) {
     m.color.setHex(0xffffff);
     m.side = THREE.DoubleSide;
     mesh.renderOrder = 2000;
+    m.toneMapped = true;
+    m.needsUpdate = true;
   } else {
-    // --- état visible par défaut (opaque, couleur bouteille) ---
-    m.map = null;
-    m.transparent = false;
-    m.opacity = 1.0;
-    m.alphaTest = 0.0;
-    m.depthTest = true;
-    m.depthWrite = true;
-    m.polygonOffset = false;
-    m.side = THREE.DoubleSide;
+    // --- état visible forcé (debug) ---
+    mesh.material = new THREE.MeshBasicMaterial({
+      color: 0x00ff00,           // vert pétant (juste pour tester)
+      side: THREE.DoubleSide,
+    });
     mesh.renderOrder = 1;
-
-    // restaure couleur et paramètres d’origine
-    const base = mesh.userData.baseMaterial;
-    if (base) {
-      m.color.copy(base.color); // → noir
-      if ("roughness" in base) m.roughness = base.roughness;
-      if ("metalness" in base) m.metalness = base.metalness;
-    } else {
-      m.color.setHex(0x000000); // fallback noir
-      m.roughness = 1.0;
-      m.metalness = 0.0;
-    }
+    mesh.material.needsUpdate = true;
+    console.log("✅ Impression forcée visible (MeshBasicMaterial vert)");
   }
-
-  m.toneMapped = true;
-  m.needsUpdate = true;
 }
 
 
