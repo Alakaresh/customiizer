@@ -2,8 +2,19 @@
 register_rest_route('api/v1/products', '/variant/(?P<variant_id>\d+)/mockup-position', [
     'methods'  => 'POST',
     'callback' => 'customiizer_update_mockup_position',
-    'permission_callback' => '__return_true',
+    'permission_callback' => 'customiizer_can_edit_mockup_position',
 ]);
+
+function customiizer_can_edit_mockup_position() {
+    if (!current_user_can('edit_posts')) {
+        return new WP_Error(
+            'rest_forbidden',
+            __('Droits insuffisants pour modifier la position du mockup.', 'customiizer'),
+            ['status' => 403]
+        );
+    }
+    return true;
+}
 
 function customiizer_update_mockup_position(WP_REST_Request $req) {
     global $wpdb;
