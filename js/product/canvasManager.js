@@ -5,6 +5,7 @@ let template = null;
 let resizeObserver = null;
 let productOverlay = null;
 let guideGroup = null;
+let printMask = null;
 
 const CanvasManager = {
 	init: function (templateData, containerId) {
@@ -52,14 +53,33 @@ const CanvasManager = {
 		wrapper.appendChild(canvasEl);
 		container.appendChild(wrapper);
 
-		// 🖌️ Initialisation Fabric
-		canvas = new fabric.Canvas(canvasEl, {
-			preserveObjectStacking: true,
-			selection: false
-		});
+                // 🖌️ Initialisation Fabric
+                canvas = new fabric.Canvas(canvasEl, {
+                        preserveObjectStacking: true,
+                        selection: false
+                });
 
-		// 📷 Image de fond (template Printful)
-		fabric.Image.fromURL(template.image_url, function (img) {
+                // 🖼️ Préchargement du masque de zone imprimable si disponible
+                printMask = null;
+                if (template.image_path) {
+                        fabric.Image.fromURL(template.image_path, function (maskImg) {
+                                const maskScaleX = template.print_area_width / maskImg.width;
+                                const maskScaleY = template.print_area_height / maskImg.height;
+                                maskImg.set({
+                                        originX: 'left',
+                                        originY: 'top',
+                                        left: template.print_area_left,
+                                        top: template.print_area_top,
+                                        scaleX: maskScaleX,
+                                        scaleY: maskScaleY,
+                                        absolutePositioned: true
+                                });
+                                printMask = maskImg;
+                        }, { crossOrigin: 'anonymous' });
+                }
+
+                // 📷 Image de fond (template Printful)
+                fabric.Image.fromURL(template.image_url, function (img) {
     const scaleX = template.template_width / img.width;
     const scaleY = template.template_height / img.height;
 
@@ -127,28 +147,35 @@ const CanvasManager = {
 				//cornerColor: 'blue'
 			});
 
-			img.setControlsVisibility({
-				tl: true,  // coin haut gauche
-				tr: true,  // coin haut droit
-				bl: true,  // coin bas gauche
-				br: true,  // coin bas droit
-				mt: false,
-				mb: false,
+                        img.setControlsVisibility({
+                                tl: true,  // coin haut gauche
+                                tr: true,  // coin haut droit
+                                bl: true,  // coin bas gauche
+                                br: true,  // coin bas droit
+                                mt: false,
+                                mb: false,
                                 ml: false,
                                 mr: false,
                                 mtr: true  // rotation activée
-			});
+                        });
 
+                        let clip;
+                        if (printMask) {
+                                clip = printMask.clone();
+                                clip.set({ absolutePositioned: true });
+                        } else {
+                                clip = new fabric.Rect({
+                                        left: template.print_area_left,
+                                        top: template.print_area_top,
+                                        width: template.print_area_width,
+                                        height: template.print_area_height,
+                                        originX: 'left',
+                                        originY: 'top',
+                                        absolutePositioned: true
+                                });
+                        }
 
-			img.clipPath = new fabric.Rect({
-				left: template.print_area_left,
-				top: template.print_area_top,
-				width: template.print_area_width,
-				height: template.print_area_height,
-				originX: 'left',
-				originY: 'top',
-				absolutePositioned: true
-			});
+                        img.clipPath = clip;
 
                        canvas.add(img);
                        img.setCoords();
@@ -201,15 +228,22 @@ const CanvasManager = {
                                 mr: false,
                                 mtr: true
                         });
-                        img.clipPath = new fabric.Rect({
-                                left: template.print_area_left,
-                                top: template.print_area_top,
-                                width: template.print_area_width,
-                                height: template.print_area_height,
-                                originX: 'left',
-                                originY: 'top',
-                                absolutePositioned: true
-                        });
+                        let clip;
+                        if (printMask) {
+                                clip = printMask.clone();
+                                clip.set({ absolutePositioned: true });
+                        } else {
+                                clip = new fabric.Rect({
+                                        left: template.print_area_left,
+                                        top: template.print_area_top,
+                                        width: template.print_area_width,
+                                        height: template.print_area_height,
+                                        originX: 'left',
+                                        originY: 'top',
+                                        absolutePositioned: true
+                                });
+                        }
+                        img.clipPath = clip;
                         canvas.add(img);
                         img.setCoords();
                         canvas.bringToFront(productOverlay);

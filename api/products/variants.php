@@ -26,13 +26,14 @@ function get_product_variants_full($request) {
                         vm.position_top,
                         vm.position_left,
                         vm.view_name,
-			vt.image_url AS template_image,
-			vt.template_width,
-			vt.template_height,
-			vt.print_area_width,
-			vt.print_area_height,
-			vt.print_area_top,
-			vt.print_area_left,
+                        vt.image_url AS template_image_url,
+                        vt.image_path AS template_image_path,
+                        vt.template_width,
+                        vt.template_height,
+                        vt.print_area_width,
+                        vt.print_area_height,
+                        vt.print_area_top,
+                        vt.print_area_left,
 			vprint.technique,
 			vprint.placement
 		FROM {$prefix}variants v
@@ -73,17 +74,18 @@ function get_product_variants_full($request) {
                                         'left' => $v['position_left'],
                                         'view_name' => $v['view_name']
                                 ],
-				'template' => [
-					'image' => $v['template_image'],
-					'width' => $v['template_width'],
-					'height' => $v['template_height'],
-					'print_area' => [
-						'width' => $v['print_area_width'],
-						'height' => $v['print_area_height'],
-						'top' => $v['print_area_top'],
-						'left' => $v['print_area_left']
-					]
-				],
+                                'template' => [
+                                        'image_url' => $v['template_image_url'],
+                                        'image_path' => $v['template_image_path'],
+                                        'width' => $v['template_width'],
+                                        'height' => $v['template_height'],
+                                        'print_area' => [
+                                                'width' => $v['print_area_width'],
+                                                'height' => $v['print_area_height'],
+                                                'top' => $v['print_area_top'],
+                                                'left' => $v['print_area_left']
+                                        ]
+                                ],
 				'print' => [
 					'technique' => $v['technique'],
 					'placement' => $v['placement']
