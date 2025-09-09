@@ -90,7 +90,7 @@ const CanvasManager = {
 
     productOverlay = img;
     canvas.add(productOverlay);
-    canvas.bringToFront(productOverlay);
+    canvas.sendToBack(productOverlay);
     canvas.bringToFront(guideGroup);
 
     // 🔁 Forcer un premier rendu
@@ -167,8 +167,8 @@ const CanvasManager = {
 
                        canvas.add(img);
                        img.setCoords();
-                       canvas.bringToFront(productOverlay);
-                       canvas.bringToFront(guideGroup);
+                       if (productOverlay) canvas.sendToBack(productOverlay);
+                       if (guideGroup) canvas.bringToFront(guideGroup);
                        canvas.renderAll();
 
                        setTimeout(() => {
@@ -227,8 +227,8 @@ const CanvasManager = {
                         });
                         canvas.add(img);
                         img.setCoords();
-                        canvas.bringToFront(productOverlay);
-                        canvas.bringToFront(guideGroup);
+                        if (productOverlay) canvas.sendToBack(productOverlay);
+                        if (guideGroup) canvas.bringToFront(guideGroup);
                         canvas.renderAll();
 
                         setTimeout(() => {
@@ -278,8 +278,8 @@ const CanvasManager = {
                 const obj = canvas.getActiveObject();
                 if (!obj) return;
                 canvas.bringForward(obj);
-                canvas.bringToFront(productOverlay);
-                canvas.bringToFront(guideGroup);
+                if (productOverlay) canvas.sendToBack(productOverlay);
+                if (guideGroup) canvas.bringToFront(guideGroup);
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
@@ -288,8 +288,8 @@ const CanvasManager = {
                 const obj = canvas.getActiveObject();
                 if (!obj) return;
                 canvas.sendBackwards(obj);
-                canvas.bringToFront(productOverlay);
-                canvas.bringToFront(guideGroup);
+                if (productOverlay) canvas.sendToBack(productOverlay);
+                if (guideGroup) canvas.bringToFront(guideGroup);
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
