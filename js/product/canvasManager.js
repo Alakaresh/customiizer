@@ -1,4 +1,4 @@
-// 📁 canvasManager.js — BG + clipPath (image_path) + API UI + notifications + LOGS
+// 📁 canvasManager.js — BG + clipPath (image_path) + API UI + notifications (adapté à ton HTML)
 
 let canvas = null;
 let template = null;
@@ -71,6 +71,20 @@ function getClipWindowBBox() {
   return b;
 }
 
+// Sélecteurs DOM (permet override côté thème via window.CUSTOMIZER_SELECTORS)
+const SEL = (window.CUSTOMIZER_SELECTORS || {
+  addButton: ['#addImageButton'],           // ← ton HTML
+  tools:     ['.image-controls']            // ← ta barre d’outils
+});
+
+function pick(selectorList) {
+  for (const s of selectorList) {
+    const el = document.querySelector(s);
+    if (el) return { el, s };
+  }
+  return { el: null, s: null };
+}
+
 // Notifie l'UI : CustomEvent + jQuery + compat + fallback DOM
 function notifyChange(src = 'unknown') {
   const hasImage = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
@@ -107,32 +121,24 @@ function notifyChange(src = 'unknown') {
     }
   } catch (e) { CM.warn('notifyChange: call updateAddImageButtonVisibility KO', e); }
 
-  // 4) Fallback DOM
+  // 4) Fallback DOM — adapté à TON HTML
   try {
-    const addBtn =
-      document.querySelector('#btn-add-image') ||
-      document.querySelector('.btn-add-image') ||
-      document.querySelector('[data-role="btn-add-image"]') ||
-      document.querySelector('button[data-action="add-image"]');
+    const { el: addBtn,  s: sAdd }  = pick(SEL.addButton);
+    const { el: toolsEl, s: sTools } = pick(SEL.tools);
 
     if (addBtn) {
       addBtn.style.display = hasImage ? 'none' : '';
-      CM.log('fallback: addBtn display =', addBtn.style.display);
+      CM.log('fallback: addBtn', sAdd, '→ display =', addBtn.style.display);
     } else {
-      CM.log('fallback: addBtn introuvable');
+      CM.log('fallback: addBtn introuvable dans', SEL.addButton);
     }
 
-    const tools =
-      document.querySelector('#image-tools') ||
-      document.querySelector('.image-tools') ||
-      document.querySelector('[data-role="image-tools"]') ||
-      document.querySelector('.customizer-tools');
-
-    if (tools) {
-      tools.style.display = hasImage ? '' : 'none';
-      CM.log('fallback: tools display =', tools.style.display);
+    if (toolsEl) {
+      // souvent flex
+      toolsEl.style.display = hasImage ? 'flex' : 'none';
+      CM.log('fallback: tools', sTools, '→ display =', toolsEl.style.display);
     } else {
-      CM.log('fallback: tools introuvable');
+      CM.log('fallback: tools introuvable dans', SEL.tools);
     }
   } catch (e) { CM.warn('notifyChange: fallback DOM KO', e); }
 }
