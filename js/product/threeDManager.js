@@ -210,50 +210,50 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
 
 // --- Appliquer une texture depuis Canvas ---
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
-    const mesh = getPrintableMesh(zoneName);
-    if (!mesh || !canvas) return;
+  const mesh = getPrintableMesh(zoneName);
+  if (!mesh || !canvas) return;
 
-    const offscreen = document.createElement("canvas");
-    offscreen.width = canvas.width;
-    offscreen.height = canvas.height;
-    const ctx = offscreen.getContext("2d");
+  // Clone le matériau pour ne pas casser celui d’origine
+  if (!mesh.userData.baseMaterial) {
+    mesh.userData.baseMaterial = mesh.material;        // garde une référence
+    mesh.material = mesh.material.clone();             // clone pour l'impression
+  }
 
-    // 🎨 Fond noir pur (zones sans image)
-    //ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+  // Canvas → texture SANS fond peint
+  const offscreen = document.createElement("canvas");
+  offscreen.width = canvas.width;
+  offscreen.height = canvas.height;
+  const ctx = offscreen.getContext("2d");
 
-    // 🎨 Dessine l'image par-dessus
-    ctx.drawImage(canvas, 0, 0);
+  // ⚠️ pas de fillRect noir : on veut un fond transparent
+  ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+  ctx.drawImage(canvas, 0, 0);
 
-    const texture = new THREE.CanvasTexture(offscreen);
-    texture.flipY = false;
-    texture.encoding = THREE.sRGBEncoding;
-    texture.needsUpdate = true;
+  const texture = new THREE.CanvasTexture(offscreen);
+  texture.flipY = false;
+  // three r15x : utilisez colorSpace si dispo
+  if ('colorSpace' in texture) texture.colorSpace = THREE.SRGBColorSpace;
+  else texture.encoding = THREE.sRGBEncoding;
+  texture.needsUpdate = true;
 
-    // 👉 Le matériau doit être blanc pour ne pas altérer la texture
-    mesh.material.map = texture;
-    mesh.material.color.setHex(0xffffff);
-    mesh.material.transparent = true; // autoriser transparence si besoin
-    mesh.material.opacity = 1.0;
-
-    // 👉 Empêcher l'éclairage d’assombrir les couleurs
-    mesh.material.toneMapped = false;  // désactive la correction tonemapping
-    mesh.material.needsUpdate = true;
-    console.log("[3D] ✅ Texture appliquée avec fond noir pur (sans altération)", mesh.name);
+  mesh.material.map = texture;
+  // ne pas forcer le matériau en blanc, on garde sa couleur/params PBR
+  // mesh.material.color = mesh.material.color; // inchangé
+  mesh.material.transparent = true;
+  mesh.material.alphaTest = 0.001;     // évite halo sombre sur les bords
+  mesh.material.toneMapped = true;     // reste cohérent avec la scène
+  mesh.material.needsUpdate = true;
 };
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
 window.clear3DTexture = function (zoneName = null) {
-    const mesh = getPrintableMesh(zoneName);
-    if (!mesh) return;
-
-    mesh.material.map = null;
-    mesh.material.color.setHex(mesh.userData?.baseColor || 0xffffff);
-    mesh.material.needsUpdate = true;
-
-    console.log("[3D] 🧹 Texture retirée, couleur restaurée :", mesh.name);
+  const mesh = getPrintableMesh(zoneName);
+  if (!mesh) return;
+  if (mesh.userData.baseMaterial) mesh.material = mesh.userData.baseMaterial;
+  else { mesh.material.map = null; mesh.material.needsUpdate = true; }
 };
+
 
 // --- Debug ---
 window.logPrintableMeshPosition = function (zoneName = null) {
