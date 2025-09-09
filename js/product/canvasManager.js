@@ -155,30 +155,49 @@ const CanvasManager = {
 			});
 
 
-			img.clipPath = new fabric.Rect({
-				left: template.print_area_left,
-				top: template.print_area_top,
-				width: template.print_area_width,
-				height: template.print_area_height,
-				originX: 'left',
-				originY: 'top',
-				absolutePositioned: true
-			});
-
-                       canvas.add(img);
-                       img.setCoords();
-                       if (productOverlay) canvas.sendToBack(productOverlay);
-                       if (guideGroup) canvas.bringToFront(guideGroup);
-                       canvas.renderAll();
-
-                       setTimeout(() => {
-                               canvas.setActiveObject(img);
+                       const finalize = () => {
+                               canvas.add(img);
+                               img.setCoords();
+                               if (productOverlay) canvas.sendToBack(productOverlay);
+                               if (guideGroup) canvas.bringToFront(guideGroup);
                                canvas.renderAll();
-                               if (typeof callback === 'function') {
-                                       callback();
-                               }
-                               CanvasManager.syncTo3D();
-                       }, 0);
+
+                               setTimeout(() => {
+                                       canvas.setActiveObject(img);
+                                       canvas.renderAll();
+                                       if (typeof callback === 'function') {
+                                               callback();
+                                       }
+                                       CanvasManager.syncTo3D();
+                               }, 0);
+                       };
+
+                       if (template.image_path) {
+                               fabric.Image.fromURL(template.image_path, function (clipImg) {
+                                       clipImg.set({
+                                               left: template.print_area_left,
+                                               top: template.print_area_top,
+                                               originX: 'left',
+                                               originY: 'top',
+                                               scaleX: template.print_area_width / clipImg.width,
+                                               scaleY: template.print_area_height / clipImg.height,
+                                               absolutePositioned: true
+                                       });
+                                       img.clipPath = clipImg;
+                                       finalize();
+                               }, { crossOrigin: 'anonymous' });
+                       } else {
+                               img.clipPath = new fabric.Rect({
+                                       left: template.print_area_left,
+                                       top: template.print_area_top,
+                                       width: template.print_area_width,
+                                       height: template.print_area_height,
+                                       originX: 'left',
+                                       originY: 'top',
+                                       absolutePositioned: true
+                               });
+                               finalize();
+                       }
 
 
                }, { crossOrigin: 'anonymous' });
@@ -216,29 +235,50 @@ const CanvasManager = {
                                 mr: false,
                                 mtr: true
                         });
-                        img.clipPath = new fabric.Rect({
-                                left: template.print_area_left,
-                                top: template.print_area_top,
-                                width: template.print_area_width,
-                                height: template.print_area_height,
-                                originX: 'left',
-                                originY: 'top',
-                                absolutePositioned: true
-                        });
-                        canvas.add(img);
-                        img.setCoords();
-                        if (productOverlay) canvas.sendToBack(productOverlay);
-                        if (guideGroup) canvas.bringToFront(guideGroup);
-                        canvas.renderAll();
 
-                        setTimeout(() => {
-                                canvas.setActiveObject(img);
+                        const finalize = () => {
+                                canvas.add(img);
+                                img.setCoords();
+                                if (productOverlay) canvas.sendToBack(productOverlay);
+                                if (guideGroup) canvas.bringToFront(guideGroup);
                                 canvas.renderAll();
-                                if (typeof callback === 'function') {
-                                        callback();
-                                }
-                                CanvasManager.syncTo3D();
-                        }, 0);
+
+                                setTimeout(() => {
+                                        canvas.setActiveObject(img);
+                                        canvas.renderAll();
+                                        if (typeof callback === 'function') {
+                                                callback();
+                                        }
+                                        CanvasManager.syncTo3D();
+                                }, 0);
+                        };
+
+                        if (template.image_path) {
+                                fabric.Image.fromURL(template.image_path, function (clipImg) {
+                                        clipImg.set({
+                                                left: template.print_area_left,
+                                                top: template.print_area_top,
+                                                originX: 'left',
+                                                originY: 'top',
+                                                scaleX: template.print_area_width / clipImg.width,
+                                                scaleY: template.print_area_height / clipImg.height,
+                                                absolutePositioned: true
+                                        });
+                                        img.clipPath = clipImg;
+                                        finalize();
+                                }, { crossOrigin: 'anonymous' });
+                        } else {
+                                img.clipPath = new fabric.Rect({
+                                        left: template.print_area_left,
+                                        top: template.print_area_top,
+                                        width: template.print_area_width,
+                                        height: template.print_area_height,
+                                        originX: 'left',
+                                        originY: 'top',
+                                        absolutePositioned: true
+                                });
+                                finalize();
+                        }
                }, { crossOrigin: 'anonymous' });
        },
 
