@@ -1,8 +1,13 @@
-// 📁 threeDManager.js
+// 📁 threeDManager.js — version “logique viewer”
+// - Pas d’états opaques/overlay compliqués
+// - On garde le matériau d’origine (clone sauvegardé), et on applique la map comme dans le viewer
+// - Si aucune texture: matériau original visible (ex: noir PBR)
+// - Si texture: clone + map + color = blanc (pour ne pas teinter la texture)
 
 let scene, camera, renderer, controls;
-let printableMeshes = {};
 let resizeObserver3D = null;
+let printableMeshes = {}; // { name -> Mesh }
+let modelRoot = null;
 
 const productScales = {
   mug: [1.2, 1.2, 1.2],
@@ -10,196 +15,183 @@ const productScales = {
   bottle: [2, 2, 2],
 };
 
-// ---------------- Utils ----------------
+// ---------- Utils ----------
 function getScaleForProduct(modelUrl) {
-  const lowerUrl = (modelUrl || "").toLowerCase();
-  for (const key in productScales) {
-    if (lowerUrl.includes(key)) {
-      console.log(`[3D Debug] Produit détecté: "${key}" → Scale:`, productScales[key]);
-      return productScales[key];
-    }
+  const u = (modelUrl || '').toLowerCase();
+  for (const k in productScales) {
+    if (u.includes(k)) return productScales[k];
   }
   return [1, 1, 1];
 }
 
-function show3DLoader(container) {
-  let loader = container.querySelector(".loading-overlay");
-  if (!loader) {
-    loader = document.createElement("div");
-    loader.className = "loading-overlay";
-    loader.innerHTML = '<div class="loading-spinner"></div>';
-    container.appendChild(loader);
-  }
-  loader.style.display = "flex";
-}
-function hide3DLoader(container) {
-  const loader = container.querySelector(".loading-overlay");
-  if (loader) loader.remove();
+function firstPrintableMesh() {
+  const keys = Object.keys(printableMeshes);
+  return keys.length ? printableMeshes[keys[0]] : null;
 }
 
-// ---------------- Scene ----------------
-function init3DScene(containerId, modelUrl, canvasId = "threeDCanvas") {
+function getPrintableMesh(zoneName) {
+  if (!zoneName) return firstPrintableMesh();
+  const key = Object.keys(printableMeshes).find(n => n.toLowerCase() === zoneName.toLowerCase());
+  return key ? printableMeshes[key] : null;
+}
+
+// ---------- Init ----------
+function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas', opts = {}) {
   const container = document.getElementById(containerId);
   const canvas = document.getElementById(canvasId);
   if (!container || !canvas) {
-    setTimeout(() => init3DScene(containerId, modelUrl, canvasId), 100);
+    console.warn(`[3D] Container/canvas introuvable (${containerId}, ${canvasId}), retry...`);
+    setTimeout(() => init3DScene(containerId, modelUrl, canvasId, opts), 120);
     return;
   }
 
-  show3DLoader(container);
-
-  const rect = container.getBoundingClientRect();
-  const width = rect.width;
-  const height = rect.height || width;
-
+  // Scene + Camera
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, width / height, 0.01, 5000);
+  camera = new THREE.PerspectiveCamera(75,
+    Math.max(1, container.clientWidth) / Math.max(1, container.clientHeight || container.clientWidth),
+    0.01, 5000
+  );
   camera.position.set(0, 0, 0.7);
 
+  // Renderer
   renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height, false);
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  // Color mgmt moderne (r15+)
+  if ('outputColorSpace' in renderer) {
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+  } else {
+    renderer.outputEncoding = THREE.sRGBEncoding;
+  }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1;
+  renderer.toneMappingExposure = 1.0;
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(container.clientWidth, container.clientHeight || container.clientWidth, false);
 
-  // HDRI
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  new THREE.RGBELoader().load(
-    "https://customiizer.blob.core.windows.net/assets/Hdr/brown_photostudio_01_1k.hdr",
-    (hdr) => {
-      const envMap = pmrem.fromEquirectangular(hdr).texture;
-      scene.environment = envMap;
+  // (Optionnel) HDRI simple comme le viewer
+  if (opts.hdrUrl) {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const isExr = opts.hdrUrl.toLowerCase().endsWith('.exr');
+    const Loader = isExr ? THREE.EXRLoader : THREE.RGBELoader;
+    new Loader().load(opts.hdrUrl, (hdr) => {
+      const env = pmrem.fromEquirectangular(hdr).texture;
+      scene.environment = env;
       scene.background = null;
-      hdr.dispose();
+      hdr.dispose?.();
       pmrem.dispose();
-    }
-  );
-
-  // Resize
-  if (resizeObserver3D) resizeObserver3D.disconnect();
-  resizeObserver3D = new ResizeObserver((entries) => {
-    const { width: w, height: h } = entries[0].contentRect;
-    if (w > 0 && h > 0) {
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-  });
-  resizeObserver3D.observe(container);
+      renderOnce();
+    }, undefined, (e) => console.warn('[3D] HDR load error', e));
+  }
 
   // Controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.enableZoom = false;
 
+  // Resize
+  if (resizeObserver3D) resizeObserver3D.disconnect();
+  resizeObserver3D = new ResizeObserver(entries => {
+    const { width, height } = entries[0].contentRect;
+    if (width > 0 && height > 0) {
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderOnce();
+    }
+  });
+  resizeObserver3D.observe(container);
+
+  // Load model
   loadModel(modelUrl);
   animate();
 }
 
-// ---------------- Impression state ----------------
-function setImpressionState(mesh, hasTexture, texture = null) {
-  const m = mesh.material;
-
-  if (hasTexture && texture) {
-    // --- avec texture ---
-    m.map = texture;
-    m.color.setHex(0xffffff);     // ne pas teinter la map
-    m.transparent = true;
-    m.opacity = 1.0;
-    m.alphaTest = 0.01;
-    m.depthWrite = false;         // pour éviter de boucher la bouteille
-    m.depthTest = true;
-    m.side = THREE.DoubleSide;
-    m.needsUpdate = true;
-    mesh.renderOrder = 2000;
-  } else {
-    // --- sans texture (surface visible en noir mat) ---
-    m.map = null;
-    m.color.setHex(0x000000);     // noir mat
-    m.transparent = false;
-    m.opacity = 1.0;
-    m.alphaTest = 0.0;
-    m.depthWrite = true;
-    m.depthTest = true;
-    m.side = THREE.DoubleSide;
-    m.needsUpdate = true;
-    mesh.renderOrder = 1;
-  }
-}
-
-
-
-// ---------------- Load GLB ----------------
+// ---------- Load model ----------
 function loadModel(modelUrl) {
   const loader = new THREE.GLTFLoader();
-  loader.load(
-    modelUrl,
-    (gltf) => {
-      printableMeshes = {};
+  loader.load(modelUrl, (gltf) => {
+    modelRoot = gltf.scene;
+    printableMeshes = {};
 
-      gltf.scene.traverse((child) => {
-        if (!child.isMesh) return;
-        const lower = child.name.toLowerCase();
+    // Détection des zones imprimables :
+    // - priorité aux noms qui commencent par "impression"
+    // - sinon, si le nom de matériau contient "impression"
+    modelRoot.traverse(child => {
+      if (!child.isMesh) return;
+      const lname = (child.name || '').toLowerCase();
+      const matName = (child.material?.name || '').toLowerCase();
+      const isPrintable = lname.startsWith('impression') || /impression/.test(matName);
 
-        if (lower.startsWith("impression")) {
-          child.userData.baseMaterial = child.material.clone(); // copie indépendante
-          child.material = child.material.clone();
-          printableMeshes[child.name] = child;
-          setImpressionState(child, false);
-        }
-      });
+      if (isPrintable) {
+        // Sauvegarde un CLONE du matériau d’origine
+        child.userData.baseMaterial = child.material.clone();
+        printableMeshes[child.name] = child;
+      }
+    });
 
-      scene.add(gltf.scene);
+    // Échelle produit & placement caméra
+    const s = getScaleForProduct(modelUrl);
+    modelRoot.scale.set(s[0], s[1], s[2]);
+    scene.add(modelRoot);
+    fitCameraToObject(camera, modelRoot, controls, renderer);
+    renderOnce();
 
-      const scale = getScaleForProduct(modelUrl);
-      gltf.scene.scale.set(scale[0], scale[1], scale[2]);
-      fitCameraToObject(camera, gltf.scene, controls, renderer);
-
-      hide3DLoader(renderer.domElement.parentElement);
-      console.log("[3D] ✅ Modèle chargé :", modelUrl);
-    },
-    undefined,
-    (err) => {
-      console.error("[3D] ❌ Erreur chargement modèle :", err);
-      hide3DLoader(renderer.domElement.parentElement);
-    }
-  );
+    console.log('[3D] ✅ Modèle chargé, zones imprimables:', Object.keys(printableMeshes));
+  }, undefined, (err) => {
+    console.error('[3D] ❌ Erreur GLB:', err);
+  });
 }
-scene.traverse(obj => {
-  if (obj.isMesh && obj.name.toLowerCase().startsWith("impression")) {
-    console.log("[DEBUG] Matériau impression au chargement :", obj.material);
-    obj.material.wireframe = true; // pour vérifier qu’il est toujours rendu
+
+// ---------- Texture depuis Canvas (logique viewer) ----------
+window.update3DTextureFromCanvas = function update3DTextureFromCanvas(canvas, zoneName = null) {
+  const mesh = getPrintableMesh(zoneName);
+  if (!mesh || !canvas) return;
+
+  // ATTENTION: ton canvas doit avoir un fond transparent si tu veux “voir” le matériau sous-jacent.
+  // (ex: dans Fabric.js, pas de backgroundColor opaque)
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.flipY = false;
+  if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
+  else tex.encoding = THREE.SRGBEncoding;
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
+  tex.needsUpdate = true;
+
+  // Clone du matériau courant + map (exactement comme le viewer)
+  const mat = mesh.material.clone();
+  mat.map = tex;
+  mat.color.set(0xffffff); // important: ne pas teinter la texture
+  // NE PAS toucher à transparent / depthWrite / alphaTest ici → pas nécessaire si ta bouteille est creusée
+  mat.needsUpdate = true;
+
+  mesh.material = mat;
+  renderOnce();
+
+  console.log('🖼️ Texture appliquée sur', mesh.name, `(canvas ${canvas.width}×${canvas.height})`);
+};
+
+// ---------- Retirer texture = restaurer matériau d’origine ----------
+window.clear3DTexture = function clear3DTexture(zoneName = null) {
+  const mesh = getPrintableMesh(zoneName);
+  if (!mesh) return;
+
+  const base = mesh.userData.baseMaterial;
+  if (base) {
+    mesh.material = base.clone();
+    mesh.material.needsUpdate = true;
+    renderOnce();
+    console.log('🧹 Texture retirée, matériau restauré sur', mesh.name);
+  } else {
+    console.warn('⚠️ Pas de baseMaterial sauvegardé pour', mesh.name);
   }
-});
+};
 
-// ---------------- Loop ----------------
-function animate() {
-  requestAnimationFrame(animate);
-  if (controls) controls.update();
-  if (renderer && scene && camera) renderer.render(scene, camera);
-}
-
-// ---------------- Helpers ----------------
-function getPrintableMesh(zoneName) {
-  if (!zoneName) {
-    const firstKey = Object.keys(printableMeshes)[0];
-    return firstKey ? printableMeshes[firstKey] : null;
-  }
-  const key = Object.keys(printableMeshes).find(
-    (n) => n.toLowerCase() === zoneName.toLowerCase()
-  );
-  return key ? printableMeshes[key] : null;
-}
-
+// ---------- Helpers ----------
 function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const aspect = renderer.domElement.clientWidth / renderer.domElement.clientHeight;
-  const fov = (camera.fov * Math.PI) / 180;
 
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = camera.fov * Math.PI / 180;
+  const aspect = renderer.domElement.clientWidth / Math.max(1, renderer.domElement.clientHeight);
   let cameraZ = Math.abs(maxDim / (2 * Math.tan(fov / 2)));
   if (aspect < 1) cameraZ /= aspect;
   cameraZ *= offset;
@@ -213,48 +205,18 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
   }
 }
 
-// ---------------- API ----------------
+function animate() {
+  requestAnimationFrame(animate);
+  if (controls) controls.update();
+  if (renderer && scene && camera) renderer.render(scene, camera);
+}
+function renderOnce() {
+  if (renderer && scene && camera) renderer.render(scene, camera);
+}
+
+// ---------- API export ----------
 window.init3DScene = init3DScene;
-
-window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
-  const mesh = getPrintableMesh(zoneName);
-  if (!mesh || !canvas) return;
-
-  const off = document.createElement("canvas");
-  off.width = canvas.width;
-  off.height = canvas.height;
-  const ctx = off.getContext("2d");
-
-  ctx.clearRect(0, 0, off.width, off.height);
-  ctx.drawImage(canvas, 0, 0);
-
-  const tex = new THREE.CanvasTexture(off);
-  tex.flipY = false;
-  if ("colorSpace" in tex) tex.colorSpace = THREE.SRGBColorSpace;
-  else tex.encoding = THREE.sRGBEncoding;
-  tex.premultiplyAlpha = true;
-  tex.needsUpdate = true;
-
-  setImpressionState(mesh, true, tex);
+window.logPrintableMeshes = function () {
+  console.table(Object.keys(printableMeshes));
 };
-window.clear3DTexture = function (zoneName = null) {
-  const mesh = getPrintableMesh(zoneName);
-  if (!mesh) return;
-  setImpressionState(mesh, false);
-};
-
-
-window.logPrintableMeshPosition = function (zoneName = null) {
-  const mesh = getPrintableMesh(zoneName);
-  if (mesh) {
-    console.log(
-      "[3D] 🎯 Printable mesh:",
-      mesh.name,
-      mesh.position,
-      mesh.rotation,
-      mesh.scale
-    );
-  } else {
-    console.warn("[3D] 🚫 Aucune zone imprimable trouvée pour", zoneName);
-  }
-};
+window.getPrintableMesh = getPrintableMesh;
