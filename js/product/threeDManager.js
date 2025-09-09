@@ -213,37 +213,42 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh || !canvas) return;
 
-  // Clone le matériau pour ne pas casser celui d’origine
-  if (!mesh.userData.baseMaterial) {
-    mesh.userData.baseMaterial = mesh.material;        // garde une référence
-    mesh.material = mesh.material.clone();             // clone pour l'impression
-  }
-
-  // Canvas → texture SANS fond peint
-  const offscreen = document.createElement("canvas");
-  offscreen.width = canvas.width;
-  offscreen.height = canvas.height;
-  const ctx = offscreen.getContext("2d");
-
-  // ⚠️ pas de fillRect noir : on veut un fond transparent
-  ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+  // Canvas → texture AVEC alpha (ne peins pas de fond !)
+  const off = document.createElement('canvas');
+  off.width = canvas.width; off.height = canvas.height;
+  const ctx = off.getContext('2d');
+  ctx.clearRect(0, 0, off.width, off.height);   // fond transparent
   ctx.drawImage(canvas, 0, 0);
 
-  const texture = new THREE.CanvasTexture(offscreen);
-  texture.flipY = false;
-  // three r15x : utilisez colorSpace si dispo
-  if ('colorSpace' in texture) texture.colorSpace = THREE.SRGBColorSpace;
-  else texture.encoding = THREE.sRGBEncoding;
-  texture.needsUpdate = true;
+  const tex = new THREE.CanvasTexture(off);
+  tex.flipY = false;
+  if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
+  else tex.encoding = THREE.sRGBEncoding;
+  tex.needsUpdate = true;
 
-  mesh.material.map = texture;
-  // ne pas forcer le matériau en blanc, on garde sa couleur/params PBR
-  // mesh.material.color = mesh.material.color; // inchangé
-  mesh.material.transparent = true;
-  mesh.material.alphaTest = 0.001;     // évite halo sombre sur les bords
-  mesh.material.toneMapped = true;     // reste cohérent avec la scène
-  mesh.material.needsUpdate = true;
+  // Matériau d’impression : transparent, pas d’écriture profondeur,
+  // léger décalage pour éviter le z-fighting, rendu après la base.
+  if (!mesh.userData.baseMaterial) {
+    mesh.userData.baseMaterial = mesh.material;
+    mesh.material = mesh.material.clone();
+  }
+
+  const m = mesh.material;
+  m.map = tex;
+  m.color.setHex(0xffffff);     // pas de teinte sur la texture
+  m.transparent = true;
+  m.alphaTest = 0.01;           // pixels vraiment opaques seulement
+  m.depthWrite = false;         // ne “bouche” pas la profondeur
+  m.depthTest = true;
+  m.polygonOffset = true;       // se “détache” de la surface
+  m.polygonOffsetFactor = -1;
+  m.polygonOffsetUnits = -1;
+  m.toneMapped = true;          // cohérent avec ACES
+  m.needsUpdate = true;
+
+  mesh.renderOrder = 2;         // rendu après la bouteille
 };
+
 
 
 // --- Nettoyer la texture et restaurer la couleur ---
@@ -251,8 +256,10 @@ window.clear3DTexture = function (zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh) return;
   if (mesh.userData.baseMaterial) mesh.material = mesh.userData.baseMaterial;
-  else { mesh.material.map = null; mesh.material.needsUpdate = true; }
+  else { mesh.material.map = null; }
+  mesh.material.needsUpdate = true;
 };
+
 
 
 // --- Debug ---
