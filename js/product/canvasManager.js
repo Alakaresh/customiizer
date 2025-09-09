@@ -26,7 +26,7 @@ const CM = {
 // Helpers
 // =============================
 
-// 1) Attendre que le conteneur soit VISIBLE (dimensions > 0) avant de calculer le zoom
+// Attendre que le conteneur soit VISIBLE (dimensions > 0) avant de calculer le zoom
 function waitForContainerSize(containerId, cb, { attempts = 80, interval = 50 } = {}) {
   let tries = 0;
   (function check() {
@@ -46,29 +46,32 @@ function waitForContainerSize(containerId, cb, { attempts = 80, interval = 50 } 
   })();
 }
 
-// 2) Fallback DOM (scopé au modal) — cache/affiche bouton + outils + classe CSS
+// Fallback DOM (scopé au modal) — cache/affiche bouton + outils + classe CSS
 function toggleUI(hasImage) {
-  const root = document.getElementById('customizeModal') || document;
-  const addBtn  = root.querySelector('#addImageButton');
-  const header  = root.querySelector('.visual-header');
-  const tools   = root.querySelector('.image-controls');
+  const root   = document.getElementById('customizeModal') || document;
+  const addBtn = root.querySelector('#addImageButton');
+  const header = root.querySelector('.visual-header');
+  const tools  = root.querySelector('.image-controls');
 
-  // Classe globale pour le CSS (montre header / cache le bouton)
+  // Classe globale pour CSS (montre header / cache bouton)
   if (root.id === 'customizeModal') {
     root.classList.toggle('has-user-image', !!hasImage);
   }
 
+  // Bouton
   if (addBtn) {
     addBtn.toggleAttribute('hidden', hasImage);
     addBtn.setAttribute('aria-hidden', hasImage ? 'true' : 'false');
     addBtn.style.setProperty('display', hasImage ? 'none' : '', 'important');
   }
+  // Header
   if (header) {
     header.style.setProperty('display', hasImage ? 'flex' : 'none', 'important');
     header.style.setProperty('visibility', hasImage ? 'visible' : 'hidden', 'important');
     header.style.setProperty('opacity', hasImage ? '1' : '0', 'important');
     header.style.setProperty('pointer-events', hasImage ? 'auto' : 'none', 'important');
   }
+  // Toolbar
   if (tools) {
     tools.style.setProperty('display', hasImage ? 'flex' : 'none', 'important');
     tools.style.setProperty('visibility', hasImage ? 'visible' : 'hidden', 'important');
@@ -77,7 +80,7 @@ function toggleUI(hasImage) {
   }
 }
 
-// 3) notifyChange : évènements + compat UI + fallback DOM
+// notifyChange : évènements + compat UI + fallback DOM
 function notifyChange(src = 'unknown') {
   const hasImage = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
   const activeObj = canvas?.getActiveObject();
@@ -190,7 +193,7 @@ const CanvasManager = {
           _maskReadyResolve?.();
           CM.log('init: mask chargé', { maskW: clipImg.width, maskH: clipImg.height, sX, sY });
 
-          // ➜ Première mise à l’échelle uniquement quand le conteneur est visible
+          // Première mise à l’échelle uniquement quand le conteneur est visible
           waitForContainerSize(containerId, () => {
             this._resizeToContainer(containerId);
             canvas.requestRenderAll();
@@ -230,6 +233,32 @@ const CanvasManager = {
     notifyChange('init(end)');
   },
 
+  // ===== BBOX de fenêtre imprimable =====
+  getClipWindowBBox() {
+    // 1) Si la print_area du template est renseignée, on s’aligne dessus
+    if (template?.print_area_width != null && template?.print_area_height != null) {
+      const b = {
+        left:  Number(template.print_area_left  ?? 0),
+        top:   Number(template.print_area_top   ?? 0),
+        width: Number(template.print_area_width),
+        height:Number(template.print_area_height),
+      };
+      CM.log("getClipWindowBBox(CanvasManager): from template print_area", b);
+      return b;
+    }
+    // 2) Sinon, bbox du mask
+    if (maskPath) {
+      const m = maskPath.getBoundingRect(true);
+      const b = { left: m.left, top: m.top, width: m.width, height: m.height };
+      CM.log("getClipWindowBBox(CanvasManager): from mask bbox", b);
+      return b;
+    }
+    // 3) Fallback canvas entier
+    const b = { left: 0, top: 0, width: canvas?.width || 0, height: canvas?.height || 0 };
+    CM.log("getClipWindowBBox(CanvasManager): fallback full canvas", b);
+    return b;
+  },
+
   // Ajoute l’image utilisateur sous le clip (origine = coin HG de la fenêtre)
   addImage(url) {
     if (!canvas) { CM.warn('addImage: canvas absent'); return; }
@@ -239,7 +268,7 @@ const CanvasManager = {
       CM.log('addImage: BG+mask ready');
       fabric.Image.fromURL(url, (img) => {
         CM.log('addImage: image chargée', { iw: img.width, ih: img.height });
-        const zone = getClipWindowBBox();
+        const zone = CanvasManager.getClipWindowBBox();
         const iw = img.width, ih = img.height;
         const zw = zone.width, zh = zone.height;
         const scale = Math.max(zw / iw, zh / ih); // cover
@@ -264,7 +293,7 @@ const CanvasManager = {
           canvas.requestRenderAll();
           CM.log('addImage: finalize -> objets =', canvas.getObjects().length);
 
-          // ➜ Double salve de resize anti-lag (si layout bouge après affichage)
+          // Double salve de resize anti-lag (si layout bouge après affichage)
           setTimeout(() => this._resizeToContainer(_containerId), 0);
           setTimeout(() => this._resizeToContainer(_containerId), 200);
 
@@ -272,9 +301,21 @@ const CanvasManager = {
         };
 
         if (maskPath) {
-          cloneClipPath((cp) => {
-            if (cp) { img.clipPath = cp; CM.log('addImage: clipPath appliqué'); }
-            else { CM.warn('addImage: clipPath manquant'); }
+          maskPath.clone((cp) => {
+            if (cp) {
+              cp.set({
+                absolutePositioned: true,
+                objectCaching: false,
+                selectable: false,
+                evented: false,
+                originX: 'left',
+                originY: 'top',
+              });
+              img.clipPath = cp;
+              CM.log('addImage: clipPath appliqué');
+            } else {
+              CM.warn('addImage: clipPath clone manquant');
+            }
             finalize();
           });
         } else {
@@ -288,7 +329,7 @@ const CanvasManager = {
   // Nettoyage des images utilisateur (garde BG)
   clearUserImages() {
     if (!canvas) return;
-    const imgs = getUserImages();
+    const imgs = canvas.getObjects().filter(o => o.type === "image" && o !== bgImage);
     imgs.forEach(o => canvas.remove(o));
     canvas.discardActiveObject();
     canvas.requestRenderAll();
@@ -299,7 +340,7 @@ const CanvasManager = {
   // Export PNG : crope la fenêtre (print_area si dispo)
   exportPNG() {
     if (!canvas) { CM.warn('exportPNG: pas de canvas'); return null; }
-    const b = getClipWindowBBox();
+    const b = this.getClipWindowBBox();
     CM.log('exportPNG: bbox', b);
 
     const prevVPT = canvas.viewportTransform?.slice();
@@ -328,7 +369,7 @@ const CanvasManager = {
       return;
     }
     const off = document.createElement('canvas');
-    const b = getClipWindowBBox();
+    const b = this.getClipWindowBBox();
     off.width = b.width; off.height = b.height;
     const ctx = off.getContext('2d');
     const img = new Image();
@@ -375,13 +416,25 @@ const CanvasManager = {
 
   // -------- API UI : état et actions --------
   hasImage() {
-    const v = getUserImages().length > 0;
+    const v = canvas?.getObjects()?.some(o => o.type === 'image' && o !== bgImage) || false;
     CM.log('hasImage =>', v);
     return v;
   },
 
+  hasActiveImage() {
+    const a = canvas?.getActiveObject();
+    return !!(a && a.type === 'image' && a !== bgImage);
+  },
+
+  getActiveUserImage() {
+    const a = canvas?.getActiveObject();
+    if (a && a.type === 'image' && a !== bgImage) return a;
+    const imgs = canvas?.getObjects()?.filter(o => o.type === 'image' && o !== bgImage) || [];
+    return imgs[0] || null;
+  },
+
   removeImage() {
-    const imgs = getUserImages();
+    const imgs = canvas?.getObjects()?.filter(o => o.type === 'image' && o !== bgImage) || [];
     if (!imgs.length) { CM.log('removeImage: aucune image'); return; }
     const active = canvas.getActiveObject();
     const target = (active && active.type === 'image' && active !== bgImage) ? active : imgs[0];
@@ -411,7 +464,7 @@ const CanvasManager = {
     const img = canvas?.getActiveObject();
     if (!img) { CM.warn("alignImage: pas d'image active"); return; }
 
-    const zone = getClipWindowBBox();
+    const zone = this.getClipWindowBBox();
     const bounds = img.getBoundingRect(true);
     const offsetX = img.left - bounds.left;
     const offsetY = img.top  - bounds.top;
@@ -430,6 +483,14 @@ const CanvasManager = {
     notifyChange('alignImage');
   },
 
+  // Wrappers d'alignement pratiques pour l’UI
+  alignLeft()   { return this.alignImage('left'); },
+  alignCenter() { return this.alignImage('center'); },
+  alignRight()  { return this.alignImage('right'); },
+  alignTop()    { return this.alignImage('top'); },
+  alignMiddle() { return this.alignImage('middle'); },
+  alignBottom() { return this.alignImage('bottom'); },
+
   rotateImage(angle) {
     const img = canvas?.getActiveObject();
     if (!img) { CM.warn("rotateImage: pas d'image active"); return; }
@@ -438,6 +499,28 @@ const CanvasManager = {
     canvas.requestRenderAll();
     CM.log('rotateImage:', angle);
     notifyChange('rotateImage');
+  },
+
+  rotateLeft() {
+    const img = this.getActiveUserImage();
+    if (!img) { CM.warn("rotateLeft: pas d'image active"); return; }
+    const current = img.angle || 0;
+    const target  = Math.round((current - 90) / 90) * 90;
+    img.rotate(target);
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange('rotateLeft');
+  },
+
+  rotateRight() {
+    const img = this.getActiveUserImage();
+    if (!img) { CM.warn("rotateRight: pas d'image active"); return; }
+    const current = img.angle || 0;
+    const target  = Math.round((current + 90) / 90) * 90;
+    img.rotate(target);
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange('rotateRight');
   },
 
   mirrorImage() {
@@ -468,69 +551,6 @@ const CanvasManager = {
     notifyChange('sendImageBackward');
   },
 
-  // Debug
-  getState() {
-    const state = {
-      hasImage: this.hasImage(),
-      activeType: canvas?.getActiveObject()?.type || null,
-      objects: canvas?.getObjects()?.map(o => ({ type: o.type, isBG: o === bgImage })) || [],
-      template,
-      bgDims: { w: bgImage?.width || 0, h: bgImage?.height || 0 },
-      printArea: getClipWindowBBox(),
-    };
-    CM.log('getState =>', state);
-    return state;
-  },
-
-  forceNotify() { notifyChange('forceNotify'); },
-
-  /* ============================
-     \-\-\- Extensions manquantes \-\-\-
-     (wrappers d'alignment/rotation, export Printful, restore/save, etc.)
-  ============================ */
-
-  hasActiveImage() {
-    const a = canvas?.getActiveObject();
-    return !!(a && a.type === 'image' && a !== bgImage);
-  },
-
-  getActiveUserImage() {
-    const a = canvas?.getActiveObject();
-    if (a && a.type === 'image' && a !== bgImage) return a;
-    const imgs = canvas?.getObjects()?.filter(o => o.type === 'image' && o !== bgImage) || [];
-    return imgs[0] || null;
-  },
-
-  // Wrappers d'alignement pratiques pour le wiring UI
-  alignLeft()   { return this.alignImage('left'); },
-  alignCenter() { return this.alignImage('center'); },
-  alignRight()  { return this.alignImage('right'); },
-  alignTop()    { return this.alignImage('top'); },
-  alignMiddle() { return this.alignImage('middle'); },
-  alignBottom() { return this.alignImage('bottom'); },
-
-  // Rotation 90° avec snap
-  rotateLeft() {
-    const img = this.getActiveUserImage();
-    if (!img) { CM.warn('rotateLeft: pas d\'image active'); return; }
-    const current = img.angle || 0;
-    const target  = Math.round((current - 90) / 90) * 90;
-    img.rotate(target);
-    img.setCoords();
-    canvas.requestRenderAll();
-    notifyChange('rotateLeft');
-  },
-  rotateRight() {
-    const img = this.getActiveUserImage();
-    if (!img) { CM.warn('rotateRight: pas d\'image active'); return; }
-    const current = img.angle || 0;
-    const target  = Math.round((current + 90) / 90) * 90;
-    img.rotate(target);
-    img.setCoords();
-    canvas.requestRenderAll();
-    notifyChange('rotateRight');
-  },
-
   bringToFront() {
     const img = this.getActiveUserImage();
     if (!img) return;
@@ -538,16 +558,17 @@ const CanvasManager = {
     canvas.requestRenderAll();
     notifyChange('bringToFront');
   },
+
   sendToBack() {
     const img = this.getActiveUserImage();
     if (!img) return;
     canvas.sendToBack(img);
-    if (bgImage) canvas.bringToFront(bgImage); // s'assurer que le BG reste derrière
+    if (bgImage) canvas.bringToFront(bgImage); // assure le BG reste au fond
     canvas.requestRenderAll();
     notifyChange('sendToBack');
   },
 
-  // Alias attendu par certains scripts
+  // Export alias attendu
   exportPrintAreaPNG() { return this.exportPNG(); },
 
   // Export compatible Printful: image recadrée à la fenêtre + placement (x,y,w,h) dans la fenêtre
@@ -559,13 +580,16 @@ const CanvasManager = {
       return null;
     }
 
-    const b = getClipWindowBBox();
+    const b = this.getClipWindowBBox();
     const imgEl = imageObject._element;
     const scaleX = imageObject.scaleX || 1;
     const scaleY = imageObject.scaleY || 1;
 
-    const imgDisplayW = (imageObject.width || imgEl.naturalWidth) * scaleX;
-    const imgDisplayH = (imageObject.height || imgEl.naturalHeight) * scaleY;
+    const baseW = imageObject.width  || imgEl.naturalWidth  || imgEl.width;
+    const baseH = imageObject.height || imgEl.naturalHeight || imgEl.height;
+
+    const imgDisplayW = baseW * scaleX;
+    const imgDisplayH = baseH * scaleY;
 
     // Décalage de l’image par rapport à la fenêtre (print area)
     const offsetX = (imageObject.left || 0) - b.left;
@@ -614,7 +638,7 @@ const CanvasManager = {
 
     Promise.all([bgReady, maskReady]).then(() => {
       fabric.Image.fromURL(data.design_image_url, (img) => {
-        const b = getClipWindowBBox();
+        const b = this.getClipWindowBBox();
         const sX = (data.design_width  || img.width)  / img.width;
         const sY = (data.design_height || img.height) / img.height;
 
@@ -639,7 +663,20 @@ const CanvasManager = {
         };
 
         if (maskPath) {
-          cloneClipPath((cp) => { if (cp) img.clipPath = cp; finalize(); });
+          maskPath.clone((cp) => {
+            if (cp) {
+              cp.set({
+                absolutePositioned: true,
+                objectCaching: false,
+                selectable: false,
+                evented: false,
+                originX: 'left',
+                originY: 'top',
+              });
+              img.clipPath = cp;
+            }
+            finalize();
+          });
         } else {
           finalize();
         }
@@ -651,22 +688,43 @@ const CanvasManager = {
   getProductDataForSave() {
     const img = this.getActiveUserImage();
     if (!img || !img._element) return null;
-    const b = getClipWindowBBox();
+    const b = this.getClipWindowBBox();
 
     return {
       design_image_url: img._element.currentSrc || img._element.src || null,
-      design_left: Math.round((img.left || 0) - b.left),
-      design_top:  Math.round((img.top  || 0) - b.top),
+      design_left:   Math.round((img.left || 0) - b.left),
+      design_top:    Math.round((img.top  || 0) - b.top),
       design_width:  Math.round((img.width  || img._element.naturalWidth)  * (img.scaleX || 1)),
       design_height: Math.round((img.height || img._element.naturalHeight) * (img.scaleY || 1)),
-      design_angle: Math.round(img.angle || 0),
-      design_flipX: !!img.flipX,
+      design_angle:  Math.round(img.angle || 0),
+      design_flipX:  !!img.flipX,
     };
   },
 
-  // Garde pour compat
-  forceNotify() { notifyChange('forceNotify'); },
+  // Debug
+  getState() {
+    const state = {
+      hasImage: this.hasImage(),
+      activeType: canvas?.getActiveObject()?.type || null,
+      objects: canvas?.getObjects()?.map(o => ({ type: o.type, isBG: o === bgImage })) || [],
+      template,
+      bgDims: { w: bgImage?.width || 0, h: bgImage?.height || 0 },
+      printArea: this.getClipWindowBBox(),
+    };
+    CM.log('getState =>', state);
+    return state;
+  },
 
+  forceNotify() { notifyChange('forceNotify'); },
 };
 
 window.CanvasManager = CanvasManager;
+
+// (Optionnel) SHIM rétro-compat si d’anciens appels libres traînent encore
+if (typeof window.getClipWindowBBox !== 'function') {
+  window.getClipWindowBBox = function () {
+    return window.CanvasManager && typeof window.CanvasManager.getClipWindowBBox === 'function'
+      ? window.CanvasManager.getClipWindowBBox()
+      : { left: 0, top: 0, width: 0, height: 0 };
+  };
+}
