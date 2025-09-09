@@ -1,18 +1,20 @@
-// 📁 canvasManager.js — version ultra-simplifiée (BG + clipPath image_path)
+// 📁 canvasManager.js — BG + clipPath (image_path) + API UI (LYA)
 
 let canvas = null;
 let template = null;
-let bgImage = null;      // Image de fond (template)
-let maskPath = null;     // Clip path (image_path)
+let bgImage = null;       // Image de fond (template)
+let maskPath = null;      // Clip path (image_path), NON ajouté au canvas
 let resizeObserver = null;
+
+// Mémo du conteneur pour resize public
 let _containerId = null;
 
-
-// Promesses de readiness (BG + masque)
+// Promesses de readiness (BG + masque) pour éviter les courses
 let _bgReadyResolve, _maskReadyResolve;
-const bgReady = new Promise(r => _bgReadyResolve = r);
-const maskReady = new Promise(r => _maskReadyResolve = r);
+let bgReady = new Promise(r => _bgReadyResolve = r);
+let maskReady = new Promise(r => _maskReadyResolve = r);
 
+// ---------- Helpers ----------
 function cloneClipPath(done) {
   if (!maskPath) return done(null);
   maskPath.clone((cp) => {
@@ -30,15 +32,38 @@ function cloneClipPath(done) {
 
 function getUserImages() {
   if (!canvas) return [];
-  // "image utilisateur" = toutes les images sauf le background
+  // "image utilisateur" = toutes les images de la scène sauf le BG (maskPath n'est pas dans la scène)
   return canvas.getObjects().filter(o => o.type === 'image' && o !== bgImage);
 }
 
+// Fenêtre imprimable (0,0) = coin HG de la print_area si dispo, sinon bbox du masque, sinon canvas entier
+function getClipWindowBBox() {
+  if (template?.print_area_width != null && template?.print_area_height != null) {
+    return {
+      left:  Number(template.print_area_left  ?? 0),
+      top:   Number(template.print_area_top   ?? 0),
+      width: Number(template.print_area_width),
+      height:Number(template.print_area_height)
+    };
+  }
+  if (maskPath) {
+    const b = maskPath.getBoundingRect(true);
+    return { left: b.left, top: b.top, width: b.width, height: b.height };
+  }
+  return { left: 0, top: 0, width: canvas?.width || 0, height: canvas?.height || 0 };
+}
+
+// Notifie l'UI : utile pour masquer/afficher “Ajouter une image” & co
+function notifyChange() {
+  const has = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
+  window.dispatchEvent(new CustomEvent('canvas:image-change', { detail: { hasImage: has } }));
+}
+
+// ---------- CanvasManager ----------
 const CanvasManager = {
   init(templateData, containerId) {
     template = { ...templateData };
     _containerId = containerId;
-
 
     // sécuriser numériques si présents
     for (const k of ['print_area_left','print_area_top','print_area_width','print_area_height']) {
@@ -50,6 +75,10 @@ const CanvasManager = {
       console.error("[CanvasManager] ❌ Conteneur introuvable :", containerId);
       return;
     }
+
+    // (ré)initialise readiness
+    bgReady = new Promise(r => _bgReadyResolve = r);
+    maskReady = new Promise(r => _maskReadyResolve = r);
 
     if (resizeObserver) resizeObserver.disconnect();
     resizeObserver = new ResizeObserver(() => this._resizeToContainer(containerId));
@@ -82,7 +111,7 @@ const CanvasManager = {
       canvas.setHeight(img.height);
       canvas.add(bgImage);
       canvas.sendToBack(bgImage);
-      _bgReadyResolve?.(); // BG prêt
+      _bgReadyResolve?.();
 
       // 2) Charger le clipPath (image_path) et l’aligner 1:1 sur le BG
       if (template.image_path) {
@@ -99,45 +128,49 @@ const CanvasManager = {
             strokeWidth: 0, opacity: 1
           });
           maskPath = clipImg;
-          _maskReadyResolve?.(); // masque prêt
+          _maskReadyResolve?.();
 
           this._resizeToContainer(containerId);
           canvas.requestRenderAll();
+          notifyChange();
         }, { crossOrigin: 'anonymous' });
       } else {
         _maskReadyResolve?.(); // pas de masque => considéré prêt
         this._resizeToContainer(containerId);
         canvas.requestRenderAll();
+        notifyChange();
       }
     }, { crossOrigin: 'anonymous' });
 
     window.addEventListener('resize', () => this._resizeToContainer(containerId));
 
-    // sync 3D basique : à chaque changement on exporte la zone imprimable
-    canvas.on('object:modified', () => this.syncTo3D && this.syncTo3D());
-    canvas.on('object:added',    () => this.syncTo3D && this.syncTo3D());
-    canvas.on('object:removed',  () => this.syncTo3D && this.syncTo3D());
+    // Listeners : sync + notif
+    const _onAny = () => { this.syncTo3D && this.syncTo3D(); notifyChange(); };
+    canvas.on('object:modified', _onAny);
+    canvas.on('object:added',    _onAny);
+    canvas.on('object:removed',  _onAny);
+
+    // notifier l'UI au démarrage
+    notifyChange();
   },
 
-  // Ajoute l’image utilisateur sous le clip (origine = coin HG de la print_area si dispo, sinon 0,0)
+  // Ajoute l’image utilisateur sous le clip (origine = coin HG de la fenêtre)
   addImage(url) {
     if (!canvas) return;
 
-    // On attend BG + masque pour garantir le découpage
+    // On attend BG + masque pour garantir le découpage et le bon placement
     Promise.all([bgReady, maskReady]).then(() => {
       fabric.Image.fromURL(url, (img) => {
-        const L = (template.print_area_left  ?? 0);
-        const T = (template.print_area_top   ?? 0);
-        const W = (template.print_area_width ?? bgImage.width);
-        const H = (template.print_area_height?? bgImage.height);
-
-        // cover par défaut (remplit la fenêtre ; rognera si nécessaire)
+        const zone = getClipWindowBBox();
         const iw = img.width, ih = img.height;
-        const scale = Math.max(W / iw, H / ih);
+        const zw = zone.width, zh = zone.height;
+
+        // cover : remplit la fenêtre (rognage possible)
+        const scale = Math.max(zw / iw, zh / ih);
 
         img.set({
-          left: L,
-          top:  T,
+          left: zone.left,
+          top:  zone.top,
           originX: 'left',
           originY: 'top',
           scaleX: scale,
@@ -152,6 +185,7 @@ const CanvasManager = {
           img.setCoords();
           if (bgImage) canvas.sendToBack(bgImage);
           canvas.requestRenderAll();
+          notifyChange();
         };
 
         if (maskPath) {
@@ -166,28 +200,26 @@ const CanvasManager = {
     });
   },
 
-  // Optionnel : supprime les images utilisateur (garde BG/clip)
+  // Nettoyage des images utilisateur (garde BG)
   clearUserImages() {
     if (!canvas) return;
     getUserImages().forEach(o => canvas.remove(o));
     canvas.discardActiveObject();
     canvas.requestRenderAll();
+    notifyChange();
   },
 
-  // Exporte la zone print_area si dispo, sinon tout le canvas (viewport neutre)
+  // Export PNG : crope la fenêtre (print_area si dispo)
   exportPNG() {
     if (!canvas) return null;
 
-    const L = (template.print_area_left  ?? 0);
-    const T = (template.print_area_top   ?? 0);
-    const W = (template.print_area_width ?? canvas.width);
-    const H = (template.print_area_height?? canvas.height);
+    const b = getClipWindowBBox();
 
     const prevVPT = canvas.viewportTransform?.slice();
     canvas.setViewportTransform([1,0,0,1,0,0]);
 
     const dataUrl = canvas.toDataURL({
-      left: L, top: T, width: W, height: H,
+      left: b.left, top: b.top, width: b.width, height: b.height,
       format: 'png',
       multiplier: 1,
       enableRetinaScaling: false,
@@ -207,9 +239,8 @@ const CanvasManager = {
       return;
     }
     const off = document.createElement('canvas');
-    const w = (template.print_area_width ?? canvas.width);
-    const h = (template.print_area_height ?? canvas.height);
-    off.width = w; off.height = h;
+    const b = getClipWindowBBox();
+    off.width = b.width; off.height = b.height;
     const ctx = off.getContext('2d');
     const img = new Image();
     img.onload = () => {
@@ -220,7 +251,7 @@ const CanvasManager = {
     img.src = dataUrl;
   },
 
-  // zoom canvas pour remplir le conteneur (sans toucher aux objets)
+  // -------- Affichage / Resize --------
   _resizeToContainer(containerId) {
     const container = document.getElementById(containerId);
     if (!container || !canvas || !bgImage) return;
@@ -243,11 +274,14 @@ const CanvasManager = {
       wrapper.style.alignItems = 'center';
     }
     canvas.requestRenderAll();
-  }, // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< IMPORTANT: virgule ici
-resizeToContainer(id) {
-  this._resizeToContainer(id || _containerId);
-},
+  },
 
+  // Alias public attendu par l'UI
+  resizeToContainer(id) {
+    this._resizeToContainer(id || _containerId);
+  },
+
+  // -------- API UI : état et actions --------
   hasImage() {
     return getUserImages().length > 0;
   },
@@ -260,6 +294,7 @@ resizeToContainer(id) {
     canvas.remove(target);
     canvas.discardActiveObject();
     canvas.requestRenderAll();
+    notifyChange();
   },
 
   getCurrentImageData() {
@@ -273,6 +308,62 @@ resizeToContainer(id) {
       angle: img.angle || 0,
       flipX: !!img.flipX
     };
+  },
+
+  // Alignements dans la fenêtre
+  alignImage(position) {
+    const img = canvas?.getActiveObject();
+    if (!img) return;
+
+    const zone = getClipWindowBBox();
+    const bounds = img.getBoundingRect(true);
+    const offsetX = img.left - bounds.left;
+    const offsetY = img.top  - bounds.top;
+
+    if (position === 'left')        img.set({ left: zone.left + offsetX });
+    else if (position === 'right')  img.set({ left: zone.left + zone.width - bounds.width + offsetX });
+    else if (position === 'center') img.set({ left: zone.left + (zone.width - bounds.width)/2 + offsetX });
+    else if (position === 'top')    img.set({ top:  zone.top + offsetY });
+    else if (position === 'bottom') img.set({ top:  zone.top + zone.height - bounds.height + offsetY });
+    else if (position === 'middle') img.set({ top:  zone.top + (zone.height - bounds.height)/2 + offsetY });
+
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange();
+  },
+
+  rotateImage(angle) {
+    const img = canvas?.getActiveObject();
+    if (!img) return;
+    img.rotate((img.angle || 0) + angle);
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange();
+  },
+
+  mirrorImage() {
+    const img = canvas?.getActiveObject();
+    if (!img) return;
+    img.flipX = !img.flipX;
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange();
+  },
+
+  bringImageForward() {
+    const obj = canvas?.getActiveObject();
+    if (!obj) return;
+    canvas.bringForward(obj);
+    canvas.requestRenderAll();
+    notifyChange();
+  },
+
+  sendImageBackward() {
+    const obj = canvas?.getActiveObject();
+    if (!obj) return;
+    canvas.sendBackwards(obj);
+    canvas.requestRenderAll();
+    notifyChange();
   }
 };
 
