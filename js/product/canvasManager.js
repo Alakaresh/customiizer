@@ -17,7 +17,16 @@ const CanvasManager = {
 		template.print_area_width = parseFloat(template.print_area_width);
 		template.print_area_height = parseFloat(template.print_area_height);
 		template.template_width = parseFloat(template.template_width);
-		template.template_height = parseFloat(template.template_height);
+               template.template_height = parseFloat(template.template_height);
+
+               console.log('[CanvasManager] 📐 template metrics', {
+                       template_width: template.template_width,
+                       template_height: template.template_height,
+                       print_area_left: template.print_area_left,
+                       print_area_top: template.print_area_top,
+                       print_area_width: template.print_area_width,
+                       print_area_height: template.print_area_height
+               });
 
 		// 🔍 Conteneur principal
                 const container = document.getElementById(containerId);
@@ -124,12 +133,20 @@ const CanvasManager = {
        addImage: function (url, callback) {
                fabric.Image.fromURL(url, function (img) {
                         const drawX = template.print_area_left;
-                        const drawY = template.print_area_top;
+                       const drawY = template.print_area_top;
 
-			const scale = Math.min(
-				template.print_area_width / img.width,
-				template.print_area_height / img.height
-			);
+                       const scale = Math.min(
+                               template.print_area_width / img.width,
+                               template.print_area_height / img.height
+                        );
+
+                       console.log('[CanvasManager] 🖼️ ajout image', {
+                               drawX,
+                               drawY,
+                               imgWidth: img.width,
+                               imgHeight: img.height,
+                               scale
+                       });
 
 			img.set({
 				left: drawX,
@@ -580,12 +597,22 @@ const CanvasManager = {
 		const containerH = container.clientHeight;
 
 		const tplW = template.template_width;
-		const tplH = template.template_height;
-		const tplRatio = tplW / tplH;
+               const tplH = template.template_height;
+               const tplRatio = tplW / tplH;
 
-		let zoom = Math.min(containerW / tplW, containerH / tplH);
-		const canvasW = tplW * zoom;
-		const canvasH = tplH * zoom;
+               let zoom = Math.min(containerW / tplW, containerH / tplH);
+               const canvasW = tplW * zoom;
+               const canvasH = tplH * zoom;
+
+               console.log('[CanvasManager] 🔍 resize', {
+                       containerW,
+                       containerH,
+                       tplW,
+                       tplH,
+                       zoom,
+                       canvasW,
+                       canvasH
+               });
 
 		canvas.setZoom(zoom);
 		canvas.setWidth(canvasW);

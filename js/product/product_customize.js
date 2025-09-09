@@ -311,15 +311,28 @@ jQuery(document).ready(function ($) {
                try {
                        let template = window.customizerCache.templates[variant.variant_id];
                        if (!template) {
-                               const res = await fetch(`/wp-json/custom-api/v1/variant-template/${variant.variant_id}`);
-                               const data = await res.json();
-                               if (!data.success || !data.template) {
-                                       console.error('[UI] template not found for variant', variant.variant_id);
-                                       return;
+                               if (variant.template) {
+                                       template = variant.template;
+                                       window.customizerCache.templates[variant.variant_id] = template;
+                               } else {
+                                       const res = await fetch(`/wp-json/custom-api/v1/variant-template/${variant.variant_id}`);
+                                       const data = await res.json();
+                                       if (!data.success || !data.template) {
+                                               console.error('[UI] template not found for variant', variant.variant_id);
+                                               return;
+                                       }
+                                       template = data.template;
+                                       window.customizerCache.templates[variant.variant_id] = template;
                                }
-                               template = data.template;
-                               window.customizerCache.templates[variant.variant_id] = template;
                        }
+                       console.log('[Customizer] ✅ template chargé pour la variante', variant.variant_id, {
+                               template_width: template.template_width,
+                               template_height: template.template_height,
+                               print_area_left: template.print_area_left,
+                               print_area_top: template.print_area_top,
+                               print_area_width: template.print_area_width,
+                               print_area_height: template.print_area_height
+                       });
                        CanvasManager.init(template, 'product2DContainer');
                        updateAddImageButtonVisibility();
                        if (variant.url_3d) {
@@ -370,17 +383,22 @@ jQuery(document).ready(function ($) {
                         // 1. Charger le template depuis le cache ou l'API
                         let template = window.customizerCache.templates[selectedVariant.variant_id];
                         if (!template) {
-                                const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
-                                const data = await res.json();
+                                if (selectedVariant.template) {
+                                        template = selectedVariant.template;
+                                        window.customizerCache.templates[selectedVariant.variant_id] = template;
+                                } else {
+                                        const res = await fetch(`/wp-json/custom-api/v1/variant-template/${selectedVariant.variant_id}`);
+                                        const data = await res.json();
 
-                                if (!data.success || !data.template) {
-                                        console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
-                                        $('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
-                                        return;
+                                        if (!data.success || !data.template) {
+                                                console.error("[UI] ❌ Template introuvable pour la variante", selectedVariant.variant_id);
+                                                $('#product2DContainer').html('<p style="color:red;">Template non disponible</p>');
+                                                return;
+                                        }
+
+                                        template = data.template;
+                                        window.customizerCache.templates[selectedVariant.variant_id] = template;
                                 }
-
-                                template = data.template;
-                                window.customizerCache.templates[selectedVariant.variant_id] = template;
                         } else {
                         }
 
