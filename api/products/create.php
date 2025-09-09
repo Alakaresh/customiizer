@@ -419,26 +419,33 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 
 							$filename   = "{$catalog_id}_{$vid}_MKP_$index.png";
 							$full_path  = "$mockup_dir/$filename";
-							$db_path    = get_stylesheet_directory_uri() . $subdir . "/$filename";
-							$relative_url = strstr($db_path, '/wp-content');
+                                                        $db_path = get_stylesheet_directory_uri() . $subdir . "/$filename";
+                                                        $relative_url = wp_make_link_relative($db_path);
+                                                        if (empty($relative_url)) {
+                                                                $relative_url = $db_path; // fallback sur l'URL absolue
+                                                        }
+                                                        if (!filter_var($relative_url, FILTER_VALIDATE_URL) && strpos($relative_url, '/') !== 0) {
+                                                                product_log("⚠️ Chemin mockup invalide pour variant_id=$vid : $db_path", 'mockup');
+                                                                continue;
+                                                        }
 
-							$image_data = wp_remote_retrieve_body(wp_remote_get($url));
-							if ($image_data) {
-								file_put_contents($full_path, $image_data);
-								product_log("💡 Saving mockup_id=$style_id for variant_id=$vid — url=$relative_url", 'mockup');
+                                                        $image_data = wp_remote_retrieve_body(wp_remote_get($url));
+                                                        if ($image_data) {
+                                                                file_put_contents($full_path, $image_data);
+                                                                product_log("💡 Saving mockup_id=$style_id for variant_id=$vid — url=$relative_url", 'mockup');
 
-								$wpdb->replace(
-									'WPC_variant_mockup',
-									[
-										'variant_id'    => $vid,
-										'mockup_id'     => $style_id,
-										'image'         => $relative_url,
-										'position_top'  => 0,
-										'position_left' => 50,
-									],
-									[ '%d','%d','%s','%d','%d' ]
-								);
-							}
+                                                                $wpdb->replace(
+                                                                        'WPC_variant_mockup',
+                                                                        [
+                                                                                'variant_id'    => $vid,
+                                                                                'mockup_id'     => $style_id,
+                                                                                'image'         => $relative_url,
+                                                                                'position_top'  => 0,
+                                                                                'position_left' => 50,
+                                                                        ],
+                                                                        [ '%d','%d','%s','%d','%d' ]
+                                                                );
+                                                        }
 						}
 
 						$mockup_generated_count++;
