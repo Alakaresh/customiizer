@@ -159,12 +159,31 @@ const CanvasManager = {
                                 mtr: true  // rotation activée
                         });
 
-                        let clip;
+                        const finalizeAdd = () => {
+                                canvas.add(img);
+                                img.setCoords();
+                                canvas.bringToFront(productOverlay);
+                                canvas.bringToFront(guideGroup);
+                                canvas.renderAll();
+
+                                setTimeout(() => {
+                                        canvas.setActiveObject(img);
+                                        canvas.renderAll();
+                                        if (typeof callback === 'function') {
+                                                callback();
+                                        }
+                                        CanvasManager.syncTo3D();
+                                }, 0);
+                        };
+
                         if (printMask) {
-                                clip = printMask.clone();
-                                clip.set({ absolutePositioned: true });
+                                printMask.clone((cloned) => {
+                                        cloned.set({ absolutePositioned: true });
+                                        img.clipPath = cloned;
+                                        finalizeAdd();
+                                });
                         } else {
-                                clip = new fabric.Rect({
+                                const clip = new fabric.Rect({
                                         left: template.print_area_left,
                                         top: template.print_area_top,
                                         width: template.print_area_width,
@@ -173,24 +192,9 @@ const CanvasManager = {
                                         originY: 'top',
                                         absolutePositioned: true
                                 });
+                                img.clipPath = clip;
+                                finalizeAdd();
                         }
-
-                        img.clipPath = clip;
-
-                       canvas.add(img);
-                       img.setCoords();
-                       canvas.bringToFront(productOverlay);
-                       canvas.bringToFront(guideGroup);
-                       canvas.renderAll();
-
-                       setTimeout(() => {
-                               canvas.setActiveObject(img);
-                               canvas.renderAll();
-                               if (typeof callback === 'function') {
-                                       callback();
-                               }
-                               CanvasManager.syncTo3D();
-                       }, 0);
 
 
                }, { crossOrigin: 'anonymous' });
@@ -228,38 +232,44 @@ const CanvasManager = {
                                 mr: false,
                                 mtr: true
                         });
-                        let clip;
-                        if (printMask) {
-                                clip = printMask.clone();
-                                clip.set({ absolutePositioned: true });
-                        } else {
-                                clip = new fabric.Rect({
-                                        left: template.print_area_left,
-                                        top: template.print_area_top,
-                                        width: template.print_area_width,
-                                        height: template.print_area_height,
-                                        originX: 'left',
-                                        originY: 'top',
-                                        absolutePositioned: true
-                                });
-                        }
-                        img.clipPath = clip;
-                        canvas.add(img);
-                        img.setCoords();
-                        canvas.bringToFront(productOverlay);
-                        canvas.bringToFront(guideGroup);
-                        canvas.renderAll();
+                         const finalizeRestore = () => {
+                                 canvas.add(img);
+                                 img.setCoords();
+                                 canvas.bringToFront(productOverlay);
+                                 canvas.bringToFront(guideGroup);
+                                 canvas.renderAll();
 
-                        setTimeout(() => {
-                                canvas.setActiveObject(img);
-                                canvas.renderAll();
-                                if (typeof callback === 'function') {
-                                        callback();
-                                }
-                                CanvasManager.syncTo3D();
-                        }, 0);
+                                 setTimeout(() => {
+                                         canvas.setActiveObject(img);
+                                         canvas.renderAll();
+                                         if (typeof callback === 'function') {
+                                                 callback();
+                                         }
+                                         CanvasManager.syncTo3D();
+                                 }, 0);
+                         };
+
+                         if (printMask) {
+                                 printMask.clone((cloned) => {
+                                         cloned.set({ absolutePositioned: true });
+                                         img.clipPath = cloned;
+                                         finalizeRestore();
+                                 });
+                         } else {
+                                 const clip = new fabric.Rect({
+                                         left: template.print_area_left,
+                                         top: template.print_area_top,
+                                         width: template.print_area_width,
+                                         height: template.print_area_height,
+                                         originX: 'left',
+                                         originY: 'top',
+                                         absolutePositioned: true
+                                 });
+                                 img.clipPath = clip;
+                                 finalizeRestore();
+                         }
                }, { crossOrigin: 'anonymous' });
-       },
+        },
 
         alignImage: function (position) {
                 const img = canvas.getActiveObject();
