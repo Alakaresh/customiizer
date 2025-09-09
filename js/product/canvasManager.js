@@ -96,7 +96,7 @@ const CanvasManager = {
 
     productOverlay = img;
     canvas.add(productOverlay);
-    canvas.bringToFront(productOverlay);
+    canvas.sendToBack(productOverlay);
 
     // 🔁 Forcer un premier rendu
     canvas.renderAll();
@@ -159,12 +159,14 @@ const CanvasManager = {
                                 mtr: true  // rotation activée
                         });
 
-                        const finalizeAdd = () => {
-                                canvas.add(img);
-                                img.setCoords();
-                                canvas.bringToFront(productOverlay);
-                                canvas.bringToFront(guideGroup);
-                                canvas.renderAll();
+        const finalizeAdd = () => {
+                canvas.add(img);
+                img.setCoords();
+                canvas.sendToBack(productOverlay);
+                if (guideGroup) {
+                        canvas.bringToFront(guideGroup);
+                }
+                canvas.renderAll();
 
                                 setTimeout(() => {
                                         canvas.setActiveObject(img);
@@ -232,12 +234,14 @@ const CanvasManager = {
                                 mr: false,
                                 mtr: true
                         });
-                         const finalizeRestore = () => {
-                                 canvas.add(img);
-                                 img.setCoords();
-                                 canvas.bringToFront(productOverlay);
-                                 canvas.bringToFront(guideGroup);
-                                 canvas.renderAll();
+         const finalizeRestore = () => {
+                                canvas.add(img);
+                                img.setCoords();
+                                canvas.sendToBack(productOverlay);
+                                if (guideGroup) {
+                                        canvas.bringToFront(guideGroup);
+                                }
+                                canvas.renderAll();
 
                                  setTimeout(() => {
                                          canvas.setActiveObject(img);
@@ -307,8 +311,10 @@ const CanvasManager = {
                 const obj = canvas.getActiveObject();
                 if (!obj) return;
                 canvas.bringForward(obj);
-                canvas.bringToFront(productOverlay);
-                canvas.bringToFront(guideGroup);
+                canvas.sendToBack(productOverlay);
+                if (guideGroup) {
+                        canvas.bringToFront(guideGroup);
+                }
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
@@ -317,8 +323,10 @@ const CanvasManager = {
                 const obj = canvas.getActiveObject();
                 if (!obj) return;
                 canvas.sendBackwards(obj);
-                canvas.bringToFront(productOverlay);
-                canvas.bringToFront(guideGroup);
+                canvas.sendToBack(productOverlay);
+                if (guideGroup) {
+                        canvas.bringToFront(guideGroup);
+                }
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
