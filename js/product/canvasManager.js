@@ -6,6 +6,11 @@ let bgImage = null;      // Image de fond (template)
 let maskPath = null;     // Clip path (image_path)
 let resizeObserver = null;
 
+// Promesses de readiness (BG + masque)
+let _bgReadyResolve, _maskReadyResolve;
+const bgReady = new Promise(r => _bgReadyResolve = r);
+const maskReady = new Promise(r => _maskReadyResolve = r);
+
 function cloneClipPath(done) {
   if (!maskPath) return done(null);
   maskPath.clone((cp) => {
@@ -20,9 +25,10 @@ function cloneClipPath(done) {
     done(cp);
   });
 }
+
 function getUserImages() {
   if (!canvas) return [];
-  // On considère "image utilisateur" = toutes les images sauf le background
+  // "image utilisateur" = toutes les images sauf le background
   return canvas.getObjects().filter(o => o.type === 'image' && o !== bgImage);
 }
 
@@ -72,6 +78,7 @@ const CanvasManager = {
       canvas.setHeight(img.height);
       canvas.add(bgImage);
       canvas.sendToBack(bgImage);
+      _bgReadyResolve?.(); // BG prêt
 
       // 2) Charger le clipPath (image_path) et l’aligner 1:1 sur le BG
       if (template.image_path) {
@@ -88,11 +95,13 @@ const CanvasManager = {
             strokeWidth: 0, opacity: 1
           });
           maskPath = clipImg;
+          _maskReadyResolve?.(); // masque prêt
 
           this._resizeToContainer(containerId);
           canvas.requestRenderAll();
         }, { crossOrigin: 'anonymous' });
       } else {
+        _maskReadyResolve?.(); // pas de masque => considéré prêt
         this._resizeToContainer(containerId);
         canvas.requestRenderAll();
       }
@@ -106,57 +115,58 @@ const CanvasManager = {
     canvas.on('object:removed',  () => this.syncTo3D && this.syncTo3D());
   },
 
-  // Ajoute l’image utilisateur et l’applique sous le clip (origine = coin HG de la print_area si dispo, sinon 0,0)
+  // Ajoute l’image utilisateur sous le clip (origine = coin HG de la print_area si dispo, sinon 0,0)
   addImage(url) {
-    if (!canvas || !bgImage) return;
+    if (!canvas) return;
 
-    fabric.Image.fromURL(url, (img) => {
-      // zone de placement initiale : print_area si dispo, sinon tout le canvas
-      const L = (template.print_area_left  ?? 0);
-      const T = (template.print_area_top   ?? 0);
-      const W = (template.print_area_width ?? bgImage.width);
-      const H = (template.print_area_height?? bgImage.height);
+    // On attend BG + masque pour garantir le découpage
+    Promise.all([bgReady, maskReady]).then(() => {
+      fabric.Image.fromURL(url, (img) => {
+        const L = (template.print_area_left  ?? 0);
+        const T = (template.print_area_top   ?? 0);
+        const W = (template.print_area_width ?? bgImage.width);
+        const H = (template.print_area_height?? bgImage.height);
 
-      // “cover” par défaut (remplit la fenêtre ; rognera si nécessaire)
-      const iw = img.width, ih = img.height;
-      const scale = Math.max(W / iw, H / ih);
+        // cover par défaut (remplit la fenêtre ; rognera si nécessaire)
+        const iw = img.width, ih = img.height;
+        const scale = Math.max(W / iw, H / ih);
 
-      img.set({
-        left: L,
-        top:  T,
-        originX: 'left',
-        originY: 'top',
-        scaleX: scale,
-        scaleY: scale,
-        selectable: true,
-        hasControls: true,
-        lockUniScaling: true
-      });
-
-      const finalize = () => {
-        canvas.add(img);
-        img.setCoords();
-        if (bgImage) canvas.sendToBack(bgImage);
-        canvas.requestRenderAll();
-      };
-
-      if (maskPath) {
-        cloneClipPath((cp) => {
-          if (cp) img.clipPath = cp;
-          finalize();
+        img.set({
+          left: L,
+          top:  T,
+          originX: 'left',
+          originY: 'top',
+          scaleX: scale,
+          scaleY: scale,
+          selectable: true,
+          hasControls: true,
+          lockUniScaling: true
         });
-      } else {
-        finalize();
-      }
-    }, { crossOrigin: 'anonymous' });
+
+        const finalize = () => {
+          canvas.add(img);
+          img.setCoords();
+          if (bgImage) canvas.sendToBack(bgImage);
+          canvas.requestRenderAll();
+        };
+
+        if (maskPath) {
+          cloneClipPath((cp) => {
+            if (cp) img.clipPath = cp;
+            finalize();
+          });
+        } else {
+          finalize();
+        }
+      }, { crossOrigin: 'anonymous' });
+    });
   },
 
   // Optionnel : supprime les images utilisateur (garde BG/clip)
   clearUserImages() {
     if (!canvas) return;
-    canvas.getObjects().forEach(o => {
-      if (o.type === 'image' && o !== bgImage) canvas.remove(o);
-    });
+    getUserImages().forEach(o => canvas.remove(o));
+    canvas.discardActiveObject();
     canvas.requestRenderAll();
   },
 
@@ -193,14 +203,15 @@ const CanvasManager = {
       return;
     }
     const off = document.createElement('canvas');
-    const b = {
-      w: (template.print_area_width ?? canvas.width),
-      h: (template.print_area_height ?? canvas.height)
-    };
-    off.width = b.w; off.height = b.h;
+    const w = (template.print_area_width ?? canvas.width);
+    const h = (template.print_area_height ?? canvas.height);
+    off.width = w; off.height = h;
     const ctx = off.getContext('2d');
     const img = new Image();
-    img.onload = () => { ctx.drawImage(img, 0, 0); window.update3DTextureFromCanvas && window.update3DTextureFromCanvas(off); };
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+      window.update3DTextureFromCanvas && window.update3DTextureFromCanvas(off);
+    };
     img.crossOrigin = 'anonymous';
     img.src = dataUrl;
   },
@@ -228,34 +239,34 @@ const CanvasManager = {
       wrapper.style.alignItems = 'center';
     }
     canvas.requestRenderAll();
-  }
+  }, // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< IMPORTANT: virgule ici
+
   hasImage() {
-  return getUserImages().length > 0;
-},
+    return getUserImages().length > 0;
+  },
 
-removeImage() {
-  const imgs = getUserImages();
-  if (!imgs.length) return;
-  // supprime l'image active si c'est une image utilisateur, sinon la première
-  const active = canvas.getActiveObject();
-  const target = (active && active.type === 'image' && active !== bgImage) ? active : imgs[0];
-  canvas.remove(target);
-  canvas.requestRenderAll();
-},
+  removeImage() {
+    const imgs = getUserImages();
+    if (!imgs.length) return;
+    const active = canvas.getActiveObject();
+    const target = (active && active.type === 'image' && active !== bgImage) ? active : imgs[0];
+    canvas.remove(target);
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
+  },
 
-getCurrentImageData() {
-  const img = canvas?.getActiveObject();
-  if (!img || img.type !== 'image' || img === bgImage) return null;
-  return {
-    left: img.left,
-    top: img.top,
-    width: img.width * img.scaleX,
-    height: img.height * img.scaleY,
-    angle: img.angle || 0,
-    flipX: !!img.flipX
-  };
-},
-
+  getCurrentImageData() {
+    const img = canvas?.getActiveObject();
+    if (!img || img.type !== 'image' || img === bgImage) return null;
+    return {
+      left: img.left,
+      top: img.top,
+      width: img.width * img.scaleX,
+      height: img.height * img.scaleY,
+      angle: img.angle || 0,
+      flipX: !!img.flipX
+    };
+  }
 };
 
 window.CanvasManager = CanvasManager;
