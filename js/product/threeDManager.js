@@ -98,39 +98,36 @@ function init3DScene(containerId, modelUrl, canvasId = "threeDCanvas") {
 }
 
 // ---------------- Impression state ----------------
-function setImpressionState(mesh, hasTexture) {
-  if (hasTexture) {
-    const m = mesh.material;
+function setImpressionState(mesh, hasTexture, texture = null) {
+  const m = mesh.material;
+
+  if (hasTexture && texture) {
+    // --- avec texture ---
+    m.map = texture;
+    m.color.setHex(0xffffff);     // ne pas teinter la map
     m.transparent = true;
     m.opacity = 1.0;
     m.alphaTest = 0.01;
+    m.depthWrite = false;         // pour éviter de boucher la bouteille
     m.depthTest = true;
-    m.depthWrite = false;
-    m.polygonOffset = true;
-    m.polygonOffsetFactor = -2;
-    m.polygonOffsetUnits = -2;
-    m.color.setHex(0xffffff);
     m.side = THREE.DoubleSide;
-    mesh.renderOrder = 2000;
-    m.toneMapped = true;
     m.needsUpdate = true;
+    mesh.renderOrder = 2000;
   } else {
-    // 🔧 restaure vraiment le matériau original
-    if (mesh.userData.baseMaterial) {
-      mesh.material.copy(mesh.userData.baseMaterial);
-    } else {
-      // fallback noir standard si jamais baseMaterial manquant
-      mesh.material = new THREE.MeshStandardMaterial({
-        color: 0x000000,
-        roughness: 1,
-        metalness: 0,
-        side: THREE.DoubleSide,
-      });
-    }
+    // --- sans texture (surface visible en noir mat) ---
+    m.map = null;
+    m.color.setHex(0x000000);     // noir mat
+    m.transparent = false;
+    m.opacity = 1.0;
+    m.alphaTest = 0.0;
+    m.depthWrite = true;
+    m.depthTest = true;
+    m.side = THREE.DoubleSide;
+    m.needsUpdate = true;
     mesh.renderOrder = 1;
-    mesh.material.needsUpdate = true;
   }
 }
+
 
 
 // ---------------- Load GLB ----------------
@@ -227,6 +224,7 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
   off.width = canvas.width;
   off.height = canvas.height;
   const ctx = off.getContext("2d");
+
   ctx.clearRect(0, 0, off.width, off.height);
   ctx.drawImage(canvas, 0, 0);
 
@@ -237,15 +235,14 @@ window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
   tex.premultiplyAlpha = true;
   tex.needsUpdate = true;
 
-  mesh.material.map = tex;
-  setImpressionState(mesh, true);
+  setImpressionState(mesh, true, tex);
 };
-
 window.clear3DTexture = function (zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh) return;
   setImpressionState(mesh, false);
 };
+
 
 window.logPrintableMeshPosition = function (zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
