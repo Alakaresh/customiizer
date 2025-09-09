@@ -517,22 +517,28 @@ function getMaskBBox() {
 }
 
 function addOrUpdateGuideRect() {
-  const b = getMaskBBox();
+  const L = template.print_area_left  ?? 0;
+  const T = template.print_area_top   ?? 0;
+  const W = template.print_area_width ?? (bgImage?.width  || 0);
+  const H = template.print_area_height?? (bgImage?.height || 0);
+
   if (!guideRect) {
     guideRect = new fabric.Rect({
-      left: b.left, top: b.top, width: b.width, height: b.height,
+      left: L, top: T, width: W, height: H,
       fill: 'rgba(0,0,0,0)',
-      stroke: 'red', strokeWidth: 2,
+      stroke: 'red',
+      strokeWidth: 2,
       strokeUniform: true,
       objectCaching: false,
       selectable: false, evented: false
     });
     canvas.add(guideRect);
   } else {
-    guideRect.set({ left: b.left, top: b.top, width: b.width, height: b.height });
+    guideRect.set({ left: L, top: T, width: W, height: H });
   }
   canvas.bringToFront(guideRect);
   canvas.requestRenderAll();
 }
+
 
 window.CanvasManager = CanvasManager;
