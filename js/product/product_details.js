@@ -60,14 +60,18 @@ jQuery(document).ready(function ($) {
                 const vid = variant.variant_id;
 
                 if (vid && !window.customizerCache.templates[vid]) {
-                        try {
-                                const res = await fetch(`/wp-json/custom-api/v1/variant-template/${vid}`);
-                                const data = await res.json();
-                                if (data.success && data.template) {
-                                        window.customizerCache.templates[vid] = data.template;
+                        if (variant.template) {
+                                window.customizerCache.templates[vid] = variant.template;
+                        } else {
+                                try {
+                                        const res = await fetch(`/wp-json/custom-api/v1/variant-template/${vid}`);
+                                        const data = await res.json();
+                                        if (data.success && data.template) {
+                                                window.customizerCache.templates[vid] = data.template;
+                                        }
+                                } catch (e) {
+                                        console.error('[Cache] Erreur préchargement template:', e);
                                 }
-                        } catch (e) {
-                                console.error('[Cache] Erreur préchargement template:', e);
                         }
                 }
 
