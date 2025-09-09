@@ -10,42 +10,38 @@ const productScales = {
   bottle: [2, 2, 2],
 };
 
-// ----------------------- Utils -----------------------
+// ---------------- Utils ----------------
 function getScaleForProduct(modelUrl) {
-  const lowerUrl = (modelUrl || '').toLowerCase();
+  const lowerUrl = (modelUrl || "").toLowerCase();
   for (const key in productScales) {
     if (lowerUrl.includes(key)) {
       console.log(`[3D Debug] Produit détecté: "${key}" → Scale:`, productScales[key]);
       return productScales[key];
     }
   }
-  console.log(`[3D Debug] Aucun produit détecté dans "${modelUrl}", scale par défaut [1,1,1]`);
   return [1, 1, 1];
 }
 
 function show3DLoader(container) {
-  let loader = container.querySelector('.loading-overlay');
+  let loader = container.querySelector(".loading-overlay");
   if (!loader) {
-    loader = document.createElement('div');
-    loader.className = 'loading-overlay';
+    loader = document.createElement("div");
+    loader.className = "loading-overlay";
     loader.innerHTML = '<div class="loading-spinner"></div>';
     container.appendChild(loader);
   }
-  loader.style.display = 'flex';
+  loader.style.display = "flex";
 }
-
 function hide3DLoader(container) {
-  const loader = container.querySelector('.loading-overlay');
+  const loader = container.querySelector(".loading-overlay");
   if (loader) loader.remove();
 }
 
-// ----------------------- Scene init -----------------------
-function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
+// ---------------- Scene ----------------
+function init3DScene(containerId, modelUrl, canvasId = "threeDCanvas") {
   const container = document.getElementById(containerId);
   const canvas = document.getElementById(canvasId);
-
   if (!container || !canvas) {
-    console.warn(`[3D] ⏳ Container ou canvas introuvable (${containerId}, ${canvasId}), nouvel essai...`);
     setTimeout(() => init3DScene(containerId, modelUrl, canvasId), 100);
     return;
   }
@@ -56,13 +52,10 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
   const width = rect.width;
   const height = rect.height || width;
 
-  // Scene & camera
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(75, width / height, 0.01, 5000);
   camera.position.set(0, 0, 0.7);
-  camera.lookAt(0, 0, 0);
 
-  // Renderer
   renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height, false);
@@ -70,18 +63,18 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
 
-  // HDRI (éclairage, pas de background)
+  // HDRI
   const pmrem = new THREE.PMREMGenerator(renderer);
-  pmrem.compileEquirectangularShader();
-  new THREE.RGBELoader()
-    .load('https://customiizer.blob.core.windows.net/assets/Hdr/brown_photostudio_01_1k.hdr', (hdr) => {
+  new THREE.RGBELoader().load(
+    "https://customiizer.blob.core.windows.net/assets/Hdr/brown_photostudio_01_1k.hdr",
+    (hdr) => {
       const envMap = pmrem.fromEquirectangular(hdr).texture;
       scene.environment = envMap;
       scene.background = null;
       hdr.dispose();
       pmrem.dispose();
-      console.log('✅ HDR chargé (sans background)');
-    });
+    }
+  );
 
   // Resize
   if (resizeObserver3D) resizeObserver3D.disconnect();
@@ -100,33 +93,28 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
   controls.enableDamping = true;
   controls.enableZoom = false;
 
-  // Model
   loadModel(modelUrl);
-
-  // Loop
   animate();
 }
 
-// ----------------------- Impression state -----------------------
+// ---------------- Impression state ----------------
 function setImpressionState(mesh, hasTexture) {
   const m = mesh.material;
-  mesh.visible = true;
-
   if (hasTexture) {
-    // --- overlay pour l’impression ---
+    // overlay texture
     m.transparent = true;
     m.opacity = 1.0;
     m.alphaTest = 0.01;
     m.depthTest = true;
-    m.depthWrite = false;           // ne “bouche” pas la bouteille
-    m.polygonOffset = true;         // évite z-fighting si coplanaire
-    m.polygonOffsetFactor = -1;
-    m.polygonOffsetUnits = -1;
-    m.color.setHex(0xffffff);       // pas de teinte sur la map
-    m.side = THREE.FrontSide;
-    mesh.renderOrder = 2;           // rendu après la base
+    m.depthWrite = false;
+    m.polygonOffset = true;
+    m.polygonOffsetFactor = -2;
+    m.polygonOffsetUnits = -2;
+    m.color.setHex(0xffffff);
+    m.side = THREE.DoubleSide; // pour éviter problème de normales
+    mesh.renderOrder = 2000;
   } else {
-    // --- état normal (pas de texture) ---
+    // état par défaut (opaque, comme bouteille)
     m.map = null;
     m.transparent = false;
     m.opacity = 1.0;
@@ -134,23 +122,22 @@ function setImpressionState(mesh, hasTexture) {
     m.depthTest = true;
     m.depthWrite = true;
     m.polygonOffset = false;
-    m.side = THREE.FrontSide;
+    m.side = THREE.DoubleSide;
     mesh.renderOrder = 1;
 
-    // Restaurer look d’origine
+    // restaure couleur du matériau original
     const base = mesh.userData.baseMaterial;
     if (base) {
       m.color.copy(base.color);
-      if ('roughness' in m && 'roughness' in base) m.roughness = base.roughness;
-      if ('metalness' in m && 'metalness' in base) m.metalness = base.metalness;
+      if ("roughness" in base) m.roughness = base.roughness;
+      if ("metalness" in base) m.metalness = base.metalness;
     }
   }
-
   m.toneMapped = true;
   m.needsUpdate = true;
 }
 
-// ----------------------- Load GLB -----------------------
+// ---------------- Load GLB ----------------
 function loadModel(modelUrl) {
   const loader = new THREE.GLTFLoader();
   loader.load(
@@ -160,51 +147,41 @@ function loadModel(modelUrl) {
 
       gltf.scene.traverse((child) => {
         if (!child.isMesh) return;
-
         const lower = child.name.toLowerCase();
 
-        if (lower.startsWith('impression')) {
-          // Sauvegarde matériau d’origine, puis clone pour instance indépendante
+        if (lower.startsWith("impression")) {
           child.userData.baseMaterial = child.material;
           child.material = child.material.clone();
-
           printableMeshes[child.name] = child;
-          setImpressionState(child, false); // visible, pas de texture
-
-          // Assure l’ordre de rendu vs base
-          child.renderOrder = 2;
-        } else {
-          // La bouteille / autres meshes
-          child.renderOrder = 1;
+          setImpressionState(child, false);
         }
       });
 
       scene.add(gltf.scene);
 
-      // Scale & camera
       const scale = getScaleForProduct(modelUrl);
       gltf.scene.scale.set(scale[0], scale[1], scale[2]);
       fitCameraToObject(camera, gltf.scene, controls, renderer);
 
       hide3DLoader(renderer.domElement.parentElement);
-      console.log('[3D] ✅ Modèle chargé :', modelUrl);
+      console.log("[3D] ✅ Modèle chargé :", modelUrl);
     },
     undefined,
-    (error) => {
-      console.error('[3D] ❌ Erreur chargement modèle :', error);
+    (err) => {
+      console.error("[3D] ❌ Erreur chargement modèle :", err);
       hide3DLoader(renderer.domElement.parentElement);
     }
   );
 }
 
-// ----------------------- Render loop -----------------------
+// ---------------- Loop ----------------
 function animate() {
   requestAnimationFrame(animate);
   if (controls) controls.update();
   if (renderer && scene && camera) renderer.render(scene, camera);
 }
 
-// ----------------------- Helpers -----------------------
+// ---------------- Helpers ----------------
 function getPrintableMesh(zoneName) {
   if (!zoneName) {
     const firstKey = Object.keys(printableMeshes)[0];
@@ -237,44 +214,48 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
   }
 }
 
-// ----------------------- Public API -----------------------
+// ---------------- API ----------------
 window.init3DScene = init3DScene;
 
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh || !canvas) return;
 
-  // Canvas → texture avec alpha (fond transparent)
-  const off = document.createElement('canvas');
+  const off = document.createElement("canvas");
   off.width = canvas.width;
   off.height = canvas.height;
-  const ctx = off.getContext('2d');
+  const ctx = off.getContext("2d");
   ctx.clearRect(0, 0, off.width, off.height);
   ctx.drawImage(canvas, 0, 0);
 
   const tex = new THREE.CanvasTexture(off);
   tex.flipY = false;
-  if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
+  if ("colorSpace" in tex) tex.colorSpace = THREE.SRGBColorSpace;
   else tex.encoding = THREE.sRGBEncoding;
   tex.premultiplyAlpha = true;
   tex.needsUpdate = true;
 
   mesh.material.map = tex;
-  setImpressionState(mesh, true); // passe en mode overlay
+  setImpressionState(mesh, true);
 };
 
 window.clear3DTexture = function (zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh) return;
-  // retire la map + repasse en état normal (opaque)
   setImpressionState(mesh, false);
 };
 
 window.logPrintableMeshPosition = function (zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (mesh) {
-    console.log('[3D] 🎯 Printable mesh:', mesh.name, mesh.position, mesh.rotation, mesh.scale);
+    console.log(
+      "[3D] 🎯 Printable mesh:",
+      mesh.name,
+      mesh.position,
+      mesh.rotation,
+      mesh.scale
+    );
   } else {
-    console.warn('[3D] 🚫 Aucune zone imprimable trouvée pour', zoneName);
+    console.warn("[3D] 🚫 Aucune zone imprimable trouvée pour", zoneName);
   }
 };
