@@ -104,98 +104,110 @@ const CanvasManager = {
 
   // ========= addImage =========
   addImage: function (url, callback) {
-    if (!canvas || !bgImage) return;
+  if (!canvas || !bgImage) return;
 
-    fabric.Image.fromURL(url, (img) => {
-      const zone = getMaskBBox(); // bbox en coords NATIVES
-      const scale = Math.min(zone.width / img.width, zone.height / img.height);
+  fabric.Image.fromURL(url, (img) => {
+    const zone = getMaskBBox(); // bbox en coords NATIVES
+    const scale = Math.min(zone.width / img.width, zone.height / img.height);
 
-      img.set({
-        left: zone.left,
-        top: zone.top,
-        originX: 'left',
-        originY: 'top',
-        scaleX: scale,
-        scaleY: scale,
-        selectable: true,
-        hasControls: true,
-        lockRotation: false,
-        lockUniScaling: true,
-        hasRotatingPoint: true
-      });
+    img.set({
+      left: zone.left,
+      top: zone.top,
+      originX: 'left',
+      originY: 'top',
+      scaleX: scale,
+      scaleY: scale,
+      selectable: true,
+      hasControls: true,
+      lockRotation: false,
+      lockUniScaling: true,
+      hasRotatingPoint: true
+    });
 
-      // Visuels des contrôles
-      img.setControlsVisibility({
-        tl: true, tr: true, bl: true, br: true,
-        mt: false, mb: false, ml: false, mr: false, mtr: true
-      });
+    img.setControlsVisibility({
+      tl: true, tr: true, bl: true, br: true,
+      mt: false, mb: false, ml: false, mr: false, mtr: true
+    });
 
-      // Clip direct (coords canvas = coords BG natives)
-      if (maskPath) img.clipPath = maskPath.clone();
-
-      // Ordres d’empilement : BG au fond, guide au-dessus
+    const finalizeAdd = () => {
       canvas.add(img);
       img.setCoords();
       if (bgImage) canvas.sendToBack(bgImage);
       if (guideRect) canvas.bringToFront(guideRect);
-      canvas.renderAll();
 
-      setTimeout(() => {
-        canvas.setActiveObject(img);
-        canvas.renderAll();
-        if (typeof callback === 'function') callback();
-        CanvasManager.syncTo3D();
-      }, 0);
-    }, { crossOrigin: 'anonymous' });
-  },
+      // marquer sale pour forcer un repaint propre
+      img.dirty = true;
+      if (img.clipPath) img.clipPath.dirty = true;
+
+      canvas.requestRenderAll();
+      if (typeof callback === 'function') callback();
+      CanvasManager.syncTo3D?.();
+    };
+
+    // ⚠️ CLONE ASYNC du clipPath
+    cloneClipPath((cp) => {
+      if (cp) img.clipPath = cp;
+      finalizeAdd();
+    });
+
+  }, { crossOrigin: 'anonymous' });
+},
+
 
   // ========= restoreFromProductData =========
   // data = { design_image_url, design_left, design_top, design_width, design_height, design_angle, design_flipX }
   // ⚠️ Ici on considère que design_* sont exprimés en coords NATIVES BG.
   restoreFromProductData: function (data, callback) {
-    if (!data || !data.design_image_url) return;
+  if (!data || !data.design_image_url) return;
 
-    fabric.Image.fromURL(data.design_image_url, (img) => {
-      const sX = (data.design_width  && img.width)  ? (data.design_width  / img.width)  : 1;
-      const sY = (data.design_height && img.height) ? (data.design_height / img.height) : 1;
+  fabric.Image.fromURL(data.design_image_url, (img) => {
+    const sX = (data.design_width  && img.width)  ? (data.design_width  / img.width)  : 1;
+    const sY = (data.design_height && img.height) ? (data.design_height / img.height) : 1;
 
-      img.set({
-        left: (data.design_left  ?? 0),
-        top:  (data.design_top   ?? 0),
-        scaleX: sX,
-        scaleY: sY,
-        originX: 'left',
-        originY: 'top',
-        selectable: true,
-        hasControls: true,
-        lockRotation: false,
-        lockUniScaling: true,
-        hasRotatingPoint: true,
-        angle: data.design_angle || 0,
-        flipX: !!data.design_flipX
-      });
+    img.set({
+      left: (data.design_left  ?? 0),
+      top:  (data.design_top   ?? 0),
+      scaleX: sX,
+      scaleY: sY,
+      originX: 'left',
+      originY: 'top',
+      selectable: true,
+      hasControls: true,
+      lockRotation: false,
+      lockUniScaling: true,
+      hasRotatingPoint: true,
+      angle: data.design_angle || 0,
+      flipX: !!data.design_flipX
+    });
 
-      img.setControlsVisibility({
-        tl: true, tr: true, bl: true, br: true,
-        mt: false, mb: false, ml: false, mr: false, mtr: true
-      });
+    img.setControlsVisibility({
+      tl: true, tr: true, bl: true, br: true,
+      mt: false, mb: false, ml: false, mr: false, mtr: true
+    });
 
-      if (maskPath) img.clipPath = maskPath.clone();
-
+    const finalizeAdd = () => {
       canvas.add(img);
       img.setCoords();
       if (bgImage) canvas.sendToBack(bgImage);
       if (guideRect) canvas.bringToFront(guideRect);
-      canvas.renderAll();
 
-      setTimeout(() => {
-        canvas.setActiveObject(img);
-        canvas.renderAll();
-        if (typeof callback === 'function') callback();
-        CanvasManager.syncTo3D();
-      }, 0);
-    }, { crossOrigin: 'anonymous' });
-  },
+      img.dirty = true;
+      if (img.clipPath) img.clipPath.dirty = true;
+
+      canvas.requestRenderAll();
+      if (typeof callback === 'function') callback();
+      CanvasManager.syncTo3D?.();
+    };
+
+    // ⚠️ CLONE ASYNC du clipPath
+    cloneClipPath((cp) => {
+      if (cp) img.clipPath = cp;
+      finalizeAdd();
+    });
+
+  }, { crossOrigin: 'anonymous' });
+},
+
 
   // ========= alignImage =========
   alignImage: function (position) {
@@ -466,6 +478,21 @@ function makeClipPath(done) {
     strokeWidth: 0, fill: 'rgba(0,0,0,0)'
   });
   done(rect);
+}
+// -- Helper: cloner le clipPath de façon sûre (Fabric v5 = async)
+function cloneClipPath(done) {
+  if (!maskPath) return done(null);
+  maskPath.clone((cp) => {
+    cp.set({
+      absolutePositioned: true,  // coords canvas (identiques à BG natif)
+      objectCaching: false,
+      selectable: false,
+      evented: false,
+      originX: 'left',
+      originY: 'top'
+    });
+    done(cp);
+  });
 }
 
 function getMaskBBox() {
