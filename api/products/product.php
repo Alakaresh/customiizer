@@ -76,21 +76,20 @@ function product($request) {
                                 'template_image_url' => $row['template_image_url'],
                                 'template_image_path' => $row['template_image_path'],
                                 'placement' => $row['placement'],
-                                'template' => [
-                                        'image_url' => $row['template_image_url'],
-                                        'image_path' => $row['template_image_path'],
-                                        'width' => floatval($row['template_width']),
-                                        'height' => floatval($row['template_height']),
-                                        'print_area' => [
-                                                'width' => floatval($row['print_area_width']),
-                                                'height' => floatval($row['print_area_height']),
-                                                'top' => floatval($row['print_area_top']),
-                                                'left' => floatval($row['print_area_left']),
-                                        ],
-                                ],
-                                'mockups' => []
-                        ];
-                }
+                               'template' => [
+                                       'image_url' => $row['template_image_url'],
+                                       'image_path' => $row['template_image_path'],
+                                       'template_width' => floatval($row['template_width']),
+                                       'template_height' => floatval($row['template_height']),
+                                       'print_area_left' => floatval($row['print_area_left']),
+                                       'print_area_top' => floatval($row['print_area_top']),
+                                       'print_area_width' => floatval($row['print_area_width']),
+                                       'print_area_height' => floatval($row['print_area_height']),
+                               ],
+                               'mockups' => []
+                       ];
+               }
+
 
 		if (!empty($row['mockup_id'])) {
 			$variants[$variant_id]['mockups'][] = [
