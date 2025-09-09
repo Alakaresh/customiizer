@@ -5,6 +5,8 @@ let template = null;
 let bgImage = null;      // Image de fond (template)
 let maskPath = null;     // Clip path (image_path)
 let resizeObserver = null;
+let _containerId = null;
+
 
 // Promesses de readiness (BG + masque)
 let _bgReadyResolve, _maskReadyResolve;
@@ -35,6 +37,8 @@ function getUserImages() {
 const CanvasManager = {
   init(templateData, containerId) {
     template = { ...templateData };
+    _containerId = containerId;
+
 
     // sécuriser numériques si présents
     for (const k of ['print_area_left','print_area_top','print_area_width','print_area_height']) {
@@ -240,6 +244,9 @@ const CanvasManager = {
     }
     canvas.requestRenderAll();
   }, // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< IMPORTANT: virgule ici
+resizeToContainer(id) {
+  this._resizeToContainer(id || _containerId);
+},
 
   hasImage() {
     return getUserImages().length > 0;
