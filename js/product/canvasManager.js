@@ -441,32 +441,32 @@ function makeClipPath(done) {
   const W = Math.round(template.print_area_width ?? (bgImage?.width  ?? 0));
   const H = Math.round(template.print_area_height?? (bgImage?.height ?? 0));
 
-  if (template.image_path) {
-    fabric.Image.fromURL(template.image_path, (clipImg) => {
-      // ⚠️ AUCUNE ÉCHELLE : on suppose image_path calée au BG natif
-      // Si ton fichier est 1:1 avec le BG 1000×1000, il doit être (left=0, top=0)
-      // S’il décrit une sous-zone, place-le avec L/T/W/H adaptés.
-      // Par sécurité: si le masque doit couvrir seulement la print_area, on l’aligne :
-      // -> commente la ligne suivante si TON masque est global 1:1
-      if (template.print_area_width && template.print_area_height) {
-        const sX = W / clipImg.width;
-        const sY = H / clipImg.height;
-        clipImg.set({ left: L, top: T, scaleX: sX, scaleY: sY });
-      } else {
-        clipImg.set({ left: 0, top: 0 });
-      }
+if (template.image_path) {
+  fabric.Image.fromURL(template.image_path, (clipImg) => {
+    // Aligner le masque sur TOUT le template (BG) 1:1
+    const sX = (bgImage?.width  || clipImg.width)  / clipImg.width;
+    const sY = (bgImage?.height || clipImg.height) / clipImg.height;
 
-      clipImg.set({
-        originX: 'left', originY: 'top',
-        absolutePositioned: true,
-        objectCaching: false,
-        selectable: false, evented: false,
-        strokeWidth: 0, opacity: 1
-      });
-      done(clipImg);
-    }, { crossOrigin: 'anonymous' });
-    return;
-  }
+    clipImg.set({
+      left: 0,
+      top:  0,
+      originX: 'left',
+      originY: 'top',
+      scaleX: sX,
+      scaleY: sY,
+      absolutePositioned: true,
+      objectCaching: false,
+      selectable: false,
+      evented: false,
+      strokeWidth: 0,
+      opacity: 1
+    });
+
+    done(clipImg);
+  }, { crossOrigin: 'anonymous' });
+  return;
+}
+
 
   // Pas d’image masque : rect de print_area (ou toute l’image si non défini)
   const rect = new fabric.Rect({
