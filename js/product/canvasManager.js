@@ -1,9 +1,9 @@
-// 📁 canvasManager.js — BG + clipPath (image_path) + API UI (LYA) — avec notif UI & sélection auto
+// 📁 canvasManager.js — BG + clipPath (image_path) + API UI + notifications robustes
 
 let canvas = null;
 let template = null;
 let bgImage = null;       // Image de fond (template)
-let maskPath = null;      // Clip path (image_path), NON ajouté au canvas
+let maskPath = null;      // Clip path (image_path), NON ajouté à la scène
 let resizeObserver = null;
 
 // Mémo du conteneur pour resize public
@@ -53,31 +53,48 @@ function getClipWindowBBox() {
   return { left: 0, top: 0, width: canvas?.width || 0, height: canvas?.height || 0 };
 }
 
-// Notifie l'UI : event + compat + fallback DOM
+// Notifie l'UI : CustomEvent + jQuery + compat + fallback DOM
 function notifyChange() {
   const hasImage = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
   const activeObj = canvas?.getActiveObject();
   const hasActiveImage = !!(activeObj && activeObj.type === 'image' && activeObj !== bgImage);
 
-  // 1) Event custom
+  // 1) CustomEvent natif
   try {
     window.dispatchEvent(new CustomEvent('canvas:image-change', {
       detail: { hasImage, hasActiveImage }
     }));
-  } catch(_) {}
+  } catch (_) {}
 
-  // 2) Compat : fonction existante dans ton UI
+  // 2) jQuery event si présent (ton projet a jQuery)
+  try {
+    if (window.jQuery) {
+      window.jQuery(document).trigger('canvas:image-change', [{ hasImage, hasActiveImage }]);
+    }
+  } catch (_) {}
+
+  // 3) Compat direct : fonction globale de ton UI si dispo
   try {
     if (typeof window.updateAddImageButtonVisibility === 'function') {
       window.updateAddImageButtonVisibility();
     }
-  } catch(_) {}
+  } catch (_) {}
 
-  // 3) Fallback DOM (facultatif, robuste si l’UI n’écoute pas)
-  const addBtn = document.querySelector('#btn-add-image, .btn-add-image, [data-role="btn-add-image"]');
+  // 4) Fallback DOM (si personne n’écoute)
+  const addBtn =
+    document.querySelector('#btn-add-image') ||
+    document.querySelector('.btn-add-image') ||
+    document.querySelector('[data-role="btn-add-image"]') ||
+    document.querySelector('button[data-action="add-image"]');
+
   if (addBtn) addBtn.style.display = hasImage ? 'none' : '';
 
-  const tools = document.querySelector('#image-tools, .image-tools, [data-role="image-tools"]');
+  const tools =
+    document.querySelector('#image-tools') ||
+    document.querySelector('.image-tools') ||
+    document.querySelector('[data-role="image-tools"]') ||
+    document.querySelector('.customizer-tools');
+
   if (tools) tools.style.display = hasImage ? '' : 'none';
 }
 
@@ -208,11 +225,12 @@ const CanvasManager = {
         const finalize = () => {
           canvas.add(img);
           img.setCoords();
-          // Sélectionne l’image pour afficher la barre d’outils côté UI
+          // Sélection auto => l’UI a un objet actif
           canvas.setActiveObject(img);
           if (bgImage) canvas.sendToBack(bgImage);
           canvas.requestRenderAll();
-          notifyChange();
+          // Notif immédiate (au cas où l’UI ne réagit pas aux events Fabric)
+          setTimeout(notifyChange, 0);
         };
 
         if (maskPath) {
