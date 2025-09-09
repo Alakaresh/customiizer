@@ -1,610 +1,511 @@
-// 📁 canvasManager.js
+// 📁 canvasManager.js (version "BG natif + zoom canvas")
 
 let canvas = null;
 let template = null;
 let resizeObserver = null;
-let productOverlay = null;
-let guideGroup = null;
+
+let bgImage = null;         // Image de template (fond), chargée à taille native (ex: 1000x1000)
+let overlayImage = null;    // Optionnel: overlay par-dessus (si besoin plus tard)
+let guideRect = null;       // Guide rouge (optionnel)
+let maskPath = null;        // Le masque clipPath (image_path ou rect), posé en coords natives
+let containerRef = null;
 
 const CanvasManager = {
-	init: function (templateData, containerId) {
-		template = templateData;
+  // ========= init =========
+  init: function (templateData, containerId) {
+    template = { ...templateData };
+    containerRef = containerId;
 
-		// 🔢 Sécuriser les valeurs numériques
-		template.print_area_left = parseFloat(template.print_area_left);
-		template.print_area_top = parseFloat(template.print_area_top);
-		template.print_area_width = parseFloat(template.print_area_width);
-		template.print_area_height = parseFloat(template.print_area_height);
-		template.template_width = parseFloat(template.template_width);
-		template.template_height = parseFloat(template.template_height);
+    // 🔢 Sécuriser numériques s’ils existent
+    for (const k of [
+      'print_area_left','print_area_top','print_area_width','print_area_height',
+      'template_width','template_height'
+    ]) {
+      if (template[k] != null) template[k] = parseFloat(template[k]);
+    }
 
-		// 🔍 Conteneur principal
-                const container = document.getElementById(containerId);
-                if (!container) {
-                        console.error("[CanvasManager] ❌ Conteneur introuvable :", containerId);
-                        return;
-                }
+    // 🎯 Container
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error("[CanvasManager] ❌ Conteneur introuvable :", containerId);
+      return;
+    }
 
-                if (resizeObserver) {
-                        resizeObserver.disconnect();
-                }
-                resizeObserver = new ResizeObserver(() => {
-                        CanvasManager.resizeToContainer(containerId);
-                });
-                resizeObserver.observe(container);
+    // ♻️ Observer resize
+    if (resizeObserver) resizeObserver.disconnect();
+    resizeObserver = new ResizeObserver(() => {
+      CanvasManager.resizeToContainer(containerId);
+    });
+    resizeObserver.observe(container);
 
-                // 🧹 Nettoyage du conteneur sans retirer le bouton "Ajouter une image"
-                const existingWrapper = container.querySelector('#productCanvasWrapper');
-                if (existingWrapper) {
-                        existingWrapper.remove();
-                }
+    // 🧹 Nettoyage wrapper
+    const existingWrapper = container.querySelector('#productCanvasWrapper');
+    if (existingWrapper) existingWrapper.remove();
 
-		// 🧱 Créer wrapper + canvas
-		const wrapper = document.createElement("div");
-		wrapper.className = "fabric-wrapper";
-		wrapper.id = "productCanvasWrapper";
+    // 🧱 Wrapper + canvas (taille définie après chargement BG)
+    const wrapper = document.createElement("div");
+    wrapper.className = "fabric-wrapper";
+    wrapper.id = "productCanvasWrapper";
 
-		const canvasEl = document.createElement("canvas");
-		canvasEl.id = "productCanvas";
-		canvasEl.width = template.template_width;
-		canvasEl.height = template.template_height;
+    const canvasEl = document.createElement("canvas");
+    canvasEl.id = "productCanvas";
+    wrapper.appendChild(canvasEl);
+    container.appendChild(wrapper);
 
-		wrapper.appendChild(canvasEl);
-		container.appendChild(wrapper);
-
-                // 🖌️ Initialisation Fabric
-                canvas = new fabric.Canvas(canvasEl, {
-                        preserveObjectStacking: true,
-                        selection: false
-                });
-
-                // 🔲 Guide rouge délimitant la zone imprimable
-                guideGroup = new fabric.Rect({
-                        left: template.print_area_left,
-                        top: template.print_area_top,
-                        width: template.print_area_width,
-                        height: template.print_area_height,
-                        fill: 'rgba(0,0,0,0)',
-                        stroke: 'red',
-                        strokeWidth: 2,
-                        selectable: false,
-                        evented: false
-                });
-                canvas.add(guideGroup);
-
-		// 📷 Image de fond (template Printful)
-		fabric.Image.fromURL(template.image_url, function (img) {
-    const scaleX = template.template_width / img.width;
-    const scaleY = template.template_height / img.height;
-
-    img.set({
-        originX: 'left',
-        originY: 'top',
-        scaleX: scaleX,
-        scaleY: scaleY,
-        left: 0,
-        top: 0,
-        selectable: false,
-        evented: false
+    // 🖌️ Fabric
+    canvas = new fabric.Canvas(canvasEl, {
+      preserveObjectStacking: true,
+      selection: false
     });
 
-    productOverlay = img;
-    canvas.add(productOverlay);
-    canvas.sendToBack(productOverlay);
-    canvas.bringToFront(guideGroup);
+    // ========= Charger le BG à TAILLE NATIVE, SANS SCALE =========
+    // Important: pas de scaleX/scaleY ici ; on affichera via zoom du canvas
+    fabric.Image.fromURL(template.image_url, (img) => {
+      img.set({
+        left: 0, top: 0,
+        originX: 'left', originY: 'top',
+        selectable: false, evented: false
+      });
+      bgImage = img;
 
-    // 🔁 Forcer un premier rendu
-    canvas.renderAll();
+      // Fixer la taille de travail du canvas aux dimensions NATIVES du BG
+      canvas.setWidth(img.width);
+      canvas.setHeight(img.height);
+      canvas.add(bgImage);
+      canvas.sendToBack(bgImage);
 
-    // 🚀 Synchroniser directement la texture 3D
-    if (typeof CanvasManager.syncTo3D === "function") {
+      // ========= Créer/Charger le masque (coords NATIVES BG) =========
+      makeClipPath((cp) => {
+        maskPath = cp; // on le garde à portée
+        // Guide rouge optionnel pour feedback
+        addOrUpdateGuideRect();
+
+        // Zoom canvas pour remplir le conteneur (affichage)
+        CanvasManager.resizeToContainer(containerId);
+
+        // Premier rendu
+        canvas.renderAll();
+        if (typeof CanvasManager.syncTo3D === 'function') {
+          CanvasManager.syncTo3D();
+        }
+      });
+
+    }, { crossOrigin: 'anonymous' });
+
+    // 🔁 Sync 3D à chaque modif utile
+    canvas.on('object:modified', CanvasManager.syncTo3D);
+    canvas.on('object:added', CanvasManager.syncTo3D);
+    canvas.on('object:removed', CanvasManager.syncTo3D);
+
+    window.addEventListener('resize', () => {
+      CanvasManager.resizeToContainer(containerId);
+    });
+  },
+
+  // ========= addImage =========
+  addImage: function (url, callback) {
+    if (!canvas || !bgImage) return;
+
+    fabric.Image.fromURL(url, (img) => {
+      const zone = getMaskBBox(); // bbox en coords NATIVES
+      const scale = Math.min(zone.width / img.width, zone.height / img.height);
+
+      img.set({
+        left: zone.left,
+        top: zone.top,
+        originX: 'left',
+        originY: 'top',
+        scaleX: scale,
+        scaleY: scale,
+        selectable: true,
+        hasControls: true,
+        lockRotation: false,
+        lockUniScaling: true,
+        hasRotatingPoint: true
+      });
+
+      // Visuels des contrôles
+      img.setControlsVisibility({
+        tl: true, tr: true, bl: true, br: true,
+        mt: false, mb: false, ml: false, mr: false, mtr: true
+      });
+
+      // Clip direct (coords canvas = coords BG natives)
+      if (maskPath) img.clipPath = maskPath.clone();
+
+      // Ordres d’empilement : BG au fond, guide au-dessus
+      canvas.add(img);
+      img.setCoords();
+      if (bgImage) canvas.sendToBack(bgImage);
+      if (guideRect) canvas.bringToFront(guideRect);
+      canvas.renderAll();
+
+      setTimeout(() => {
+        canvas.setActiveObject(img);
+        canvas.renderAll();
+        if (typeof callback === 'function') callback();
         CanvasManager.syncTo3D();
+      }, 0);
+    }, { crossOrigin: 'anonymous' });
+  },
+
+  // ========= restoreFromProductData =========
+  // data = { design_image_url, design_left, design_top, design_width, design_height, design_angle, design_flipX }
+  // ⚠️ Ici on considère que design_* sont exprimés en coords NATIVES BG.
+  restoreFromProductData: function (data, callback) {
+    if (!data || !data.design_image_url) return;
+
+    fabric.Image.fromURL(data.design_image_url, (img) => {
+      const sX = (data.design_width  && img.width)  ? (data.design_width  / img.width)  : 1;
+      const sY = (data.design_height && img.height) ? (data.design_height / img.height) : 1;
+
+      img.set({
+        left: (data.design_left  ?? 0),
+        top:  (data.design_top   ?? 0),
+        scaleX: sX,
+        scaleY: sY,
+        originX: 'left',
+        originY: 'top',
+        selectable: true,
+        hasControls: true,
+        lockRotation: false,
+        lockUniScaling: true,
+        hasRotatingPoint: true,
+        angle: data.design_angle || 0,
+        flipX: !!data.design_flipX
+      });
+
+      img.setControlsVisibility({
+        tl: true, tr: true, bl: true, br: true,
+        mt: false, mb: false, ml: false, mr: false, mtr: true
+      });
+
+      if (maskPath) img.clipPath = maskPath.clone();
+
+      canvas.add(img);
+      img.setCoords();
+      if (bgImage) canvas.sendToBack(bgImage);
+      if (guideRect) canvas.bringToFront(guideRect);
+      canvas.renderAll();
+
+      setTimeout(() => {
+        canvas.setActiveObject(img);
+        canvas.renderAll();
+        if (typeof callback === 'function') callback();
+        CanvasManager.syncTo3D();
+      }, 0);
+    }, { crossOrigin: 'anonymous' });
+  },
+
+  // ========= alignImage =========
+  alignImage: function (position) {
+    const img = canvas?.getActiveObject();
+    if (!img) return;
+
+    const zone = getMaskBBox();
+    const bounds = img.getBoundingRect(true);
+    const offsetX = img.left - bounds.left;
+    const offsetY = img.top  - bounds.top;
+
+    if (position === 'left') {
+      img.set({ left: zone.left + offsetX });
+    } else if (position === 'right') {
+      img.set({ left: zone.left + zone.width - bounds.width + offsetX });
+    } else if (position === 'center') {
+      img.set({ left: zone.left + (zone.width - bounds.width) / 2 + offsetX });
+    } else if (position === 'top') {
+      img.set({ top: zone.top + offsetY });
+    } else if (position === 'bottom') {
+      img.set({ top: zone.top + zone.height - bounds.height + offsetY });
+    } else if (position === 'middle') {
+      img.set({ top: zone.top + (zone.height - bounds.height) / 2 + offsetY });
     }
-}, { crossOrigin: 'anonymous' });
-
-
-                // 🔁 Resize automatique au conteneur
-		CanvasManager.resizeToContainer(containerId);
-		window.addEventListener('resize', () => {
-			CanvasManager.resizeToContainer(containerId);
-		});
-
-                // 🔁 Sync 3D à chaque changement sur le canvas
-                canvas.on('object:modified', CanvasManager.syncTo3D);
-                canvas.on('object:added', CanvasManager.syncTo3D);
-                canvas.on('object:removed', CanvasManager.syncTo3D);
-        },
-
-
-       addImage: function (url, callback) {
-               fabric.Image.fromURL(url, function (img) {
-                        const drawX = template.print_area_left;
-                        const drawY = template.print_area_top;
-
-			const scale = Math.min(
-				template.print_area_width / img.width,
-				template.print_area_height / img.height
-			);
-
-			img.set({
-				left: drawX,
-				top: drawY,
-				scaleX: scale,
-				scaleY: scale,
-				originX: 'left',
-				originY: 'top',
-                                selectable: true,
-                                hasControls: true,
-                                lockRotation: false,
-                                lockUniScaling: true, // 🔒 Empêche la déformation (garde les proportions)
-                                hasRotatingPoint: true,
-				//borderColor: 'green',
-				//cornerColor: 'blue'
-			});
-
-			img.setControlsVisibility({
-				tl: true,  // coin haut gauche
-				tr: true,  // coin haut droit
-				bl: true,  // coin bas gauche
-				br: true,  // coin bas droit
-				mt: false,
-				mb: false,
-                                ml: false,
-                                mr: false,
-                                mtr: true  // rotation activée
-			});
-
-
-                       const finalize = () => {
-                               canvas.add(img);
-                               img.setCoords();
-                               if (productOverlay) canvas.sendToBack(productOverlay);
-                               if (guideGroup) canvas.bringToFront(guideGroup);
-                               canvas.renderAll();
-
-                               setTimeout(() => {
-                                       canvas.setActiveObject(img);
-                                       canvas.renderAll();
-                                       if (typeof callback === 'function') {
-                                               callback();
-                                       }
-                                       CanvasManager.syncTo3D();
-                               }, 0);
-                       };
-
-                       if (template.image_path) {
-                               fabric.Image.fromURL(template.image_path, function (clipImg) {
-                                       clipImg.set({
-                                               left: template.print_area_left,
-                                               top: template.print_area_top,
-                                               originX: 'left',
-                                               originY: 'top',
-                                               scaleX: template.print_area_width / clipImg.width,
-                                               scaleY: template.print_area_height / clipImg.height,
-                                               absolutePositioned: true
-                                       });
-                                       img.clipPath = clipImg;
-                                       finalize();
-                               }, { crossOrigin: 'anonymous' });
-                       } else {
-                               img.clipPath = new fabric.Rect({
-                                       left: template.print_area_left,
-                                       top: template.print_area_top,
-                                       width: template.print_area_width,
-                                       height: template.print_area_height,
-                                       originX: 'left',
-                                       originY: 'top',
-                                       absolutePositioned: true
-                               });
-                               finalize();
-                       }
-
-
-               }, { crossOrigin: 'anonymous' });
-       },
-
-       restoreFromProductData: function (data, callback) {
-               if (!data || !data.design_image_url) return;
-               fabric.Image.fromURL(data.design_image_url, function (img) {
-                        const scaleX = data.design_width / img.width;
-                        const scaleY = data.design_height / img.height;
-
-                       img.set({
-                                left: template.print_area_left + data.design_left,
-                                top: template.print_area_top + data.design_top,
-                                scaleX: scaleX,
-                                scaleY: scaleY,
-                                originX: 'left',
-                                originY: 'top',
-                                selectable: true,
-                                hasControls: true,
-                                lockRotation: false,
-                                lockUniScaling: true,
-                                hasRotatingPoint: true,
-                                angle: data.design_angle || 0,
-                                flipX: data.design_flipX || false,
-                        });
-                        img.setControlsVisibility({
-                                tl: true,
-                                tr: true,
-                                bl: true,
-                                br: true,
-                                mt: false,
-                                mb: false,
-                                ml: false,
-                                mr: false,
-                                mtr: true
-                        });
-
-                        const finalize = () => {
-                                canvas.add(img);
-                                img.setCoords();
-                                if (productOverlay) canvas.sendToBack(productOverlay);
-                                if (guideGroup) canvas.bringToFront(guideGroup);
-                                canvas.renderAll();
-
-                                setTimeout(() => {
-                                        canvas.setActiveObject(img);
-                                        canvas.renderAll();
-                                        if (typeof callback === 'function') {
-                                                callback();
-                                        }
-                                        CanvasManager.syncTo3D();
-                                }, 0);
-                        };
-
-                        if (template.image_path) {
-                                fabric.Image.fromURL(template.image_path, function (clipImg) {
-                                        clipImg.set({
-                                                left: template.print_area_left,
-                                                top: template.print_area_top,
-                                                originX: 'left',
-                                                originY: 'top',
-                                                scaleX: template.print_area_width / clipImg.width,
-                                                scaleY: template.print_area_height / clipImg.height,
-                                                absolutePositioned: true
-                                        });
-                                        img.clipPath = clipImg;
-                                        finalize();
-                                }, { crossOrigin: 'anonymous' });
-                        } else {
-                                img.clipPath = new fabric.Rect({
-                                        left: template.print_area_left,
-                                        top: template.print_area_top,
-                                        width: template.print_area_width,
-                                        height: template.print_area_height,
-                                        originX: 'left',
-                                        originY: 'top',
-                                        absolutePositioned: true
-                                });
-                                finalize();
-                        }
-               }, { crossOrigin: 'anonymous' });
-       },
-
-        alignImage: function (position) {
-                const img = canvas.getActiveObject();
-                if (!img) return;
-
-               const areaLeft = template.print_area_left;
-               const areaTop = template.print_area_top;
-               const areaWidth = template.print_area_width;
-               const areaHeight = template.print_area_height;
-
-               const bounds = img.getBoundingRect(true);
-               const offsetX = img.left - bounds.left;
-               const offsetY = img.top - bounds.top;
-
-               if (position === 'left') {
-                       img.set({ left: areaLeft + offsetX });
-               } else if (position === 'right') {
-                       img.set({ left: areaLeft + areaWidth - bounds.width + offsetX });
-               } else if (position === 'center') {
-                       img.set({ left: areaLeft + (areaWidth - bounds.width) / 2 + offsetX });
-               } else if (position === 'top') {
-                       img.set({ top: areaTop + offsetY });
-               } else if (position === 'bottom') {
-                       img.set({ top: areaTop + areaHeight - bounds.height + offsetY });
-               } else if (position === 'middle') {
-                       img.set({ top: areaTop + (areaHeight - bounds.height) / 2 + offsetY });
-               }
-
-                img.setCoords();
-                canvas.renderAll();
-                CanvasManager.syncTo3D();
-        },
-
-        bringImageForward: function () {
-                const obj = canvas.getActiveObject();
-                if (!obj) return;
-                canvas.bringForward(obj);
-                if (productOverlay) canvas.sendToBack(productOverlay);
-                if (guideGroup) canvas.bringToFront(guideGroup);
-                canvas.renderAll();
-                CanvasManager.syncTo3D();
-        },
-
-        sendImageBackward: function () {
-                const obj = canvas.getActiveObject();
-                if (!obj) return;
-                canvas.sendBackwards(obj);
-                if (productOverlay) canvas.sendToBack(productOverlay);
-                if (guideGroup) canvas.bringToFront(guideGroup);
-                canvas.renderAll();
-                CanvasManager.syncTo3D();
-        },
-
-        rotateImage: function(angle) {
-                const img = canvas.getActiveObject();
-                if (!img) return;
-                const current = img.angle || 0;
-                let target = current + angle;
-                target = Math.round(target / 90) * 90;
-                img.rotate(target);
-                img.setCoords();
-                canvas.renderAll();
-                CanvasManager.syncTo3D();
-        },
-
-        mirrorImage: function () {
-                const img = canvas.getActiveObject();
-                if (!img) return;
-                img.flipX = !img.flipX;
-                img.setCoords();
-                canvas.renderAll();
-                CanvasManager.syncTo3D();
-        },
-
-       removeImage: function () {
-               const img = canvas.getObjects().find(obj => obj.type === 'image');
-               if (!img) return;
-               canvas.remove(img);
-               canvas.renderAll();
-               CanvasManager.syncTo3D();
-       },
-
-       hasImage: function () {
-               if (!canvas) return false;
-               return canvas.getObjects().some(obj => obj.type === 'image');
-       },
-
-       getCurrentImageData: function () {
-               if (!canvas) return null;
-               const img = canvas.getObjects().find(obj => obj.type === 'image');
-               if (!img) return null;
-               return {
-                       left: img.left - template.print_area_left,
-                       top: img.top - template.print_area_top,
-                       width: img.width * img.scaleX,
-                       height: img.height * img.scaleY,
-                       angle: img.angle || 0,
-                       flipX: !!img.flipX
-               };
-       },
-
-       syncTo3D: function () {
-               const imgDataUrl = CanvasManager.exportPrintAreaPNG();
-
-               if (!imgDataUrl) {
-                       console.warn("[Canvas] ❌ Aucune donnée exportable.");
-                       if (window.clear3DTexture) {
-                               window.clear3DTexture();
-                       }
-                       return;
-               }
-
-               const offscreen = document.createElement('canvas');
-               offscreen.width = template.print_area_width;
-               offscreen.height = template.print_area_height;
-               const ctx = offscreen.getContext('2d');
-               ctx.clearRect(0, 0, offscreen.width, offscreen.height);
-
-               const img = new Image();
-               img.onload = function () {
-                       ctx.drawImage(img, 0, 0);
-                       const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
-                       if (imageObject) {
-                               const bounds = imageObject.getBoundingRect(true);
-                       }
-                       if (window.update3DTextureFromCanvas) {
-                               window.update3DTextureFromCanvas(offscreen);
-                               if (window.logPrintableMeshPosition) {
-                                       window.logPrintableMeshPosition();
-                               }
-                       }
-               };
-               img.crossOrigin = 'anonymous';
-               img.src = imgDataUrl;
-       },
-	getExportDataForPrintful: function () {
-		const imageObject = canvas.getObjects().find(obj => obj.type === 'image');
-		if (!imageObject || !imageObject._element) {
-			console.warn("[CanvasManager] ❌ Aucune image trouvée.");
-			return null;
-		}
-
-		const img = imageObject._element;
-		const scaleX = imageObject.scaleX;
-		const scaleY = imageObject.scaleY;
-
-		const imgDisplayWidth = imageObject.width * scaleX;
-		const imgDisplayHeight = imageObject.height * scaleY;
-
-		// Décalage de l’image dans la zone imprimable
-		const offsetX = imageObject.left - template.print_area_left;
-		const offsetY = imageObject.top - template.print_area_top;
-
-		const cropX = Math.max(0, -offsetX);
-		const cropY = Math.max(0, -offsetY);
-
-		const visibleWidth = Math.min(imgDisplayWidth - cropX, template.print_area_width - Math.max(0, offsetX));
-		const visibleHeight = Math.min(imgDisplayHeight - cropY, template.print_area_height - Math.max(0, offsetY));
-
-		if (visibleWidth <= 0 || visibleHeight <= 0) {
-			console.warn("[CanvasManager] 🚫 Image totalement hors zone imprimable");
-			return null;
-		}
-
-		// ✅ Création d’un canvas natif à la taille EXACTE
-		const outputCanvas = document.createElement('canvas');
-		outputCanvas.width = visibleWidth;
-		outputCanvas.height = visibleHeight;
-
-		const ctx = outputCanvas.getContext('2d');
-		ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-
-		// Source crop dans l'image originale (pré-scale)
-		const sourceX = cropX / scaleX;
-		const sourceY = cropY / scaleY;
-		const sourceW = visibleWidth / scaleX;
-		const sourceH = visibleHeight / scaleY;
-
-
-		// ✅ Draw avec source + destination
-		ctx.drawImage(
-			img,
-			sourceX, sourceY, sourceW, sourceH, // src
-			0, 0, visibleWidth, visibleHeight   // dest
-		);
-
-		// ✅ Visualisation (pour toi)
-		const debugDataUrl = outputCanvas.toDataURL("image/png");
-
-		return {
-			imageDataUrl: debugDataUrl,
-			placement: {
-				x: Math.max(0, offsetX),
-				y: Math.max(0, offsetY),
-				width: visibleWidth,
-				height: visibleHeight
-			}
-		};
-	}
-
-
-	,
-
-	// Fonction privée : recadre le canvas dans la print_area
-        _getCroppedImageInPrintArea: function () {
-                const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
-
-                const outputCanvas = document.createElement('canvas');
-                outputCanvas.width = print_area_width;
-                outputCanvas.height = print_area_height;
-
-                const ctx = outputCanvas.getContext('2d');
-                ctx.clearRect(0, 0, print_area_width, print_area_height);
-
-                const zoom = canvas.getZoom();
-                const ratio = canvas.getRetinaScaling ? canvas.getRetinaScaling() : 1;
-                ctx.drawImage(
-                        canvas.lowerCanvasEl,
-                        print_area_left * zoom * ratio,
-                        print_area_top * zoom * ratio,
-                        print_area_width * zoom * ratio,
-                        print_area_height * zoom * ratio,
-                        0,
-                        0,
-                        print_area_width,
-                        print_area_height
-                );
-
-                return outputCanvas.toDataURL('image/png');
-        },
-
-        exportPrintAreaPNG: function () {
-                const savedBg = canvas.backgroundImage;
-                const activeObj = canvas.getActiveObject();
-                const overlayVisible = productOverlay ? productOverlay.visible : null;
-                const guideVisible = guideGroup ? guideGroup.visible : null;
-                if (activeObj) {
-                        canvas.discardActiveObject();
-                }
-                if (productOverlay) productOverlay.visible = false;
-                if (guideGroup) guideGroup.visible = false;
-                canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-
-                const { print_area_left, print_area_top, print_area_width, print_area_height } = template;
-                const outputCanvas = document.createElement('canvas');
-                outputCanvas.width = print_area_width;
-                outputCanvas.height = print_area_height;
-
-                const ctx = outputCanvas.getContext('2d');
-                ctx.clearRect(0, 0, print_area_width, print_area_height);
-
-                const zoom = canvas.getZoom();
-                const ratio = canvas.getRetinaScaling ? canvas.getRetinaScaling() : 1;
-                ctx.drawImage(
-                        canvas.lowerCanvasEl,
-                        print_area_left * zoom * ratio,
-                        print_area_top * zoom * ratio,
-                        print_area_width * zoom * ratio,
-                        print_area_height * zoom * ratio,
-                        0,
-                        0,
-                        print_area_width,
-                        print_area_height
-                );
-
-                canvas.setBackgroundImage(savedBg, canvas.renderAll.bind(canvas));
-                if (productOverlay) productOverlay.visible = overlayVisible;
-                if (guideGroup) guideGroup.visible = guideVisible;
-                if (activeObj) {
-                        canvas.setActiveObject(activeObj);
-                }
-                canvas.requestRenderAll();
-                return outputCanvas.toDataURL('image/png');
-        },
-
-	// Fonction privée : retourne position visible de l'image dans la zone imprimable
-	_getPrintfulPlacement: function (imageObject) {
-		const bounds = imageObject.getBoundingRect(true);
-
-		const zoneLeft = template.print_area_left;
-		const zoneTop = template.print_area_top;
-		const zoneRight = zoneLeft + template.print_area_width;
-		const zoneBottom = zoneTop + template.print_area_height;
-
-		const x = Math.max(0, bounds.left - zoneLeft);
-		const y = Math.max(0, bounds.top - zoneTop);
-		const width = Math.max(0, Math.min(bounds.left + bounds.width, zoneRight) - Math.max(bounds.left, zoneLeft));
-		const height = Math.max(0, Math.min(bounds.top + bounds.height, zoneBottom) - Math.max(bounds.top, zoneTop));
-
-		if (width === 0 || height === 0) return null;
-
-		return { x, y, width, height };
-	},
-
-	resizeToContainer: function (containerId) {
-		const container = document.getElementById(containerId);
-		if (!container || !canvas || !template) return;
-
-		const containerW = container.clientWidth;
-		const containerH = container.clientHeight;
-
-		const tplW = template.template_width;
-		const tplH = template.template_height;
-		const tplRatio = tplW / tplH;
-
-		let zoom = Math.min(containerW / tplW, containerH / tplH);
-		const canvasW = tplW * zoom;
-		const canvasH = tplH * zoom;
-
-		canvas.setZoom(zoom);
-		canvas.setWidth(canvasW);
-		canvas.setHeight(canvasH);
-
-		// ✅ wrapper dimensions réelles
-		const wrapper = document.getElementById("productCanvasWrapper");
-		if (wrapper) {
-			wrapper.style.width = `${canvasW}px`;
-			wrapper.style.height = `${canvasH}px`;
-			wrapper.style.margin = "0 auto";
-			wrapper.style.display = "flex";
-			wrapper.style.justifyContent = "center";
-			wrapper.style.alignItems = "center";
-		}
-
-		canvas.renderAll();
-	}
+
+    img.setCoords();
+    canvas.renderAll();
+    CanvasManager.syncTo3D();
+  },
+
+  // ========= Z-order =========
+  bringImageForward: function () {
+    const obj = canvas?.getActiveObject();
+    if (!obj) return;
+    canvas.bringForward(obj);
+    if (bgImage) canvas.sendToBack(bgImage);
+    if (guideRect) canvas.bringToFront(guideRect);
+    canvas.renderAll();
+    CanvasManager.syncTo3D();
+  },
+
+  sendImageBackward: function () {
+    const obj = canvas?.getActiveObject();
+    if (!obj) return;
+    canvas.sendBackwards(obj);
+    if (bgImage) canvas.sendToBack(bgImage);
+    if (guideRect) canvas.bringToFront(guideRect);
+    canvas.renderAll();
+    CanvasManager.syncTo3D();
+  },
+
+  // ========= rotations/miroir =========
+  rotateImage: function (angle) {
+    const img = canvas?.getActiveObject();
+    if (!img) return;
+    const current = img.angle || 0;
+    let target = current + angle;
+    target = Math.round(target / 90) * 90;
+    img.rotate(target);
+    img.setCoords();
+    canvas.renderAll();
+    CanvasManager.syncTo3D();
+  },
+
+  mirrorImage: function () {
+    const img = canvas?.getActiveObject();
+    if (!img) return;
+    img.flipX = !img.flipX;
+    img.setCoords();
+    canvas.renderAll();
+    CanvasManager.syncTo3D();
+  },
+
+  // ========= remove/has =========
+  removeImage: function () {
+    if (!canvas) return;
+    // Ne supprime que les images utilisateur (pas le BG)
+    const imgs = canvas.getObjects().filter(o => o.type === 'image' && o !== bgImage && o !== overlayImage);
+    imgs.forEach(o => canvas.remove(o));
+    canvas.renderAll();
+    CanvasManager.syncTo3D();
+  },
+
+  hasImage: function () {
+    if (!canvas) return false;
+    return canvas.getObjects().some(o => o.type === 'image' && o !== bgImage && o !== overlayImage);
+  },
+
+  // ========= état courant image active (coords NATIVES) =========
+  getCurrentImageData: function () {
+    if (!canvas) return null;
+    const img = canvas.getActiveObject();
+    if (!img || img.type !== 'image' || img === bgImage || img === overlayImage) return null;
+    return {
+      left: img.left,
+      top: img.top,
+      width: img.width * img.scaleX,
+      height: img.height * img.scaleY,
+      angle: img.angle || 0,
+      flipX: !!img.flipX
+    };
+  },
+
+  // ========= Export zone masquée (PNG) =========
+  exportMaskedAreaPNG: function () {
+    if (!canvas) return null;
+    const b = getMaskBBox();
+    if (!b) return null;
+
+    // Neutraliser le zoom pour exporter pixel-à-pixel
+    const prevVPT = canvas.viewportTransform?.slice();
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+
+    const dataUrl = canvas.toDataURL({
+      left: Math.round(b.left),
+      top: Math.round(b.top),
+      width: Math.round(b.width),
+      height: Math.round(b.height),
+      format: 'png',
+      multiplier: 1,
+      enableRetinaScaling: false,
+      withoutShadow: true,
+      withoutTransform: true
+    });
+
+    if (prevVPT) canvas.setViewportTransform(prevVPT);
+    return dataUrl;
+  },
+
+  // ========= Export "print area" legacy (si besoin, fallback) =========
+  exportPrintAreaPNG: function () {
+    if (maskPath) return CanvasManager.exportMaskedAreaPNG();
+    // Pas de masque : fallback rect basé sur print_area_*
+    const L = Math.round(template.print_area_left ?? 0);
+    const T = Math.round(template.print_area_top ?? 0);
+    const W = Math.round(template.print_area_width ?? canvas.width);
+    const H = Math.round(template.print_area_height ?? canvas.height);
+
+    const prevVPT = canvas.viewportTransform?.slice();
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+
+    const dataUrl = canvas.toDataURL({
+      left: L, top: T, width: W, height: H,
+      format: 'png',
+      multiplier: 1,
+      enableRetinaScaling: false,
+      withoutShadow: true,
+      withoutTransform: true
+    });
+
+    if (prevVPT) canvas.setViewportTransform(prevVPT);
+    return dataUrl;
+  },
+
+  // ========= Export pour Printful (image + placement en bbox masque) =========
+  getExportDataForPrintful: function () {
+    const dataUrl = CanvasManager.exportMaskedAreaPNG();
+    if (!dataUrl) {
+      console.warn("[CanvasManager] 🚫 exportMaskedAreaPNG nul");
+      return null;
+    }
+    const b = getMaskBBox();
+    return {
+      imageDataUrl: dataUrl,
+      placement: { x: b.left, y: b.top, width: b.width, height: b.height } // coords NATIVES
+    };
+  },
+
+  // ========= Sync 3D (envoie un canvas hors-écran à update3DTextureFromCanvas) =========
+  syncTo3D: function () {
+    const dataUrl = CanvasManager.exportMaskedAreaPNG();
+    if (!dataUrl) {
+      if (window.clear3DTexture) window.clear3DTexture();
+      return;
+    }
+    const b = getMaskBBox();
+    const offscreen = document.createElement('canvas');
+    offscreen.width = b.width;
+    offscreen.height = b.height;
+    const ctx = offscreen.getContext('2d');
+
+    const img = new Image();
+    img.onload = function () {
+      ctx.clearRect(0, 0, offscreen.width, offscreen.height);
+      ctx.drawImage(img, 0, 0);
+      if (window.update3DTextureFromCanvas) {
+        window.update3DTextureFromCanvas(offscreen);
+        if (window.logPrintableMeshPosition) window.logPrintableMeshPosition();
+      }
+    };
+    img.crossOrigin = 'anonymous';
+    img.src = dataUrl;
+  },
+
+  // ========= Resize to container (affichage via zoom) =========
+  resizeToContainer: function (containerId) {
+    const container = document.getElementById(containerId);
+    if (!container || !canvas || !bgImage) return;
+
+    const containerW = container.clientWidth || 1;
+    const containerH = container.clientHeight || 1;
+
+    const sceneW = bgImage.width;
+    const sceneH = bgImage.height;
+    const zoom = Math.min(containerW / sceneW, containerH / sceneH);
+
+    canvas.setZoom(zoom);
+    canvas.setWidth(sceneW * zoom);
+    canvas.setHeight(sceneH * zoom);
+
+    // wrapper dimensions réelles
+    const wrapper = document.getElementById("productCanvasWrapper");
+    if (wrapper) {
+      wrapper.style.width = `${sceneW * zoom}px`;
+      wrapper.style.height = `${sceneH * zoom}px`;
+      wrapper.style.margin = "0 auto";
+      wrapper.style.display = "flex";
+      wrapper.style.justifyContent = "center";
+      wrapper.style.alignItems = "center";
+    }
+    canvas.renderAll();
+  }
 };
+
+// ===== Helpers internes =====
+
+// Crée le clipPath : si image_path existe → image native alignée au BG ; sinon rect via print_area_*.
+function makeClipPath(done) {
+  const L = Math.round(template.print_area_left  ?? 0);
+  const T = Math.round(template.print_area_top   ?? 0);
+  const W = Math.round(template.print_area_width ?? (bgImage?.width  ?? 0));
+  const H = Math.round(template.print_area_height?? (bgImage?.height ?? 0));
+
+  if (template.image_path) {
+    fabric.Image.fromURL(template.image_path, (clipImg) => {
+      // ⚠️ AUCUNE ÉCHELLE : on suppose image_path calée au BG natif
+      // Si ton fichier est 1:1 avec le BG 1000×1000, il doit être (left=0, top=0)
+      // S’il décrit une sous-zone, place-le avec L/T/W/H adaptés.
+      // Par sécurité: si le masque doit couvrir seulement la print_area, on l’aligne :
+      // -> commente la ligne suivante si TON masque est global 1:1
+      if (template.print_area_width && template.print_area_height) {
+        const sX = W / clipImg.width;
+        const sY = H / clipImg.height;
+        clipImg.set({ left: L, top: T, scaleX: sX, scaleY: sY });
+      } else {
+        clipImg.set({ left: 0, top: 0 });
+      }
+
+      clipImg.set({
+        originX: 'left', originY: 'top',
+        absolutePositioned: true,
+        objectCaching: false,
+        selectable: false, evented: false,
+        strokeWidth: 0, opacity: 1
+      });
+      done(clipImg);
+    }, { crossOrigin: 'anonymous' });
+    return;
+  }
+
+  // Pas d’image masque : rect de print_area (ou toute l’image si non défini)
+  const rect = new fabric.Rect({
+    left: L, top: T, width: W, height: H,
+    originX: 'left', originY: 'top',
+    absolutePositioned: true,
+    objectCaching: false,
+    selectable: false, evented: false,
+    strokeWidth: 0, fill: 'rgba(0,0,0,0)'
+  });
+  done(rect);
+}
+
+function getMaskBBox() {
+  if (maskPath) {
+    // getBoundingRect(true) renvoie la bbox en coords canvas (ici = coords BG natives)
+    const b = maskPath.getBoundingRect(true);
+    // Arrondir pour éviter les 0.5px imprécis
+    return {
+      left: Math.round(b.left),
+      top: Math.round(b.top),
+      width: Math.round(b.width),
+      height: Math.round(b.height)
+    };
+  }
+  // Fallback : print_area_* ou full
+  return {
+    left: Math.round(template.print_area_left ?? 0),
+    top: Math.round(template.print_area_top ?? 0),
+    width: Math.round(template.print_area_width ?? (bgImage?.width || 0)),
+    height: Math.round(template.print_area_height ?? (bgImage?.height || 0))
+  };
+}
+
+function addOrUpdateGuideRect() {
+  const b = getMaskBBox();
+  if (!guideRect) {
+    guideRect = new fabric.Rect({
+      left: b.left, top: b.top, width: b.width, height: b.height,
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'red', strokeWidth: 2,
+      strokeUniform: true,
+      objectCaching: false,
+      selectable: false, evented: false
+    });
+    canvas.add(guideRect);
+  } else {
+    guideRect.set({ left: b.left, top: b.top, width: b.width, height: b.height });
+  }
+  canvas.bringToFront(guideRect);
+  canvas.requestRenderAll();
+}
+
+window.CanvasManager = CanvasManager;
