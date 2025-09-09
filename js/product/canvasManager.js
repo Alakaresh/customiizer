@@ -483,6 +483,190 @@ const CanvasManager = {
   },
 
   forceNotify() { notifyChange('forceNotify'); },
+
+  /* ============================
+     \-\-\- Extensions manquantes \-\-\-
+     (wrappers d'alignment/rotation, export Printful, restore/save, etc.)
+  ============================ */
+
+  hasActiveImage() {
+    const a = canvas?.getActiveObject();
+    return !!(a && a.type === 'image' && a !== bgImage);
+  },
+
+  getActiveUserImage() {
+    const a = canvas?.getActiveObject();
+    if (a && a.type === 'image' && a !== bgImage) return a;
+    const imgs = canvas?.getObjects()?.filter(o => o.type === 'image' && o !== bgImage) || [];
+    return imgs[0] || null;
+  },
+
+  // Wrappers d'alignement pratiques pour le wiring UI
+  alignLeft()   { return this.alignImage('left'); },
+  alignCenter() { return this.alignImage('center'); },
+  alignRight()  { return this.alignImage('right'); },
+  alignTop()    { return this.alignImage('top'); },
+  alignMiddle() { return this.alignImage('middle'); },
+  alignBottom() { return this.alignImage('bottom'); },
+
+  // Rotation 90° avec snap
+  rotateLeft() {
+    const img = this.getActiveUserImage();
+    if (!img) { CM.warn('rotateLeft: pas d\'image active'); return; }
+    const current = img.angle || 0;
+    const target  = Math.round((current - 90) / 90) * 90;
+    img.rotate(target);
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange('rotateLeft');
+  },
+  rotateRight() {
+    const img = this.getActiveUserImage();
+    if (!img) { CM.warn('rotateRight: pas d\'image active'); return; }
+    const current = img.angle || 0;
+    const target  = Math.round((current + 90) / 90) * 90;
+    img.rotate(target);
+    img.setCoords();
+    canvas.requestRenderAll();
+    notifyChange('rotateRight');
+  },
+
+  bringToFront() {
+    const img = this.getActiveUserImage();
+    if (!img) return;
+    canvas.bringToFront(img);
+    canvas.requestRenderAll();
+    notifyChange('bringToFront');
+  },
+  sendToBack() {
+    const img = this.getActiveUserImage();
+    if (!img) return;
+    canvas.sendToBack(img);
+    if (bgImage) canvas.bringToFront(bgImage); // s'assurer que le BG reste derrière
+    canvas.requestRenderAll();
+    notifyChange('sendToBack');
+  },
+
+  // Alias attendu par certains scripts
+  exportPrintAreaPNG() { return this.exportPNG(); },
+
+  // Export compatible Printful: image recadrée à la fenêtre + placement (x,y,w,h) dans la fenêtre
+  getExportDataForPrintful() {
+    if (!canvas) { CM.warn('getExportDataForPrintful: pas de canvas'); return null; }
+    const imageObject = this.getActiveUserImage();
+    if (!imageObject || !imageObject._element) {
+      CM.warn('getExportDataForPrintful: aucune image utilisateur');
+      return null;
+    }
+
+    const b = getClipWindowBBox();
+    const imgEl = imageObject._element;
+    const scaleX = imageObject.scaleX || 1;
+    const scaleY = imageObject.scaleY || 1;
+
+    const imgDisplayW = (imageObject.width || imgEl.naturalWidth) * scaleX;
+    const imgDisplayH = (imageObject.height || imgEl.naturalHeight) * scaleY;
+
+    // Décalage de l’image par rapport à la fenêtre (print area)
+    const offsetX = (imageObject.left || 0) - b.left;
+    const offsetY = (imageObject.top  || 0) - b.top;
+
+    const cropX = Math.max(0, -offsetX);
+    const cropY = Math.max(0, -offsetY);
+
+    const visibleW = Math.min(imgDisplayW - cropX, b.width  - Math.max(0, offsetX));
+    const visibleH = Math.min(imgDisplayH - cropY, b.height - Math.max(0, offsetY));
+
+    if (visibleW <= 0 || visibleH <= 0) {
+      CM.warn('getExportDataForPrintful: image totalement hors zone');
+      return null;
+    }
+
+    // Canvas de sortie à la taille EXACTE de la portion visible
+    const out = document.createElement('canvas');
+    out.width = Math.round(visibleW);
+    out.height = Math.round(visibleH);
+    const ctx = out.getContext('2d');
+    ctx.clearRect(0,0,out.width,out.height);
+
+    // Source crop dans l'image originale (pré-scale)
+    const srcX = cropX / scaleX;
+    const srcY = cropY / scaleY;
+    const srcW = visibleW / scaleX;
+    const srcH = visibleH / scaleY;
+
+    ctx.drawImage(imgEl, srcX, srcY, srcW, srcH, 0, 0, out.width, out.height);
+
+    return {
+      imageDataUrl: out.toDataURL('image/png'),
+      placement: {
+        x: Math.max(0, Math.round(offsetX)),
+        y: Math.max(0, Math.round(offsetY)),
+        width:  Math.round(visibleW),
+        height: Math.round(visibleH),
+      }
+    };
+  },
+
+  // Restauration depuis des données produit (positions relatives à la print area)
+  restoreFromProductData(data, callback) {
+    if (!data || !data.design_image_url) { CM.warn('restoreFromProductData: données manquantes'); return; }
+
+    Promise.all([bgReady, maskReady]).then(() => {
+      fabric.Image.fromURL(data.design_image_url, (img) => {
+        const b = getClipWindowBBox();
+        const sX = (data.design_width  || img.width)  / img.width;
+        const sY = (data.design_height || img.height) / img.height;
+
+        img.set({
+          left: b.left + (data.design_left || 0),
+          top:  b.top  + (data.design_top  || 0),
+          originX: 'left', originY: 'top',
+          scaleX: sX, scaleY: sY,
+          selectable: true, hasControls: true, lockUniScaling: true,
+          angle: data.design_angle || 0,
+          flipX: !!data.design_flipX,
+        });
+
+        const finalize = () => {
+          canvas.add(img);
+          img.setCoords();
+          canvas.setActiveObject(img);
+          if (bgImage) canvas.sendToBack(bgImage);
+          canvas.requestRenderAll();
+          notifyChange('restoreFromProductData');
+          if (typeof callback === 'function') callback();
+        };
+
+        if (maskPath) {
+          cloneClipPath((cp) => { if (cp) img.clipPath = cp; finalize(); });
+        } else {
+          finalize();
+        }
+      }, { crossOrigin: 'anonymous' });
+    });
+  },
+
+  // Données à sauvegarder côté produit (relatives à la print area)
+  getProductDataForSave() {
+    const img = this.getActiveUserImage();
+    if (!img || !img._element) return null;
+    const b = getClipWindowBBox();
+
+    return {
+      design_image_url: img._element.currentSrc || img._element.src || null,
+      design_left: Math.round((img.left || 0) - b.left),
+      design_top:  Math.round((img.top  || 0) - b.top),
+      design_width:  Math.round((img.width  || img._element.naturalWidth)  * (img.scaleX || 1)),
+      design_height: Math.round((img.height || img._element.naturalHeight) * (img.scaleY || 1)),
+      design_angle: Math.round(img.angle || 0),
+      design_flipX: !!img.flipX,
+    };
+  },
+
+  // Garde pour compat
+  forceNotify() { notifyChange('forceNotify'); },
+
 };
 
 window.CanvasManager = CanvasManager;
