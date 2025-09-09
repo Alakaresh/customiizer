@@ -84,8 +84,40 @@ function pick(selectorList) {
   }
   return { el: null, s: null };
 }
+function toggleUI(hasImage) {
+  const root = document.getElementById('customizeModal') || document;
+
+  const addBtns = Array.from(root.querySelectorAll('#addImageButton'));
+  const toolbars = Array.from(root.querySelectorAll('.image-controls'));
+
+  CM.log('toggleUI: found', { addButtons: addBtns.length, toolbars: toolbars.length });
+
+  // Bouton "Ajouter une image"
+  addBtns.forEach(btn => {
+    btn.toggleAttribute('hidden', hasImage);
+    btn.setAttribute('aria-hidden', hasImage ? 'true' : 'false');
+    btn.style.setProperty('display', hasImage ? 'none' : '', 'important');
+  });
+
+  // Barre d'outils (image-controls)
+  toolbars.forEach(tb => {
+    tb.removeAttribute('hidden');
+    tb.setAttribute('aria-hidden', hasImage ? 'false' : 'true');
+    tb.style.setProperty('display', hasImage ? 'flex' : 'none', 'important');
+    tb.style.setProperty('visibility', hasImage ? 'visible' : 'hidden', 'important');
+    tb.style.setProperty('opacity', hasImage ? '1' : '0', 'important');
+    tb.style.setProperty('pointer-events', hasImage ? 'auto' : 'none', 'important');
+
+    // log du style calculé
+    const cs = window.getComputedStyle(tb);
+    CM.log('toggleUI: toolbar computed', {
+      display: cs.display, visibility: cs.visibility, opacity: cs.opacity, pe: cs.pointerEvents
+    });
+  });
+}
 
 // Notifie l'UI : CustomEvent + jQuery + compat + fallback DOM
+// --- NOTIFY CHANGE (remplacer entièrement l'ancienne fonction) ---
 function notifyChange(src = 'unknown') {
   const hasImage = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
   const activeObj = canvas?.getActiveObject();
@@ -93,7 +125,7 @@ function notifyChange(src = 'unknown') {
 
   CM.log('notifyChange from', src, { hasImage, hasActiveImage, activeType: activeObj?.type });
 
-  // 1) CustomEvent natif
+  // 1) Event natif (CustomEvent)
   try {
     window.dispatchEvent(new CustomEvent('canvas:image-change', {
       detail: { hasImage, hasActiveImage }
@@ -101,17 +133,17 @@ function notifyChange(src = 'unknown') {
     CM.log('notifyChange: CustomEvent dispatch OK');
   } catch (e) { CM.warn('notifyChange: CustomEvent KO', e); }
 
-  // 2) jQuery event si présent
+  // 2) jQuery (si présent)
   try {
     if (window.jQuery) {
       window.jQuery(document).trigger('canvas:image-change', [{ hasImage, hasActiveImage }]);
-      CM.log('notifyChange: jQuery event trigger OK');
+      CM.log('notifyChange: jQuery trigger OK');
     } else {
       CM.log('notifyChange: jQuery non détecté');
     }
   } catch (e) { CM.warn('notifyChange: jQuery trigger KO', e); }
 
-  // 3) Compat direct : fonction globale de ton UI si dispo
+  // 3) Compat UI : fonction globale si dispo
   try {
     if (typeof window.updateAddImageButtonVisibility === 'function') {
       CM.log('notifyChange: call window.updateAddImageButtonVisibility()');
@@ -121,27 +153,14 @@ function notifyChange(src = 'unknown') {
     }
   } catch (e) { CM.warn('notifyChange: call updateAddImageButtonVisibility KO', e); }
 
-  // 4) Fallback DOM — adapté à TON HTML
+  // 4) Fallback DOM — SCOPÉ au modal + forçage CSS
   try {
-    const { el: addBtn,  s: sAdd }  = pick(SEL.addButton);
-    const { el: toolsEl, s: sTools } = pick(SEL.tools);
-
-    if (addBtn) {
-      addBtn.style.display = hasImage ? 'none' : '';
-      CM.log('fallback: addBtn', sAdd, '→ display =', addBtn.style.display);
-    } else {
-      CM.log('fallback: addBtn introuvable dans', SEL.addButton);
-    }
-
-    if (toolsEl) {
-      // souvent flex
-      toolsEl.style.display = hasImage ? 'flex' : 'none';
-      CM.log('fallback: tools', sTools, '→ display =', toolsEl.style.display);
-    } else {
-      CM.log('fallback: tools introuvable dans', SEL.tools);
-    }
-  } catch (e) { CM.warn('notifyChange: fallback DOM KO', e); }
+    toggleUI(hasImage);
+  } catch (e) {
+    CM.warn('notifyChange: toggleUI KO', e);
+  }
 }
+
 
 // ---------- CanvasManager ----------
 const CanvasManager = {
