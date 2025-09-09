@@ -118,41 +118,36 @@ function init3DScene(containerId, modelUrl, canvasId = 'threeDCanvas') {
 
 // --- Load GLB ---
 function loadModel(modelUrl) {
-    const loader = new THREE.GLTFLoader();
-    loader.load(modelUrl, (gltf) => {
-        printableMeshes = {};
+  const loader = new THREE.GLTFLoader();
+  loader.load(modelUrl, (gltf) => {
+    printableMeshes = {};
 
-        gltf.scene.traverse((child) => {
-            if (!child.isMesh) return;
-            const name = child.name.toLowerCase();
+    gltf.scene.traverse((child) => {
+      if (!child.isMesh) return;
+      const name = child.name.toLowerCase();
 
-            if (name.startsWith("impression")) {
-                printableMeshes[child.name] = child;
+      if (name.startsWith("impression")) {
+        // 👇 CLONE le matériau pour ne pas modifier celui de la bouteille
+        child.material = child.material.clone();
+        printableMeshes[child.name] = child;
 
-                // Sauvegarde couleur + map d’origine
-                child.userData.baseColor = child.material.color.getHex();
-                if (child.material.map) {
-                    child.userData.baseMap = child.material.map.clone();
-                }
-
-                child.material.transparent = false;
-                child.material.opacity = 1.0;
-                child.material.needsUpdate = true;
-            }
-        });
-
-        scene.add(gltf.scene);
-        fitCameraToObject(camera, gltf.scene, controls, renderer);
-        const scale = getScaleForProduct(modelUrl);
-        gltf.scene.scale.set(scale[0], scale[1], scale[2]);
-        console.log(`[3D Debug] Scale appliqué: ${scale} à`, gltf.scene);
-        hide3DLoader(renderer.domElement.parentElement);
-        console.log("[3D] ✅ Modèle chargé :", modelUrl);
-    }, undefined, (error) => {
-        console.error("[3D] ❌ Erreur chargement modèle :", error);
-        hide3DLoader(renderer.domElement.parentElement);
+        // Sauvegardes
+        child.userData.baseColor = child.material.color.getHex();
+        child.userData.baseMaterial = child.material.clone(); // copie de référence
+      }
     });
+
+    scene.add(gltf.scene);
+    fitCameraToObject(camera, gltf.scene, controls, renderer);
+    const scale = getScaleForProduct(modelUrl);
+    gltf.scene.scale.set(scale[0], scale[1], scale[2]);
+    hide3DLoader(renderer.domElement.parentElement);
+  }, undefined, (err) => {
+    console.error(err);
+    hide3DLoader(renderer.domElement.parentElement);
+  });
 }
+
 
 // --- Render loop ---
 function animate() {
@@ -208,59 +203,52 @@ function fitCameraToObject(camera, object, controls, renderer, offset = 2) {
     }
 }
 
-// --- Appliquer une texture depuis Canvas ---
+// --- Appliquer une texture depuis Canvas (sans peindre de fond)
 window.update3DTextureFromCanvas = function (canvas, zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh || !canvas) return;
 
-  // Canvas → texture AVEC alpha (ne peins pas de fond !)
   const off = document.createElement('canvas');
   off.width = canvas.width; off.height = canvas.height;
   const ctx = off.getContext('2d');
-  ctx.clearRect(0, 0, off.width, off.height);   // fond transparent
+  ctx.clearRect(0, 0, off.width, off.height); // ✅ fond transparent
   ctx.drawImage(canvas, 0, 0);
 
   const tex = new THREE.CanvasTexture(off);
   tex.flipY = false;
   if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
   else tex.encoding = THREE.sRGBEncoding;
+  tex.premultiplyAlpha = true;
   tex.needsUpdate = true;
 
-  // Matériau d’impression : transparent, pas d’écriture profondeur,
-  // léger décalage pour éviter le z-fighting, rendu après la base.
-  if (!mesh.userData.baseMaterial) {
-    mesh.userData.baseMaterial = mesh.material;
-    mesh.material = mesh.material.clone();
-  }
-
-  const m = mesh.material;
+  const m = mesh.material;              // matériau CLONÉ de l’impression
   m.map = tex;
-  m.color.setHex(0xffffff);     // pas de teinte sur la texture
+  // ne PAS forcer en blanc → garde le look du matériau
   m.transparent = true;
-  m.alphaTest = 0.01;           // pixels vraiment opaques seulement
-  m.depthWrite = false;         // ne “bouche” pas la profondeur
+  m.alphaTest = 0.01;
+  m.depthWrite = false;                 // n’occulte pas la bouteille
   m.depthTest = true;
-  m.polygonOffset = true;       // se “détache” de la surface
+  m.polygonOffset = true;               // évite z-fighting si coplanaire
   m.polygonOffsetFactor = -1;
   m.polygonOffsetUnits = -1;
-  m.toneMapped = true;          // cohérent avec ACES
+  m.toneMapped = true;                  // cohérent avec ACES
   m.needsUpdate = true;
 
-  mesh.renderOrder = 2;         // rendu après la bouteille
+  mesh.renderOrder = 2;                 // rend après la bouteille
 };
 
 
-
-// --- Nettoyer la texture et restaurer la couleur ---
+// --- Restaurer proprement
 window.clear3DTexture = function (zoneName = null) {
   const mesh = getPrintableMesh(zoneName);
   if (!mesh) return;
-  if (mesh.userData.baseMaterial) mesh.material = mesh.userData.baseMaterial;
-  else { mesh.material.map = null; }
+  if (mesh.userData.baseMaterial) {
+    mesh.material = mesh.userData.baseMaterial.clone();
+  } else {
+    mesh.material.map = null;
+  }
   mesh.material.needsUpdate = true;
 };
-
-
 
 // --- Debug ---
 window.logPrintableMeshPosition = function (zoneName = null) {
