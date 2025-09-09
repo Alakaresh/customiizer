@@ -169,6 +169,12 @@ function loadModel(modelUrl) {
     }
   );
 }
+scene.traverse(obj => {
+  if (obj.isMesh && obj.name.toLowerCase().startsWith("impression")) {
+    console.log("[DEBUG] Matériau impression au chargement :", obj.material);
+    obj.material.wireframe = true; // pour vérifier qu’il est toujours rendu
+  }
+});
 
 // ---------------- Loop ----------------
 function animate() {
