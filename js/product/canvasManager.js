@@ -20,6 +20,11 @@ function cloneClipPath(done) {
     done(cp);
   });
 }
+function getUserImages() {
+  if (!canvas) return [];
+  // On considère "image utilisateur" = toutes les images sauf le background
+  return canvas.getObjects().filter(o => o.type === 'image' && o !== bgImage);
+}
 
 const CanvasManager = {
   init(templateData, containerId) {
@@ -224,6 +229,33 @@ const CanvasManager = {
     }
     canvas.requestRenderAll();
   }
+  hasImage() {
+  return getUserImages().length > 0;
+},
+
+removeImage() {
+  const imgs = getUserImages();
+  if (!imgs.length) return;
+  // supprime l'image active si c'est une image utilisateur, sinon la première
+  const active = canvas.getActiveObject();
+  const target = (active && active.type === 'image' && active !== bgImage) ? active : imgs[0];
+  canvas.remove(target);
+  canvas.requestRenderAll();
+},
+
+getCurrentImageData() {
+  const img = canvas?.getActiveObject();
+  if (!img || img.type !== 'image' || img === bgImage) return null;
+  return {
+    left: img.left,
+    top: img.top,
+    width: img.width * img.scaleX,
+    height: img.height * img.scaleY,
+    angle: img.angle || 0,
+    flipX: !!img.flipX
+  };
+},
+
 };
 
 window.CanvasManager = CanvasManager;
