@@ -1,4 +1,4 @@
-// 📁 canvasManager.js — BG + clipPath (image_path) + API UI (LYA)
+// 📁 canvasManager.js — BG + clipPath (image_path) + API UI (LYA) — avec notif UI & sélection auto
 
 let canvas = null;
 let template = null;
@@ -53,10 +53,32 @@ function getClipWindowBBox() {
   return { left: 0, top: 0, width: canvas?.width || 0, height: canvas?.height || 0 };
 }
 
-// Notifie l'UI : utile pour masquer/afficher “Ajouter une image” & co
+// Notifie l'UI : event + compat + fallback DOM
 function notifyChange() {
-  const has = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
-  window.dispatchEvent(new CustomEvent('canvas:image-change', { detail: { hasImage: has } }));
+  const hasImage = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
+  const activeObj = canvas?.getActiveObject();
+  const hasActiveImage = !!(activeObj && activeObj.type === 'image' && activeObj !== bgImage);
+
+  // 1) Event custom
+  try {
+    window.dispatchEvent(new CustomEvent('canvas:image-change', {
+      detail: { hasImage, hasActiveImage }
+    }));
+  } catch(_) {}
+
+  // 2) Compat : fonction existante dans ton UI
+  try {
+    if (typeof window.updateAddImageButtonVisibility === 'function') {
+      window.updateAddImageButtonVisibility();
+    }
+  } catch(_) {}
+
+  // 3) Fallback DOM (facultatif, robuste si l’UI n’écoute pas)
+  const addBtn = document.querySelector('#btn-add-image, .btn-add-image, [data-role="btn-add-image"]');
+  if (addBtn) addBtn.style.display = hasImage ? 'none' : '';
+
+  const tools = document.querySelector('#image-tools, .image-tools, [data-role="image-tools"]');
+  if (tools) tools.style.display = hasImage ? '' : 'none';
 }
 
 // ---------- CanvasManager ----------
@@ -96,7 +118,7 @@ const CanvasManager = {
     wrapper.appendChild(canvasEl);
     container.appendChild(wrapper);
 
-    canvas = new fabric.Canvas(canvasEl, { preserveObjectStacking: true, selection: false });
+    canvas = new fabric.Canvas(canvasEl, { preserveObjectStacking: true, selection: true });
 
     // 1) Charger le BG à taille native (PAS de scale sur l’objet)
     fabric.Image.fromURL(template.image_url, (img) => {
@@ -144,11 +166,14 @@ const CanvasManager = {
 
     window.addEventListener('resize', () => this._resizeToContainer(containerId));
 
-    // Listeners : sync + notif
+    // Listeners : sync + notif + sélection
     const _onAny = () => { this.syncTo3D && this.syncTo3D(); notifyChange(); };
     canvas.on('object:modified', _onAny);
     canvas.on('object:added',    _onAny);
     canvas.on('object:removed',  _onAny);
+    canvas.on('selection:created', _onAny);
+    canvas.on('selection:updated', _onAny);
+    canvas.on('selection:cleared', _onAny);
 
     // notifier l'UI au démarrage
     notifyChange();
@@ -183,6 +208,8 @@ const CanvasManager = {
         const finalize = () => {
           canvas.add(img);
           img.setCoords();
+          // Sélectionne l’image pour afficher la barre d’outils côté UI
+          canvas.setActiveObject(img);
           if (bgImage) canvas.sendToBack(bgImage);
           canvas.requestRenderAll();
           notifyChange();
