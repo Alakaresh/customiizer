@@ -100,8 +100,9 @@ function init3DScene(containerId, modelUrl, canvasId = "threeDCanvas") {
 // ---------------- Impression state ----------------
 function setImpressionState(mesh, hasTexture) {
   const m = mesh.material;
+
   if (hasTexture) {
-    // overlay texture
+    // --- état overlay avec texture ---
     m.transparent = true;
     m.opacity = 1.0;
     m.alphaTest = 0.01;
@@ -111,10 +112,10 @@ function setImpressionState(mesh, hasTexture) {
     m.polygonOffsetFactor = -2;
     m.polygonOffsetUnits = -2;
     m.color.setHex(0xffffff);
-    m.side = THREE.DoubleSide; // pour éviter problème de normales
+    m.side = THREE.DoubleSide;
     mesh.renderOrder = 2000;
   } else {
-    // état par défaut (opaque, comme bouteille)
+    // --- état visible par défaut (opaque, couleur bouteille) ---
     m.map = null;
     m.transparent = false;
     m.opacity = 1.0;
@@ -125,17 +126,23 @@ function setImpressionState(mesh, hasTexture) {
     m.side = THREE.DoubleSide;
     mesh.renderOrder = 1;
 
-    // restaure couleur du matériau original
+    // restaure couleur et paramètres d’origine
     const base = mesh.userData.baseMaterial;
     if (base) {
-      m.color.copy(base.color);
+      m.color.copy(base.color); // → noir
       if ("roughness" in base) m.roughness = base.roughness;
       if ("metalness" in base) m.metalness = base.metalness;
+    } else {
+      m.color.setHex(0x000000); // fallback noir
+      m.roughness = 1.0;
+      m.metalness = 0.0;
     }
   }
+
   m.toneMapped = true;
   m.needsUpdate = true;
 }
+
 
 // ---------------- Load GLB ----------------
 function loadModel(modelUrl) {
