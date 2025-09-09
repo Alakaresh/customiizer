@@ -52,11 +52,25 @@ const CanvasManager = {
 		wrapper.appendChild(canvasEl);
 		container.appendChild(wrapper);
 
-		// 🖌️ Initialisation Fabric
-		canvas = new fabric.Canvas(canvasEl, {
-			preserveObjectStacking: true,
-			selection: false
-		});
+                // 🖌️ Initialisation Fabric
+                canvas = new fabric.Canvas(canvasEl, {
+                        preserveObjectStacking: true,
+                        selection: false
+                });
+
+                // 🔲 Guide rouge délimitant la zone imprimable
+                guideGroup = new fabric.Rect({
+                        left: template.print_area_left,
+                        top: template.print_area_top,
+                        width: template.print_area_width,
+                        height: template.print_area_height,
+                        fill: 'rgba(0,0,0,0)',
+                        stroke: 'red',
+                        strokeWidth: 2,
+                        selectable: false,
+                        evented: false
+                });
+                canvas.add(guideGroup);
 
 		// 📷 Image de fond (template Printful)
 		fabric.Image.fromURL(template.image_url, function (img) {
@@ -76,7 +90,8 @@ const CanvasManager = {
 
     productOverlay = img;
     canvas.add(productOverlay);
-    canvas.bringToFront(productOverlay);
+    canvas.sendToBack(productOverlay);
+    canvas.bringToFront(guideGroup);
 
     // 🔁 Forcer un premier rendu
     canvas.renderAll();
@@ -152,8 +167,8 @@ const CanvasManager = {
 
                        canvas.add(img);
                        img.setCoords();
-                       canvas.bringToFront(productOverlay);
-                       canvas.bringToFront(guideGroup);
+                       if (productOverlay) canvas.sendToBack(productOverlay);
+                       if (guideGroup) canvas.bringToFront(guideGroup);
                        canvas.renderAll();
 
                        setTimeout(() => {
@@ -212,8 +227,8 @@ const CanvasManager = {
                         });
                         canvas.add(img);
                         img.setCoords();
-                        canvas.bringToFront(productOverlay);
-                        canvas.bringToFront(guideGroup);
+                        if (productOverlay) canvas.sendToBack(productOverlay);
+                        if (guideGroup) canvas.bringToFront(guideGroup);
                         canvas.renderAll();
 
                         setTimeout(() => {
@@ -263,8 +278,8 @@ const CanvasManager = {
                 const obj = canvas.getActiveObject();
                 if (!obj) return;
                 canvas.bringForward(obj);
-                canvas.bringToFront(productOverlay);
-                canvas.bringToFront(guideGroup);
+                if (productOverlay) canvas.sendToBack(productOverlay);
+                if (guideGroup) canvas.bringToFront(guideGroup);
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
@@ -273,8 +288,8 @@ const CanvasManager = {
                 const obj = canvas.getActiveObject();
                 if (!obj) return;
                 canvas.sendBackwards(obj);
-                canvas.bringToFront(productOverlay);
-                canvas.bringToFront(guideGroup);
+                if (productOverlay) canvas.sendToBack(productOverlay);
+                if (guideGroup) canvas.bringToFront(guideGroup);
                 canvas.renderAll();
                 CanvasManager.syncTo3D();
         },
