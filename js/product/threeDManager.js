@@ -100,7 +100,6 @@ function init3DScene(containerId, modelUrl, canvasId = "threeDCanvas") {
 // ---------------- Impression state ----------------
 function setImpressionState(mesh, hasTexture) {
   if (hasTexture) {
-    // --- overlay avec texture ---
     const m = mesh.material;
     m.transparent = true;
     m.opacity = 1.0;
@@ -116,14 +115,20 @@ function setImpressionState(mesh, hasTexture) {
     m.toneMapped = true;
     m.needsUpdate = true;
   } else {
-    // --- état visible forcé (debug) ---
-    mesh.material = new THREE.MeshBasicMaterial({
-      color: 0x00ff00,           // vert pétant (juste pour tester)
-      side: THREE.DoubleSide,
-    });
+    // 🔧 restaure vraiment le matériau original
+    if (mesh.userData.baseMaterial) {
+      mesh.material.copy(mesh.userData.baseMaterial);
+    } else {
+      // fallback noir standard si jamais baseMaterial manquant
+      mesh.material = new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        roughness: 1,
+        metalness: 0,
+        side: THREE.DoubleSide,
+      });
+    }
     mesh.renderOrder = 1;
     mesh.material.needsUpdate = true;
-    console.log("✅ Impression forcée visible (MeshBasicMaterial vert)");
   }
 }
 
@@ -141,7 +146,7 @@ function loadModel(modelUrl) {
         const lower = child.name.toLowerCase();
 
         if (lower.startsWith("impression")) {
-          child.userData.baseMaterial = child.material;
+          child.userData.baseMaterial = child.material.clone(); // copie indépendante
           child.material = child.material.clone();
           printableMeshes[child.name] = child;
           setImpressionState(child, false);
