@@ -511,19 +511,40 @@ jQuery(document).ready(function ($) {
                         if (selectedVariant && selectedVariant.variant_id == variantId) {
                                 clearInterval(checkReady);
 
-                                const mockupData = {
-                                        image_url: imageUrl,
-                                        product_id: window.currentProductId,
-                                        variant_id: selectedVariant.variant_id,
-					placement: selectedVariant.placement,
-					technique: selectedVariant.technique,
-					width: selectedVariant.print_area_width,
-                                        height: selectedVariant.print_area_height,
-                                        left: 0,
-                                        top: 0
+                                const applyImageToCustomizer = () => {
+                                        const addToCanvas = () => {
+                                                if (typeof CanvasManager === 'undefined') return;
+                                                CanvasManager.addImage(imageUrl, () => {
+                                                        const addImageButton = jQuery('#addImageButton');
+                                                        const imageControls = jQuery('.image-controls');
+                                                        const visualHeader = jQuery('.visual-header');
+
+                                                        addImageButton.hide();
+                                                        imageControls.css('display', 'flex').show();
+                                                        visualHeader.css('display', 'flex');
+                                                        jQuery('.visual-zone').addClass('with-header');
+                                                        CanvasManager.resizeToContainer('product2DContainer');
+                                                });
+                                        };
+
+                                        if (jQuery('#customizeModal').is(':visible')) {
+                                                addToCanvas();
+                                        } else {
+                                                const designButton = document.querySelector('.design-button');
+                                                if (designButton) {
+                                                        designButton.click();
+                                                        const interval = setInterval(() => {
+                                                                if (document.getElementById('productCanvas')) {
+                                                                        clearInterval(interval);
+                                                                        addToCanvas();
+                                                                }
+                                                        }, 100);
+                                                        setTimeout(() => clearInterval(interval), 10000);
+                                                }
+                                        }
                                 };
 
-                                generateMockup(mockupData);
+                                applyImageToCustomizer();
                                 clearMockupParams();
                         }
                 }, 200);
