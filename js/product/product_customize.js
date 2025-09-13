@@ -1,38 +1,6 @@
 window.currentProductId = window.currentProductId || null;
 // Objet partagé pour mesurer les temps de génération de mockup
 window.mockupTimes = window.mockupTimes || {};
-function displayGeneratedImages(images) {
-        const siteFilesList = jQuery('#siteFilesList');
-        siteFilesList.empty();
-        if (!images.length) {
-		siteFilesList.append('<div class="no-images">Aucune image trouvée.</div>');
-		return;
-	}
-	images.forEach(image => {
-		siteFilesList.append(`
-				<div class="site-image">
-					<img src="${image.image_url}" 
-						 alt="${image.prompt || 'Image générée'}" 
-						 class="image-thumbnail" 
-						 data-image-url="${image.image_url}">
-				</div>
-			`);
-        });
-}
-
-let currentRatio = '';
-let filterFavorites = false;
-
-function filterAndDisplayImages(images) {
-        let filtered = images;
-        if (currentRatio) {
-                filtered = filtered.filter(img => img.format === currentRatio);
-        }
-        if (filterFavorites) {
-                filtered = filtered.filter(img => img.favorited_by_user === true);
-        }
-        displayGeneratedImages(filtered);
-}
 
 
 
@@ -151,10 +119,7 @@ jQuery(document).ready(function ($) {
 jQuery(document).ready(function ($) {
 
         let importedFiles = [];
-        let allGeneratedImages = [];
 
-	const pcFilesList = $('#pcFilesList');
-	const siteFilesList = $('#siteFilesList');
         const customizeButton = $('.design-button');
         const customizeModal = $('#customizeModal');
         const closeButtonMain = $('#customizeModal .close-button');
@@ -166,8 +131,6 @@ jQuery(document).ready(function ($) {
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
-        const imageToggle = $('#imageToggle');
-        const ratioFilter = $('#ratioFilter');
 
         // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
         window.addEventListener('beforeunload', function (e) {
@@ -176,8 +139,6 @@ jQuery(document).ready(function ($) {
                         e.returnValue = '';
                 }
         });
-
-        const favoriteFilter = $('#favoriteFilter');
 
         const alignLeftButton = $('#alignLeftButton');
         const alignCenterButton = $('#alignCenterButton');
@@ -200,13 +161,10 @@ jQuery(document).ready(function ($) {
         let sidebarVariants = [];
         let threeDInitialized = false;
 
-        currentRatio = selectedVariant?.ratio_image || '';
-        ratioFilter.val('current');
-        favoriteFilter.val('all');
-        filterFavorites = false;
-
-        const startCommunity = imageToggle.is(':checked');
-        filterAndDisplayImages(startCommunity ? communityImages : myGeneratedImages);
+        FileLibrary.init({
+                generated: typeof myGeneratedImages !== 'undefined' ? myGeneratedImages : [],
+                imported: importedFiles
+        });
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -234,6 +192,7 @@ jQuery(document).ready(function ($) {
        function releaseFocus(modal) {
                modal.off('keydown.trapFocus');
        }
+       window.releaseFocus = releaseFocus;
 
        function updateAddImageButtonVisibility() {
                if (CanvasManager.hasImage()) {
@@ -250,6 +209,7 @@ jQuery(document).ready(function ($) {
                        CanvasManager.resizeToContainer('product2DContainer');
                }
        }
+       window.updateAddImageButtonVisibility = updateAddImageButtonVisibility;
 
 
        function renderSidebarOptions(variants, preselect) {
@@ -439,29 +399,14 @@ jQuery(document).ready(function ($) {
         cancelQuitButton.on('click', hideUnsavedModal);
         closeButtonUnsaved.on('click', hideUnsavedModal);
 
-        // Afficher le bouton lors du changement de produit et mettre à jour le ratio
+        // Afficher le bouton lors du changement de produit
         $(document).on('productSelected', function () {
                 updateAddImageButtonVisibility();
-                currentRatio = selectedVariant?.ratio_image || '';
-                ratioFilter.val('current');
-
-                favoriteFilter.val('all');
-                filterFavorites = false;
-
-                const isCommunity = imageToggle.is(':checked');
-                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
         });
 
         // Mise à jour initiale quand la variante est prête
-        $(document).on('variantReady', function (event, variant) {
-                currentRatio = variant?.ratio_image || '';
-                ratioFilter.val('current');
-
-                favoriteFilter.val('all');
-                filterFavorites = false;
-
-                const isCommunity = imageToggle.is(':checked');
-                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
+        $(document).on('variantReady', function () {
+                updateAddImageButtonVisibility();
         });
 
 	// 4) Ouvrir le sélecteur d’image
@@ -503,60 +448,14 @@ jQuery(document).ready(function ($) {
                 productSidebar.removeClass('open');
         });
 
-	// 5) Fermer le sélecteur d’image
+        // 5) Fermer le sélecteur d’image
         closeButtonImageModal.on('click', function () {
                 imageSourceModal.hide();
                 releaseFocus(imageSourceModal);
         });
 
-	// 6) Toggle Mes images / Communauté
-        imageToggle.on('change', function () {
-                const isCommunity = $(this).is(':checked');
-                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
-                $('#switch-label-left').toggleClass('active', !isCommunity);
-                $('#switch-label-right').toggleClass('active', isCommunity);
-        });
-
-        ratioFilter.on('change', function () {
-                const val = $(this).val();
-                if (val === 'all') {
-                        currentRatio = '';
-                } else if (val === 'current') {
-                        currentRatio = selectedVariant?.ratio_image || '';
-                } else {
-                        currentRatio = val;
-                }
-
-                const isCommunity = imageToggle.is(':checked');
-                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
-        });
-
-        favoriteFilter.on('change', function () {
-                filterFavorites = $(this).val() === 'fav';
-                const isCommunity = imageToggle.is(':checked');
-                filterAndDisplayImages(isCommunity ? communityImages : myGeneratedImages);
-        });
-
-
-
-	// 7) Clic sur une miniature
-        siteFilesList.on('click', '.image-thumbnail', function () {
-                const url = $(this).data('image-url');
-                CanvasManager.addImage(url, function () {
-                        updateAddImageButtonVisibility();
-                });
-                imageSourceModal.hide();
-                releaseFocus(imageSourceModal);
-        });
-
-        pcFilesList.on('click', '.image-thumbnail', function () {
-                const url = $(this).data('image-url');
-                CanvasManager.addImage(url, function () {
-                        updateAddImageButtonVisibility();
-                });
-                imageSourceModal.hide();
-                releaseFocus(imageSourceModal);
-        });
+        // Les interactions de la bibliothèque (tri, recherche, vue et sélection des images)
+        // sont gérées par file_library.js
 
         alignLeftButton.on('click', function () {
                 CanvasManager.alignImage('left');
@@ -618,38 +517,19 @@ jQuery(document).ready(function ($) {
         });
 
 
-	async function fetchUserImages() {
-		try {
-			const response = await fetch(`/wp-json/customiizer/v1/user-images/?user_id=${currentUser.ID}`);
-			const data = await response.json();
+        async function fetchUserImages() {
+                try {
+                        const response = await fetch(`/wp-json/customiizer/v1/user-images/?user_id=${currentUser.ID}`);
+                        const data = await response.json();
 
-			if (Array.isArray(data)) {
-				displayUserImages(data);
-			} else {
-				pcFilesList.html('<p style="color:white;">Aucune image importée.</p>');
-			}
-		} catch (error) {
-			console.error("[UserImages] Erreur API :", error);
-		}
-	}
-
-	function displayUserImages(images) {
-		pcFilesList.empty();
-		if (!images.length) {
-			pcFilesList.append('<p style="color:white;">Aucune image importée.</p>');
-			return;
-		}
-		images.forEach(image => {
-			pcFilesList.append(`
-				<div class="site-image">
-					<img src="${image.image_url}" 
-						 alt="Image utilisateur" 
-						 class="image-thumbnail" 
-						 data-image-url="${image.image_url}">
-				</div>
-			`);
-		});
-	}
+                        if (Array.isArray(data)) {
+                                importedFiles = data;
+                                FileLibrary.setImportedFiles(importedFiles);
+                        }
+                } catch (error) {
+                        console.error("[UserImages] Erreur API :", error);
+                }
+        }
 
 	uploadPcImageButton.on('click', function () {
 		const input = $('<input type="file" accept="image/png, image/jpeg">');
@@ -697,19 +577,5 @@ jQuery(document).ready(function ($) {
                 }
         }
 
-        // Recherche dans les listes d'images
-        jQuery('#searchInput').on('input', function () {
-                const searchValue = jQuery(this).val().toLowerCase();
-
-                jQuery('#siteFilesList .site-image').each(function () {
-                        const altText = jQuery(this).find('.image-thumbnail').attr('alt') || '';
-                        jQuery(this).toggle(altText.toLowerCase().includes(searchValue));
-                });
-
-                jQuery('#pcFilesList .site-image').each(function () {
-                        const fileUrl = jQuery(this).find('.image-thumbnail').attr('src') || '';
-                        const fileName = fileUrl.split('/').pop().split('.').slice(0, -1).join('.').toLowerCase();
-                        jQuery(this).toggle(fileName.includes(searchValue));
-                });
-        });
+        // La recherche est gérée par file_library.js
 });

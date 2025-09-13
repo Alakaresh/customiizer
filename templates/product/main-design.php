@@ -78,61 +78,33 @@
 
 
 <!-- Second modal pour choisir l'image -->
-<div id="imageSourceModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="imageSourceModalTitle">
-	<div class="small-modal">
-		<div class="modal-header">
-			<span class="close-button">&times;</span>
-		</div>
-               <h3 id="imageSourceModalTitle">Bibliothèque de fichiers</h3>
+<div id="imageSourceModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Bibliothèque de fichiers</h2>
 
-                <!-- Section recherche et upload -->
-                <div class="search-upload">
-                        <input type="text" id="searchInput" placeholder="Rechercher un fichier..." class="search-bar">
-                       <button id="uploadPcImageButton" class="source-button">Téléverser</button>
-                </div>
+        <!-- Sélecteur de dossier -->
+        <div id="folder-selector" class="folder-selector">
+            <button id="folder-site" class="active">Images du site</button>
+            <button id="folder-user">Images importées</button>
+        </div>
 
-		<!-- Contenu principal du modal -->
-		<!-- Fichiers importés depuis le PC -->
-		<div class="imported-files">
-                       <h4>Images importées</h4>
-			<div id="pcFilesList" class="pcfile-list">
-				<!-- Liste des fichiers importés sera injectée ici -->
-			</div>
-		</div>
+        <!-- Barres de contrôle : tri, recherche, vue -->
+        <div class="file-controls">
+            <select id="sort-select">
+                <option value="name">Nom (A‑Z)</option>
+                <option value="date">Date (plus récentes)</option>
+            </select>
+            <input id="searchInput" type="text" placeholder="Rechercher…" />
+            <div id="view-toggle" class="view-toggle">
+                <button id="view-grid" class="active">Grille</button>
+                <button id="view-list">Liste</button>
+            </div>
+        </div>
 
-		<!-- Fichiers disponibles sur le site -->
-		<div class="site-files">
-                       <h4>Images générées</h4>
-                        <div class="switch-wrapper">
-                                <div class="toggle-group">
-                                        <span id="switch-label-left" class="switch-label active">Mes images</span>
-                                        <label class="switch-toggle">
-                                                <input type="checkbox" id="imageToggle" class="switch-checkbox" >
-                                                <span class="slider"></span>
-                                        </label>
-                                        <span id="switch-label-right" class="switch-label">Communauté</span>
-                                </div>
-                                <select id="ratioFilter" class="ratio-filter">
-                                        <option value="current">Produit (ratio actuel)</option>
-                                        <option value="1:1">1:1</option>
-                                        <option value="4:3">4:3</option>
-                                        <option value="3:4">3:4</option>
-                                        <option value="16:9">16:9</option>
-                                        <option value="9:16">9:16</option>
-                                        <option value="all">Tous</option>
-                                </select>
-                                <select id="favoriteFilter" class="favorite-filter">
-                                        <option value="all">Toutes</option>
-                                        <option value="fav">Favoris</option>
-                                </select>
-                        </div>
-
-
-			<div id="siteFilesList" class="file-list">
-				<!-- Contenu dynamique injecté ici -->
-</div>
-</div>
-</div>
+        <!-- Conteneur dynamique -->
+        <div id="fileList" class="file-list grid-view"></div>
+    </div>
 </div>
 
 <!-- Modal de confirmation de fermeture -->
