@@ -72,37 +72,39 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height, false);
 
-  // HDRI par défaut (comme ton viewer)
-  const defaultHdr = 'https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_1k.hdr';
-  const useHdr = opts.hdr !== 0 && opts.hdr !== false;
-  const hdrUrl = (typeof opts.hdr==='string' && opts.hdr && opts.hdr!=='1') ? opts.hdr : defaultHdr;
-  const hdrIntensity = Number.isFinite(opts.hdrIntensity) ? opts.hdrIntensity : 1.0;
+  // HDRI and database-provided lights are disabled to rely solely on GLB lighting
+  // const defaultHdr = 'https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_1k.hdr';
+  // const useHdr = opts.hdr !== 0 && opts.hdr !== false;
+  // const hdrUrl = (typeof opts.hdr==='string' && opts.hdr && opts.hdr!=='1') ? opts.hdr : defaultHdr;
+  // const hdrIntensity = Number.isFinite(opts.hdrIntensity) ? opts.hdrIntensity : 1.0;
 
-  if(useHdr){
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    new THREE.RGBELoader().load(
-      hdrUrl,
-      (hdr)=>{
-        const env = pmrem.fromEquirectangular(hdr).texture;
-        scene.environment = env;
-        scene.background  = null;
-        renderer.toneMappingExposure = 1.2 * hdrIntensity;
-        hdr.dispose?.(); pmrem.dispose();
-        renderOnce();
-      },
-      undefined,
-      (err)=>{
-        console.warn('⚠️ HDR KO → fallback lumières', err);
-        const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
-        const fill = new THREE.AmbientLight(0xffffff, 0.25);
-        scene.add(key, fill); renderOnce();
-      }
-    );
-  } else {
-    const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
-    const fill = new THREE.AmbientLight(0xffffff, 0.25);
-    scene.add(key, fill);
-  }
+  // if(useHdr){
+  //   const pmrem = new THREE.PMREMGenerator(renderer);
+  //   new THREE.RGBELoader().load(
+  //     hdrUrl,
+  //     (hdr)=>{
+  //       const env = pmrem.fromEquirectangular(hdr).texture;
+  //       scene.environment = env;
+  //       scene.background  = null;
+  //       renderer.toneMappingExposure = 1.2 * hdrIntensity;
+  //       hdr.dispose?.(); pmrem.dispose();
+  //       renderOnce();
+  //     },
+  //     undefined,
+  //     (err)=>{
+  //       console.warn('⚠️ HDR KO → fallback lumières', err);
+  //       // const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
+  //       // const fill = new THREE.AmbientLight(0xffffff, 0.25);
+  //       // scene.add(key, fill);
+  //       renderOnce();
+  //     }
+  //   );
+  // } else {
+  //   // Utilise uniquement les lumières fournies par le modèle GLB
+  //   // const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
+  //   // const fill = new THREE.AmbientLight(0xffffff, 0.25);
+  //   // scene.add(key, fill);
+  // }
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.enableZoom = false;
@@ -127,6 +129,11 @@ function loadModel(modelUrl){
     (gltf)=>{
       modelRoot = gltf.scene;
       zones = {};
+
+      // Diminue fortement l'intensité des lumières présentes dans le GLB
+      modelRoot.traverse((child)=>{
+        if(child.isLight) child.intensity *= 0.1;
+      });
 
       // 1) Trouver un matériau de **référence bouteille** (non "impression")
       let bottleRefMaterial = null;
