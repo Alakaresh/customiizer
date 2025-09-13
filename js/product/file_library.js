@@ -88,7 +88,8 @@
             handleFiles(files);
         });
 
-        dropZone.on('click', function () {
+        dropZone.on('click', function (e) {
+            if (e.target === fileInput[0]) return;
             fileInput.trigger('click');
         });
 
@@ -96,7 +97,6 @@
             const files = Array.from(e.target.files || []);
             handleFiles(files);
             fileInput.val('');
-
         });
 
         // Affichage initial
