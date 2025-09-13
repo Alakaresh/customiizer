@@ -68,6 +68,9 @@ jQuery(document).ready(function ($) {
 
                 // Mise en cache locale de la personnalisation pour réouverture future
                 const placement = CanvasManager.getCurrentImageData() || {};
+                const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
+                        ? CanvasManager.getClipWindowBBox()
+                        : { left: 0, top: 0 };
                 const productData = {
                         product_name: jQuery('.product-name').text().trim(),
                         product_price: selectedVariant.price,
@@ -76,8 +79,8 @@ jQuery(document).ready(function ($) {
                         design_image_url: base64,
                        design_width: placement.width || selectedVariant.print_area_width,
                        design_height: placement.height || selectedVariant.print_area_height,
-                       design_left: placement.left || 0,
-                       design_top: placement.top || 0,
+                       design_left: (placement.left != null ? placement.left - bbox.left : 0),
+                       design_top: (placement.top != null ? placement.top - bbox.top : 0),
                        design_angle: placement.angle || 0,
                        design_flipX: placement.flipX || false,
                        variant_id: selectedVariant?.variant_id,
