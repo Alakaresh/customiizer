@@ -1,9 +1,9 @@
-/* Palette neutre */
+/* Palette sombre */
 :root {
-    --bg-color: #F5F5F5;
-    --border-color: #CCCCCC;
-    --text-color: #333333;
-    --accent-color: #999999;
+    --bg-color: #2b2b2b;
+    --border-color: #555555;
+    --text-color: #f0f0f0;
+    --accent-color: #777777;
 }
 
 /* Conteneur général de la modal */
@@ -11,25 +11,66 @@
     background: var(--bg-color);
     padding: 20px;
     border-radius: 4px;
-    max-height: 80vh;
-    overflow-y: auto;
 }
 
-/* Sélecteur de dossier */
-.folder-selector {
-    margin-bottom: 10px;
+/* Mise en page générale */
+#imageSourceModal .file-library-modal {
+    display: flex;
+    flex-direction: row;
+    height: 80vh;
+    overflow: hidden;
 }
-.folder-selector button {
+
+/* Sidebar pour la sélection de dossier */
+.file-library-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    border-right: 1px solid var(--border-color);
+    padding-right: 10px;
+    margin-right: 20px;
+    height: 100%;
+}
+.file-library-sidebar button {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
     color: var(--text-color);
     padding: 6px 12px;
-    margin-right: 6px;
+    margin-bottom: 6px;
     cursor: pointer;
 }
-.folder-selector button.active {
+.file-library-sidebar button.active {
     border-color: var(--accent-color);
     font-weight: bold;
+}
+
+/* Contenu principal */
+.file-library-main {
+    flex: 1;
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+    #imageSourceModal .file-library-modal {
+        flex-direction: column;
+    }
+    .file-library-sidebar {
+        flex-direction: row;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding-right: 0;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    .file-library-sidebar button {
+        flex: 1;
+        margin-bottom: 0;
+        margin-right: 6px;
+    }
+    .file-library-sidebar button:last-child {
+        margin-right: 0;
+    }
 }
 
 /* Contrôles de tri/recherche/vue */
