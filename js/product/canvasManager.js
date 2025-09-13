@@ -338,13 +338,17 @@ const CanvasManager = {
   },
 
   // Export PNG : crope la fenêtre (print_area si dispo)
-  exportPNG() {
+  // Par défaut, l'image de fond est masquée pour ne garder que la personnalisation
+  exportPNG(includeBackground = false) {
     if (!canvas) { CM.warn('exportPNG: pas de canvas'); return null; }
     const b = this.getClipWindowBBox();
     CM.log('exportPNG: bbox', b);
 
     const prevVPT = canvas.viewportTransform?.slice();
     canvas.setViewportTransform([1,0,0,1,0,0]);
+
+    const prevBgVisible = bgImage?.visible;
+    if (!includeBackground && bgImage) bgImage.visible = false;
 
     const dataUrl = canvas.toDataURL({
       left: b.left, top: b.top, width: b.width, height: b.height,
@@ -355,7 +359,9 @@ const CanvasManager = {
       withoutTransform: true,
     });
 
+    if (!includeBackground && bgImage) bgImage.visible = prevBgVisible;
     if (prevVPT) canvas.setViewportTransform(prevVPT);
+    canvas.requestRenderAll();
     CM.log('exportPNG: ok (length)', dataUrl?.length || 0);
     return dataUrl;
   },
@@ -569,7 +575,7 @@ const CanvasManager = {
   },
 
   // Export alias attendu
-  exportPrintAreaPNG() { return this.exportPNG(); },
+  exportPrintAreaPNG() { return this.exportPNG(false); },
 
   // Export compatible Printful: image recadrée à la fenêtre + placement (x,y,w,h) dans la fenêtre
   getExportDataForPrintful() {
