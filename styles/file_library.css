@@ -52,6 +52,29 @@
     font-weight: bold;
 }
 
+/* Zone de dépôt pour l'import de fichiers */
+.file-drop-zone {
+    border: 2px dashed var(--border-color);
+    color: var(--text-color);
+    padding: 10px;
+    text-align: center;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.file-drop-zone.drag-over {
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.file-drop-zone i {
+    font-size: 24px;
+}
+
 /* Contenu principal */
 .file-library-main {
     flex: 1;
@@ -78,6 +101,10 @@
     }
     .file-library-sidebar button:last-child {
         margin-right: 0;
+    }
+    .file-drop-zone {
+        flex: 1 1 100%;
+        margin-top: 10px;
     }
 }
 

@@ -83,6 +83,11 @@
         <div id="folder-selector" class="file-library-sidebar">
             <button id="folder-site" class="active">Images du site</button>
             <button id="folder-user">Images importées</button>
+            <div id="fileDropZone" class="file-drop-zone">
+                <i class="fas fa-upload" aria-hidden="true"></i>
+                <span>Chargez ou glissez vos images ici</span>
+                <input id="fileInput" type="file" accept="image/*" multiple hidden />
+            </div>
         </div>
         <div class="file-library-main">
             <span class="close-button">&times;</span>
