@@ -92,6 +92,7 @@
 
         // Tri
         const sorted = images.slice().sort((a, b) => {
+
             const aName = a.name || a.image_prefix || (a.url || a.image_url || '').split('/').pop();
             const bName = b.name || b.image_prefix || (b.url || b.image_url || '').split('/').pop();
 
@@ -102,6 +103,7 @@
                 const aDate = a.date_created || a.image_date || a.date || 0;
                 const bDate = b.date_created || b.image_date || b.date || 0;
                 return new Date(bDate) - new Date(aDate);
+
             }
             return 0;
         });
@@ -111,6 +113,7 @@
             const url = img.url || img.image_url;
             if (!url) return; // Ignore entries without URL
             const name = img.name || img.image_prefix || url.split('/').pop();
+
             const item = $(
                 `<div class="file-item">
                     <img src="${url}" alt="${name}" class="image-thumbnail">
