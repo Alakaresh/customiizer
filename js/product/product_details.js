@@ -90,7 +90,9 @@ jQuery(document).ready(function ($) {
                 myGeneratedImages = images.filter(img => img.user_id === currentUser.ID);
                 communityImages = images.filter(img => img.user_id !== currentUser.ID);
 
-                displayGeneratedImages(myGeneratedImages);
+                if (window.FileLibrary) {
+                        FileLibrary.setGeneratedImages(myGeneratedImages);
+                }
 
                 // Si une variante est déjà sélectionnée, met à jour la bottom-bar
                 if (selectedVariant) {
