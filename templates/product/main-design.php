@@ -79,31 +79,31 @@
 
 <!-- Second modal pour choisir l'image -->
 <div id="imageSourceModal" class="modal">
-    <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h2>Bibliothèque de fichiers</h2>
-
-        <!-- Sélecteur de dossier -->
-        <div id="folder-selector" class="folder-selector">
+    <div class="modal-content file-library-modal">
+        <div id="folder-selector" class="file-library-sidebar">
             <button id="folder-site" class="active">Images du site</button>
             <button id="folder-user">Images importées</button>
         </div>
+        <div class="file-library-main">
+            <span class="close-button">&times;</span>
+            <h2>Bibliothèque de fichiers</h2>
 
-        <!-- Barres de contrôle : tri, recherche, vue -->
-        <div class="file-controls">
-            <select id="sort-select">
-                <option value="name">Nom (A‑Z)</option>
-                <option value="date">Date (plus récentes)</option>
-            </select>
-            <input id="searchInput" type="text" placeholder="Rechercher…" />
-            <div id="view-toggle" class="view-toggle">
-                <button id="view-grid" class="active">Grille</button>
-                <button id="view-list">Liste</button>
+            <!-- Barres de contrôle : tri, recherche, vue -->
+            <div class="file-controls">
+                <select id="sort-select">
+                    <option value="name">Nom (A‑Z)</option>
+                    <option value="date">Date (plus récentes)</option>
+                </select>
+                <input id="searchInput" type="text" placeholder="Rechercher…" />
+                <div id="view-toggle" class="view-toggle">
+                    <button id="view-grid" class="active">Grille</button>
+                    <button id="view-list">Liste</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Conteneur dynamique -->
-        <div id="fileList" class="file-list grid-view"></div>
+            <!-- Conteneur dynamique -->
+            <div id="fileList" class="file-list grid-view"></div>
+        </div>
     </div>
 </div>
 
