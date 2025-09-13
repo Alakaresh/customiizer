@@ -1,0 +1,107 @@
+/* Palette neutre */
+:root {
+    --bg-color: #F5F5F5;
+    --border-color: #CCCCCC;
+    --text-color: #333333;
+    --accent-color: #999999;
+}
+
+/* Conteneur général de la modal */
+#imageSourceModal .modal-content {
+    background: var(--bg-color);
+    padding: 20px;
+    border-radius: 4px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Sélecteur de dossier */
+.folder-selector {
+    margin-bottom: 10px;
+}
+.folder-selector button {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 12px;
+    margin-right: 6px;
+    cursor: pointer;
+}
+.folder-selector button.active {
+    border-color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Contrôles de tri/recherche/vue */
+.file-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+#sort-select, #searchInput {
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+.view-toggle button {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 10px;
+    cursor: pointer;
+}
+.view-toggle button.active {
+    border-color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Conteneur des fichiers */
+.file-list {
+    display: grid;
+    gap: 10px;
+}
+.file-list.grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.file-list.list-view {
+    grid-template-columns: 1fr;
+}
+
+/* Style d’un élément de fichier */
+.file-item {
+    position: relative;
+    cursor: pointer;
+}
+.file-item img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+    display: block;
+}
+.file-item .file-name {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+/* Vue liste : disposition horizontale */
+.file-list.list-view .file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.file-list.list-view .file-item img {
+    width: 40px;
+    height: 40px;
+}
+.file-list.list-view .file-item .file-name {
+    text-align: left;
+    margin-top: 0;
+}
