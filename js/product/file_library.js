@@ -54,6 +54,32 @@
             });
         });
 
+        // Zone de dépôt pour importation d'images
+        const dropZone = $('#fileDropZone');
+        dropZone.on('dragover', function (e) {
+            e.preventDefault();
+            dropZone.addClass('drag-over');
+        });
+        dropZone.on('dragleave', function () {
+            dropZone.removeClass('drag-over');
+        });
+        dropZone.on('drop', function (e) {
+            e.preventDefault();
+            dropZone.removeClass('drag-over');
+            const files = Array.from(e.originalEvent.dataTransfer.files || []);
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function (ev) {
+                    importedFiles.push({ name: file.name, url: ev.target.result });
+                    if (currentFolder === 'user') {
+                        renderFileList();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
         // Affichage initial
         renderFileList();
     }
