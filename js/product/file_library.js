@@ -54,19 +54,11 @@
             });
         });
 
-        // Zone de dépôt pour importation d'images
+        // Zone de dépôt et chargement de fichiers
         const dropZone = $('#fileDropZone');
-        dropZone.on('dragover', function (e) {
-            e.preventDefault();
-            dropZone.addClass('drag-over');
-        });
-        dropZone.on('dragleave', function () {
-            dropZone.removeClass('drag-over');
-        });
-        dropZone.on('drop', function (e) {
-            e.preventDefault();
-            dropZone.removeClass('drag-over');
-            const files = Array.from(e.originalEvent.dataTransfer.files || []);
+        const fileInput = $('#fileInput');
+
+        function handleFiles(files) {
             files.forEach(file => {
                 if (!file.type.startsWith('image/')) return;
                 const reader = new FileReader();
@@ -78,6 +70,33 @@
                 };
                 reader.readAsDataURL(file);
             });
+        }
+
+        dropZone.on('dragover', function (e) {
+            e.preventDefault();
+            dropZone.addClass('drag-over');
+        });
+
+        dropZone.on('dragleave', function () {
+            dropZone.removeClass('drag-over');
+        });
+
+        dropZone.on('drop', function (e) {
+            e.preventDefault();
+            dropZone.removeClass('drag-over');
+            const files = Array.from(e.originalEvent.dataTransfer.files || []);
+            handleFiles(files);
+        });
+
+        dropZone.on('click', function () {
+            fileInput.trigger('click');
+        });
+
+        fileInput.on('change', function (e) {
+            const files = Array.from(e.target.files || []);
+            handleFiles(files);
+            fileInput.val('');
+
         });
 
         // Affichage initial
