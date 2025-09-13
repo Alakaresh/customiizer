@@ -93,15 +93,17 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
       undefined,
       (err)=>{
         console.warn('⚠️ HDR KO → fallback lumières', err);
-        const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
-        const fill = new THREE.AmbientLight(0xffffff, 0.25);
-        scene.add(key, fill); renderOnce();
+        // const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
+        // const fill = new THREE.AmbientLight(0xffffff, 0.25);
+        // scene.add(key, fill);
+        renderOnce();
       }
     );
   } else {
-    const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
-    const fill = new THREE.AmbientLight(0xffffff, 0.25);
-    scene.add(key, fill);
+    // Utilise uniquement les lumières fournies par le modèle GLB
+    // const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
+    // const fill = new THREE.AmbientLight(0xffffff, 0.25);
+    // scene.add(key, fill);
   }
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
