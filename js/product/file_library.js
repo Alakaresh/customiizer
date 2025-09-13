@@ -96,6 +96,7 @@
             const files = Array.from(e.target.files || []);
             handleFiles(files);
             fileInput.val('');
+
         });
 
         // Affichage initial

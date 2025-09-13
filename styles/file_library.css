@@ -70,7 +70,6 @@
     border-color: var(--accent-color);
     background: rgba(255, 255, 255, 0.05);
 }
-
 .file-drop-zone i {
     font-size: 24px;
 }
