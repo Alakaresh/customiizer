@@ -520,12 +520,12 @@
                     ? (img.prompt.text || img.prompt.prompt || JSON.stringify(img.prompt))
                     : (img.prompt || ''))
             });
+            imgElement.on('click', function (e) {
+                e.stopPropagation();
+            });
             item.find('.preview-icon').on('click', function (e) {
                 e.stopPropagation();
-                const imgEl = item.find('img.preview-enlarge')[0];
-                if (imgEl) {
-                    imgEl.click();
-                }
+                handleImageClick({ target: imgElement[0] });
             });
             item.find('.apply-button').on('click', function (e) {
                 e.stopPropagation();
