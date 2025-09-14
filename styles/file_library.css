@@ -15,9 +15,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80vw;
+    width: 70vw;
     max-width: 90vw;
-    height: 80vh;
+    height: 70vh;
     max-height: 90vh;
 }
 
