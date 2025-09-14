@@ -95,13 +95,9 @@
             <span class="close-button">&times;</span>
             <h2>Bibliothèque de fichiers</h2>
 
-            <!-- Barres de contrôle : tri, recherche, vue -->
+            <!-- Barres de contrôle : tri et recherche -->
             <div class="file-controls">
                 <input id="searchInput" type="text" placeholder="Rechercher…" />
-                <div id="view-toggle" class="view-toggle">
-                    <button id="view-grid" class="active">Grille</button>
-                    <button id="view-list">Liste</button>
-                </div>
                 <div class="sort-wrapper">
                     <label for="sort-select">Trié par</label>
                     <select id="sort-select">
