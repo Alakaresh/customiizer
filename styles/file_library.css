@@ -39,6 +39,10 @@
     margin-right: 20px;
     height: 100%;
 }
+.file-library-sidebar .sidebar-title {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
 .file-library-sidebar button {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
@@ -91,6 +95,11 @@
         border-bottom: 1px solid var(--border-color);
         padding-right: 0;
         margin-right: 0;
+        margin-bottom: 10px;
+    }
+    .file-library-sidebar .sidebar-title {
+        flex-basis: 100%;
+        text-align: center;
         margin-bottom: 10px;
     }
     .file-library-sidebar button {

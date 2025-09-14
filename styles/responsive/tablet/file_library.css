@@ -16,6 +16,12 @@
         overflow-y: auto;
     }
 
+    .file-library-sidebar .sidebar-title {
+        flex-basis: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
     /* Zone de dépôt dans la barre latérale */
     .file-drop-zone {
         border: 2px dashed var(--border-color);
