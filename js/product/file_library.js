@@ -147,7 +147,7 @@
             sizeRatioMap = {};
             $('#mainFormatFilters .format-main').removeClass('active');
             $(this).addClass('active');
-            $('#formatModal').hide();
+            $('#formatOptions').removeClass('active');
             $('#formatOptions .format-btn').removeClass('active');
             $('#product-block').hide();
             sizeBlock.hide();
@@ -158,12 +158,15 @@
         });
 
         // Ouverture du menu format
-        $('#open-format-menu').on('click', function () {
-            $('#formatModal').show();
+        $('#open-format-menu').on('click', function (e) {
+            e.stopPropagation();
+            $('#formatOptions').toggleClass('active');
         });
 
-        $('#formatModal .close-button').on('click', function () {
-            $('#formatModal').hide();
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#formatOptions, #open-format-menu').length) {
+                $('#formatOptions').removeClass('active');
+            }
         });
 
         // Sélection d'un format standard
@@ -185,12 +188,12 @@
             sizeBlock.hide();
             currentPage = 1;
             renderFileList();
-            $('#formatModal').hide();
+            $('#formatOptions').removeClass('active');
         });
 
         // Accès aux produits
         $('#format-product').on('click', function () {
-            $('#formatModal').hide();
+            $('#formatOptions').removeClass('active');
             $('#formatOptions .format-btn').removeClass('active');
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');

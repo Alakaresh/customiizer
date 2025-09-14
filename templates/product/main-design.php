@@ -105,6 +105,14 @@
                             <button id="filter-all" class="format-main active" data-format="all">Tous</button>
                             <button id="open-format-menu" class="format-main">Format</button>
                         </div>
+                        <div id="formatOptions" class="filter-buttons format-dropdown">
+                            <button class="format-btn" data-format="1:1">1:1</button>
+                            <button class="format-btn" data-format="3:4">3:4</button>
+                            <button class="format-btn" data-format="4:3">4:3</button>
+                            <button class="format-btn" data-format="16:9">16:9</button>
+                            <button class="format-btn" data-format="9:16">9:16</button>
+                            <button id="format-product" class="format-btn">Produit</button>
+                        </div>
                     </div>
                     <div class="filter-group" id="product-block" style="display:none">
                         <h4>Produits</h4>

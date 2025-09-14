@@ -185,6 +185,34 @@
     background: rgba(255, 255, 255, 0.1);
     font-weight: bold;
 }
+
+#format-block {
+    position: relative;
+}
+
+.format-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+    display: none;
+}
+
+.format-dropdown.active {
+    display: flex;
+}
+
+.format-dropdown button {
+    width: 100%;
+    text-align: left;
+    flex: none;
+}
 .sort-wrapper {
     margin-left: auto;
     display: flex;
