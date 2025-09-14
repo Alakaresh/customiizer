@@ -81,7 +81,7 @@
 <div id="imageSourceModal" class="modal">
     <div class="modal-content file-library-modal">
         <div id="folder-selector" class="file-library-sidebar">
-            <h3 class="sidebar-title">Sources d'images</h3>
+            <h3 class="sidebar-title">Média</h3>
             <button id="folder-my" class="active"><i class="fas fa-user" aria-hidden="true"></i><span>Mes images</span></button>
             <button id="folder-community"><i class="fas fa-users" aria-hidden="true"></i><span>Communauté</span></button>
             <button id="folder-imported"><i class="fas fa-file-import" aria-hidden="true"></i><span>Images importées</span></button>
@@ -93,8 +93,6 @@
         </div>
         <div class="file-library-main">
             <span class="close-button">&times;</span>
-            <h2>Bibliothèque de fichiers</h2>
-
             <!-- Barres de contrôle : tri et recherche -->
             <div class="file-controls">
                 <input id="searchInput" type="text" placeholder="Rechercher…" />
