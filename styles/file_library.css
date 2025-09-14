@@ -229,7 +229,7 @@
     height: 32px;
     padding: 0 6px;
     border: 1px solid var(--border-color);
-    background: var(--bg-color);
+    background: var(--bg-color) !important;
     color: var(--text-color);
     text-align: center;
     border-radius: 4px;
