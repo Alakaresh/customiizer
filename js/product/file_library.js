@@ -4,6 +4,9 @@
  * Ce script dépend de jQuery et de CanvasManager (pour l'ajout d'image).
  */
 (function ($) {
+    if (typeof baseUrl === 'undefined') {
+        var baseUrl = window.location.origin;
+    }
     // État interne
     let currentFolder = 'my';      // 'my' (mes images), 'community' ou 'imported'
     let currentSort   = 'date';    // 'name' ou 'date'
@@ -17,7 +20,75 @@
     let productFormats = [];         // Ratios disponibles pour le produit
     let sizeRatioMap = {};           // Association taille -> ratio
     const itemsPerPage = 40;       // Nombre d'images par page
+    let searchTimeout;             // Délai pour la recherche distante
 
+    // -------- Cache format -> produits --------
+    try {
+        const saved = sessionStorage.getItem('previewFormatCache');
+        window.previewFormatCache = {
+            ...(saved ? JSON.parse(saved) : {}),
+            ...(window.previewFormatCache || {})
+        };
+    } catch (e) {
+        window.previewFormatCache = window.previewFormatCache || {};
+    }
+
+    function persistPreviewCache() {
+        try {
+            sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
+        } catch (e) {}
+    }
+
+    async function getProductNameForFormat(fmt) {
+        const cached = window.previewFormatCache[fmt];
+        if (cached) {
+            return extractProductName(cached);
+        }
+        try {
+            const res = await fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`);
+            const data = await res.json();
+            window.previewFormatCache[fmt] = data;
+            persistPreviewCache();
+            return extractProductName(data);
+        } catch (err) {
+            console.error('❌ format fetch', fmt, err);
+            return null;
+        }
+    }
+
+    function extractProductName(data) {
+        if (data && data.success && Array.isArray(data.choices)) {
+            const ids = Array.from(new Set(data.choices.map(c => c.product_id)));
+            if (ids.length === 1 && data.choices[0]) {
+                return data.choices[0].product_name;
+            }
+        }
+        return null;
+    }
+
+    function updateFormatLabel(fmt) {
+        $('#filter-format').addClass('active').text(`Format: ${fmt}`);
+        getProductNameForFormat(fmt).then(name => {
+            if (name) {
+                $('#filter-format').addClass('active').text(`Format: ${name}`);
+            }
+        });
+    }
+
+    async function fetchCommunityImages(searchValue) {
+        const params = new URLSearchParams({ limit: 200, offset: 0 });
+        if (searchValue) {
+            params.append('search', searchValue);
+        }
+        try {
+            const res = await fetch(`${baseUrl}/wp-json/api/v1/images/load?${params.toString()}`);
+            const data = await res.json();
+            communityImages = (data && data.success && Array.isArray(data.images)) ? data.images : [];
+            renderFileList(true);
+        } catch (err) {
+            console.error('❌ community search', err);
+        }
+    }
     /**
      * Initialise la bibliothèque avec les images existantes.
      * @param {Object} options 
@@ -59,7 +130,13 @@
         });
         $('#searchInput').on('input', function () {
             currentPage = 1;
-            renderFileList();
+            const val = $(this).val();
+            clearTimeout(searchTimeout);
+            if (currentFolder === 'community') {
+                searchTimeout = setTimeout(() => fetchCommunityImages(val), 300);
+            } else {
+                renderFileList();
+            }
         });
         $('#format-block .format-btn').on('click', function () {
             currentFormatFilter = $(this).data('format');
@@ -301,7 +378,7 @@
     /**
      * Affiche la liste en fonction du dossier actif, du tri et du type de vue.
      */
-    function renderFileList() {
+    function renderFileList(skipSearch = false) {
         const container = $('#fileList');
         container.empty();
         // Sélection du jeu d'images
@@ -318,7 +395,7 @@
         }
         if (!Array.isArray(images)) return;
 
-        const searchValue = $('#searchInput').val().toLowerCase();
+        const searchValue = skipSearch ? '' : $('#searchInput').val().toLowerCase();
 
         let selectedFormat = null;
         if (currentSize && sizeRatioMap[currentSize]) {
@@ -334,7 +411,11 @@
             if (!selectedFormat && allowedFormats && !allowedFormats.includes(img.format)) return false;
             const rawUrl = img.url || img.image_url || '';
             const name = img.name || img.image_prefix || rawUrl.split('/').pop();
-            return name.toLowerCase().includes(searchValue);
+            const prompt = typeof img.prompt === 'object'
+                ? (img.prompt.text || img.prompt.prompt || JSON.stringify(img.prompt))
+                : (img.prompt || '');
+            const haystack = `${name} ${prompt}`.toLowerCase();
+            return haystack.includes(searchValue);
         });
 
         // Tri des résultats filtrés
