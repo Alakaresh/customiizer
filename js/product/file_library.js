@@ -148,6 +148,31 @@
         }
     }
 
+    async function deleteImportedImage(imageUrl) {
+        if (imageUrl.startsWith('data:')) {
+            importedFiles = importedFiles.filter(img => (img.url || img.image_url) !== imageUrl);
+            renderFileList();
+            return;
+        }
+        try {
+            const response = await fetch('/wp-json/customiizer/v1/delete-image/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_url: imageUrl, user_id: currentUser.ID })
+            });
+            const result = await response.json();
+            if (result.success) {
+                importedFiles = importedFiles.filter(img => (img.url || img.image_url) !== imageUrl);
+                renderFileList();
+            } else {
+                alert('Erreur lors de la suppression.');
+            }
+        } catch (error) {
+            console.error('[Delete] Erreur serveur :', error);
+            alert('Erreur lors de la suppression.');
+        }
+    }
+
     /**
      * Affiche les contrôles de pagination.
      * @param {number} totalPages
@@ -260,8 +285,13 @@
             if (!url || typeof url !== 'string') return; // Ignore entries without valid URL
             const name = img.name || img.image_prefix || url.split('/').pop();
 
+            const menu = currentFolder === 'imported'
+                ? `<button type="button" class="file-menu-button"><i class="fas fa-ellipsis-v"></i></button>
+                   <div class="file-menu-dropdown"><button class="file-delete">Supprimer</button></div>`
+                : '';
             const item = $(
                 `<div class="file-item">
+                    ${menu}
                     <img src="${url}" alt="${name}" class="preview-enlarge">
                     <i class="fas fa-search-plus preview-icon"></i>
                     <button type="button" class="apply-button">Appliquez</button>
@@ -286,6 +316,21 @@
                 $('#imageSourceModal').hide();
                 releaseFocus($('#imageSourceModal'));
             });
+            if (currentFolder === 'imported') {
+                const menuBtn = item.find('.file-menu-button');
+                const dropdown = item.find('.file-menu-dropdown');
+                menuBtn.on('click', function (e) {
+                    e.stopPropagation();
+                    dropdown.toggle();
+                });
+                item.on('mouseleave', function () {
+                    dropdown.hide();
+                });
+                dropdown.find('.file-delete').on('click', function (e) {
+                    e.stopPropagation();
+                    deleteImportedImage(url);
+                });
+            }
             container.append(item);
         });
 

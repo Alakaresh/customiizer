@@ -57,3 +57,17 @@ function azure_upload_blob($blobClient, $containerName, $blobName, $filePath) {
         return false;
     }
 }
+
+// Fonction pour supprimer un blob Azure
+function azure_delete_blob($blobClient, $containerName, $blobName) {
+    try {
+        $blobClient->deleteBlob($containerName, $blobName);
+        return true;
+    } catch (\MicrosoftAzure\Storage\Common\Exceptions\ServiceException $e) {
+        customiizer_log("Erreur du service Azure Blob lors de la suppression : " . $e->getMessage(), 'ERROR');
+        return false;
+    } catch (Exception $e) {
+        customiizer_log("Erreur générale lors de la suppression : " . $e->getMessage(), 'ERROR');
+        return false;
+    }
+}
