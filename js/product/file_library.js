@@ -14,6 +14,59 @@
     let currentFormatFilter = 'all'; // 'all' ou nom de format
     const itemsPerPage = 40;       // Nombre d'images par page
 
+    // -------- Cache format -> produits --------
+    try {
+        const saved = sessionStorage.getItem('previewFormatCache');
+        window.previewFormatCache = {
+            ...(saved ? JSON.parse(saved) : {}),
+            ...(window.previewFormatCache || {})
+        };
+    } catch (e) {
+        window.previewFormatCache = window.previewFormatCache || {};
+    }
+
+    function persistPreviewCache() {
+        try {
+            sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
+        } catch (e) {}
+    }
+
+    async function getProductNameForFormat(fmt) {
+        const cached = window.previewFormatCache[fmt];
+        if (cached) {
+            return extractProductName(cached);
+        }
+        try {
+            const res = await fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`);
+            const data = await res.json();
+            window.previewFormatCache[fmt] = data;
+            persistPreviewCache();
+            return extractProductName(data);
+        } catch (err) {
+            console.error('❌ format fetch', fmt, err);
+            return null;
+        }
+    }
+
+    function extractProductName(data) {
+        if (data && data.success && Array.isArray(data.choices)) {
+            const ids = Array.from(new Set(data.choices.map(c => c.product_id)));
+            if (ids.length === 1 && data.choices[0]) {
+                return data.choices[0].product_name;
+            }
+        }
+        return null;
+    }
+
+    function updateFormatLabel(fmt) {
+        $('#filter-format').addClass('active').text(`Format: ${fmt}`);
+        getProductNameForFormat(fmt).then(name => {
+            if (name) {
+                $('#filter-format').addClass('active').text(`Format: ${name}`);
+            }
+        });
+    }
+
     /**
      * Initialise la bibliothèque avec les images existantes.
      * @param {Object} options 
@@ -208,12 +261,15 @@
         dropdown.empty();
         Array.from(formats).sort().forEach(fmt => {
             const btn = $('<button type="button" class="format-option"></button>').text(fmt);
+            getProductNameForFormat(fmt).then(name => {
+                if (name) btn.text(name);
+            });
             btn.on('click', function (e) {
                 e.stopPropagation();
                 currentFormatFilter = fmt;
                 currentPage = 1;
                 $('.filter-buttons button').removeClass('active');
-                $('#filter-format').addClass('active').text(`Format: ${fmt}`);
+                updateFormatLabel(fmt);
                 dropdown.hide();
                 renderFileList();
             });
