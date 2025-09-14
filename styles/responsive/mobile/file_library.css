@@ -70,5 +70,8 @@
     .filter-buttons button {
         flex: 1;
     }
+    .filter-buttons .format-filter {
+        flex: 1;
+    }
 
 }

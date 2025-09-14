@@ -101,7 +101,10 @@
             <div class="filter-sort">
                 <div class="filter-buttons">
                     <button id="filter-all" class="active">Toutes les images</button>
-                    <button id="filter-format">Format</button>
+                    <div class="format-filter">
+                        <button id="filter-format">Format</button>
+                        <div id="formatDropdown" class="format-dropdown"></div>
+                    </div>
                 </div>
                 <div class="sort-wrapper">
                     <label for="sort-select">Trié par</label>
