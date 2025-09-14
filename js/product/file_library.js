@@ -1,36 +1,46 @@
 /**
  * Bibliothèque de fichiers pour Customiizer
- * Gère deux dossiers ("site" et "user"), le tri, la recherche et le mode d'affichage.
+ * Gère trois dossiers ("my", "community" et "imported"), le tri, la recherche et le mode d'affichage.
  * Ce script dépend de jQuery et de CanvasManager (pour l'ajout d'image).
  */
 (function ($) {
     // État interne
-    let currentFolder = 'site';    // 'site' (images du site) ou 'user' (images importées)
+    let currentFolder = 'my';      // 'my' (mes images), 'community' ou 'imported'
     let currentSort   = 'date';    // 'name' ou 'date'
     let importedFiles = [];        // Images importées par l'utilisateur
-    let generatedImages = [];      // Images générées ou du site
+    let myImages = [];             // Images générées par l'utilisateur
+    let communityImages = [];      // Images de la communauté
     let currentPage   = 1;         // Page courante
     const itemsPerPage = 20;       // Nombre d'images par page
 
     /**
      * Initialise la bibliothèque avec les images existantes.
      * @param {Object} options 
-     *        options.generated (Array) : images générées du site
-     *        options.imported (Array) : images importées par l'utilisateur
+     *        options.my (Array)        : mes images générées
+     *        options.community (Array) : images de la communauté
+     *        options.imported (Array)  : images importées par l'utilisateur
      */
     function init(options) {
-        generatedImages = options?.generated || [];
+        myImages        = options?.my || [];
+        communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
         // Écouteurs d'événements
-        $('#folder-site').on('click', function () {
-            currentFolder = 'site';
+        $('#folder-my').on('click', function () {
+            currentFolder = 'my';
             currentPage = 1;
             $('#folder-selector button').removeClass('active');
             $(this).addClass('active');
             renderFileList();
         });
-        $('#folder-user').on('click', function () {
-            currentFolder = 'user';
+        $('#folder-community').on('click', function () {
+            currentFolder = 'community';
+            currentPage = 1;
+            $('#folder-selector button').removeClass('active');
+            $(this).addClass('active');
+            renderFileList();
+        });
+        $('#folder-imported').on('click', function () {
+            currentFolder = 'imported';
             currentPage = 1;
             $('#folder-selector button').removeClass('active');
             $(this).addClass('active');
@@ -66,7 +76,7 @@
                 const reader = new FileReader();
                 reader.onload = function (ev) {
                     importedFiles.push({ name: file.name, url: ev.target.result });
-                    if (currentFolder === 'user') {
+                    if (currentFolder === 'imported') {
                         renderFileList();
                     }
                 };
@@ -111,18 +121,29 @@
      */
     function setImportedFiles(files) {
         importedFiles = files || [];
-        if (currentFolder === 'user') {
+        if (currentFolder === 'imported') {
             renderFileList();
         }
     }
 
     /**
-     * Met à jour la liste des images générées (site).
-     * @param {Array} files 
+     * Met à jour la liste de mes images.
+     * @param {Array} files
      */
-    function setGeneratedImages(files) {
-        generatedImages = files || [];
-        if (currentFolder === 'site') {
+    function setMyImages(files) {
+        myImages = files || [];
+        if (currentFolder === 'my') {
+            renderFileList();
+        }
+    }
+
+    /**
+     * Met à jour la liste des images de la communauté.
+     * @param {Array} files
+     */
+    function setCommunityImages(files) {
+        communityImages = files || [];
+        if (currentFolder === 'community') {
             renderFileList();
         }
     }
@@ -184,7 +205,17 @@
         const container = $('#fileList');
         container.empty();
         // Sélection du jeu d'images
-        const images = currentFolder === 'site' ? generatedImages : importedFiles;
+        let images;
+        switch (currentFolder) {
+            case 'my':
+                images = myImages;
+                break;
+            case 'community':
+                images = communityImages;
+                break;
+            default:
+                images = importedFiles;
+        }
         if (!Array.isArray(images)) return;
 
         const searchValue = $('#searchInput').val().toLowerCase();
@@ -255,7 +286,8 @@
     window.FileLibrary = {
         init: init,
         setImportedFiles: setImportedFiles,
-        setGeneratedImages: setGeneratedImages,
+        setMyImages: setMyImages,
+        setCommunityImages: setCommunityImages,
         render: renderFileList
     };
 })(jQuery);

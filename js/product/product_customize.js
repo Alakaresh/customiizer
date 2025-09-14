@@ -158,7 +158,8 @@ jQuery(document).ready(function ($) {
         let threeDInitialized = false;
 
         FileLibrary.init({
-                generated: typeof myGeneratedImages !== 'undefined' ? myGeneratedImages : [],
+                my: typeof myGeneratedImages !== 'undefined' ? myGeneratedImages : [],
+                community: typeof communityImages !== 'undefined' ? communityImages : [],
                 imported: importedFiles
         });
 
