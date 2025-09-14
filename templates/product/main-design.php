@@ -82,9 +82,9 @@
     <div class="modal-content file-library-modal">
         <div id="folder-selector" class="file-library-sidebar">
             <h3 class="sidebar-title">Sources d'images</h3>
-            <button id="folder-my" class="active">Mes images</button>
-            <button id="folder-community">Communauté</button>
-            <button id="folder-imported">Images importées</button>
+            <button id="folder-my" class="active"><i class="fas fa-folder" aria-hidden="true"></i><span>Mes images</span></button>
+            <button id="folder-community"><i class="fas fa-folder" aria-hidden="true"></i><span>Communauté</span></button>
+            <button id="folder-imported"><i class="fas fa-folder" aria-hidden="true"></i><span>Images importées</span></button>
             <div id="fileDropZone" class="file-drop-zone">
                 <i class="fas fa-upload" aria-hidden="true"></i>
                 <span>Glisser-déposer des fichiers<br>ou<br>Recherchez des fichiers</span>
