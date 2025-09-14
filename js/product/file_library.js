@@ -253,10 +253,12 @@
             const item = $(
                 `<div class="file-item">
                     <img src="${url}" alt="${name}" class="image-thumbnail">
+                    <button type="button" class="apply-button">Appliquez</button>
                     <span class="file-name">${name}</span>
                 </div>`
             );
-            item.on('click', function () {
+            item.find('.apply-button').on('click', function (e) {
+                e.stopPropagation();
                 // Ajoute l'image au canvas (fonction existante)
                 CanvasManager.addImage(url, function () {
                     if (typeof updateAddImageButtonVisibility === 'function') {
