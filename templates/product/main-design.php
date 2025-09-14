@@ -101,17 +101,21 @@
             <div class="filter-sort">
                 <div class="filters">
                     <div class="filter-group" id="format-block">
-                        <h4>Formats standards</h4>
-                        <div class="filter-buttons">
-                            <button class="format-btn active" data-format="all">Tous</button>
+                        <h4>Filtres</h4>
+                        <div class="filter-buttons" id="mainFormatFilters">
+                            <button id="filter-all" class="format-main active" data-format="all">Tous</button>
+                            <button id="open-format-menu" class="format-main">Format</button>
+                        </div>
+                        <div class="filter-buttons" id="formatOptions" style="display:none">
                             <button class="format-btn" data-format="1:1">1:1</button>
                             <button class="format-btn" data-format="3:4">3:4</button>
                             <button class="format-btn" data-format="4:3">4:3</button>
                             <button class="format-btn" data-format="16:9">16:9</button>
                             <button class="format-btn" data-format="9:16">9:16</button>
+                            <button id="format-product" class="format-btn">Produit</button>
                         </div>
                     </div>
-                    <div class="filter-group" id="product-block">
+                    <div class="filter-group" id="product-block" style="display:none">
                         <h4>Produits</h4>
                         <div id="productButtons" class="filter-buttons"></div>
                     </div>
