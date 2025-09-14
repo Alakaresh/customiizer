@@ -143,10 +143,18 @@
     color: var(--text-color);
 }
 
+.filter-sort {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
 .filter-buttons {
     display: flex;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 0;
 }
 
 .filter-buttons button {
