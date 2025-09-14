@@ -225,6 +225,14 @@
     opacity: 0.5;
     cursor: default;
 }
-.pagination-controls .page-info {
+.pagination-controls .page-input {
+    width: 50px;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+}
+.pagination-controls .page-total {
     color: var(--text-color);
 }
