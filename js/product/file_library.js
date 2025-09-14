@@ -6,7 +6,7 @@
 (function ($) {
     // État interne
     let currentFolder = 'site';    // 'site' (images du site) ou 'user' (images importées)
-    let currentSort   = 'name';    // 'name' ou 'date'
+    let currentSort   = 'date';    // 'name' ou 'date'
     let importedFiles = [];        // Images importées par l'utilisateur
     let generatedImages = [];      // Images générées ou du site
 
