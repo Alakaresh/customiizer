@@ -96,19 +96,19 @@
             <!-- Barres de contrôle : tri et recherche -->
             <div class="file-controls">
                 <input id="searchInput" type="text" placeholder="Rechercher…" />
-                <div class="sort-wrapper">
-                    <label for="sort-select">Trié par</label>
-                    <select id="sort-select">
-                        <option value="name">Nom</option>
-                        <option value="date" selected>Date</option>
-                    </select>
-                </div>
             </div>
 
             <div class="filter-buttons">
                 <button id="filter-all" class="active">Toutes les images</button>
                 <button id="filter-format">Format</button>
             </div>
+			<div class="sort-wrapper">
+                    <label for="sort-select">Trié par</label>
+                    <select id="sort-select">
+                        <option value="name">Nom</option>
+                        <option value="date" selected>Date</option>
+                    </select>
+                </div>
 
             <!-- Conteneur dynamique -->
             <div id="fileList" class="file-list grid-view"></div>
