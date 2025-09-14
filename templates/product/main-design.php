@@ -95,15 +95,15 @@
 
             <!-- Barres de contrôle : tri, recherche, vue -->
             <div class="file-controls">
-                <select id="sort-select">
-                    <option value="name">Nom (A‑Z)</option>
-                    <option value="date">Date (plus récentes)</option>
-                </select>
                 <input id="searchInput" type="text" placeholder="Rechercher…" />
                 <div id="view-toggle" class="view-toggle">
                     <button id="view-grid" class="active">Grille</button>
                     <button id="view-list">Liste</button>
                 </div>
+                <select id="sort-select">
+                    <option value="name">Nom (A‑Z)</option>
+                    <option value="date" selected>Date (plus récentes)</option>
+                </select>
             </div>
 
             <!-- Conteneur dynamique -->
