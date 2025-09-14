@@ -138,16 +138,64 @@
                 renderFileList();
             }
         });
-        $('#format-block .format-btn').on('click', function () {
-            currentFormatFilter = $(this).data('format');
+        // Filtre principal "Tous"
+        $('#filter-all').on('click', function () {
+            currentFormatFilter = 'all';
             currentProduct = null;
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
-            $('#format-block .format-btn').removeClass('active');
+            $('#mainFormatFilters .format-main').removeClass('active');
+            $(this).addClass('active');
+            $('#formatOptions').hide();
+            $('#formatOptions .format-btn').removeClass('active');
+            $('#product-block').hide();
+            sizeBlock.hide();
+            $('#productButtons button').removeClass('active');
+            $('#sizeButtons').empty();
+            currentPage = 1;
+            renderFileList();
+        });
+
+        // Ouverture du menu format
+        $('#open-format-menu').on('click', function () {
+            $('#formatOptions').toggle();
+        });
+
+        // Sélection d'un format standard
+        $('#formatOptions .format-btn').on('click', function () {
+            const fmt = $(this).data('format');
+            if (!fmt) return;
+            currentFormatFilter = fmt;
+            currentProduct = null;
+            currentSize = null;
+            productFormats = [];
+            sizeRatioMap = {};
+            $('#formatOptions .format-btn').removeClass('active');
             $('#productButtons button').removeClass('active');
             $('#sizeButtons').empty();
             $(this).addClass('active');
+            $('#mainFormatFilters .format-main').removeClass('active');
+            $('#open-format-menu').addClass('active');
+            $('#product-block').hide();
+            sizeBlock.hide();
+            currentPage = 1;
+            renderFileList();
+        });
+
+        // Accès aux produits
+        $('#format-product').on('click', function () {
+            $('#formatOptions').hide();
+            $('#formatOptions .format-btn').removeClass('active');
+            $(this).addClass('active');
+            $('#mainFormatFilters .format-main').removeClass('active');
+            $('#open-format-menu').addClass('active');
+            $('#product-block').show();
+            currentFormatFilter = 'all';
+            currentProduct = null;
+            currentSize = null;
+            productFormats = [];
+            sizeRatioMap = {};
             sizeBlock.hide();
             currentPage = 1;
             renderFileList();
