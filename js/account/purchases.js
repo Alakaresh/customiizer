@@ -109,13 +109,6 @@ function displayOrders(orders, maxNumPages) {
 
 		const trackingInfoCell = document.createElement('td');
 		trackingInfoCell.className = "tracking-cell";
-
-		console.log("🔍 Vérification tracking pour commande", order.number, {
-			tracking_number: order.tracking_number,
-			tracking_url: order.tracking_url,
-			orderObject: order
-		});
-
 		if (order.tracking_info) {
 			const trackingText = document.createElement('span');
 
@@ -260,11 +253,7 @@ function displayOrderDetails(orderId) {
 			// Corps de la section des détails des produits
 			const tbodyProducts = document.createElement('tbody');
 			orderDetails.items.forEach(item => {
-				const row = tbodyProducts.insertRow();
-				console.log(item)
-
-				const cellItem = row.insertCell();
-				const image = document.createElement('img');
+				const row = tbodyProducts.insertRow();				const image = document.createElement('img');
 				image.src = item.image_url; // URL de l'image du produit
 				image.alt = item.name; // Nom du produit
 				image.className = 'product-image'; // Classe pour le style de l'image

@@ -29,9 +29,7 @@ jQuery(document).ready(function ($) {
                 formData.append('top', 0);
                 const requestStart = Date.now();
                 if (window.mockupTimes.pending) {
-                        const delay = ((requestStart - window.mockupTimes.pending) / 1000).toFixed(1);
-                        console.log(`⌛ Request sent after ${delay}s`);
-                }
+                        const delay = ((requestStart - window.mockupTimes.pending) / 1000).toFixed(1);                }
                 window.mockupTimes.requestSent = requestStart;
 
                 // Mise en cache locale de la personnalisation pour réouverture future
@@ -68,9 +66,7 @@ jQuery(document).ready(function ($) {
                 fetch(ajaxurl, { method: 'POST', body: formData })
                         .then(res => res.json())
                         .then(data => {
-                                if (data.data?.timings) {
-                                        console.log('⏱ Render timings', data.data.timings);
-                                }
+                                if (data.data?.timings) {                                }
 
                                 if (data.success && Array.isArray(data.data?.files)) {
                                         window.mockupTimes.pending = null;

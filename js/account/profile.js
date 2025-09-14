@@ -6,14 +6,10 @@ function initProfileForm() {
 		return;
 	}
 
-	if (form.dataset.initialized === "true") {
-		console.log("🔁 Formulaire déjà initialisé.");
-		return;
+	if (form.dataset.initialized === "true") {		return;
 	}
 
 	form.dataset.initialized = "true";
-	console.log("🟢 Submit form initialisé.");
-
 	form.addEventListener('submit', function (e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -34,9 +30,7 @@ function initProfileForm() {
 			body: formData
 		})
 			.then(res => res.json())
-			.then(data => {
-			console.log("🧾 Réponse serveur :", data);
-                        if (data.success) {
+			.then(data => {                        if (data.success) {
                                 showToast("toast-notification", "✅ Profil mis à jour avec succès.");
                                 const nicknameSpan = document.getElementById('nickname');
                                 if (nicknameSpan) {

@@ -46,8 +46,7 @@ jQuery(document).ready(function($) {
     url: ajaxurl,
     type: 'POST',
     data: { action: 'get_all_generated_images' },
-    success: function(response) {
-        console.log("Réponse AJAX reçue:", response); // Ajoutez ceci pour inspecter la réponse
+    success: function(response) { // Ajoutez ceci pour inspecter la réponse
         try {
             // Assurez-vous que la réponse n'est pas déjà un objet JavaScript
             var filteredImages = response.filter(function(image) {

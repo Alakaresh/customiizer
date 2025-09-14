@@ -169,9 +169,6 @@ function renderCurrentGroup() {
 async function generateMockup(mockupData) {
         // Stocke les données pour la création du produit
         productData = buildProductData(mockupData);
-
-        console.log('📤 Preparing mockup request', mockupData);
-
         if (Date.now() < mockupCooldownUntil) {
                 const remain = Math.ceil((mockupCooldownUntil - Date.now()) / 1000);
                 showRateLimitMessage(remain);
@@ -189,9 +186,7 @@ async function generateMockup(mockupData) {
         // Mesure du temps écoulé depuis le clic
         const requestStart = Date.now();
         if (mockupTimes.pending) {
-                const delay = ((requestStart - mockupTimes.pending) / 1000).toFixed(1);
-                console.log(`⌛ Request sent after ${delay}s`);
-        }
+                const delay = ((requestStart - mockupTimes.pending) / 1000).toFixed(1);        }
         mockupTimes.requestSent = requestStart;
 
         document.querySelectorAll('.thumbnail').forEach(el => el.classList.add("processing"));
@@ -246,11 +241,7 @@ async function generateMockup(mockupData) {
 
         fetch("/wp-admin/admin-ajax.php", { method: "POST", body: form })
                 .then(res => res.json())
-                .then(data => {
-                        console.log('📥 Mockup response', data);
-                        if (data.data?.timings) {
-                                console.log('⏱ Render timings', data.data.timings);
-                        }
+                .then(data => {                        if (data.data?.timings) {                        }
 
                         if (data.success && Array.isArray(data.data?.files)) {
                                 mockupTimes.pending = null;
@@ -372,14 +363,9 @@ function showRateLimitMessage(seconds) {
 
 
 function updateMockupThumbnail(viewName, mockupUrl) {
-
-        console.log('🆕 Updating mockup thumbnail', { viewName, mockupUrl });
-
         // 🕒 Log du temps entre l'envoi de la requête et l'affichage de l'image
         if (mockupTimes.requestSent) {
-                const elapsed = ((Date.now() - mockupTimes.requestSent) / 1000).toFixed(1);
-                console.log(`⏱️ Mockup displayed after ${elapsed}s`);
-                mockupTimes.requestSent = null;
+                const elapsed = ((Date.now() - mockupTimes.requestSent) / 1000).toFixed(1);                mockupTimes.requestSent = null;
         }
 
         const thumbnailsContainer = document.querySelector(".image-thumbnails");
