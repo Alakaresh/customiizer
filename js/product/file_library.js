@@ -142,7 +142,8 @@
 
         const prev = $('<button class="page-prev">Précédent</button>');
         const next = $('<button class="page-next">Suivant</button>');
-        const info = $(`<span class="page-info">${currentPage} / ${totalPages}</span>`);
+        const input = $(`<input type="number" class="page-input" min="1" max="${totalPages}" value="${currentPage}">`);
+        const total = $(`<span class="page-total">/ ${totalPages}</span>`);
 
         prev.prop('disabled', currentPage === 1);
         next.prop('disabled', currentPage === totalPages);
@@ -161,7 +162,19 @@
             }
         });
 
-        controls.append(prev, info, next);
+        input.on('change keydown', function (e) {
+            if (e.type === 'change' || e.key === 'Enter') {
+                let page = parseInt($(this).val(), 10);
+                if (isNaN(page)) return;
+                page = Math.max(1, Math.min(totalPages, page));
+                if (page !== currentPage) {
+                    currentPage = page;
+                    renderFileList();
+                }
+            }
+        });
+
+        controls.append(prev, input, total, next);
     }
 
     /**
