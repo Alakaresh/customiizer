@@ -176,7 +176,7 @@
 /* Style d’un élément de fichier */
 .file-item {
     position: relative;
-    cursor: pointer;
+    cursor: default;
 }
 .file-item img {
     width: 100%;
@@ -187,6 +187,24 @@
 }
 .file-item .file-name {
     display: none;
+}
+
+.file-item .apply-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    background: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.file-item:hover .apply-button {
+    display: block;
 }
 
 /* Grille : miniatures affichées dans un carré */
