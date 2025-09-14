@@ -7,9 +7,7 @@ jQuery(document).ready(function() {
 	fetch('/wp-json/api/v1/images/load')
 		.then(response => response.json())
 		.then(data => {
-		if (data.success && Array.isArray(data.images)) {
-			console.log("✅ Images reçues depuis REST API :", data.images);
-			prepareImagesByFormat(data.images);
+		if (data.success && Array.isArray(data.images)) {			prepareImagesByFormat(data.images);
 			afficherImage(0);
 			demarrerDefilementAuto();
 		} else {
@@ -62,10 +60,8 @@ function prepareImagesByFormat(images) {
 		groupedImages.push(...formatGroups[i]);
 	}
 
-	imagesByFormat = groupedImages; // Stocker les groupes d'images mélangées
-	console.log("Images triées par format :", imagesByFormat);
+        imagesByFormat = groupedImages; // Stocker les groupes d'images mélangées
 }
-
 
 function afficherImage(indexGroup) {
 	var currentGroup = imagesByFormat.slice(indexGroup * imagesPerGroup, (indexGroup + 1) * imagesPerGroup);

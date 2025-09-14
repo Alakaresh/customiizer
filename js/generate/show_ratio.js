@@ -5,9 +5,7 @@ let selectedProduct = '';
 
 let globalProducts = [];
 
-document.addEventListener('DOMContentLoaded', function () {
-	console.log('[Init] DOM entièrement chargé');
-	loadProductData();
+document.addEventListener('DOMContentLoaded', function () {	loadProductData();
 	addRatioButtonsEventListeners();
 });
 
@@ -17,9 +15,7 @@ function toggleRatioMenu() {
 
 	const isMenuOpen = ratioMenu && ratioMenu.style.display === 'block';
 	if (ratioMenu) {
-		ratioMenu.style.display = isMenuOpen ? 'none' : 'block';
-		console.log(`[Menu] Ratio menu ${isMenuOpen ? 'fermé' : 'ouvert'}`);
-	}
+		ratioMenu.style.display = isMenuOpen ? 'none' : 'block';	}
 	if (arrowIcon) {
 		arrowIcon.classList.toggle('open', !isMenuOpen);
 	}
@@ -30,11 +26,7 @@ function addRatioButtonsEventListeners() {
 		button.addEventListener('click', function () {
 			clearAllSelections();
 			selectedRatio = this.getAttribute('data-ratio');
-			selectedProduct = '';
-			console.log(`[Ratio] Bouton sélectionné : ${selectedRatio}`);
-			if (typeof loadImages === 'function') {
-				console.log('[loadImages] Appelé après sélection ratio');
-				loadImages();
+			selectedProduct = '';			if (typeof loadImages === 'function') {				loadImages();
 			}
 			document.getElementById('selected-info').textContent = selectedRatio;
 		});
@@ -59,9 +51,7 @@ function addProductButtons(products) {
 			btn.addEventListener('click', () => {
 				clearAllSelections();
 				selectedProduct = product.product_id;
-				selectedRatio = '';
-				console.log(`[Produit] Bouton cliqué pour : ${key}`);
-				displayVariantsForProduct(key);
+				selectedRatio = '';				displayVariantsForProduct(key);
 				document.getElementById('selected-info').textContent = product.product_name;
 			});
 			container.appendChild(btn);
@@ -69,18 +59,13 @@ function addProductButtons(products) {
 	});
 }
 
-function loadProductData() {
-	console.log('[Data] Chargement des produits...');
-	jQuery.ajax({
+function loadProductData() {	jQuery.ajax({
 		url: ajaxurl,
 		method: 'POST',
 		data: { action: 'get_product_ratios' },
 		success: function (products) {
 			if (Array.isArray(products)) {
-				globalProducts = products;
-				console.log(`[Data] ${products.length} produits reçus`);
-				console.log(`products`,products);
-				addProductButtons(products);
+				globalProducts = products;				addProductButtons(products);
 			} else {
 				console.error('[Erreur] Réponse invalide :', products);
 			}
@@ -101,8 +86,6 @@ function displayVariantsForProduct(normalizedName) {
 	container.innerHTML = '';
 
 	const filtered = globalProducts.filter(v => (v.product_name.includes("Clear Case") ? "Clear Case" : v.product_name) === normalizedName && isValidMockupImage(v.image));
-	console.log(`[Filtrage] ${filtered.length} variantes trouvées pour ${normalizedName}`);
-
 	filtered.forEach(variant => {
 		const item = document.createElement('div');
 		item.className = 'product-item';
@@ -120,14 +103,8 @@ function displayVariantsForProduct(normalizedName) {
 
 		item.addEventListener('click', () => {
 			highlightSelection(item);
-			selectedVariant = variant.variant_id;
-			console.log(`[Sélection] Variante sélectionnée : ${variant.size}`);
-			selectedRatio = variant.ratio_image ? variant.ratio_image : '';
-			console.log(`[Update] selectedRatio mis à jour avec : ${selectedRatio}`);
-
-			if (typeof loadImages === 'function') {
-				console.log('[loadImages] Appelé après sélection variant');
-				loadImages();
+			selectedVariant = variant.variant_id;			selectedRatio = variant.ratio_image ? variant.ratio_image : '';
+			if (typeof loadImages === 'function') {				loadImages();
 			}
 		});
 
@@ -135,9 +112,7 @@ function displayVariantsForProduct(normalizedName) {
 	});
 	// ✅ Sélection automatique de la première variante si elle existe
 	const firstItem = container.querySelector('.product-item');
-	if (firstItem) {
-		console.log('[AutoSélection] Première variante sélectionnée automatiquement');
-		firstItem.click();
+	if (firstItem) {		firstItem.click();
 	}
 
 }
@@ -146,13 +121,9 @@ function highlightSelection(selectedElement) {
 	document.querySelectorAll('.product-item').forEach(el => {
 		el.classList.remove('selected');
 	});
-	selectedElement.classList.add('selected');
-	console.log('[UI] Mise en surbrillance de la sélection');
-}
+	selectedElement.classList.add('selected');}
 
 function clearAllSelections() {
 	document.querySelectorAll('.product-item.selected').forEach(el => {
 		el.classList.remove('selected');
-	});
-	console.log('[UI] Sélections précédentes effacées');
-}
+	});}

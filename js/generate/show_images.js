@@ -9,8 +9,7 @@ function loadImages() {
 	if (allImages.length === 0) {
 		fetch('/wp-json/api/v1/images/load')
 			.then(response => response.json())
-			.then(data => {
-			console.log("[API] 🔄 Données reçues depuis l'API REST :", data); // ← ICI
+			.then(data => { // ← ICI
 
 			if (data.success && data.images) {
 				allImages = data.images;
@@ -38,12 +37,7 @@ function displayImages() {
 	var filteredImages = allImages.filter(function(image) {
 		return image.format === selectedRatio; // Filtrer les images selon le ratio global
 	});
-
-	console.log(`[displayImages] ${filteredImages.length} images trouvées pour le ratio : ${selectedRatio}`);
-
-	if (filteredImages.length === 0) {
-		console.log('[displayImages] Aucune image trouvée, affichage des images d\'attente.');
-		for (var i = 0; i < 4; i++) {
+	if (filteredImages.length === 0) {		for (var i = 0; i < 4; i++) {
 			var imgElement = jQuery('<img>')
 			.attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
 			.attr('alt', 'Image d\'attente ' + i)
@@ -52,13 +46,9 @@ function displayImages() {
 			.append(imgElement);
 			container.append(imgContainer);
 		}
-	} else {
-		console.log('[displayImages] Affichage des vraies images générées.');
-		shuffleArray(filteredImages);
+	} else {		shuffleArray(filteredImages);
 
-		filteredImages.slice(0, 4).forEach(function(image, index) {
-			console.log("[displayImages] image :", image);
-                        const promptText = typeof image.prompt === 'object'
+		filteredImages.slice(0, 4).forEach(function(image, index) {                        const promptText = typeof image.prompt === 'object'
                             ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
                             : (image.prompt || '');
 
@@ -91,9 +81,6 @@ function shuffleArray(array) {
 function displayImagesForCurrentUser() {
 	var mainContent = jQuery('#user_images');
 	mainContent.empty(); // Nettoyer le contenu précédent
-	console.log("[CurrentUser] userId attendu :", currentUser.ID);
-	console.log("[CurrentUser] Exemple d'image :", allImages.slice(0, 5));
-
 	var currentUserImages = allImages.filter(function(image) {
 		return image.user_id == currentUser.ID; // ✅ correction ici
 	});

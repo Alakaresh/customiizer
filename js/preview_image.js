@@ -47,8 +47,6 @@ function handleImageClick(event) {
 
 	// Sélection active ➔ charger dans le cropper
 	if (typeof isSelectingImage !== 'undefined' && isSelectingImage) {
-		console.log("✅ Mode sélection actif ➔ Insert dans cropper");
-
 		const src = image.getAttribute('src');
 
 		showElement('modalChoixImage'); // Ouvrir crop modal
@@ -296,9 +294,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 }
                 fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
                         .then(res => res.json())
-                        .then(data => {
-                                console.log("📦 API produits/format :", data);
-                                window.previewFormatCache[formatImage] = data;
+                        .then(data => {                                window.previewFormatCache[formatImage] = data;
                                 persistPreviewCache();
 
                                 processData(data);
@@ -336,10 +332,7 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
 	const colorTranslations = {
 		black: "Noir",
 		white: "Blanc",
-	};
-
-	console.log("🧩 [Overlay] Affichage des variantes compatibles :");
-	console.table(choices.map(choice => ({
+	};	console.table(choices.map(choice => ({
 		variant_id: choice.variant_id,
 		product_id: choice.product_id,
 		name: choice.product_name,

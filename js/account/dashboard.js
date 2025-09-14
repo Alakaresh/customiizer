@@ -10,8 +10,6 @@ function updateProgress(increment) {
 	currentPercentage = Math.min(Math.round(currentPercentage), 100); // Toujours arrondi et limité à 100
 
 	// 🧠 Le calcul logique est fait quoi qu'il arrive
-	console.log(`🔄 Pourcentage logique actuel : ${currentPercentage}%`);
-
 	// 🖼️ Puis on essaie d'afficher visuellement SI les éléments existent
 	let progressRing = document.getElementById('progressRing');
 	let percentageElement = document.getElementById('percentage');

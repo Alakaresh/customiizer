@@ -90,8 +90,6 @@ function loadContent(targetFile) {
         }
 
         var loadUrl = baseTemplateUrl + targetFile + ".php";
-        console.log("🔄 Chargement du contenu depuis :", loadUrl);
-
         $('#main-container').load(loadUrl, function(response, status, xhr) {
                 if (status === "error") {
                         console.error("❌ Erreur lors du chargement du contenu :", xhr.status, xhr.statusText);
@@ -106,9 +104,7 @@ function loadContent(targetFile) {
 function runAfterLoad(targetFile) {
         verifyAndReloadProfileImage();
 
-        if (targetFile === 'dashboard') {
-                console.log("📦 Déclenchement du chargement des infos utilisateur...");
-                if (!userIsLoggedIn || !currentUser || currentUser.ID <= 0) {
+        if (targetFile === 'dashboard') {                if (!userIsLoggedIn || !currentUser || currentUser.ID <= 0) {
                         console.warn("⚠️ Aucun utilisateur connecté ou ID invalide.");
                         return;
                 }
@@ -118,28 +114,20 @@ function runAfterLoad(targetFile) {
                 }
         }
 
-       if (targetFile === 'purchases') {
-               console.log("📦 Chargement des commandes utilisateur...");
-               fetchUserOrders();
+       if (targetFile === 'purchases') {               fetchUserOrders();
        }
 
-       if (targetFile === 'pictures') {
-               console.log("📦 Chargement de la galerie d'images...");
-               if (typeof ImageLoader !== 'undefined' && ImageLoader.loadUserGeneratedImages) {
+       if (targetFile === 'pictures') {               if (typeof ImageLoader !== 'undefined' && ImageLoader.loadUserGeneratedImages) {
                        ImageLoader.loadUserGeneratedImages();
                }
        }
 
-       if (targetFile === 'profile') {
-               console.log("📦 Chargement des infos profil...");
-               loadUserDetails();
+       if (targetFile === 'profile') {               loadUserDetails();
                initProfileForm();
                initPasswordForm();
        }
 
-       if (targetFile === 'missions') {
-               console.log("📦 Chargement des missions...");
-               if (typeof fetchMissions === 'function') {
+       if (targetFile === 'missions') {               if (typeof fetchMissions === 'function') {
                        fetchMissions();
                } else {
                        console.warn("⚠️ fetchMissions n'est pas défini");
@@ -189,9 +177,6 @@ function verifyAndReloadProfileImage() {
                 let finalImageUrl = customImageUrl
                 ? customImageUrl
                 : baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png';
-
-                console.log("🔄 Chargement de l'image de profil :", finalImageUrl);
-
                 const testImg = new Image();
                 testImg.onload = function () {
                         profileImage.src = finalImageUrl + '?t=' + new Date().getTime();
@@ -226,9 +211,6 @@ function showElement(elementId) {
 		let imageUrlToLoad = customImageUrl
 		? customImageUrl
 		: baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png?t=' + new Date().getTime();
-
-		console.log("🔍 Image chargée dans cropper :", imageUrlToLoad);
-
 		setImagePreview(imageUrlToLoad, function() {
 			initializeCropper();
 		});
@@ -262,8 +244,6 @@ function handleImageUpload(event) {
 
 
 function setImagePreview(imageSrc, onImageReady = null) {
-	console.log("🎯 setImagePreview appelé avec :", imageSrc);
-
 	const imagePreview = document.getElementById('imagePreview');
 	imagePreview.innerHTML = ''; // Vide avant d'ajouter
 
@@ -273,9 +253,7 @@ function setImagePreview(imageSrc, onImageReady = null) {
 	imgElement.alt = 'Image Preview';
 	imgElement.style.width = '100%';
 
-	imgElement.onload = () => {
-		console.log("✅ Image affichée dans #imagePreview :", imageSrc);
-		if (typeof onImageReady === 'function') {
+	imgElement.onload = () => {		if (typeof onImageReady === 'function') {
 			onImageReady(imgElement);
 		}
 	};
@@ -333,8 +311,6 @@ function startCropper(imageElement, onReadyCallback = null) {
 		cropBoxMovable: true,
 		cropBoxResizable: true,
 		ready() {
-			console.log("✅ Cropper prêt");
-
 			if (typeof onReadyCallback === 'function') {
 				onReadyCallback();
 			}
@@ -350,9 +326,7 @@ function applyCrop() {
 		}).toBlob(function(blob) {
 			uploadCroppedImage(blob); // ➔ Plus besoin de passer cropData
 		});
-	} else {
-		console.log("Cropper is not initialized");
-	}
+	} else {	}
 }
 
 function uploadCroppedImage(blob) {
@@ -440,16 +414,11 @@ function handleGallerySelection(event) {
 	if (!image) return;
 
 	const src = image.getAttribute('src');
-
-	console.log("🖼️ Image sélectionnée dans galerie :", src);
-
 	customImageUrl = src;
 
 	isSelectingImage = false;
 
-	setTimeout(() => {
-		console.log("🕒 Réinitialisation de cropper après sélection d'image...");
-		resetCropper();
+	setTimeout(() => {		resetCropper();
 
 		setImagePreview(customImageUrl, function() {
 			initializeCropper();

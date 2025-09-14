@@ -43,9 +43,7 @@ function startProductTour() {
 	// Tu peux ajouter d'autres instructions ici si nécessaire
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-	console.log("test" + userLevel);
-	// Récupération des éléments du DOM
+document.addEventListener("DOMContentLoaded", function() {	// Récupération des éléments du DOM
 	var introScreen = document.getElementById("introScreen");
 	var startTutorialBtn = document.getElementById("startTutorial");
 	var closeIntroBtn = document.getElementById("closeIntro");
@@ -74,10 +72,6 @@ function hideIntroScreen() {
 	introScreen.style.display = "none";
 }
 
-$(document).on('userDetailsLoaded', function() {
-	console.log("test235")
-    if (userLevel == 0) {
-        showIntroScreen();
-    }
+$(document).on('userDetailsLoaded', function() {    }
 });
 */

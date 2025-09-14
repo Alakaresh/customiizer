@@ -198,10 +198,7 @@ function loadModel(modelUrl){
       const s = getScaleForProduct(modelUrl);
       modelRoot.scale.set(s[0], s[1], s[2]);
       scene.add(modelRoot);
-      fitCameraToObject(camera, modelRoot, controls, renderer);
-
-      console.log('[3D] ✅ Modèle chargé. Zones:', Object.keys(zones));
-    },
+      fitCameraToObject(camera, modelRoot, controls, renderer);    },
     undefined,
     (err)=>console.error('[3D] ❌ Erreur GLB:', err)
   );
@@ -234,10 +231,7 @@ window.update3DTextureFromCanvas = async function(canvas, zoneName=null){
 
     zone.overlay.material = m;
     zone.overlay.visible = true;   // s’assure que l’overlay est actif
-    renderOnce();
-
-    console.log('🖼️ Image appliquée sur', Object.keys(zones).find(k=>zones[k]===zone));
-  } catch (e) {
+    renderOnce();  } catch (e) {
     console.error('[3D] ❌ Échec texture:', e);
   }
 };
@@ -255,9 +249,7 @@ window.clear3DTexture = function(zoneName=null){
   zone.overlay.material.alphaTest = 0.0;
   zone.overlay.material.needsUpdate = true;
 
-  renderOnce();
-  console.log('🧹 Image retirée sur', Object.keys(zones).find(k=>zones[k]===zone));
-};
+  renderOnce();};
 
 // —————————————— Debug ——————————————
 window.logZones = function(){

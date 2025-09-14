@@ -17,7 +17,7 @@ let maskReady = new Promise(r => (_maskReadyResolve = r));
 // ----- DEBUG LOGS -----
 let DEBUG = true; // passe à false en prod si besoin
 const CM = {
-  log: (...a)   => { if (DEBUG) console.log("[CanvasManager]", ...a); },
+  log: (...a)   => { if (DEBUG) { /* log désactivé */ } },
   warn: (...a)  => { if (DEBUG) console.warn("[CanvasManager]", ...a); },
   error: (...a) => console.error("[CanvasManager]", ...a),
 };

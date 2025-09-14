@@ -41,8 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			.then(response => response.json())
 			.then(data => {
 			if (data.success) {
-				console.log("[✅] Connexion réussie");
-
 				const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
 
 				if (redirectAfterLogin === 'myCreations') {

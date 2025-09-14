@@ -219,7 +219,6 @@ function customiizer_render_update_page() {
 	echo '    headers: { "Content-Type": "application/x-www-form-urlencoded" },';
 	echo '    body: params';
 	echo '  }).then(res => res.json()).then(data => {';
-	echo '    console.log("📝 Brouillon enregistré", data);';
 	echo '  });';
 	echo '}';
 	echo '  const draftNote = document.getElementById("release_note_compiled").value;';
@@ -344,7 +343,6 @@ function customiizer_render_update_page() {
         echo '      try {';
         echo '        const data = JSON.parse(text);';
         echo '        if (data.success) {';
-        echo '                  console.log(data);';
         echo '          outputBox.innerText += "\n✅ Mise à jour terminée :\n" + data.data.output.trim();';
         echo '          if (data.release) outputBox.innerText += "\n📝 Notes de version :\n" + data.data.release;';
         echo '        } else {';

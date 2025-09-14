@@ -43,7 +43,7 @@ rm -rf "$BUILD_DIR" "$OBF_DIR"
 mkdir -p "$BUILD_DIR"
 
 # Minification avec Terser
-echo -e "${CYAN}📦 Minification + suppression console.log...${RESET}"
+echo -e "${CYAN}📦 Minification + suppression des logs...${RESET}"
 find "$TARGET_DIR" \( -name "*.js" -o -name "*.mjs" \) \
      ! -path "*/node_modules/*" \
      ! -path "*/.git/*" \
