@@ -134,7 +134,6 @@
         // Sélection du jeu d'images
         const images = currentFolder === 'site' ? generatedImages : importedFiles;
         if (!Array.isArray(images)) return;
-        console.log('[FileLibrary] Rendering', images.length, 'images from', currentFolder);
 
         // Tri
         const sorted = images.slice().sort((a, b) => {
@@ -170,7 +169,6 @@
                     <span class="file-name">${name}</span>
                 </div>`
             );
-            console.log('[FileLibrary] Displaying image:', { name, url });
             item.on('click', function () {
                 // Ajoute l'image au canvas (fonction existante)
                 CanvasManager.addImage(url, function () {
@@ -178,7 +176,6 @@
                         updateAddImageButtonVisibility();
                     }
                 });
-                console.log('[FileLibrary] Image selected:', url);
                 $('#imageSourceModal').hide();
                 releaseFocus($('#imageSourceModal'));
             });
