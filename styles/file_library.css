@@ -10,7 +10,7 @@
 #imageSourceModal .modal-content {
     background: var(--bg-color);
     padding: 20px;
-    border-radius: 20px;
+    border-radius: 50px;
     position: absolute;
     top: 50%;
     left: 50%;
