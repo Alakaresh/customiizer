@@ -11,61 +11,12 @@
     let myImages = [];             // Images générées par l'utilisateur
     let communityImages = [];      // Images de la communauté
     let currentPage   = 1;         // Page courante
-    let currentFormatFilter = 'all'; // 'all' ou nom de format
+    let currentFormatFilter = 'all'; // 'all' ou ratio sélectionné
+    let currentProduct = null;       // ID du produit sélectionné
+    let currentSize = null;          // Taille sélectionnée
+    let productFormats = [];         // Ratios disponibles pour le produit
+    let sizeRatioMap = {};           // Association taille -> ratio
     const itemsPerPage = 40;       // Nombre d'images par page
-
-    // -------- Cache format -> produits --------
-    try {
-        const saved = sessionStorage.getItem('previewFormatCache');
-        window.previewFormatCache = {
-            ...(saved ? JSON.parse(saved) : {}),
-            ...(window.previewFormatCache || {})
-        };
-    } catch (e) {
-        window.previewFormatCache = window.previewFormatCache || {};
-    }
-
-    function persistPreviewCache() {
-        try {
-            sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
-        } catch (e) {}
-    }
-
-    async function getProductNameForFormat(fmt) {
-        const cached = window.previewFormatCache[fmt];
-        if (cached) {
-            return extractProductName(cached);
-        }
-        try {
-            const res = await fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`);
-            const data = await res.json();
-            window.previewFormatCache[fmt] = data;
-            persistPreviewCache();
-            return extractProductName(data);
-        } catch (err) {
-            console.error('❌ format fetch', fmt, err);
-            return null;
-        }
-    }
-
-    function extractProductName(data) {
-        if (data && data.success && Array.isArray(data.choices)) {
-            const ids = Array.from(new Set(data.choices.map(c => c.product_id)));
-            if (ids.length === 1 && data.choices[0]) {
-                return data.choices[0].product_name;
-            }
-        }
-        return null;
-    }
-
-    function updateFormatLabel(fmt) {
-        $('#filter-format').addClass('active').text(`Format: ${fmt}`);
-        getProductNameForFormat(fmt).then(name => {
-            if (name) {
-                $('#filter-format').addClass('active').text(`Format: ${name}`);
-            }
-        });
-    }
 
     /**
      * Initialise la bibliothèque avec les images existantes.
@@ -78,7 +29,7 @@
         myImages        = options?.my || [];
         communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
-        const formatDropdown = $('#formatDropdown');
+        const sizeBlock = $('#size-block');
         // Écouteurs d'événements
         $('#folder-my').on('click', function () {
             currentFolder = 'my';
@@ -110,29 +61,75 @@
             currentPage = 1;
             renderFileList();
         });
-        $('#filter-all').on('click', function () {
-            currentFormatFilter = 'all';
-            currentPage = 1;
-            $('.filter-buttons button').removeClass('active');
+        $('#format-block .format-btn').on('click', function () {
+            currentFormatFilter = $(this).data('format');
+            currentProduct = null;
+            currentSize = null;
+            productFormats = [];
+            sizeRatioMap = {};
+            $('#format-block .format-btn').removeClass('active');
+            $('#productButtons button').removeClass('active');
+            $('#sizeButtons').empty();
             $(this).addClass('active');
-            $('#filter-format').text('Format');
-            formatDropdown.hide();
+            sizeBlock.hide();
+            currentPage = 1;
             renderFileList();
         });
-        $('#filter-format').on('click', function (e) {
-            e.stopPropagation();
-            if (formatDropdown.is(':visible')) {
-                formatDropdown.hide();
-            } else {
-                buildFormatDropdown(formatDropdown);
-                formatDropdown.show();
-            }
-        });
-        $(document).on('click', function (e) {
-            if (!$(e.target).closest('.format-filter').length) {
-                formatDropdown.hide();
-            }
-        });
+
+        // Chargement des produits
+        fetch('/wp-json/api/v1/products/list')
+            .then(res => res.json())
+            .then(products => {
+                const container = $('#productButtons');
+                container.empty();
+                (products || []).forEach(p => {
+                    const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
+                    btn.on('click', function () {
+                        currentProduct = p.product_id;
+                        currentSize = null;
+                        currentFormatFilter = 'all';
+                        $('.product-btn').removeClass('active');
+                        $('#format-block .format-btn').removeClass('active');
+                        $(this).addClass('active');
+                        fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
+                            .then(r => r.json())
+                            .then(variants => {
+                                productFormats = [];
+                                sizeRatioMap = {};
+                                const sizes = [];
+                                (variants || []).forEach(v => {
+                                    if (!sizes.includes(v.size)) sizes.push(v.size);
+                                    sizeRatioMap[v.size] = v.ratio_image;
+                                    if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
+                                });
+                                const sizeContainer = $('#sizeButtons');
+                                sizeContainer.empty();
+                                sizes.forEach(sz => {
+                                    const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+                                    sbtn.on('click', function () {
+                                        currentSize = sz;
+                                        currentFormatFilter = sizeRatioMap[sz] || 'all';
+                                        $('.size-btn').removeClass('active');
+                                        $(this).addClass('active');
+                                        currentPage = 1;
+                                        renderFileList();
+                                    });
+                                    sizeContainer.append(sbtn);
+                                });
+                                sizeBlock.show();
+                                $('#sizeButtons button').removeClass('active');
+                                currentPage = 1;
+                                renderFileList();
+                            })
+                            .catch(err => {
+                                console.error('❌ load sizes', err);
+                                sizeBlock.hide();
+                            });
+                    });
+                    container.append(btn);
+                });
+            })
+            .catch(err => console.error('❌ load products', err));
 
         // Zone de dépôt et chargement de fichiers
         const dropZone = $('#fileDropZone');
@@ -251,32 +248,6 @@
         }
     }
 
-    function buildFormatDropdown(dropdown) {
-        const formats = new Set();
-        [myImages, communityImages, importedFiles].forEach(arr => {
-            (arr || []).forEach(img => {
-                if (img.format) formats.add(img.format);
-            });
-        });
-        dropdown.empty();
-        Array.from(formats).sort().forEach(fmt => {
-            const btn = $('<button type="button" class="format-option"></button>').text(fmt);
-            getProductNameForFormat(fmt).then(name => {
-                if (name) btn.text(name);
-            });
-            btn.on('click', function (e) {
-                e.stopPropagation();
-                currentFormatFilter = fmt;
-                currentPage = 1;
-                $('.filter-buttons button').removeClass('active');
-                updateFormatLabel(fmt);
-                dropdown.hide();
-                renderFileList();
-            });
-            dropdown.append(btn);
-        });
-    }
-
     /**
      * Affiche les contrôles de pagination.
      * @param {number} totalPages
@@ -349,13 +320,18 @@
 
         const searchValue = $('#searchInput').val().toLowerCase();
 
-        const formatFilter = currentFormatFilter !== 'all'
-            ? currentFormatFilter
-            : null;
+        let selectedFormat = null;
+        if (currentSize && sizeRatioMap[currentSize]) {
+            selectedFormat = sizeRatioMap[currentSize];
+        } else if (currentFormatFilter !== 'all') {
+            selectedFormat = currentFormatFilter;
+        }
+        const allowedFormats = currentProduct ? productFormats : null;
 
-        // Filtrage par recherche et format
+        // Filtrage par recherche/format/produit/taille
         const filtered = images.filter(img => {
-            if (formatFilter && img.format !== formatFilter) return false;
+            if (selectedFormat && img.format !== selectedFormat) return false;
+            if (!selectedFormat && allowedFormats && !allowedFormats.includes(img.format)) return false;
             const rawUrl = img.url || img.image_url || '';
             const name = img.name || img.image_prefix || rawUrl.split('/').pop();
             return name.toLowerCase().includes(searchValue);
