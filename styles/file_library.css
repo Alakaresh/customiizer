@@ -226,12 +226,21 @@
     cursor: default;
 }
 .pagination-controls .page-input {
-    width: 50px;
-    padding: 6px;
+    width: 40px;
+    height: 32px;
+    padding: 0 6px;
     border: 1px solid var(--border-color);
     background: var(--bg-color);
     color: var(--text-color);
     text-align: center;
+    border-radius: 4px;
+    appearance: textfield;
+}
+
+.pagination-controls .page-input::-webkit-outer-spin-button,
+.pagination-controls .page-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 .pagination-controls .page-total {
     color: var(--text-color);
