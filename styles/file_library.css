@@ -10,15 +10,15 @@
 #imageSourceModal .modal-content {
     background: var(--bg-color);
     padding: 20px;
-    border-radius: 4px;
+    border-radius: 10px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80vw;
-    max-width: 90vw;
-    height: 80vh;
-    max-height: 90vh;
+    width: 70vw;
+    max-width: 80vw;
+    height: 70vh;
+    max-height: 80vh;
 }
 
 /* Mise en page générale */
@@ -38,6 +38,14 @@
     padding-right: 10px;
     margin-right: 20px;
     height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.file-library-sidebar h3 {
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 .file-library-sidebar button {
     background: var(--bg-color);
@@ -86,12 +94,16 @@
     }
     .file-library-sidebar {
         flex-direction: row;
+        flex-wrap: wrap;
         width: 100%;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         padding-right: 0;
         margin-right: 0;
         margin-bottom: 10px;
+    }
+    .file-library-sidebar h3 {
+        flex-basis: 100%;
     }
     .file-library-sidebar button {
         flex: 1;
