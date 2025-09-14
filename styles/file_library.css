@@ -181,7 +181,6 @@
 }
 /* Conteneur des fichiers */
 .file-list {
-    flex: 1;
     overflow-y: auto;
     display: grid;
     gap: 10px;
