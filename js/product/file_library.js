@@ -4,6 +4,9 @@
  * Ce script dépend de jQuery et de CanvasManager (pour l'ajout d'image).
  */
 (function ($) {
+    if (typeof baseUrl === 'undefined') {
+        var baseUrl = window.location.origin;
+    }
     // État interne
     let currentFolder = 'my';      // 'my' (mes images), 'community' ou 'imported'
     let currentSort   = 'date';    // 'name' ou 'date'
@@ -13,6 +16,7 @@
     let currentPage   = 1;         // Page courante
     let currentFormatFilter = 'all'; // 'all' ou nom de format
     const itemsPerPage = 40;       // Nombre d'images par page
+    let searchTimeout;             // Délai pour la recherche distante
 
     // -------- Cache format -> produits --------
     try {
@@ -67,6 +71,21 @@
         });
     }
 
+    async function fetchCommunityImages(searchValue) {
+        const params = new URLSearchParams({ limit: 200, offset: 0 });
+        if (searchValue) {
+            params.append('search', searchValue);
+        }
+        try {
+            const res = await fetch(`${baseUrl}/wp-json/api/v1/images/load?${params.toString()}`);
+            const data = await res.json();
+            communityImages = (data && data.success && Array.isArray(data.images)) ? data.images : [];
+            renderFileList(true);
+        } catch (err) {
+            console.error('❌ community search', err);
+        }
+    }
+
     /**
      * Initialise la bibliothèque avec les images existantes.
      * @param {Object} options 
@@ -108,7 +127,13 @@
         });
         $('#searchInput').on('input', function () {
             currentPage = 1;
-            renderFileList();
+            const val = $(this).val();
+            clearTimeout(searchTimeout);
+            if (currentFolder === 'community') {
+                searchTimeout = setTimeout(() => fetchCommunityImages(val), 300);
+            } else {
+                renderFileList();
+            }
         });
         $('#filter-all').on('click', function () {
             currentFormatFilter = 'all';
@@ -330,7 +355,7 @@
     /**
      * Affiche la liste en fonction du dossier actif, du tri et du type de vue.
      */
-    function renderFileList() {
+    function renderFileList(skipSearch = false) {
         const container = $('#fileList');
         container.empty();
         // Sélection du jeu d'images
@@ -347,7 +372,7 @@
         }
         if (!Array.isArray(images)) return;
 
-        const searchValue = $('#searchInput').val().toLowerCase();
+        const searchValue = skipSearch ? '' : $('#searchInput').val().toLowerCase();
 
         const formatFilter = currentFormatFilter !== 'all'
             ? currentFormatFilter
@@ -356,9 +381,14 @@
         // Filtrage par recherche et format
         const filtered = images.filter(img => {
             if (formatFilter && img.format !== formatFilter) return false;
+            if (skipSearch) return true;
             const rawUrl = img.url || img.image_url || '';
             const name = img.name || img.image_prefix || rawUrl.split('/').pop();
-            return name.toLowerCase().includes(searchValue);
+            const prompt = typeof img.prompt === 'object'
+                ? (img.prompt.text || img.prompt.prompt || JSON.stringify(img.prompt))
+                : (img.prompt || '');
+            const haystack = `${name} ${prompt}`.toLowerCase();
+            return haystack.includes(searchValue);
         });
 
         // Tri des résultats filtrés
