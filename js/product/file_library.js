@@ -1,6 +1,6 @@
 /**
  * Bibliothèque de fichiers pour Customiizer
- * Gère trois dossiers ("my", "community" et "imported"), le tri, la recherche et le mode d'affichage.
+ * Gère trois dossiers ("my", "community" et "imported"), le tri et la recherche.
  * Ce script dépend de jQuery et de CanvasManager (pour l'ajout d'image).
  */
 (function ($) {
@@ -50,16 +50,6 @@
             currentSort = $(this).val();
             currentPage = 1;
             renderFileList();
-        });
-        $('#view-grid').on('click', function () {
-            $('#fileList').removeClass('list-view').addClass('grid-view');
-            $('#view-toggle button').removeClass('active');
-            $(this).addClass('active');
-        });
-        $('#view-list').on('click', function () {
-            $('#fileList').removeClass('grid-view').addClass('list-view');
-            $('#view-toggle button').removeClass('active');
-            $(this).addClass('active');
         });
         $('#searchInput').on('input', function () {
             currentPage = 1;
