@@ -101,12 +101,11 @@
             <div class="filter-sort">
                 <div class="filters">
                     <div class="filter-group" id="format-block">
-                        <h4>Filtres</h4>
                         <div class="filter-buttons" id="mainFormatFilters">
                             <button id="filter-all" class="format-main active" data-format="all">Tous</button>
                             <button id="open-format-menu" class="format-main">Format</button>
                         </div>
-                        <div class="filter-buttons" id="formatOptions" style="display:none">
+                        <div id="formatOptions" class="filter-buttons format-dropdown">
                             <button class="format-btn" data-format="1:1">1:1</button>
                             <button class="format-btn" data-format="3:4">3:4</button>
                             <button class="format-btn" data-format="4:3">4:3</button>

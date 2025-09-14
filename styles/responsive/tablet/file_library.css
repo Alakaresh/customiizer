@@ -62,4 +62,8 @@
     .filter-buttons button {
         flex: 1;
     }
+
+    .format-dropdown button {
+        flex: none;
+    }
 }
