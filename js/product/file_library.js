@@ -335,6 +335,11 @@
         });
 
         renderPagination(totalPages);
+
+        // Assure que le zoom via l'icône déclenche bien la prévisualisation agrandie
+        if (typeof enableImageEnlargement === 'function') {
+            enableImageEnlargement();
+        }
     }
 
     // Expose l’API de la bibliothèque au niveau global pour interaction avec d’autres scripts
