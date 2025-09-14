@@ -19,7 +19,9 @@
     .file-library-sidebar .sidebar-title {
         flex-basis: 100%;
         text-align: center;
-        margin-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+        margin-bottom: 15px;
     }
 
     /* Zone de dépôt dans la barre latérale */

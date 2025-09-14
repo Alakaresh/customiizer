@@ -40,7 +40,10 @@
 }
 .file-library-sidebar .sidebar-title {
     color: var(--text-color);
-    margin-bottom: 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
 }
 .file-library-sidebar button {
     background: var(--bg-color);
