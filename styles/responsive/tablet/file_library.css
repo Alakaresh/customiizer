@@ -43,4 +43,17 @@
     .file-drop-zone i {
         font-size: 24px;
     }
+
+    /* Grille : miniatures carrées avec image contenue */
+    .file-list.grid-view .file-item {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .file-list.grid-view .file-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
 }
