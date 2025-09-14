@@ -535,6 +535,12 @@
                 e.stopPropagation();
                 handleImageClick({ target: imgElement[0] });
             });
+            item.on('click', function (e) {
+                if ($(e.target).closest('.apply-button, .preview-icon, .file-menu-button, .file-menu-dropdown').length) {
+                    return;
+                }
+                handleImageClick({ target: imgElement[0] });
+            });
             item.find('.apply-button').on('click', function (e) {
                 e.stopPropagation();
                 // Ajoute l'image au canvas (fonction existante)
