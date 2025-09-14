@@ -155,8 +155,12 @@
 
         // Rendu
         sorted.forEach(img => {
-            const url = img.url || img.image_url;
-            if (!url) return; // Ignore entries without URL
+            const rawUrl = img.url || img.image_url;
+            let url = rawUrl;
+            if (rawUrl && typeof rawUrl === 'object') {
+                url = rawUrl.url || rawUrl.src || rawUrl.path || '';
+            }
+            if (!url || typeof url !== 'string') return; // Ignore entries without valid URL
             const name = img.name || img.image_prefix || url.split('/').pop();
 
             const item = $(
