@@ -81,6 +81,7 @@
 <div id="imageSourceModal" class="modal">
     <div class="modal-content file-library-modal">
         <div id="folder-selector" class="file-library-sidebar">
+            <h3>Sources</h3>
             <button id="folder-site" class="active">Images du site</button>
             <button id="folder-user">Images importées</button>
             <div id="fileDropZone" class="file-drop-zone">
