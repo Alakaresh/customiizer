@@ -139,6 +139,26 @@
     </div>
 </div>
 
+<!-- Modal de sélection de format -->
+<div id="formatModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3>Formats</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="formatOptions" class="filter-buttons">
+                <button class="format-btn" data-format="1:1">1:1</button>
+                <button class="format-btn" data-format="3:4">3:4</button>
+                <button class="format-btn" data-format="4:3">4:3</button>
+                <button class="format-btn" data-format="16:9">16:9</button>
+                <button class="format-btn" data-format="9:16">9:16</button>
+                <button id="format-product" class="format-btn">Produit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de confirmation de fermeture -->
 <div id="unsavedChangesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="unsavedChangesTitle">
     <div class="small-modal">
