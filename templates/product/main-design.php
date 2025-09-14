@@ -112,6 +112,7 @@
 
             <!-- Conteneur dynamique -->
             <div id="fileList" class="file-list grid-view"></div>
+            <div id="paginationControls" class="pagination-controls"></div>
         </div>
     </div>
 </div>

@@ -9,6 +9,8 @@
     let currentSort   = 'date';    // 'name' ou 'date'
     let importedFiles = [];        // Images importées par l'utilisateur
     let generatedImages = [];      // Images générées ou du site
+    let currentPage   = 1;         // Page courante
+    const itemsPerPage = 20;       // Nombre d'images par page
 
     /**
      * Initialise la bibliothèque avec les images existantes.
@@ -22,18 +24,21 @@
         // Écouteurs d'événements
         $('#folder-site').on('click', function () {
             currentFolder = 'site';
+            currentPage = 1;
             $('#folder-selector button').removeClass('active');
             $(this).addClass('active');
             renderFileList();
         });
         $('#folder-user').on('click', function () {
             currentFolder = 'user';
+            currentPage = 1;
             $('#folder-selector button').removeClass('active');
             $(this).addClass('active');
             renderFileList();
         });
         $('#sort-select').on('change', function () {
             currentSort = $(this).val();
+            currentPage = 1;
             renderFileList();
         });
         $('#view-grid').on('click', function () {
@@ -47,11 +52,8 @@
             $(this).addClass('active');
         });
         $('#searchInput').on('input', function () {
-            const searchValue = $(this).val().toLowerCase();
-            $('#fileList .file-item').each(function () {
-                const fileName = $(this).find('.file-name').text().toLowerCase();
-                $(this).toggle(fileName.includes(searchValue));
-            });
+            currentPage = 1;
+            renderFileList();
         });
 
         // Zone de dépôt et chargement de fichiers
@@ -126,6 +128,43 @@
     }
 
     /**
+     * Affiche les contrôles de pagination.
+     * @param {number} totalPages
+     */
+    function renderPagination(totalPages) {
+        const controls = $('#paginationControls');
+        controls.empty();
+        if (totalPages <= 1) {
+            controls.hide();
+            return;
+        }
+        controls.show();
+
+        const prev = $('<button class="page-prev">Précédent</button>');
+        const next = $('<button class="page-next">Suivant</button>');
+        const info = $(`<span class="page-info">${currentPage} / ${totalPages}</span>`);
+
+        prev.prop('disabled', currentPage === 1);
+        next.prop('disabled', currentPage === totalPages);
+
+        prev.on('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                renderFileList();
+            }
+        });
+
+        next.on('click', function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderFileList();
+            }
+        });
+
+        controls.append(prev, info, next);
+    }
+
+    /**
      * Affiche la liste en fonction du dossier actif, du tri et du type de vue.
      */
     function renderFileList() {
@@ -134,6 +173,8 @@
         // Sélection du jeu d'images
         const images = currentFolder === 'site' ? generatedImages : importedFiles;
         if (!Array.isArray(images)) return;
+
+        const searchValue = $('#searchInput').val().toLowerCase();
 
         // Tri
         const sorted = images.slice().sort((a, b) => {
@@ -153,8 +194,20 @@
             return 0;
         });
 
+        // Filtrage par recherche
+        const filtered = sorted.filter(img => {
+            const rawUrl = img.url || img.image_url || '';
+            const name = img.name || img.image_prefix || rawUrl.split('/').pop();
+            return name.toLowerCase().includes(searchValue);
+        });
+
+        const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+        if (currentPage > totalPages) currentPage = totalPages;
+        const start = (currentPage - 1) * itemsPerPage;
+        const pageItems = filtered.slice(start, start + itemsPerPage);
+
         // Rendu
-        sorted.forEach(img => {
+        pageItems.forEach(img => {
             const rawUrl = img.url || img.image_url;
             let url = rawUrl;
             if (rawUrl && typeof rawUrl === 'object') {
@@ -181,6 +234,8 @@
             });
             container.append(item);
         });
+
+        renderPagination(totalPages);
     }
 
     // Expose l’API de la bibliothèque au niveau global pour interaction avec d’autres scripts
