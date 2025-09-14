@@ -260,9 +260,20 @@
 
         const searchValue = $('#searchInput').val().toLowerCase();
 
-        // Tri
-        const sorted = images.slice().sort((a, b) => {
+        const formatFilter = currentFormatFilter === 'format'
+            ? window.selectedVariant?.ratio_image
+            : null;
 
+        // Filtrage par recherche et format
+        const filtered = images.filter(img => {
+            if (formatFilter && img.format !== formatFilter) return false;
+            const rawUrl = img.url || img.image_url || '';
+            const name = img.name || img.image_prefix || rawUrl.split('/').pop();
+            return name.toLowerCase().includes(searchValue);
+        });
+
+        // Tri des résultats filtrés
+        const sorted = filtered.slice().sort((a, b) => {
             const aName = a.name || a.image_prefix || (a.url || a.image_url || '').split('/').pop();
             const bName = b.name || b.image_prefix || (b.url || b.image_url || '').split('/').pop();
 
@@ -273,27 +284,14 @@
                 const aDate = a.date_created || a.image_date || a.date || 0;
                 const bDate = b.date_created || b.image_date || b.date || 0;
                 return new Date(bDate) - new Date(aDate);
-
             }
             return 0;
         });
 
-        const formatFilter = currentFormatFilter === 'format'
-            ? window.selectedVariant?.ratio_image
-            : null;
-
-        // Filtrage par recherche et format
-        const filtered = sorted.filter(img => {
-            if (formatFilter && img.format !== formatFilter) return false;
-            const rawUrl = img.url || img.image_url || '';
-            const name = img.name || img.image_prefix || rawUrl.split('/').pop();
-            return name.toLowerCase().includes(searchValue);
-        });
-
-        const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+        const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
         if (currentPage > totalPages) currentPage = totalPages;
         const start = (currentPage - 1) * itemsPerPage;
-        const pageItems = filtered.slice(start, start + itemsPerPage);
+        const pageItems = sorted.slice(start, start + itemsPerPage);
 
         // Rendu
         pageItems.forEach(img => {
