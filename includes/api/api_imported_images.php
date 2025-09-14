@@ -7,11 +7,17 @@ add_action('rest_api_init', function () {
 		'permission_callback' => '__return_true',
 	]);
 
-	register_rest_route('customiizer/v1', '/user-images/', [
-		'methods' => 'GET',
-		'callback' => 'customiizer_get_user_images',
-		'permission_callback' => '__return_true',
-	]);
+        register_rest_route('customiizer/v1', '/user-images/', [
+                'methods' => 'GET',
+                'callback' => 'customiizer_get_user_images',
+                'permission_callback' => '__return_true',
+        ]);
+
+        register_rest_route('customiizer/v1', '/delete-image/', [
+                'methods' => 'POST',
+                'callback' => 'customiizer_delete_image',
+                'permission_callback' => '__return_true',
+        ]);
 });
 
 /**
@@ -177,4 +183,51 @@ function customiizer_get_user_images(WP_REST_Request $request) {
 
         customiizer_log("✅ Images récupérées avec succès pour UserID: $user_id.");
         return new WP_REST_Response($results, 200);
+}
+
+/**
+ * 🗑️ Supprime une image importée de la base et du stockage Azure
+ */
+function customiizer_delete_image(WP_REST_Request $request) {
+        global $wpdb;
+
+        $params = $request->get_json_params();
+        $image_url = isset($params['image_url']) ? $params['image_url'] : '';
+        $user_id = isset($params['user_id']) ? intval($params['user_id']) : get_current_user_id();
+
+        if (empty($image_url)) {
+                return new WP_REST_Response(['error' => "Paramètre 'image_url' manquant."], 400);
+        }
+
+        $containerName = 'imageclient';
+        $path = parse_url($image_url, PHP_URL_PATH);
+        $blobName = '';
+        if ($path) {
+                $blobName = ltrim(str_replace('/' . $containerName . '/', '', $path), '/');
+        }
+
+        $blobDeleted = false;
+        $blobClient = azure_get_blob_client();
+        if ($blobClient && $blobName) {
+                $blobDeleted = azure_delete_blob($blobClient, $containerName, $blobName);
+        }
+
+        if ($user_id === 0) {
+                if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                }
+                if (isset($_SESSION['guest_import_images'])) {
+                        $_SESSION['guest_import_images'] = array_values(array_filter(
+                                $_SESSION['guest_import_images'],
+                                function ($img) use ($image_url) {
+                                        return ($img['image_url'] ?? '') !== $image_url;
+                                }
+                        ));
+                }
+        } else {
+                $table_name = 'WPC_imported_image';
+                $wpdb->delete($table_name, ['user_id' => $user_id, 'image_url' => $image_url], ['%d', '%s']);
+        }
+
+        return new WP_REST_Response(['success' => true, 'deleted' => $blobDeleted], 200);
 }
