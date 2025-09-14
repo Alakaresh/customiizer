@@ -104,8 +104,8 @@
                 <div class="sort-wrapper">
                     <label for="sort-select">Trié par</label>
                     <select id="sort-select">
-                        <option value="name">Nom (A‑Z)</option>
-                        <option value="date" selected>Date (plus récentes)</option>
+                        <option value="name">Nom</option>
+                        <option value="date" selected>Date</option>
                     </select>
                 </div>
             </div>
