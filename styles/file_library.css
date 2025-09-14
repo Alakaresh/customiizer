@@ -210,6 +210,11 @@
     cursor: pointer;
     font-size: 14px;
     z-index: 1;
+    display: none;
+}
+
+.file-item:hover .preview-icon {
+    display: block;
 }
 
 /* Grille : miniatures affichées dans un carré */
