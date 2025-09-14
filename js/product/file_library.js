@@ -11,7 +11,7 @@
     let myImages = [];             // Images générées par l'utilisateur
     let communityImages = [];      // Images de la communauté
     let currentPage   = 1;         // Page courante
-    let currentFormatFilter = 'all'; // 'all' ou 'format'
+    let currentFormatFilter = 'all'; // 'all' ou nom de format
     const itemsPerPage = 40;       // Nombre d'images par page
 
     /**
@@ -25,6 +25,7 @@
         myImages        = options?.my || [];
         communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
+        const formatDropdown = $('#formatDropdown');
         // Écouteurs d'événements
         $('#folder-my').on('click', function () {
             currentFolder = 'my';
@@ -61,14 +62,23 @@
             currentPage = 1;
             $('.filter-buttons button').removeClass('active');
             $(this).addClass('active');
+            $('#filter-format').text('Format');
+            formatDropdown.hide();
             renderFileList();
         });
-        $('#filter-format').on('click', function () {
-            currentFormatFilter = 'format';
-            currentPage = 1;
-            $('.filter-buttons button').removeClass('active');
-            $(this).addClass('active');
-            renderFileList();
+        $('#filter-format').on('click', function (e) {
+            e.stopPropagation();
+            if (formatDropdown.is(':visible')) {
+                formatDropdown.hide();
+            } else {
+                buildFormatDropdown(formatDropdown);
+                formatDropdown.show();
+            }
+        });
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.format-filter').length) {
+                formatDropdown.hide();
+            }
         });
 
         // Zone de dépôt et chargement de fichiers
@@ -188,6 +198,29 @@
         }
     }
 
+    function buildFormatDropdown(dropdown) {
+        const formats = new Set();
+        [myImages, communityImages, importedFiles].forEach(arr => {
+            (arr || []).forEach(img => {
+                if (img.format) formats.add(img.format);
+            });
+        });
+        dropdown.empty();
+        Array.from(formats).sort().forEach(fmt => {
+            const btn = $('<button type="button" class="format-option"></button>').text(fmt);
+            btn.on('click', function (e) {
+                e.stopPropagation();
+                currentFormatFilter = fmt;
+                currentPage = 1;
+                $('.filter-buttons button').removeClass('active');
+                $('#filter-format').addClass('active').text(`Format: ${fmt}`);
+                dropdown.hide();
+                renderFileList();
+            });
+            dropdown.append(btn);
+        });
+    }
+
     /**
      * Affiche les contrôles de pagination.
      * @param {number} totalPages
@@ -260,8 +293,8 @@
 
         const searchValue = $('#searchInput').val().toLowerCase();
 
-        const formatFilter = currentFormatFilter === 'format'
-            ? window.selectedVariant?.ratio_image
+        const formatFilter = currentFormatFilter !== 'all'
+            ? currentFormatFilter
             : null;
 
         // Filtrage par recherche et format
