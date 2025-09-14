@@ -215,7 +215,7 @@
 /* Style d’un élément de fichier */
 .file-item {
     position: relative;
-    cursor: default;
+    cursor: pointer;
 }
 .file-item img {
     width: 100%;

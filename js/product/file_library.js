@@ -522,10 +522,13 @@
             });
             item.find('.preview-icon').on('click', function (e) {
                 e.stopPropagation();
-                const imgEl = item.find('img.preview-enlarge')[0];
-                if (imgEl) {
-                    imgEl.click();
+                handleImageClick({ target: imgElement[0] });
+            });
+            item.on('click', function (e) {
+                if ($(e.target).closest('.apply-button, .preview-icon, .file-menu-button, .file-menu-dropdown').length) {
+                    return;
                 }
+                handleImageClick({ target: imgElement[0] });
             });
             item.find('.apply-button').on('click', function (e) {
                 e.stopPropagation();
