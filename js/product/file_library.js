@@ -11,7 +11,7 @@
     let myImages = [];             // Images générées par l'utilisateur
     let communityImages = [];      // Images de la communauté
     let currentPage   = 1;         // Page courante
-    const itemsPerPage = 20;       // Nombre d'images par page
+    const itemsPerPage = 40;       // Nombre d'images par page
 
     /**
      * Initialise la bibliothèque avec les images existantes.

@@ -5,7 +5,7 @@ function get_images() {
     global $wpdb;
     $current_user = wp_get_current_user();
     $userId = $current_user->ID;
-    $imagesPerPage = isset($_GET['images_per_page']) ? (int)$_GET['images_per_page'] : 10;
+    $imagesPerPage = isset($_GET['images_per_page']) ? (int)$_GET['images_per_page'] : 20;
     $pageNumber = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($pageNumber - 1) * $imagesPerPage;
     $results = $wpdb->get_results($wpdb->prepare("SELECT image_url FROM WPC_generated_image WHERE user_id = %d ORDER BY image_date DESC LIMIT %d OFFSET %d", $userId, $imagesPerPage, $offset));
