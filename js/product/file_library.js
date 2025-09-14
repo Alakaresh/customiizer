@@ -147,7 +147,7 @@
             sizeRatioMap = {};
             $('#mainFormatFilters .format-main').removeClass('active');
             $(this).addClass('active');
-            $('#formatOptions').hide();
+            $('#formatModal').hide();
             $('#formatOptions .format-btn').removeClass('active');
             $('#product-block').hide();
             sizeBlock.hide();
@@ -159,7 +159,11 @@
 
         // Ouverture du menu format
         $('#open-format-menu').on('click', function () {
-            $('#formatOptions').toggle();
+            $('#formatModal').show();
+        });
+
+        $('#formatModal .close-button').on('click', function () {
+            $('#formatModal').hide();
         });
 
         // Sélection d'un format standard
@@ -181,11 +185,12 @@
             sizeBlock.hide();
             currentPage = 1;
             renderFileList();
+            $('#formatModal').hide();
         });
 
         // Accès aux produits
         $('#format-product').on('click', function () {
-            $('#formatOptions').hide();
+            $('#formatModal').hide();
             $('#formatOptions .format-btn').removeClass('active');
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
