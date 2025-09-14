@@ -57,6 +57,12 @@
     gap: 8px;
     border-radius: 8px;
 }
+
+/* Assure un alignement uniforme des noms de dossier */
+.file-library-sidebar button i {
+    width: 20px;
+    text-align: center;
+}
 .file-library-sidebar button.active {
     background: rgba(255, 255, 255, 0.1);
     font-weight: bold;
