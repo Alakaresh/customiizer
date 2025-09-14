@@ -528,25 +528,12 @@
                     ? (img.prompt.text || img.prompt.prompt || JSON.stringify(img.prompt))
                     : (img.prompt || ''))
             });
-            item.on('click', function (e) {
-                const target = $(e.target);
-                if (
-                    target.closest('.apply-button, .preview-icon, .file-menu-button, .file-menu-dropdown').length ||
-                    target.is('img.preview-enlarge')
-                ) {
-                    return;
-                }
-                const imgEl = imgElement[0];
-                if (imgEl) {
-                    imgEl.click();
-                }
+            imgElement.on('click', function (e) {
+                e.stopPropagation();
             });
             item.find('.preview-icon').on('click', function (e) {
                 e.stopPropagation();
-                const imgEl = item.find('img.preview-enlarge')[0];
-                if (imgEl) {
-                    imgEl.click();
-                }
+                handleImageClick({ target: imgElement[0] });
             });
             item.find('.apply-button').on('click', function (e) {
                 e.stopPropagation();
