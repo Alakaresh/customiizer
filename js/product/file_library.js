@@ -67,10 +67,11 @@
     }
 
     function updateFormatLabel(fmt) {
-        $('#filter-format').addClass('active').text(`Format: ${fmt}`);
+        const btn = $('#open-format-menu');
+        btn.addClass('active').text(`Format: ${fmt}`);
         getProductNameForFormat(fmt).then(name => {
             if (name) {
-                $('#filter-format').addClass('active').text(`Format: ${name}`);
+                btn.addClass('active').text(`Format: ${name}`);
             }
         });
     }
@@ -153,6 +154,7 @@
             sizeBlock.hide();
             $('#productButtons button').removeClass('active');
             $('#sizeButtons').empty();
+            $('#open-format-menu').removeClass('active').text('Format');
             currentPage = 1;
             renderFileList();
         });
@@ -188,6 +190,7 @@
             sizeBlock.hide();
             currentPage = 1;
             renderFileList();
+            updateFormatLabel(fmt);
             $('#formatOptions').removeClass('active');
         });
 
@@ -197,7 +200,7 @@
             $('#formatOptions .format-btn').removeClass('active');
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
-            $('#open-format-menu').addClass('active');
+            $('#open-format-menu').addClass('active').text('Format');
             $('#product-block').show();
             currentFormatFilter = 'all';
             currentProduct = null;
@@ -246,6 +249,11 @@
                                         $(this).addClass('active');
                                         currentPage = 1;
                                         renderFileList();
+                                        if (currentFormatFilter !== 'all') {
+                                            updateFormatLabel(currentFormatFilter);
+                                        } else {
+                                            $('#open-format-menu').text('Format');
+                                        }
                                     });
                                     sizeContainer.append(sbtn);
                                 });
