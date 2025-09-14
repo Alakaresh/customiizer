@@ -82,8 +82,9 @@
     <div class="modal-content file-library-modal">
         <div id="folder-selector" class="file-library-sidebar">
             <h3 class="sidebar-title">Sources d'images</h3>
-            <button id="folder-site" class="active">Images du site</button>
-            <button id="folder-user">Images importées</button>
+            <button id="folder-my" class="active">Mes images</button>
+            <button id="folder-community">Communauté</button>
+            <button id="folder-imported">Images importées</button>
             <div id="fileDropZone" class="file-drop-zone">
                 <i class="fas fa-upload" aria-hidden="true"></i>
                 <span>Glisser-déposer des fichiers<br>ou<br>Recherchez des fichiers</span>
