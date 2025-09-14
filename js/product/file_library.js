@@ -11,6 +11,7 @@
     let myImages = [];             // Images générées par l'utilisateur
     let communityImages = [];      // Images de la communauté
     let currentPage   = 1;         // Page courante
+    let currentFormatFilter = 'all'; // 'all' ou 'format'
     const itemsPerPage = 40;       // Nombre d'images par page
 
     /**
@@ -53,6 +54,20 @@
         });
         $('#searchInput').on('input', function () {
             currentPage = 1;
+            renderFileList();
+        });
+        $('#filter-all').on('click', function () {
+            currentFormatFilter = 'all';
+            currentPage = 1;
+            $('.filter-buttons button').removeClass('active');
+            $(this).addClass('active');
+            renderFileList();
+        });
+        $('#filter-format').on('click', function () {
+            currentFormatFilter = 'format';
+            currentPage = 1;
+            $('.filter-buttons button').removeClass('active');
+            $(this).addClass('active');
             renderFileList();
         });
 
@@ -263,8 +278,13 @@
             return 0;
         });
 
-        // Filtrage par recherche
+        const formatFilter = currentFormatFilter === 'format'
+            ? window.selectedVariant?.ratio_image
+            : null;
+
+        // Filtrage par recherche et format
         const filtered = sorted.filter(img => {
+            if (formatFilter && img.format !== formatFilter) return false;
             const rawUrl = img.url || img.image_url || '';
             const name = img.name || img.image_prefix || rawUrl.split('/').pop();
             return name.toLowerCase().includes(searchValue);
