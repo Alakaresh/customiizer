@@ -71,6 +71,7 @@
         const fileInput = $('#fileInput');
 
         function handleFiles(files) {
+            let added = false;
             files.forEach(file => {
                 if (!file.type.startsWith('image/')) return;
                 const reader = new FileReader();
@@ -81,7 +82,16 @@
                     }
                 };
                 reader.readAsDataURL(file);
+                added = true;
             });
+
+            if (added && currentFolder !== 'imported') {
+                currentFolder = 'imported';
+                currentPage = 1;
+                $('#folder-selector button').removeClass('active');
+                $('#folder-imported').addClass('active');
+                renderFileList();
+            }
         }
 
         dropZone.on('dragover', function (e) {
