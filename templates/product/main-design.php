@@ -99,11 +99,25 @@
             </div>
 
             <div class="filter-sort">
-                <div class="filter-buttons">
-                    <button id="filter-all" class="active">Toutes les images</button>
-                    <div class="format-filter">
-                        <button id="filter-format">Format</button>
-                        <div id="formatDropdown" class="format-dropdown"></div>
+                <div class="filters">
+                    <div class="filter-group" id="format-block">
+                        <h4>Formats standards</h4>
+                        <div class="filter-buttons">
+                            <button class="format-btn active" data-format="all">Tous</button>
+                            <button class="format-btn" data-format="1:1">1:1</button>
+                            <button class="format-btn" data-format="3:4">3:4</button>
+                            <button class="format-btn" data-format="4:3">4:3</button>
+                            <button class="format-btn" data-format="16:9">16:9</button>
+                            <button class="format-btn" data-format="9:16">9:16</button>
+                        </div>
+                    </div>
+                    <div class="filter-group" id="product-block">
+                        <h4>Produits</h4>
+                        <div id="productButtons" class="filter-buttons"></div>
+                    </div>
+                    <div class="filter-group" id="size-block" style="display:none">
+                        <h4>Tailles</h4>
+                        <div id="sizeButtons" class="filter-buttons"></div>
                     </div>
                 </div>
                 <div class="sort-wrapper">

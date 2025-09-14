@@ -151,10 +151,25 @@
     flex-wrap: wrap;
 }
 
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex: 1;
+}
+
+.filter-group h4 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: normal;
+}
+
 .filter-buttons {
     display: flex;
     gap: 10px;
     margin-bottom: 0;
+    flex-wrap: wrap;
 }
 
 .filter-buttons button {
@@ -169,38 +184,6 @@
 .filter-buttons button.active {
     background: rgba(255, 255, 255, 0.1);
     font-weight: bold;
-}
-.filter-buttons .format-filter {
-    position: relative;
-    flex: 1;
-}
-.format-filter > button {
-    width: 100%;
-}
-.format-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    z-index: 10;
-    min-width: 100%;
-}
-.format-dropdown .format-option,
-.format-dropdown button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    padding: 6px 12px;
-    text-align: left;
-    width: 100%;
-    cursor: pointer;
-}
-.format-dropdown .format-option:hover,
-.format-dropdown button:hover {
-    background: rgba(255, 255, 255, 0.1);
 }
 .sort-wrapper {
     margin-left: auto;
