@@ -262,11 +262,19 @@
 
             const item = $(
                 `<div class="file-item">
-                    <img src="${url}" alt="${name}" class="image-thumbnail">
+                    <img src="${url}" alt="${name}" class="preview-enlarge">
+                    <i class="fas fa-search-plus preview-icon"></i>
                     <button type="button" class="apply-button">Appliquez</button>
                     <span class="file-name">${name}</span>
                 </div>`
             );
+            item.find('.preview-icon').on('click', function (e) {
+                e.stopPropagation();
+                const imgEl = item.find('img.preview-enlarge')[0];
+                if (imgEl) {
+                    imgEl.click();
+                }
+            });
             item.find('.apply-button').on('click', function (e) {
                 e.stopPropagation();
                 // Ajoute l'image au canvas (fonction existante)
