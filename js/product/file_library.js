@@ -11,6 +11,19 @@
     let generatedImages = [];      // Images générées ou du site
 
     /**
+     * Récupère une URL d'image à partir d'une valeur pouvant être
+     * soit une chaîne, soit un objet contenant les clés `url`, `src`
+     * ou `path`.
+     * @param {string|Object} val
+     * @returns {string}
+     */
+    function extractUrl(val) {
+        if (!val) return '';
+        if (typeof val === 'string') return val;
+        return val.url || val.src || val.path || '';
+    }
+
+    /**
      * Initialise la bibliothèque avec les images existantes.
      * @param {Object} options 
      *        options.generated (Array) : images générées du site
@@ -138,8 +151,10 @@
         // Tri
         const sorted = images.slice().sort((a, b) => {
 
-            const aName = a.name || a.image_prefix || (a.url || a.image_url || '').split('/').pop();
-            const bName = b.name || b.image_prefix || (b.url || b.image_url || '').split('/').pop();
+            const aUrl = a.url || extractUrl(a.image_url);
+            const bUrl = b.url || extractUrl(b.image_url);
+            const aName = a.name || a.image_prefix || aUrl.split('/').pop();
+            const bName = b.name || b.image_prefix || bUrl.split('/').pop();
 
             if (currentSort === 'name') {
                 return aName.localeCompare(bName);
@@ -155,7 +170,7 @@
 
         // Rendu
         sorted.forEach(img => {
-            const url = img.url || img.image_url;
+            const url = img.url || extractUrl(img.image_url);
             if (!url) return; // Ignore entries without URL
             const name = img.name || img.image_prefix || url.split('/').pop();
 
