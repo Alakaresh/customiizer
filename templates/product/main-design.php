@@ -105,6 +105,11 @@
                 </div>
             </div>
 
+            <div class="filter-buttons">
+                <button id="filter-all" class="active">Toutes les images</button>
+                <button id="filter-format">Format</button>
+            </div>
+
             <!-- Conteneur dynamique -->
             <div id="fileList" class="file-list grid-view"></div>
             <div id="paginationControls" class="pagination-controls"></div>

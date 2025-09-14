@@ -62,4 +62,11 @@
         object-fit: contain;
     }
 
+    .filter-buttons {
+        gap: 8px;
+    }
+    .filter-buttons button {
+        flex: 1;
+    }
+
 }
