@@ -318,6 +318,16 @@
                     <span class="file-name">${name}</span>
                 </div>`
             );
+
+            const imgElement = item.find('img.preview-enlarge');
+            imgElement.attr({
+                'data-display_name': img.display_name || '',
+                'data-user-id': img.user_id || '',
+                'data-format-image': img.format || '',
+                'data-prompt': (typeof img.prompt === 'object'
+                    ? (img.prompt.text || img.prompt.prompt || JSON.stringify(img.prompt))
+                    : (img.prompt || ''))
+            });
             item.find('.preview-icon').on('click', function (e) {
                 e.stopPropagation();
                 const imgEl = item.find('img.preview-enlarge')[0];
