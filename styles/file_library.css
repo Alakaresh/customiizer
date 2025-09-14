@@ -131,8 +131,14 @@
     background: var(--bg-color);
     color: var(--text-color);
 }
-#sort-select {
+.sort-wrapper {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#sort-select {
+    border-radius: 8px;
 }
 .view-toggle button {
     background: var(--bg-color);

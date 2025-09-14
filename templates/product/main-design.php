@@ -101,10 +101,13 @@
                     <button id="view-grid" class="active">Grille</button>
                     <button id="view-list">Liste</button>
                 </div>
-                <select id="sort-select">
-                    <option value="name">Nom (A‑Z)</option>
-                    <option value="date" selected>Date (plus récentes)</option>
-                </select>
+                <div class="sort-wrapper">
+                    <label for="sort-select">Trié par</label>
+                    <select id="sort-select">
+                        <option value="name">Nom (A‑Z)</option>
+                        <option value="date" selected>Date (plus récentes)</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Conteneur dynamique -->
