@@ -145,7 +145,7 @@
             <span class="close-button" aria-label="Fermer">&times;</span>
         </div>
         <div class="modal-body">
-            <div id="formatOptions" class="filter-buttons">
+            <div id="formatModalOptions" class="filter-buttons">
                 <button class="format-btn" data-format="1:1">1:1</button>
                 <button class="format-btn" data-format="3:4">3:4</button>
                 <button class="format-btn" data-format="4:3">4:3</button>
