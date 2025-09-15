@@ -158,9 +158,8 @@
             $('#formatOptions').removeClass('active');
             $('#formatOptions .format-btn').removeClass('active');
             $('#product-block').removeClass('active');
-            sizeBlock.hide();
+            sizeBlock.removeClass('active').empty();
             $('#product-block button').removeClass('active');
-            $('#sizeButtons').empty();
             $('#open-format-menu').removeClass('active').text('Format');
             currentPage = 1;
             renderFileList();
@@ -171,12 +170,14 @@
             e.stopPropagation();
             $('#formatOptions').toggleClass('active');
             $('#product-block').removeClass('active');
+            sizeBlock.removeClass('active');
         });
 
         $(document).on('click', function (e) {
             if (!$(e.target).closest('#formatOptions, #open-format-menu').length) {
                 $('#formatOptions').removeClass('active');
                 $('#product-block').removeClass('active');
+                sizeBlock.removeClass('active');
             }
         });
 
@@ -191,12 +192,11 @@
             sizeRatioMap = {};
             $('#formatOptions .format-btn').removeClass('active');
             $('#product-block button').removeClass('active');
-            $('#sizeButtons').empty();
+            sizeBlock.removeClass('active').empty();
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active');
             $('#product-block').removeClass('active');
-            sizeBlock.hide();
             currentPage = 1;
             renderFileList();
             updateFormatLabel(fmt);
@@ -237,7 +237,7 @@
                                     sizeRatioMap[v.size] = v.ratio_image;
                                     if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
                                 });
-                                const sizeContainer = $('#sizeButtons');
+                                const sizeContainer = sizeBlock;
                                 sizeContainer.empty();
                                 sizes.forEach(sz => {
                                     const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
@@ -253,20 +253,21 @@
                                         } else {
                                             $('#open-format-menu').text('Format');
                                         }
+                                        $('#formatOptions').removeClass('active');
+                                        $('#product-block').removeClass('active');
+                                        sizeBlock.removeClass('active');
                                     });
                                     sizeContainer.append(sbtn);
                                 });
-                                sizeBlock.show();
-                                $('#sizeButtons button').removeClass('active');
+                                sizeBlock.addClass('active');
+                                sizeBlock.find('button').removeClass('active');
                                 currentPage = 1;
                                 renderFileList();
                             })
                             .catch(err => {
                                 console.error('❌ load sizes', err);
-                                sizeBlock.hide();
+                                sizeBlock.removeClass('active');
                             });
-                        $('#formatOptions').removeClass('active');
-                        $('#product-block').removeClass('active');
                     });
                     container.append(btn);
                 });
