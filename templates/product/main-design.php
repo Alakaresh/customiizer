@@ -167,7 +167,7 @@
             <span class="close-button" aria-label="Fermer">&times;</span>
         </div>
         <div class="modal-body">
-            <div id="productVariantList" class="product-variant-list"></div>
+            <div id="productVariantOptions" class="filter-buttons"></div>
         </div>
     </div>
 </div>
