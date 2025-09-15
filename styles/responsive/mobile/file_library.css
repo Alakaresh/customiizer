@@ -1,6 +1,7 @@
 @media screen and (max-width: 767px) {
     /* Styles de la bibliothèque de fichiers pour mobile */
-    #imageSourceModal .small-modal {
+    #imageSourceModal .small-modal,
+    #productVariantModal .small-modal {
         width: 95%;
         height: 90%;
     }

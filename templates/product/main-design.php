@@ -159,6 +159,19 @@
     </div>
 </div>
 
+<!-- Modal de sélection produit/variante -->
+<div id="productVariantModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3>Produits</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="productVariantOptions" class="filter-buttons"></div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de confirmation de fermeture -->
 <div id="unsavedChangesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="unsavedChangesTitle">
     <div class="small-modal">

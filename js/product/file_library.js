@@ -109,6 +109,9 @@
         communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
         const sizeBlock = $('#size-block');
+        const productVariantModal = $('#productVariantModal');
+        const productVariantOptions = $('#productVariantOptions');
+        productVariantModal.find('.close-button').on('click', () => productVariantModal.hide());
         // Écouteurs d'événements
         $('#folder-my').on('click', function () {
             currentFolder = 'my';
@@ -208,13 +211,14 @@
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active').text('Format');
-            $('#product-block').show();
+            $('#product-block').hide();
             currentFormatFilter = 'all';
             currentProduct = null;
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
             sizeBlock.hide();
+            productVariantModal.show();
             currentPage = 1;
             renderFileList();
         });
@@ -224,7 +228,9 @@
             .then(res => res.json())
             .then(products => {
                 const container = $('#productButtons');
+                const modalContainer = productVariantOptions;
                 container.empty();
+                modalContainer.empty();
                 (products || []).forEach(p => {
                     const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
                     btn.on('click', function () {
@@ -275,6 +281,30 @@
                             });
                     });
                     container.append(btn);
+
+                    fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
+                        .then(r => r.json())
+                        .then(variants => {
+                        (variants || []).forEach(v => {
+                            const vBtn = $('<button type="button" class="product-variant-btn"></button>').text(`${p.name} - ${v.size}`);
+                            vBtn.on('click', function () {
+                                    currentProduct = p.product_id;
+                                    currentSize = v.size;
+                                    currentFormatFilter = v.ratio_image || 'all';
+                                    productVariantModal.hide();
+                                    $('#product-block').hide();
+                                    sizeBlock.hide();
+                                    currentPage = 1;
+                                    renderFileList();
+                                    if (currentFormatFilter !== 'all') {
+                                        updateFormatLabel(currentFormatFilter, true);
+                                    } else {
+                                        $('#open-format-menu').text('Format');
+                                    }
+                                });
+                                modalContainer.append(vBtn);
+                            });
+                        });
                 });
             })
             .catch(err => console.error('❌ load products', err));
