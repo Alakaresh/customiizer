@@ -1,6 +1,7 @@
 @media screen and (min-width: 768px) and (max-width: 1024px) {
     /* Styles de la bibliothèque de fichiers pour tablette */
-    #imageSourceModal .small-modal {
+    #imageSourceModal .small-modal,
+    #productVariantModal .small-modal {
         width: 80%;
         height: 80%;
     }
