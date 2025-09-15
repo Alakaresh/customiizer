@@ -298,6 +298,7 @@
                                     } else {
                                         $('#open-format-menu').text('Format');
                                     }
+                                    $('#formatOptions').removeClass('active');
                                 });
                                 sizeContainer.append(sbtn);
                             });
