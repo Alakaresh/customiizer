@@ -159,6 +159,26 @@
     </div>
 </div>
 
+<!-- Modal de sélection produit/variante -->
+<div id="productVariantModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3>Sélectionner un produit</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body flex-column">
+            <div id="productListWrapper" class="modal-section">
+                <h4>Produits</h4>
+                <ul id="productList" class="modal-list"></ul>
+            </div>
+            <div id="variantListWrapper" class="modal-section" style="display:none">
+                <h4>Variantes</h4>
+                <ul id="variantList" class="modal-list"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de confirmation de fermeture -->
 <div id="unsavedChangesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="unsavedChangesTitle">
     <div class="small-modal">

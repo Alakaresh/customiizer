@@ -394,3 +394,47 @@
 .pagination-controls .page-total {
     color: var(--text-color);
 }
+
+/* =======================
+   Modale produit/variante
+======================= */
+.flex-column {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-section h4 {
+    margin: 0 0 8px;
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.modal-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-list li {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.modal-list li:hover,
+.modal-list li.active {
+    background: rgba(255, 255, 255, 0.1);
+}
