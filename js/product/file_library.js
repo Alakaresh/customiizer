@@ -108,7 +108,20 @@
         myImages        = options?.my || [];
         communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
-        const sizeBlock = $('#size-block');
+        const productModal = $('#productListModal');
+        const variantModal = $('#variantListModal');
+        const imageSourceModal = $('#imageSourceModal');
+        productModal.find('.close-button').on('click', function () {
+            productModal.hide();
+            releaseFocus(productModal);
+            trapFocus(imageSourceModal);
+        });
+        variantModal.find('.close-button').on('click', function () {
+            variantModal.hide();
+            releaseFocus(variantModal);
+            productModal.show();
+            trapFocus(productModal);
+        });
         // Écouteurs d'événements
         $('#folder-my').on('click', function () {
             currentFolder = 'my';
@@ -157,10 +170,13 @@
             $(this).addClass('active');
             $('#formatOptions').removeClass('active');
             $('#formatOptions .format-btn').removeClass('active');
-            $('#product-block').hide();
-            sizeBlock.hide();
             $('#productButtons button').removeClass('active');
             $('#sizeButtons').empty();
+            productModal.hide();
+            variantModal.hide();
+            releaseFocus(productModal);
+            releaseFocus(variantModal);
+            trapFocus(imageSourceModal);
             $('#open-format-menu').removeClass('active').text('Format');
             currentPage = 1;
             renderFileList();
@@ -190,11 +206,14 @@
             $('#formatOptions .format-btn').removeClass('active');
             $('#productButtons button').removeClass('active');
             $('#sizeButtons').empty();
+            productModal.hide();
+            variantModal.hide();
+            releaseFocus(productModal);
+            releaseFocus(variantModal);
+            trapFocus(imageSourceModal);
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active');
-            $('#product-block').hide();
-            sizeBlock.hide();
             currentPage = 1;
             renderFileList();
             updateFormatLabel(fmt);
@@ -208,13 +227,18 @@
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active').text('Format');
-            $('#product-block').show();
             currentFormatFilter = 'all';
             currentProduct = null;
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
-            sizeBlock.hide();
+            $('#productButtons button').removeClass('active');
+            $('#sizeButtons').empty();
+            releaseFocus(imageSourceModal);
+            productModal.show();
+            trapFocus(productModal);
+            variantModal.hide();
+            releaseFocus(variantModal);
             currentPage = 1;
             renderFileList();
         });
@@ -261,17 +285,25 @@
                                         } else {
                                             $('#open-format-menu').text('Format');
                                         }
+                                        variantModal.hide();
+                                        releaseFocus(variantModal);
+                                        trapFocus(imageSourceModal);
                                     });
                                     sizeContainer.append(sbtn);
                                 });
-                                sizeBlock.show();
+                                releaseFocus(productModal);
+                                productModal.hide();
+                                variantModal.show();
+                                trapFocus(variantModal);
                                 $('#sizeButtons button').removeClass('active');
                                 currentPage = 1;
                                 renderFileList();
                             })
                             .catch(err => {
                                 console.error('❌ load sizes', err);
-                                sizeBlock.hide();
+                                variantModal.hide();
+                                releaseFocus(variantModal);
+                                trapFocus(productModal);
                             });
                     });
                     container.append(btn);

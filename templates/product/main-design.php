@@ -114,14 +114,6 @@
                             <button id="format-product" class="format-btn">Produit</button>
                         </div>
                     </div>
-                    <div class="filter-group" id="product-block" style="display:none">
-                        <h4>Produits</h4>
-                        <div id="productButtons" class="filter-buttons"></div>
-                    </div>
-                    <div class="filter-group" id="size-block" style="display:none">
-                        <h4>Tailles</h4>
-                        <div id="sizeButtons" class="filter-buttons"></div>
-                    </div>
                 </div>
                 <div class="sort-wrapper">
                     <label for="sort-select">Trié par</label>
@@ -135,6 +127,32 @@
             <!-- Conteneur dynamique -->
             <div id="fileList" class="file-list grid-view"></div>
             <div id="paginationControls" class="pagination-controls"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal liste produits -->
+<div id="productListModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3>Produits</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="productButtons" class="filter-buttons"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal liste variantes -->
+<div id="variantListModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3>Variantes</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="sizeButtons" class="filter-buttons"></div>
         </div>
     </div>
 </div>
