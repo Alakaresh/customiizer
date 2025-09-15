@@ -66,14 +66,21 @@
         return null;
     }
 
-    function updateFormatLabel(fmt) {
+    /**
+     * Met à jour le libellé du format sélectionné.
+     * @param {string} fmt                 Ratio de l'image.
+     * @param {boolean} [showProductName]  Affiche le nom du produit associé si true.
+     */
+    function updateFormatLabel(fmt, showProductName = false) {
         const btn = $('#open-format-menu');
         btn.addClass('active').text(`Format: ${fmt}`);
-        getProductNameForFormat(fmt).then(name => {
-            if (name) {
-                btn.addClass('active').text(`Format: ${name}`);
-            }
-        });
+        if (showProductName) {
+            getProductNameForFormat(fmt).then(name => {
+                if (name) {
+                    btn.addClass('active').text(`Format: ${name}`);
+                }
+            });
+        }
     }
 
     async function fetchCommunityImages(searchValue) {
@@ -250,7 +257,7 @@
                                         currentPage = 1;
                                         renderFileList();
                                         if (currentFormatFilter !== 'all') {
-                                            updateFormatLabel(currentFormatFilter);
+                                            updateFormatLabel(currentFormatFilter, true);
                                         } else {
                                             $('#open-format-menu').text('Format');
                                         }
