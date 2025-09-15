@@ -108,7 +108,32 @@
         myImages        = options?.my || [];
         communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
-        const sizeBlock = $('#size-block');
+        const formatModal   = $('#formatModal');
+        const productModal  = $('#productModal');
+        const variantModal  = $('#variantModal');
+        const imageSourceModal = $('#imageSourceModal');
+        const formatOptions = $('#formatOptions');
+        const productList   = $('#productList');
+        const variantList   = $('#variantList');
+
+        formatModal.find('.close-button').on('click', function () {
+            formatModal.hide();
+            releaseFocus(formatModal);
+            trapFocus(imageSourceModal);
+        });
+
+        productModal.find('.close-button').on('click', function () {
+            productModal.hide();
+            releaseFocus(productModal);
+            trapFocus(imageSourceModal);
+        });
+
+        variantModal.find('.close-button').on('click', function () {
+            variantModal.hide();
+            releaseFocus(variantModal);
+            productModal.show();
+            trapFocus(productModal);
+        });
         // Écouteurs d'événements
         $('#folder-my').on('click', function () {
             currentFolder = 'my';
@@ -155,31 +180,27 @@
             sizeRatioMap = {};
             $('#mainFormatFilters .format-main').removeClass('active');
             $(this).addClass('active');
-            $('#formatOptions').removeClass('active');
-            $('#formatOptions .format-btn').removeClass('active');
-            $('#product-block').hide();
-            sizeBlock.hide();
-            $('#productButtons button').removeClass('active');
-            $('#sizeButtons').empty();
+            formatModal.hide();
+            productModal.hide();
+            variantModal.hide();
+            releaseFocus(formatModal);
+            releaseFocus(productModal);
+            releaseFocus(variantModal);
+            trapFocus(imageSourceModal);
             $('#open-format-menu').removeClass('active').text('Format');
             currentPage = 1;
             renderFileList();
         });
 
         // Ouverture du menu format
-        $('#open-format-menu').on('click', function (e) {
-            e.stopPropagation();
-            $('#formatOptions').toggleClass('active');
-        });
-
-        $(document).on('click', function (e) {
-            if (!$(e.target).closest('#formatOptions, #open-format-menu').length) {
-                $('#formatOptions').removeClass('active');
-            }
+        $('#open-format-menu').on('click', function () {
+            releaseFocus(imageSourceModal);
+            formatModal.show();
+            trapFocus(formatModal);
         });
 
         // Sélection d'un format standard
-        $('#formatOptions .format-btn').on('click', function () {
+        formatOptions.on('click', '.format-btn', function () {
             const fmt = $(this).data('format');
             if (!fmt) return;
             currentFormatFilter = fmt;
@@ -187,68 +208,60 @@
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
-            $('#formatOptions .format-btn').removeClass('active');
-            $('#productButtons button').removeClass('active');
-            $('#sizeButtons').empty();
+            formatOptions.find('.format-btn').removeClass('active');
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active');
-            $('#product-block').hide();
-            sizeBlock.hide();
             currentPage = 1;
             renderFileList();
             updateFormatLabel(fmt);
-            $('#formatOptions').removeClass('active');
+            formatModal.hide();
+            releaseFocus(formatModal);
+            trapFocus(imageSourceModal);
         });
 
         // Accès aux produits
-        $('#format-product').on('click', function () {
-            $('#formatOptions').removeClass('active');
-            $('#formatOptions .format-btn').removeClass('active');
-            $(this).addClass('active');
-            $('#mainFormatFilters .format-main').removeClass('active');
-            $('#open-format-menu').addClass('active').text('Format');
-            $('#product-block').show();
+        formatOptions.on('click', '#format-product', function () {
             currentFormatFilter = 'all';
             currentProduct = null;
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
-            sizeBlock.hide();
-            currentPage = 1;
-            renderFileList();
+            formatModal.hide();
+            releaseFocus(formatModal);
+            productModal.show();
+            trapFocus(productModal);
         });
 
         // Chargement des produits
         fetch('/wp-json/api/v1/products/list')
             .then(res => res.json())
             .then(products => {
-                const container = $('#productButtons');
-                container.empty();
+                productList.empty();
                 (products || []).forEach(p => {
-                    const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
+                    const btn = $('<button type="button" class="format-btn product-btn"></button>')
+                        .text(p.name)
+                        .data('id', p.product_id);
                     btn.on('click', function () {
                         currentProduct = p.product_id;
                         currentSize = null;
                         currentFormatFilter = 'all';
                         $('.product-btn').removeClass('active');
-                        $('#format-block .format-btn').removeClass('active');
                         $(this).addClass('active');
                         fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
                             .then(r => r.json())
                             .then(variants => {
                                 productFormats = [];
                                 sizeRatioMap = {};
+                                variantList.empty();
                                 const sizes = [];
                                 (variants || []).forEach(v => {
                                     if (!sizes.includes(v.size)) sizes.push(v.size);
                                     sizeRatioMap[v.size] = v.ratio_image;
                                     if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
                                 });
-                                const sizeContainer = $('#sizeButtons');
-                                sizeContainer.empty();
                                 sizes.forEach(sz => {
-                                    const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+                                    const sbtn = $('<button type="button" class="format-btn size-btn"></button>').text(sz);
                                     sbtn.on('click', function () {
                                         currentSize = sz;
                                         currentFormatFilter = sizeRatioMap[sz] || 'all';
@@ -261,20 +274,28 @@
                                         } else {
                                             $('#open-format-menu').text('Format');
                                         }
+                                        variantModal.hide();
+                                        releaseFocus(variantModal);
+                                        trapFocus(imageSourceModal);
                                     });
-                                    sizeContainer.append(sbtn);
+                                    variantList.append(sbtn);
                                 });
-                                sizeBlock.show();
-                                $('#sizeButtons button').removeClass('active');
+                                productModal.hide();
+                                releaseFocus(productModal);
+                                variantModal.show();
+                                trapFocus(variantModal);
                                 currentPage = 1;
                                 renderFileList();
                             })
                             .catch(err => {
                                 console.error('❌ load sizes', err);
-                                sizeBlock.hide();
+                                variantModal.hide();
+                                releaseFocus(variantModal);
+                                productModal.show();
+                                trapFocus(productModal);
                             });
                     });
-                    container.append(btn);
+                    productList.append(btn);
                 });
             })
             .catch(err => console.error('❌ load products', err));

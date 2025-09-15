@@ -186,6 +186,17 @@
     font-weight: bold;
 }
 
+.vertical-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vertical-buttons button {
+    width: 100%;
+    text-align: left;
+}
+
 #format-block {
     position: relative;
 }

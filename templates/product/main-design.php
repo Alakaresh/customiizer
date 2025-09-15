@@ -105,22 +105,6 @@
                             <button id="filter-all" class="format-main active" data-format="all">Tous</button>
                             <button id="open-format-menu" class="format-main">Format</button>
                         </div>
-                        <div id="formatOptions" class="filter-buttons format-dropdown">
-                            <button class="format-btn" data-format="1:1">1:1</button>
-                            <button class="format-btn" data-format="3:4">3:4</button>
-                            <button class="format-btn" data-format="4:3">4:3</button>
-                            <button class="format-btn" data-format="16:9">16:9</button>
-                            <button class="format-btn" data-format="9:16">9:16</button>
-                            <button id="format-product" class="format-btn">Produit</button>
-                        </div>
-                    </div>
-                    <div class="filter-group" id="product-block" style="display:none">
-                        <h4>Produits</h4>
-                        <div id="productButtons" class="filter-buttons"></div>
-                    </div>
-                    <div class="filter-group" id="size-block" style="display:none">
-                        <h4>Tailles</h4>
-                        <div id="sizeButtons" class="filter-buttons"></div>
                     </div>
                 </div>
                 <div class="sort-wrapper">
@@ -137,13 +121,14 @@
             <div id="paginationControls" class="pagination-controls"></div>
         </div>
     </div>
+
 </div>
 
-<!-- Modal de sélection de format -->
+<!-- Modal de sélection de format / produit / variante -->
 <div id="formatModal" class="modal">
     <div class="small-modal">
         <div class="modal-header">
-            <h3>Formats</h3>
+            <h3 id="formatModalTitle">Formats</h3>
             <span class="close-button" aria-label="Fermer">&times;</span>
         </div>
         <div class="modal-body">
@@ -155,6 +140,32 @@
                 <button class="format-btn" data-format="9:16">9:16</button>
                 <button id="format-product" class="format-btn">Produit</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de sélection de produit -->
+<div id="productModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3 id="productModalTitle">Produits</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="productList" class="vertical-buttons"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de sélection de variante -->
+<div id="variantModal" class="modal">
+    <div class="small-modal">
+        <div class="modal-header">
+            <h3 id="variantModalTitle">Variantes</h3>
+            <span class="close-button" aria-label="Fermer">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="variantList" class="vertical-buttons"></div>
         </div>
     </div>
 </div>
