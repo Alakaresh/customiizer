@@ -190,7 +190,7 @@
     position: relative;
 }
 
-.format-dropdown {
+#format-block .format-dropdown {
     position: absolute;
     top: 100%;
     left: 0;
@@ -198,17 +198,32 @@
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 8px;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
     z-index: 10;
     display: none;
 }
 
-.format-dropdown.active {
+#format-block .format-dropdown.active {
     display: flex;
 }
 
-.format-dropdown button {
+#format-block .format-dropdown .filter-buttons {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
+#format-block #product-block {
+    display: none;
+    margin-left: 8px;
+}
+
+#format-block #product-block.active {
+    display: flex;
+}
+
+#format-block .format-dropdown button {
     width: 100%;
     text-align: left;
     flex: none;

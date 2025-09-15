@@ -157,9 +157,9 @@
             $(this).addClass('active');
             $('#formatOptions').removeClass('active');
             $('#formatOptions .format-btn').removeClass('active');
-            $('#product-block').hide();
+            $('#product-block').removeClass('active');
             sizeBlock.hide();
-            $('#productButtons button').removeClass('active');
+            $('#product-block button').removeClass('active');
             $('#sizeButtons').empty();
             $('#open-format-menu').removeClass('active').text('Format');
             currentPage = 1;
@@ -170,11 +170,13 @@
         $('#open-format-menu').on('click', function (e) {
             e.stopPropagation();
             $('#formatOptions').toggleClass('active');
+            $('#product-block').removeClass('active');
         });
 
         $(document).on('click', function (e) {
             if (!$(e.target).closest('#formatOptions, #open-format-menu').length) {
                 $('#formatOptions').removeClass('active');
+                $('#product-block').removeClass('active');
             }
         });
 
@@ -188,12 +190,12 @@
             productFormats = [];
             sizeRatioMap = {};
             $('#formatOptions .format-btn').removeClass('active');
-            $('#productButtons button').removeClass('active');
+            $('#product-block button').removeClass('active');
             $('#sizeButtons').empty();
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active');
-            $('#product-block').hide();
+            $('#product-block').removeClass('active');
             sizeBlock.hide();
             currentPage = 1;
             renderFileList();
@@ -202,28 +204,16 @@
         });
 
         // Accès aux produits
-        $('#format-product').on('click', function () {
-            $('#formatOptions').removeClass('active');
-            $('#formatOptions .format-btn').removeClass('active');
-            $(this).addClass('active');
-            $('#mainFormatFilters .format-main').removeClass('active');
-            $('#open-format-menu').addClass('active').text('Format');
-            $('#product-block').show();
-            currentFormatFilter = 'all';
-            currentProduct = null;
-            currentSize = null;
-            productFormats = [];
-            sizeRatioMap = {};
-            sizeBlock.hide();
-            currentPage = 1;
-            renderFileList();
+        $('#format-product').on('click', function (e) {
+            e.stopPropagation();
+            $('#product-block').toggleClass('active');
         });
 
         // Chargement des produits
         fetch('/wp-json/api/v1/products/list')
             .then(res => res.json())
             .then(products => {
-                const container = $('#productButtons');
+                const container = $('#product-block');
                 container.empty();
                 (products || []).forEach(p => {
                     const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
@@ -234,6 +224,8 @@
                         $('.product-btn').removeClass('active');
                         $('#format-block .format-btn').removeClass('active');
                         $(this).addClass('active');
+                        $('#mainFormatFilters .format-main').removeClass('active');
+                        $('#open-format-menu').addClass('active').text('Format');
                         fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
                             .then(r => r.json())
                             .then(variants => {
@@ -273,6 +265,8 @@
                                 console.error('❌ load sizes', err);
                                 sizeBlock.hide();
                             });
+                        $('#formatOptions').removeClass('active');
+                        $('#product-block').removeClass('active');
                     });
                     container.append(btn);
                 });
