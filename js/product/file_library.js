@@ -250,7 +250,7 @@
                 const container = $('#productButtons');
                 container.empty();
                 (products || []).forEach(p => {
-                    const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
+                    const btn = $('<button type="button" class="format-btn product-btn"></button>').text(p.name);
                     btn.on('click', function () {
                         currentProduct = p.product_id;
                         currentSize = null;
@@ -272,7 +272,7 @@
                                 const sizeContainer = $('#sizeButtons');
                                 sizeContainer.empty();
                                 sizes.forEach(sz => {
-                                    const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+                                    const sbtn = $('<button type="button" class="format-btn size-btn"></button>').text(sz);
                                     sbtn.on('click', function () {
                                         currentSize = sz;
                                         currentFormatFilter = sizeRatioMap[sz] || 'all';
