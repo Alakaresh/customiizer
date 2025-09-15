@@ -63,7 +63,7 @@
         flex: 1;
     }
 
-    .format-dropdown button {
+    #format-block .format-dropdown button {
         flex: none;
     }
 }
