@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.customizerCache.products = window.customizerCache.products || [];
     window.customizerCache.variants = window.customizerCache.variants || {};
+    window.customizerCache.variantBasics = window.customizerCache.variantBasics || {};
 
     function persistCache() {
         const tmp = { ...window.customizerCache, models: {} };
@@ -34,18 +35,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        for (const p of window.customizerCache.products) {
-            if (!window.customizerCache.variants[p.product_id]) {
-                try {
-                    const res = await fetch(`/wp-json/api/v1/products/${p.product_id}`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        window.customizerCache.variants[p.product_id] = data;
-                        persistCache();
-                    }
-                } catch (err) {
-                    console.error('Preload variants error', p.product_id, err);
+        if (Object.keys(window.customizerCache.variantBasics).length === 0) {
+            try {
+                const res = await fetch('/wp-json/api/v1/products/variants_all');
+                if (res.ok) {
+                    const data = await res.json();
+                    const grouped = {};
+                    (data || []).forEach(v => {
+                        const pid = v.product_id;
+                        if (!grouped[pid]) grouped[pid] = [];
+                        grouped[pid].push({
+                            variant_id: v.variant_id,
+                            size: v.size,
+                            ratio_image: v.ratio_image
+                        });
+                    });
+                    window.customizerCache.variantBasics = grouped;
+                    persistCache();
                 }
+            } catch (err) {
+                console.error('Preload variants error', err);
             }
         }
     }

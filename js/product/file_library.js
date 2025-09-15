@@ -22,6 +22,42 @@
     const itemsPerPage = 40;       // Nombre d'images par page
     let searchTimeout;             // Délai pour la recherche distante
 
+    // Cache des variantes (taille/ratio) par produit
+    let variantCache = {};
+    try {
+        variantCache = window.customizerCache?.variantBasics || {};
+    } catch (e) {
+        variantCache = {};
+    }
+
+    async function ensureVariantCache() {
+        if (Object.keys(variantCache).length === 0) {
+            try {
+                const res = await fetch('/wp-json/api/v1/products/variants_all');
+                const data = await res.json();
+                const grouped = {};
+                (data || []).forEach(v => {
+                    if (!grouped[v.product_id]) grouped[v.product_id] = [];
+                    grouped[v.product_id].push({
+                        variant_id: v.variant_id,
+                        size: v.size,
+                        ratio_image: v.ratio_image
+                    });
+                });
+                variantCache = grouped;
+                window.customizerCache = window.customizerCache || {};
+                window.customizerCache.variantBasics = variantCache;
+                try {
+                    const tmp = { ...window.customizerCache, models: {} };
+                    sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+                } catch (e) {}
+            } catch (err) {
+                console.error('❌ preload variants', err);
+            }
+        }
+    }
+    ensureVariantCache();
+
     // -------- Cache format -> produits --------
     try {
         const saved = sessionStorage.getItem('previewFormatCache');
@@ -227,45 +263,66 @@
                         $(this).addClass('active');
                         $('#mainFormatFilters .format-main').removeClass('active');
                         $('#open-format-menu').addClass('active').text('Format');
-                        fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
-                            .then(r => r.json())
-                            .then(variants => {
-                                productFormats = [];
-                                sizeRatioMap = {};
-                                const sizes = [];
-                                (variants || []).forEach(v => {
-                                    if (!sizes.includes(v.size)) sizes.push(v.size);
-                                    sizeRatioMap[v.size] = v.ratio_image;
-                                    if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
-                                });
-                                const sizeContainer = $('#sizeButtons');
-                                sizeContainer.empty();
-                                sizes.forEach(sz => {
-                                    const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
-                                    sbtn.on('click', function () {
-                                        currentSize = sz;
-                                        currentFormatFilter = sizeRatioMap[sz] || 'all';
-                                        $('.size-btn').removeClass('active');
-                                        $(this).addClass('active');
-                                        currentPage = 1;
-                                        renderFileList();
-                                        if (currentFormatFilter !== 'all') {
-                                            updateFormatLabel(currentFormatFilter, true);
-                                        } else {
-                                            $('#open-format-menu').text('Format');
-                                        }
-                                    });
-                                    sizeContainer.append(sbtn);
-                                });
-                                sizeBlock.css('display', 'flex');
-                                $('#sizeButtons button').removeClass('active');
-                                currentPage = 1;
-                                renderFileList();
-                            })
-                            .catch(err => {
-                                console.error('❌ load sizes', err);
-                                sizeBlock.hide();
+
+                        const handleVariants = (variants) => {
+                            productFormats = [];
+                            sizeRatioMap = {};
+                            const sizes = [];
+                            (variants || []).forEach(v => {
+                                if (!sizes.includes(v.size)) sizes.push(v.size);
+                                sizeRatioMap[v.size] = v.ratio_image;
+                                if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
                             });
+                            const sizeContainer = $('#sizeButtons');
+                            sizeContainer.empty();
+                            sizes.forEach(sz => {
+                                const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+                                sbtn.on('click', function () {
+                                    currentSize = sz;
+                                    currentFormatFilter = sizeRatioMap[sz] || 'all';
+                                    $('.size-btn').removeClass('active');
+                                    $(this).addClass('active');
+                                    currentPage = 1;
+                                    renderFileList();
+                                    if (currentFormatFilter !== 'all') {
+                                        updateFormatLabel(currentFormatFilter, true);
+                                    } else {
+                                        $('#open-format-menu').text('Format');
+                                    }
+                                });
+                                sizeContainer.append(sbtn);
+                            });
+                            sizeBlock.css('display', 'flex');
+                            $('#sizeButtons button').removeClass('active');
+                            currentPage = 1;
+                            renderFileList();
+                        };
+
+                        const cached = variantCache[p.product_id];
+                        if (cached) {
+                            handleVariants(cached);
+                        } else {
+                            fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
+                                .then(r => r.json())
+                                .then(variants => {
+                                    variantCache[p.product_id] = (variants || []).map(v => ({
+                                        variant_id: v.variant_id,
+                                        size: v.size,
+                                        ratio_image: v.ratio_image
+                                    }));
+                                    try {
+                                        window.customizerCache = window.customizerCache || {};
+                                        window.customizerCache.variantBasics = variantCache;
+                                        const tmp = { ...window.customizerCache, models: {} };
+                                        sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+                                    } catch (e) {}
+                                    handleVariants(variantCache[p.product_id]);
+                                })
+                                .catch(err => {
+                                    console.error('❌ load sizes', err);
+                                    sizeBlock.hide();
+                                });
+                        }
                     });
                     container.append(btn);
                 });
