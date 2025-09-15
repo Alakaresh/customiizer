@@ -232,6 +232,7 @@
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
+
             formatOptions.hide();
             productButtons.show();
             sizeButtons.hide();

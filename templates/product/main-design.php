@@ -124,7 +124,6 @@
 
 </div>
 
-<!-- Modal de sélection de format / produit / variante -->
 <div id="formatModal" class="modal">
     <div class="small-modal">
         <div class="modal-header">
