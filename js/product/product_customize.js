@@ -185,6 +185,7 @@ jQuery(document).ready(function ($) {
                 });
                 first.focus();
         }
+       window.trapFocus = trapFocus;
 
        function releaseFocus(modal) {
                modal.off('keydown.trapFocus');
