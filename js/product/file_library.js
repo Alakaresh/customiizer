@@ -106,16 +106,25 @@
      * Met à jour le libellé du format sélectionné.
      * @param {string} fmt                 Ratio de l'image.
      * @param {boolean} [showProductName]  Affiche le nom du produit associé si true.
+     * @param {string|null} productName    Nom du produit sélectionné.
+     * @param {string|null} variantName    Nom de la variante sélectionnée.
      */
-    function updateFormatLabel(fmt, showProductName = false) {
+    function updateFormatLabel(fmt, showProductName = false, productName = null, variantName = null) {
         const btn = $('#open-format-menu');
         btn.addClass('active').text(`Format: ${fmt}`);
         if (showProductName) {
-            getProductNameForFormat(fmt).then(name => {
-                if (name) {
-                    btn.addClass('active').text(`Format: ${name}`);
-                }
-            });
+            const parts = [];
+            if (productName) parts.push(productName);
+            if (variantName) parts.push(variantName);
+            if (parts.length > 0) {
+                btn.addClass('active').text(`Format: ${parts.join(' – ')}`);
+            } else {
+                getProductNameForFormat(fmt).then(name => {
+                    if (name) {
+                        btn.addClass('active').text(`Format: ${name}`);
+                    }
+                });
+            }
         }
     }
 
@@ -285,7 +294,7 @@
                                     currentPage = 1;
                                     renderFileList();
                                     if (currentFormatFilter !== 'all') {
-                                        updateFormatLabel(currentFormatFilter, true);
+                                        updateFormatLabel(currentFormatFilter, true, p.name, sz);
                                     } else {
                                         $('#open-format-menu').text('Format');
                                     }
