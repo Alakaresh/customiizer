@@ -71,6 +71,15 @@
         flex: 1;
     }
 
+    #product-block {
+        position: static;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+    #product-block button {
+        flex: none;
+    }
+
     .format-dropdown button {
         flex: none;
     }

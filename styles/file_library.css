@@ -394,3 +394,17 @@
 .pagination-controls .page-total {
     color: var(--text-color);
 }
+
+#product-block {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 10px);
+    display: flex;
+    flex-direction: column;
+    min-width: 160px;
+}
+
+#product-block button {
+    width: 100%;
+    text-align: left;
+}

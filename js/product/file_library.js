@@ -159,7 +159,7 @@
             $('#formatOptions .format-btn').removeClass('active');
             $('#product-block').hide();
             sizeBlock.hide();
-            $('#productButtons button').removeClass('active');
+            $('#product-block button').removeClass('active');
             $('#sizeButtons').empty();
             $('#open-format-menu').removeClass('active').text('Format');
             currentPage = 1;
@@ -170,11 +170,15 @@
         $('#open-format-menu').on('click', function (e) {
             e.stopPropagation();
             $('#formatOptions').toggleClass('active');
+            if (!$('#formatOptions').hasClass('active')) {
+                $('#product-block').hide();
+            }
         });
 
         $(document).on('click', function (e) {
-            if (!$(e.target).closest('#formatOptions, #open-format-menu').length) {
+            if (!$(e.target).closest('#formatOptions, #open-format-menu, #product-block').length) {
                 $('#formatOptions').removeClass('active');
+                $('#product-block').hide();
             }
         });
 
@@ -188,7 +192,7 @@
             productFormats = [];
             sizeRatioMap = {};
             $('#formatOptions .format-btn').removeClass('active');
-            $('#productButtons button').removeClass('active');
+            $('#product-block button').removeClass('active');
             $('#sizeButtons').empty();
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
@@ -203,17 +207,16 @@
 
         // Accès aux produits
         $('#format-product').on('click', function () {
-            $('#formatOptions').removeClass('active');
             $('#formatOptions .format-btn').removeClass('active');
             $(this).addClass('active');
             $('#mainFormatFilters .format-main').removeClass('active');
             $('#open-format-menu').addClass('active').text('Format');
-            $('#product-block').show();
             currentFormatFilter = 'all';
             currentProduct = null;
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
+            $('#product-block').show();
             sizeBlock.hide();
             currentPage = 1;
             renderFileList();
@@ -223,7 +226,7 @@
         fetch('/wp-json/api/v1/products/list')
             .then(res => res.json())
             .then(products => {
-                const container = $('#productButtons');
+                const container = $('#product-block');
                 container.empty();
                 (products || []).forEach(p => {
                     const btn = $('<button type="button" class="product-btn"></button>').text(p.name);

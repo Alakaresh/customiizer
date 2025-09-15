@@ -113,10 +113,7 @@
                             <button class="format-btn" data-format="9:16">9:16</button>
                             <button id="format-product" class="format-btn">Produit</button>
                         </div>
-                    </div>
-                    <div class="filter-group" id="product-block" style="display:none">
-                        <h4>Produits</h4>
-                        <div id="productButtons" class="filter-buttons"></div>
+                        <div id="product-block" class="filter-buttons product-list" style="display:none"></div>
                     </div>
                     <div class="filter-group" id="size-block" style="display:none">
                         <h4>Tailles</h4>
