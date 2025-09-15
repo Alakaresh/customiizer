@@ -281,7 +281,6 @@
                             });
                     });
                     container.append(btn);
-
                     fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
                         .then(r => r.json())
                         .then(variants => {
