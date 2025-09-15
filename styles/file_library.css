@@ -158,10 +158,6 @@
     flex: 1;
 }
 
-#size-block {
-    display: none;
-}
-
 .filter-group h4 {
     margin: 0;
     color: var(--text-color);
@@ -225,6 +221,27 @@
 
 #format-block #product-block.active {
     display: flex;
+}
+
+#format-block #product-block .product-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+#format-block #product-block .size-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#format-block #product-block .size-list button {
+    flex: none;
+    width: auto;
+}
+
+#format-block #product-block .product-row .product-btn {
+    width: auto;
 }
 
 #format-block .format-dropdown button {

@@ -117,10 +117,6 @@
                             <div id="product-block" class="filter-buttons"></div>
                         </div>
                     </div>
-                    <div class="filter-group" id="size-block">
-                        <h4>Tailles</h4>
-                        <div id="sizeButtons" class="filter-buttons"></div>
-                    </div>
                 </div>
                 <div class="sort-wrapper">
                     <label for="sort-select">Trié par</label>
