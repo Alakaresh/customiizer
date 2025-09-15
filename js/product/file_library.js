@@ -32,7 +32,6 @@
     } catch (e) {
         window.previewFormatCache = window.previewFormatCache || {};
     }
-
     function getProductNameForFormat(fmt) {
         const cached = window.previewFormatCache && window.previewFormatCache[fmt];
         return extractProductName(cached);
