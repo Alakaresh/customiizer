@@ -110,6 +110,7 @@ add_action( 'init', function() {
 
         $includes = [
                 '/utilities.php',
+                '/includes/variant_product_map.php',
                 '/assets.php',
                 '/includes/azure.php',
 

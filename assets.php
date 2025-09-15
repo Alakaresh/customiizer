@@ -81,6 +81,7 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_script('user-modal-script', get_stylesheet_directory_uri() . '/js/account/user-modal.js', ['jquery'], $ver, true);
        wp_enqueue_script('cart-modal-script', get_stylesheet_directory_uri() . '/js/cart/cart-modal.js', [], $ver, true);
        wp_enqueue_script('preload-products', get_stylesheet_directory_uri() . '/js/preload_products.js', [], $ver, true);
+        wp_enqueue_script('variant-map', get_stylesheet_directory_uri() . '/js/variant_map.js', [], $ver, true);
        wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
        wp_enqueue_script('referral-script', get_stylesheet_directory_uri() . '/js/referral/referral.js', [], $ver, true);
        wp_enqueue_script('mission-indicator', get_stylesheet_directory_uri() . '/js/mission_indicator.js', ['jquery'], $ver, true);
