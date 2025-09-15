@@ -33,27 +33,9 @@
         window.previewFormatCache = window.previewFormatCache || {};
     }
 
-    function persistPreviewCache() {
-        try {
-            sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
-        } catch (e) {}
-    }
-
-    async function getProductNameForFormat(fmt) {
-        const cached = window.previewFormatCache[fmt];
-        if (cached) {
-            return extractProductName(cached);
-        }
-        try {
-            const res = await fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`);
-            const data = await res.json();
-            window.previewFormatCache[fmt] = data;
-            persistPreviewCache();
-            return extractProductName(data);
-        } catch (err) {
-            console.error('❌ format fetch', fmt, err);
-            return null;
-        }
+    function getProductNameForFormat(fmt) {
+        const cached = window.previewFormatCache && window.previewFormatCache[fmt];
+        return extractProductName(cached);
     }
 
     function extractProductName(data) {
@@ -75,11 +57,10 @@
         const btn = $('#open-format-menu');
         btn.addClass('active').text(`Format: ${fmt}`);
         if (showProductName) {
-            getProductNameForFormat(fmt).then(name => {
-                if (name) {
-                    btn.addClass('active').text(`Format: ${name}`);
-                }
-            });
+            const name = getProductNameForFormat(fmt);
+            if (name) {
+                btn.addClass('active').text(`Format: ${name}`);
+            }
         }
     }
 
@@ -209,70 +190,69 @@
             $('#product-block').toggleClass('active');
         });
 
-        // Chargement des produits
-        fetch('/wp-json/api/v1/products/list')
-            .then(res => res.json())
-            .then(products => {
-                const container = $('#product-block');
-                container.empty();
-                (products || []).forEach(p => {
-                    const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
-                    btn.on('click', function () {
-                        currentProduct = p.product_id;
-                        currentSize = null;
-                        currentFormatFilter = 'all';
-                        $('.product-btn').removeClass('active');
-                        $('#format-block .format-btn').removeClass('active');
-                        $(this).addClass('active');
-                        $('#mainFormatFilters .format-main').removeClass('active');
-                        $('#open-format-menu').addClass('active').text('Format');
-                        fetch(`/wp-json/api/v1/products/${p.product_id}/variants`)
-                            .then(r => r.json())
-                            .then(variants => {
-                                productFormats = [];
-                                sizeRatioMap = {};
-                                const sizes = [];
-                                (variants || []).forEach(v => {
-                                    if (!sizes.includes(v.size)) sizes.push(v.size);
-                                    sizeRatioMap[v.size] = v.ratio_image;
-                                    if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
-                                });
-                                const sizeContainer = sizeBlock;
-                                sizeContainer.empty();
-                                sizes.forEach(sz => {
-                                    const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
-                                    sbtn.on('click', function () {
-                                        currentSize = sz;
-                                        currentFormatFilter = sizeRatioMap[sz] || 'all';
-                                        $('.size-btn').removeClass('active');
-                                        $(this).addClass('active');
-                                        currentPage = 1;
-                                        renderFileList();
-                                        if (currentFormatFilter !== 'all') {
-                                            updateFormatLabel(currentFormatFilter, true);
-                                        } else {
-                                            $('#open-format-menu').text('Format');
-                                        }
-                                        $('#formatOptions').removeClass('active');
-                                        $('#product-block').removeClass('active');
-                                        sizeBlock.removeClass('active');
-                                    });
-                                    sizeContainer.append(sbtn);
-                                });
-                                sizeBlock.addClass('active');
-                                sizeBlock.find('button').removeClass('active');
-                                currentPage = 1;
-                                renderFileList();
-                            })
-                            .catch(err => {
-                                console.error('❌ load sizes', err);
-                                sizeBlock.removeClass('active');
-                            });
-                    });
-                    container.append(btn);
+        // Chargement des produits depuis le cache préchargé
+        const container = $('#product-block');
+        container.empty();
+        const products = (window.customizerCache && Array.isArray(window.customizerCache.products))
+            ? window.customizerCache.products
+            : [];
+
+        products.forEach(p => {
+            const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
+            btn.on('click', function () {
+                currentProduct = p.product_id;
+                currentSize = null;
+                currentFormatFilter = 'all';
+                $('.product-btn').removeClass('active');
+                $('#format-block .format-btn').removeClass('active');
+                $(this).addClass('active');
+                $('#mainFormatFilters .format-main').removeClass('active');
+                $('#open-format-menu').addClass('active').text('Format');
+
+                const variantData = window.customizerCache?.variants?.[p.product_id];
+                const variants = Array.isArray(variantData)
+                    ? variantData
+                    : (variantData && Array.isArray(variantData.variants) ? variantData.variants : []);
+
+                productFormats = [];
+                sizeRatioMap = {};
+                const sizes = [];
+                (variants || []).forEach(v => {
+                    if (!sizes.includes(v.size)) sizes.push(v.size);
+                    sizeRatioMap[v.size] = v.ratio_image;
+                    if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
                 });
-            })
-            .catch(err => console.error('❌ load products', err));
+
+                const sizeContainer = sizeBlock;
+                sizeContainer.empty();
+                sizes.forEach(sz => {
+                    const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+                    sbtn.on('click', function () {
+                        currentSize = sz;
+                        currentFormatFilter = sizeRatioMap[sz] || 'all';
+                        $('.size-btn').removeClass('active');
+                        $(this).addClass('active');
+                        currentPage = 1;
+                        renderFileList();
+                        if (currentFormatFilter !== 'all') {
+                            updateFormatLabel(currentFormatFilter, true);
+                        } else {
+                            $('#open-format-menu').text('Format');
+                        }
+                        $('#formatOptions').removeClass('active');
+                        $('#product-block').removeClass('active');
+                        sizeBlock.removeClass('active');
+                    });
+                    sizeContainer.append(sbtn);
+                });
+                sizeBlock.addClass('active');
+                sizeBlock.find('button').removeClass('active');
+                currentPage = 1;
+                renderFileList();
+                $('#product-block').removeClass('active');
+            });
+            container.append(btn);
+        });
 
         // Zone de dépôt et chargement de fichiers
         const dropZone = $('#fileDropZone');

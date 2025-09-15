@@ -15,21 +15,6 @@ function persistPreviewCache() {
     } catch (e) {}
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const formats = ['1:1', '3:4', '4:3', '16:9', '9:16'];
-    formats.forEach(fmt => {
-        if (!window.previewFormatCache[fmt]) {
-            fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`)
-                .then(res => res.json())
-                .then(data => {
-                    window.previewFormatCache[fmt] = data;
-                    persistPreviewCache();
-                })
-                .catch(err => console.error('❌ Preload format', fmt, err));
-        }
-    });
-});
-
 
 function enableImageEnlargement() {
         // D'abord retirer l'ancien event listener si présent
