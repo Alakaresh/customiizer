@@ -124,7 +124,6 @@
 
 </div>
 
-<!-- Modal de sélection de format / produit / variante -->
 <div id="formatModal" class="modal">
     <div class="small-modal">
         <div class="modal-header">
@@ -140,6 +139,8 @@
                 <button class="format-btn" data-format="9:16">9:16</button>
                 <button id="format-product" class="format-btn">Produit</button>
             </div>
+            <div id="productButtons" class="filter-buttons" style="display:none;"></div>
+            <div id="sizeButtons" class="filter-buttons" style="display:none;"></div>
         </div>
     </div>
 </div>

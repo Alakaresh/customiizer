@@ -239,6 +239,7 @@
             .then(products => {
                 productList.empty();
                 (products || []).forEach(p => {
+
                     const btn = $('<button type="button" class="format-btn product-btn"></button>')
                         .text(p.name)
                         .data('id', p.product_id);
