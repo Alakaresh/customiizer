@@ -216,10 +216,14 @@
         // Chargement des produits
         fetch('/wp-json/api/v1/products/list')
             .then(res => res.json())
-            .then(products => {
+            .then(data => {
+                // L'API devrait retourner un tableau de produits, mais certains environnements
+                // peuvent encapsuler les données dans une propriété (ex: { products: [...] }).
+                const products = Array.isArray(data) ? data : (Array.isArray(data.products) ? data.products : []);
+
                 const container = $('#product-block');
                 container.empty();
-                (products || []).forEach(p => {
+                products.forEach(p => {
                     const row = $('<div class="product-row"></div>');
                     const btn = $('<button type="button" class="product-btn"></button>').text(p.name);
                     const sizeContainer = $('<div class="size-list filter-buttons"></div>');
