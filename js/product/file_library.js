@@ -177,6 +177,7 @@
             if (!$(e.target).closest('#formatOptions, #open-format-menu').length) {
                 $('#formatOptions').removeClass('active');
                 $('#product-block').removeClass('active');
+                sizeBlock.hide();
             }
         });
 
@@ -256,7 +257,7 @@
                                     });
                                     sizeContainer.append(sbtn);
                                 });
-                                sizeBlock.show();
+                                sizeBlock.css('display', 'flex');
                                 $('#sizeButtons button').removeClass('active');
                                 currentPage = 1;
                                 renderFileList();
@@ -265,8 +266,6 @@
                                 console.error('❌ load sizes', err);
                                 sizeBlock.hide();
                             });
-                        $('#formatOptions').removeClass('active');
-                        $('#product-block').removeClass('active');
                     });
                     container.append(btn);
                 });
