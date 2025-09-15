@@ -243,7 +243,6 @@
 /* Style d’un élément de fichier */
 .file-item {
     position: relative;
-    cursor: pointer;
 }
 .file-item img {
     width: 100%;
@@ -255,6 +254,9 @@
 }
 .file-item img:hover {
     transform: none;
+}
+.file-item img.preview-enlarge {
+    cursor: default;
 }
 .file-item .file-name {
     display: none;
