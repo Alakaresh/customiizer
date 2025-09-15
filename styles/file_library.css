@@ -160,6 +160,11 @@
 
 #size-block {
     display: none;
+    flex-direction: column;
+}
+
+#format-block .format-dropdown #size-block {
+    margin-left: 8px;
 }
 
 .filter-group h4 {
