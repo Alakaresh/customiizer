@@ -39,6 +39,24 @@
         } catch (e) {}
     }
 
+    // Précharge les associations format → produit dès que le DOM est prêt
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.querySelectorAll('#formatOptions .format-btn, #mainFormatFilters .format-main');
+        const formats = Array.from(buttons)
+            .map(btn => btn.dataset.format)
+            .filter(Boolean);
+        formats.forEach(fmt => {
+            if (window.previewFormatCache[fmt]) return;
+            fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`)
+                .then(res => res.json())
+                .then(data => {
+                    window.previewFormatCache[fmt] = data;
+                    persistPreviewCache();
+                })
+                .catch(err => console.error('❌ Preload format', fmt, err));
+        });
+    });
+
     async function getProductNameForFormat(fmt) {
         const cached = window.previewFormatCache[fmt];
         if (cached) {
