@@ -153,9 +153,13 @@
 
 .filters {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 15px;
     flex: 1;
+}
+
+#size-block {
+    display: none;
 }
 
 .filter-group h4 {
