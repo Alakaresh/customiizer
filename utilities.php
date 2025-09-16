@@ -21,11 +21,28 @@ if (!defined('MOCKUP_MAX_DIMENSION')) {
 // Hosts allowed for remote image downloads performed by convert_webp_to_png_server().
 // Only images from these domains will be retrieved.
 if (!defined('ALLOWED_IMAGE_HOSTS')) {
-    $host = parse_url(site_url(), PHP_URL_HOST);
     $hosts = ['customiizer.blob.core.windows.net'];
+
+    $host = null;
+    if (function_exists('site_url')) {
+        $site_url = site_url();
+        if ($site_url) {
+            $host = parse_url($site_url, PHP_URL_HOST);
+        }
+    }
+
+    if (!$host) {
+        $server_host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? null;
+        if ($server_host) {
+            // Remove the port if present (e.g. example.com:8443).
+            $host = preg_replace('/:\d+$/', '', $server_host);
+        }
+    }
+
     if ($host && !in_array($host, $hosts, true)) {
         $hosts[] = $host;
     }
+
     define('ALLOWED_IMAGE_HOSTS', $hosts);
 }
 
