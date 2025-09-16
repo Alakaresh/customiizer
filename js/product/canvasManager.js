@@ -260,9 +260,66 @@ const CanvasManager = {
   },
 
   // Ajoute l’image utilisateur sous le clip (origine = coin HG de la fenêtre)
-  addImage(url) {
+  addImage(url, optionsOrCallback, maybeCallback) {
     if (!canvas) { CM.warn('addImage: canvas absent'); return; }
     CM.log('addImage: start', url);
+
+    let options = {};
+    let done = null;
+    if (typeof optionsOrCallback === 'function') {
+      done = optionsOrCallback;
+    } else if (optionsOrCallback && typeof optionsOrCallback === 'object') {
+      options = optionsOrCallback;
+      if (typeof maybeCallback === 'function') {
+        done = maybeCallback;
+      }
+    } else if (typeof maybeCallback === 'function') {
+      done = maybeCallback;
+    }
+
+    const placement = options?.placement || null;
+
+    const applySavedPlacement = (img, zone) => {
+      if (!placement || !img) return;
+      const safeNumber = (value) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : null;
+      };
+
+      const width = safeNumber(placement.design_width);
+      const height = safeNumber(placement.design_height);
+      if (width != null && img.width) {
+        const scaleX = width / img.width;
+        if (Number.isFinite(scaleX) && scaleX > 0) {
+          img.set({ scaleX });
+        }
+      }
+      if (height != null && img.height) {
+        const scaleY = height / img.height;
+        if (Number.isFinite(scaleY) && scaleY > 0) {
+          img.set({ scaleY });
+        }
+      }
+
+      const left = safeNumber(placement.design_left);
+      const top = safeNumber(placement.design_top);
+      if (left != null) {
+        img.set({ left: zone.left + left });
+      }
+      if (top != null) {
+        img.set({ top: zone.top + top });
+      }
+
+      if (placement.design_angle != null) {
+        const angle = safeNumber(placement.design_angle);
+        if (angle != null) {
+          img.set({ angle });
+        }
+      }
+      if (typeof placement.design_flipX !== 'undefined') {
+        img.set({ flipX: !!placement.design_flipX });
+      }
+    };
 
     Promise.all([bgReady, maskReady]).then(() => {
       CM.log('addImage: BG+mask ready');
@@ -285,6 +342,8 @@ const CanvasManager = {
           lockUniScaling: true,
         });
 
+        applySavedPlacement(img, zone);
+
         const finalize = () => {
           canvas.add(img);
           img.setCoords();
@@ -298,6 +357,14 @@ const CanvasManager = {
           setTimeout(() => this._resizeToContainer(_containerId), 200);
 
           setTimeout(() => notifyChange('addImage(finalize)'), 0);
+
+          if (typeof done === 'function') {
+            try {
+              done(img);
+            } catch (err) {
+              CM.error('addImage: callback error', err);
+            }
+          }
         };
 
         if (maskPath) {

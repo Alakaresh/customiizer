@@ -53,7 +53,9 @@ jQuery(document).ready(function ($) {
                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
                        technique: selectedVariant?.technique || ''
                };
-                if (window.customizerCache) {
+                if (window.DesignCache?.saveDesign) {
+                        window.DesignCache.saveDesign(window.currentProductId, productData);
+                } else if (window.customizerCache) {
                         window.customizerCache.designs = window.customizerCache.designs || {};
                         window.customizerCache.designs[window.currentProductId] = productData;
                         if (typeof persistCache === 'function') {
@@ -93,7 +95,9 @@ jQuery(document).ready(function ($) {
                                 } else {
                                         alert("Erreur lors de la génération du mockup");
                                 }
-                                if (window.customizerCache?.designs?.[window.currentProductId]) {
+                                if (window.DesignCache?.saveDesign) {
+                                        window.DesignCache.saveDesign(window.currentProductId, productData);
+                                } else if (window.customizerCache?.designs?.[window.currentProductId]) {
                                         window.customizerCache.designs[window.currentProductId] = productData;
                                         if (typeof persistCache === 'function') {
                                                 persistCache();
@@ -311,9 +315,6 @@ jQuery(document).ready(function ($) {
 
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function (event) {
-                const isProgrammaticTrigger = Boolean(event && event.isTrigger);
-                const hasNativeEvent = Boolean(event && event.originalEvent);
-                const shouldRestoreDesign = hasNativeEvent && !isProgrammaticTrigger;
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
@@ -350,14 +351,7 @@ jQuery(document).ready(function ($) {
                         // 2. Lancer Fabric.js dans le container
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
-                        if (shouldRestoreDesign) {
-                                const savedDesign = window.customizerCache?.designs?.[window.currentProductId];
-                                if (savedDesign && savedDesign.design_image_url) {
-                                        CanvasManager.restoreFromProductData(savedDesign, () => {
-                                                updateAddImageButtonVisibility();
-                                        });
-                                }
-                        }
+                        // La personnalisation n'est plus restaurée automatiquement lors d'une réouverture.
 
                         // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {

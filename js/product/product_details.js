@@ -46,6 +46,205 @@ function persistCache() {
     const tmp = { ...window.customizerCache, models: {} };
     sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
 }
+
+const DESIGN_CACHE_MIRROR_FIELDS = [
+    'product_name',
+    'product_price',
+    'delivery_price',
+    'mockup_url',
+    'design_image_url',
+    'design_width',
+    'design_height',
+    'design_left',
+    'design_top',
+    'design_angle',
+    'design_flipX',
+    'variant_id',
+    'placement',
+    'technique',
+    'product_id'
+];
+
+const DESIGN_CACHE_NUMERIC_FIELDS = ['design_left', 'design_top', 'design_width', 'design_height', 'design_angle'];
+
+function cloneDesignData(data) {
+    if (!data) return null;
+    try {
+        return JSON.parse(JSON.stringify(data));
+    } catch (err) {
+        const clone = {};
+        Object.keys(data || {}).forEach((key) => {
+            clone[key] = data[key];
+        });
+        return clone;
+    }
+}
+
+function computePlacementKey(designUrl) {
+    if (!designUrl || typeof designUrl !== 'string') return null;
+    const trimmed = designUrl.trim();
+    if (trimmed.startsWith('data:')) {
+        const fragment = trimmed.slice(0, 512);
+        let hash = 0;
+        for (let i = 0; i < fragment.length; i++) {
+            hash = (hash * 31 + fragment.charCodeAt(i)) >>> 0;
+        }
+        return `data:${hash.toString(16)}`;
+    }
+    return trimmed;
+}
+
+function mirrorEntryFields(entry, data) {
+    DESIGN_CACHE_MIRROR_FIELDS.forEach((field) => {
+        if (data && data[field] !== undefined) {
+            entry[field] = data[field];
+        } else {
+            delete entry[field];
+        }
+    });
+}
+
+function buildPlacementPayload(data) {
+    if (!data) return null;
+    const placement = {};
+    DESIGN_CACHE_NUMERIC_FIELDS.forEach((field) => {
+        if (data[field] === undefined || data[field] === null || data[field] === '') return;
+        const value = Number(data[field]);
+        if (!Number.isNaN(value)) {
+            placement[field] = value;
+        }
+    });
+    if (typeof data.design_flipX !== 'undefined') {
+        placement.design_flipX = !!data.design_flipX;
+    }
+    if (data.placement) {
+        placement.placement = data.placement;
+    }
+    if (data.technique) {
+        placement.technique = data.technique;
+    }
+    if (data.variant_id !== undefined && data.variant_id !== null && data.variant_id !== '') {
+        placement.variant_id = String(data.variant_id);
+    }
+    return Object.keys(placement).length ? placement : null;
+}
+
+function ensureDesignEntry(productId) {
+    if (!productId) return null;
+    window.customizerCache.designs = window.customizerCache.designs || {};
+    let entry = window.customizerCache.designs[productId];
+    const isObject = entry && typeof entry === 'object' && !Array.isArray(entry);
+
+    if (!isObject) {
+        entry = { placements: {}, last: null };
+    } else if (entry.design_image_url && !entry.last) {
+        const legacy = entry;
+        entry = { placements: {}, last: cloneDesignData(legacy) };
+        if (legacy.product_id) {
+            entry.product_id = legacy.product_id;
+        }
+        const legacyPlacement = buildPlacementPayload(legacy);
+        const legacyKey = computePlacementKey(legacy.design_image_url);
+        if (legacyPlacement && legacyKey) {
+            entry.placements[legacyKey] = entry.placements[legacyKey] || {};
+            const variantKey = legacyPlacement.variant_id || '_default';
+            entry.placements[legacyKey][variantKey] = legacyPlacement;
+        }
+    } else {
+        entry.placements = entry.placements || {};
+        if (entry.last && entry.last.design_image_url) {
+            const currentPlacement = buildPlacementPayload(entry.last);
+            const currentKey = computePlacementKey(entry.last.design_image_url);
+            if (currentPlacement && currentKey) {
+                entry.placements[currentKey] = entry.placements[currentKey] || {};
+                const variantKey = currentPlacement.variant_id || '_default';
+                entry.placements[currentKey][variantKey] = currentPlacement;
+            }
+        }
+    }
+
+    mirrorEntryFields(entry, entry.last);
+    window.customizerCache.designs[productId] = entry;
+    return entry;
+}
+
+function storePlacement(entry, data) {
+    if (!entry || !data || !data.design_image_url) return;
+    const key = computePlacementKey(data.design_image_url);
+    if (!key) return;
+    const placement = buildPlacementPayload(data);
+    if (!placement) return;
+    entry.placements = entry.placements || {};
+    entry.placements[key] = entry.placements[key] || {};
+    const variantKey = placement.variant_id || '_default';
+    entry.placements[key][variantKey] = placement;
+}
+
+function saveDesignToCache(productId, productData) {
+    if (!productId) return null;
+    const entry = ensureDesignEntry(productId) || { placements: {}, last: null };
+    const clone = cloneDesignData(productData);
+    entry.last = clone;
+    if (clone && clone.product_id) {
+        entry.product_id = clone.product_id;
+    }
+    if (clone) {
+        storePlacement(entry, clone);
+    }
+    mirrorEntryFields(entry, clone);
+    window.customizerCache.designs[productId] = entry;
+    if (typeof persistCache === 'function') {
+        try { persistCache(); } catch (e) {}
+    }
+    return entry.last;
+}
+
+function updateDesignProductId(productId, productIdValue) {
+    if (!productId || !productIdValue) return;
+    const entry = ensureDesignEntry(productId);
+    if (!entry) return;
+    entry.product_id = productIdValue;
+    if (entry.last) {
+        entry.last.product_id = productIdValue;
+    }
+    mirrorEntryFields(entry, entry.last);
+    if (typeof persistCache === 'function') {
+        try { persistCache(); } catch (e) {}
+    }
+}
+
+function getLastDesignFromCache(productId) {
+    const entry = ensureDesignEntry(productId);
+    return entry ? entry.last : null;
+}
+
+function getPlacementForImage(productId, imageUrl, variantId) {
+    if (!productId || !imageUrl) return null;
+    const entry = ensureDesignEntry(productId);
+    if (!entry) return null;
+    const key = computePlacementKey(imageUrl);
+    if (!key) return null;
+    const perImage = entry.placements?.[key];
+    if (!perImage) return null;
+    const variantKey = variantId !== undefined && variantId !== null ? String(variantId) : '_default';
+    const placement = perImage[variantKey] || perImage['_default'];
+    return placement ? { ...placement } : null;
+}
+
+window.DesignCache = {
+    saveDesign: saveDesignToCache,
+    updateProductId: updateDesignProductId,
+    getLastDesign: getLastDesignFromCache,
+    getPlacement: getPlacementForImage,
+    ensureEntry: ensureDesignEntry
+};
+
+try {
+    Object.keys(window.customizerCache.designs || {}).forEach((pid) => ensureDesignEntry(pid));
+    if (typeof persistCache === 'function') {
+        persistCache();
+    }
+} catch (e) {}
 jQuery(document).ready(function ($) {
         const apiBaseURL = '/wp-json/api/v1/products';
         const mainProductImage = $('#product-main-image');
@@ -444,6 +643,11 @@ jQuery(document).ready(function ($) {
                 let designUrl = null;
                 if (typeof productData !== 'undefined' && productData?.design_image_url) {
                         designUrl = productData.design_image_url;
+                } else if (window.DesignCache?.getLastDesign) {
+                        const cachedDesign = window.DesignCache.getLastDesign(window.currentProductId);
+                        if (cachedDesign?.design_image_url) {
+                                designUrl = cachedDesign.design_image_url;
+                        }
                 } else if (window.customizerCache?.designs?.[window.currentProductId]?.design_image_url) {
                         designUrl = window.customizerCache.designs[window.currentProductId].design_image_url;
                 }
@@ -517,7 +721,11 @@ jQuery(document).ready(function ($) {
                                 const applyImageToCustomizer = () => {
                                         const addToCanvas = () => {
                                                 if (typeof CanvasManager === 'undefined') return;
-                                                CanvasManager.addImage(imageUrl, () => {
+                                                const activeVariant = (typeof selectedVariant !== 'undefined' && selectedVariant) ? selectedVariant : window.selectedVariant;
+                                                const placement = window.DesignCache?.getPlacement
+                                                        ? window.DesignCache.getPlacement(window.currentProductId, imageUrl, activeVariant?.variant_id)
+                                                        : null;
+                                                const afterAdd = () => {
                                                         const addImageButton = jQuery('#addImageButton');
                                                         const imageControls = jQuery('.image-controls');
                                                         const visualHeader = jQuery('.visual-header');
@@ -527,7 +735,12 @@ jQuery(document).ready(function ($) {
                                                         visualHeader.css('display', 'flex');
                                                         jQuery('.visual-zone').addClass('with-header');
                                                         CanvasManager.resizeToContainer('product2DContainer');
-                                                });
+                                                };
+                                                if (placement) {
+                                                        CanvasManager.addImage(imageUrl, { placement }, afterAdd);
+                                                } else {
+                                                        CanvasManager.addImage(imageUrl, afterAdd);
+                                                }
                                         };
 
                                         if (jQuery('#customizeModal').is(':visible')) {
