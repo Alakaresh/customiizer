@@ -33,6 +33,8 @@ jQuery(document).ready(function($) {
                 let productDataToSend = null;
                 if (productData !== null) {
                         productDataToSend = productData;
+                } else if (window.DesignCache?.getLastDesign) {
+                        productDataToSend = window.DesignCache.getLastDesign(window.currentProductId);
                 } else if (window.customizerCache?.designs?.[window.currentProductId]) {
                         productDataToSend = window.customizerCache.designs[window.currentProductId];
                 } else if (selectedVariant) {

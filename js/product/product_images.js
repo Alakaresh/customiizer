@@ -14,7 +14,9 @@ window.createProduct = function(pd) {
             if (data.success) {
                 window.generatedProductId = data.data.product_id;
                 pd.product_id = data.data.product_id;
-                if (window.customizerCache?.designs?.[window.currentProductId]) {
+                if (window.DesignCache?.updateProductId) {
+                    window.DesignCache.updateProductId(window.currentProductId, data.data.product_id);
+                } else if (window.customizerCache?.designs?.[window.currentProductId]) {
                     window.customizerCache.designs[window.currentProductId].product_id = data.data.product_id;
                     if (typeof persistCache === 'function') {
                         persistCache();
@@ -128,7 +130,11 @@ function renderCurrentGroup() {
 
                         const addToCanvas = () => {
                                 if (typeof CanvasManager === 'undefined') return;
-                                CanvasManager.addImage(url, () => {
+                                const activeVariant = (typeof selectedVariant !== 'undefined' && selectedVariant) ? selectedVariant : window.selectedVariant;
+                                const placement = window.DesignCache?.getPlacement
+                                        ? window.DesignCache.getPlacement(window.currentProductId, url, activeVariant?.variant_id)
+                                        : null;
+                                const afterAdd = () => {
                                         const addImageButton = jQuery('#addImageButton');
                                         const imageControls = jQuery('.image-controls');
                                         const visualHeader = jQuery('.visual-header');
@@ -138,7 +144,12 @@ function renderCurrentGroup() {
                                         visualHeader.css('display', 'flex');
                                         jQuery('.visual-zone').addClass('with-header');
                                         CanvasManager.resizeToContainer('product2DContainer');
-                                });
+                                };
+                                if (placement) {
+                                        CanvasManager.addImage(url, { placement }, afterAdd);
+                                } else {
+                                        CanvasManager.addImage(url, afterAdd);
+                                }
                         };
 
                         if (jQuery('#customizeModal').is(':visible')) {
@@ -289,7 +300,9 @@ function buildProductData(mockupData) {
                 technique: mockupData.technique
         };
 
-        if (window.customizerCache) {
+        if (window.DesignCache?.saveDesign) {
+                window.DesignCache.saveDesign(window.currentProductId, productData);
+        } else if (window.customizerCache) {
                 window.customizerCache.designs = window.customizerCache.designs || {};
                 window.customizerCache.designs[window.currentProductId] = productData;
                 if (typeof persistCache === 'function') {

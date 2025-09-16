@@ -619,11 +619,20 @@
             item.find('.apply-button').on('click', function (e) {
                 e.stopPropagation();
                 // Ajoute l'image au canvas (fonction existante)
-                CanvasManager.addImage(url, function () {
+                const activeVariant = (typeof selectedVariant !== 'undefined' && selectedVariant) ? selectedVariant : window.selectedVariant;
+                const placement = window.DesignCache?.getPlacement
+                    ? window.DesignCache.getPlacement(window.currentProductId, url, activeVariant?.variant_id)
+                    : null;
+                const onAdded = function () {
                     if (typeof updateAddImageButtonVisibility === 'function') {
                         updateAddImageButtonVisibility();
                     }
-                });
+                };
+                if (placement) {
+                    CanvasManager.addImage(url, { placement }, onAdded);
+                } else {
+                    CanvasManager.addImage(url, onAdded);
+                }
                 $('#imageSourceModal').hide();
                 releaseFocus($('#imageSourceModal'));
             });
