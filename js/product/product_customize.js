@@ -310,7 +310,10 @@ jQuery(document).ready(function ($) {
        }
 
         // 2) Ouvrir le modal de personnalisation
-        customizeButton.on('click', async function () {
+        customizeButton.on('click', async function (event) {
+                const isProgrammaticTrigger = Boolean(event && event.isTrigger);
+                const hasNativeEvent = Boolean(event && event.originalEvent);
+                const shouldRestoreDesign = hasNativeEvent && !isProgrammaticTrigger;
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
@@ -347,11 +350,13 @@ jQuery(document).ready(function ($) {
                         // 2. Lancer Fabric.js dans le container
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
-                        const savedDesign = window.customizerCache?.designs?.[window.currentProductId];
-                        if (savedDesign && savedDesign.design_image_url) {
-                                CanvasManager.restoreFromProductData(savedDesign, () => {
-                                        updateAddImageButtonVisibility();
-                                });
+                        if (shouldRestoreDesign) {
+                                const savedDesign = window.customizerCache?.designs?.[window.currentProductId];
+                                if (savedDesign && savedDesign.design_image_url) {
+                                        CanvasManager.restoreFromProductData(savedDesign, () => {
+                                                updateAddImageButtonVisibility();
+                                        });
+                                }
                         }
 
                         // 3. Lancer Three.js si disponible
