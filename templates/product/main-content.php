@@ -20,42 +20,56 @@
 					<!-- Section texte et options du produit à gauche -->
 					<div class="product-info">
 						<!-- Menu de sélection de produit -->
-						<div class="product-selector">
-							<div class="custom-select">
-								<div class="selected-item">
-									<img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
-								</div>
-								<h1 class="product-name">Nom du produit</h1>
-								<div class="dropdown-icon">▼</div>
-								<ul id="product-options" class="options-list"></ul>
-							</div>
-						</div>
+                                               <div class="product-selector" data-component="variant-selector">
+                                                        <p class="product-selector-label"><?php esc_html_e('Variantes', 'customiizer'); ?></p>
+                                                        <div class="custom-select" data-dropdown>
+                                                                <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
+                                                                        <span class="selected-visual">
+                                                                                <img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
+                                                                        </span>
+                                                                        <span class="selected-text">
+                                                                                <span class="selected-helper"><?php esc_html_e('Variante sélectionnée', 'customiizer'); ?></span>
+                                                                                <span class="product-name" aria-live="polite">Nom du produit</span>
+                                                                        </span>
+                                                                </button>
+                                                                <button type="button" class="dropdown-icon" aria-label="<?php esc_attr_e('Ouvrir la liste des variantes', 'customiizer'); ?>" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
+                                                                        <span class="chevron" aria-hidden="true"></span>
+                                                                </button>
+                                                                <ul id="product-options" class="options-list" role="listbox" aria-hidden="true"></ul>
+                                                        </div>
+                                                        <h1 class="product-title visually-hidden" aria-live="polite">Nom du produit</h1>
+                                                </div>
 
 						<!-- Options de couleur -->
-						<div class="product-colors">
-							<p>Couleurs :</p>
-							<div class="colors-container"></div>
-						</div>
+                                                <div class="product-colors">
+                                                        <p class="product-section-label"><?php esc_html_e('Couleurs', 'customiizer'); ?></p>
+                                                        <div class="colors-container"></div>
+                                                </div>
 
-						<!-- Options de taille -->
-						<div class="product-sizes">
-							<p>Tailles :</p>
-							<div class="sizes-container"></div>
-						</div>
+                                                <!-- Options de taille -->
+                                                <div class="product-sizes" data-component="size-selector">
+                                                        <p class="product-section-label"><?php esc_html_e('Tailles', 'customiizer'); ?></p>
+                                                        <div class="sizes-container" data-label="<?php esc_attr_e('Tailles disponibles', 'customiizer'); ?>"></div>
+                                                </div>
 
-						<div class="product-description">
-							<button class="toggle-description">Description</button>
-							<div class="description-content">
-								<p>Chargement de la description...</p> <!-- Contenu mis à jour dynamiquement -->
-							</div>
-						</div>
+                                                <div class="product-description" data-component="product-description">
+                                                        <button class="toggle-description" type="button" aria-expanded="false">
+                                                                <span class="toggle-label"><?php esc_html_e('Description', 'customiizer'); ?></span>
+                                                                <span class="toggle-icon" aria-hidden="true"></span>
+                                                        </button>
+                                                        <div class="description-content" aria-hidden="true">
+                                                                <p>Chargement de la description...</p> <!-- Contenu mis à jour dynamiquement -->
+                                                        </div>
+                                                </div>
 
 
-						<!-- Boutons d'action -->
-						<!-- Boutons d'action -->
-						<div class="product-actions">
-							<button id="customize-button" class="design-button">Personnaliser le design</button>
-						</div>
+                                                <!-- Boutons d'action -->
+                                                <!-- Boutons d'action -->
+                                                <div class="product-actions product-actions--primary">
+                                                        <button id="customize-button" class="design-button" type="button">
+                                                                <span class="design-button__label"><?php esc_html_e('Personnaliser le design', 'customiizer'); ?></span>
+                                                        </button>
+                                                </div>
 
 						<p id="no-stock-message" style="display:none; color:red; margin-top:10px;">
 							❌ Ce produit n’est actuellement pas disponible.
