@@ -327,75 +327,108 @@ body {
 
 /* Section de prix, délai de livraison et boutons d'action à droite */
 .product-details {
-	position: absolute;
-	top: 0;
-	right: 1%;
-	color: #fff;
-	font-family: Arial, sans-serif;
-	padding-top: 20px;
+    position: absolute;
+    top: 0;
+    right: 1%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 24px;
+    width: 30%;
+    max-width: 420px;
+    min-width: 280px;
+    padding-top: 20px;
+    color: #fff;
+    font-family: Arial, sans-serif;
 }
 
-/* Ligne pour aligner price-info et delivery-info horizontalement et à droite */
-.info-row {
-	display: flex;
-	justify-content: flex-end; /* Aligne les éléments à droite */
-	gap: 20px; /* Espace entre price-info et delivery-info */
-	margin-bottom: 20px; /* Espace entre la ligne d'infos et les boutons */
+.product-details__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
 }
 
-.price-info, .delivery-info {
-	background-color: #222;
-	padding: 15px;
-	border-radius: 8px;
-	color: #ffffff;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	margin-bottom: 10px;
+.product-details__card {
+    width: 100%;
+    padding: 24px 26px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.94));
+    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.price-title, .delivery-title {
-	font-size: 16px;
-	font-weight: bold;
-	color: #e6e6e6;
-	margin-bottom: 8px;
+.price-info,
+.delivery-info {
+    margin: 0;
+}
+
+.price-title,
+.delivery-title {
+    margin: 0 0 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
 }
 
 .price-value {
-        font-size: 24px;
-        font-weight: bold;
-        color: #B8B8B8;
-        margin: 5px 0;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #f8f8f8;
 }
 
-.price-value span, .discounted-price, .shipping-cost {
-	color: #b3b3b3;
+.price-value span {
+    color: #ffffff;
 }
 
 .discounted-price {
-	color: #a3d76d;
+    margin: 2px 0 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1abc9c;
+}
+
+.discounted-price span {
+    color: inherit;
+}
+
+.delivery-info {
+    gap: 10px;
 }
 
 .delivery-location {
-	display: flex;
-	align-items: center;
-	gap: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .flag-icon {
-	width: 20px;
-	height: auto;
-	border-radius: 3px;
+    width: 20px;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
 }
 
 .delivery-time {
-	font-size: 22px;
-	font-weight: bold;
-	color: #ffffff;
-	margin: 8px 0;
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
 .shipping-cost {
-	font-size: 14px;
-	color: #b3b3b3;
+    margin: 0;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.72);
 }
 
 .price-info p, .delivery-info p {
@@ -404,9 +437,10 @@ body {
 
 /* Alignement des boutons d'action sous .info-row */
 .product-actions {
-        display: flex;
-        gap: 15px;
-        margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
 }
 
 .product-actions.product-actions--primary {
@@ -415,6 +449,13 @@ body {
     max-width: 420px;
     width: 100%;
     gap: 18px;
+}
+
+.product-actions.product-actions--secondary {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    margin-top: 0;
 }
 
 .design-button {
@@ -493,21 +534,71 @@ body {
 
 /* Style sombre pour le bouton "Ajouter au panier" */
 .add-to-cart-button {
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: bold;
-        border: none;
-        cursor: pointer;
-        border-radius: 12px;
-        transition: background-color 0.3s ease, color 0.3s ease;
-        color: #ffffff;
-        background-color: #444444;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+    color: #f9f9f9;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 26px 48px rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease, border-color 0.3s ease;
+    overflow: hidden;
 }
 
-.add-to-cart-button:hover {
-        background-color: #666666;
-        color: #e6e6e6;
+.add-to-cart-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.add-to-cart-button:hover,
+.add-to-cart-button:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 32px 58px rgba(0, 0, 0, 0.45);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+    border-color: rgba(255, 255, 255, 0.38);
+    outline: none;
+}
+
+.add-to-cart-button:hover::before,
+.add-to-cart-button:focus-visible::before {
+    opacity: 0.5;
+}
+
+.add-to-cart-button:active {
+    transform: translateY(0);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.35);
+}
+
+.add-to-cart-button:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.65);
+    outline-offset: 4px;
+}
+
+.add-to-cart-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.add-to-cart-button:disabled::before {
+    opacity: 0;
 }
 
 /* Style pour l'image du produit */
