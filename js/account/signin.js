@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		let errors = [];
 
-		if (!email.includes('@')) {
-			errors.push("Please enter a valid email address.");
-		}
+                if (!email.includes('@')) {
+                        errors.push("Veuillez entrer une adresse e-mail valide.");
+                }
 		if (errors.length > 0) {
 			alert(errors.join("\n"));
 		} else {
@@ -65,9 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		})
 			.catch(error => {
-			console.error('Error:', error);
-			alert('An error occurred. Please try again.\n' + error.message);
-		});
-	}
+                        console.error('Error:', error);
+                        alert('Une erreur est survenue. Veuillez réessayer.\n' + error.message);
+                });
+        }
 
 });
