@@ -2,7 +2,15 @@ window.generatedProductId = window.generatedProductId || null;
 window.productCreationPromise = window.productCreationPromise || null;
 
 function getLatestMockup(variant) {
-    return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
+    if (!variant || !Array.isArray(variant.mockups)) {
+        return null;
+    }
+
+    if (variant.mockups.length === 0) {
+        return null;
+    }
+
+    return variant.mockups[variant.mockups.length - 1];
 }
 
 jQuery(document).ready(function($) {

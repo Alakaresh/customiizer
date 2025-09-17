@@ -12,6 +12,10 @@ function shouldShowSingleMockup() {
 }
 
 function dedupeMockups(mockups) {
+    if (!Array.isArray(mockups)) {
+        return [];
+    }
+
     const seen = new Set();
     return mockups.filter(m => {
         if (seen.has(m.mockup_image)) return false;
@@ -397,7 +401,6 @@ jQuery(document).ready(function ($) {
 
         function updateProductDisplay(variants) {
                 variants.forEach(v => {
-                        v.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
                         v.mockups = dedupeMockups(v.mockups);
                 });
                 const urlParams = new URLSearchParams(window.location.search);
@@ -602,7 +605,6 @@ jQuery(document).ready(function ($) {
                 const hideExtra = shouldShowSingleMockup();
 
                 variants.forEach(variant => {
-                        variant.mockups.sort((a, b) => a.mockup_id - b.mockup_id);
                         const uniqueMockups = dedupeMockups(variant.mockups);
                         const displayMockups = hideExtra ? uniqueMockups.slice(0, 1) : uniqueMockups;
                         displayMockups.forEach((mockup, index) => {

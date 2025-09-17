@@ -73,11 +73,19 @@ function imageUrlToBase64(url) {
 }
 
 function getLatestMockup(variant) {
-    return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id).pop();
+    if (!variant || !Array.isArray(variant.mockups) || !variant.mockups.length) {
+        return null;
+    }
+
+    return variant.mockups[variant.mockups.length - 1];
 }
 
 function getFirstMockup(variant) {
-    return variant.mockups.slice().sort((a, b) => a.mockup_id - b.mockup_id)[0];
+    if (!variant || !Array.isArray(variant.mockups) || !variant.mockups.length) {
+        return null;
+    }
+
+    return variant.mockups[0];
 }
 
 // Création de l'info-bulle globale
