@@ -191,9 +191,17 @@ body {
 }
 /* la description prend tout l’espace restant */
 .product-description {
-    flex-grow: 1;
+    flex-grow: 0;
     display: flex;
     flex-direction: column;
+}
+.product-description.is-open {
+    flex-grow: 1;
+}
+.product-description .description-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: none; /* pas de limite arbitraire */
 }
 .product-colors {
     width: 100%;
@@ -207,14 +215,6 @@ body {
     backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
-}
-.product-description .description-content.open {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 0 26px 26px;
-    border-color: rgba(255, 255, 255, 0.08);
-    opacity: 1;
-    max-height: none; /* important : on enlève la limite arbitraire */
 }
 .colors-container {
     display: flex;
