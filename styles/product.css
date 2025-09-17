@@ -151,6 +151,16 @@ body {
         color: #fff;
         font-family: Arial, sans-serif;
         padding-top: 12px;
+        bottom: 120px;
+        padding-right: 14px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+}
+
+.product-info > * {
+        flex-shrink: 0;
 }
 
 .product-selector {
@@ -360,8 +370,16 @@ body {
     max-width: 360px;
     min-width: 260px;
     padding-top: 12px;
+    bottom: 120px;
+    padding-right: 14px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
     color: #fff;
     font-family: Arial, sans-serif;
+}
+
+.product-details > * {
+    flex-shrink: 0;
 }
 
 .product-details__cards {
@@ -471,13 +489,16 @@ body {
     max-width: 420px;
     width: 100%;
     gap: 18px;
+    margin-top: auto;
+    padding-top: 20px;
 }
 
 .product-actions.product-actions--secondary {
     flex-direction: column;
     align-items: stretch;
     gap: 18px;
-    margin-top: 0;
+    margin-top: auto;
+    padding-top: 18px;
 }
 
 .design-button {
