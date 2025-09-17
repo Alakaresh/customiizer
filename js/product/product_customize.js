@@ -749,6 +749,20 @@ jQuery(document).ready(function ($) {
                        loadVariantInCustomizer(variant);
                        $(document).trigger('variantReady', [variant]);
                        productSidebar.removeClass('open');
+
+                       if (typeof window.applyVariantSelection === 'function') {
+                               window.applyVariantSelection(variant);
+                       }
+
+                       const mainImage = $('#product-main-image');
+                       if (mainImage.length) {
+                               $('#footerProductImage').attr('src', mainImage.attr('src'));
+                       }
+
+                       const updatedPrice = $('.price-value span').text().trim();
+                       if (updatedPrice) {
+                               customizeModal.find('.summary-price').text(updatedPrice);
+                       }
                }
        }
 
