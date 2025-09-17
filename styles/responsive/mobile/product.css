@@ -185,9 +185,12 @@
         .bottom-bar .image-wrapper {
                 overflow-x: auto;
                 max-width: none;
+                display: flex;
+                justify-content: center;
         }
 
         .bottom-bar .content {
+                justify-content: center;
                 gap: 12px;
         }
 

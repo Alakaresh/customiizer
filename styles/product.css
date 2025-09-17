@@ -82,12 +82,15 @@ body {
     flex: 1;
     max-width: 960px;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
 }
 
 /* Conteneur des images dans la barre du bas */
 .bottom-bar .content {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 18px;
     white-space: nowrap; /* Garde les images sur une ligne */
     padding: 0;
