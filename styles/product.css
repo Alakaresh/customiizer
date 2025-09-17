@@ -651,12 +651,13 @@ body {
 
 /* Conteneur de la liste déroulante */
 .custom-select {
+    --select-border-radius: 22px;
     position: relative;
     display: flex;
     align-items: stretch;
     width: 100%;
     min-height: 72px;
-    border-radius: 22px;
+    border-radius: var(--select-border-radius, 22px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: linear-gradient(135deg, rgba(25, 25, 25, 0.92), rgba(12, 12, 12, 0.9));
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
@@ -680,6 +681,7 @@ body {
     gap: 18px;
     padding: 16px 22px;
     border: none;
+    border-radius: var(--select-border-radius, 22px) 0 0 var(--select-border-radius, 22px);
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -769,6 +771,7 @@ body {
     min-height: 100%;
     border: none;
     border-left: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0 var(--select-border-radius, 22px) var(--select-border-radius, 22px) 0;
     background: linear-gradient(135deg, rgba(26, 188, 156, 0.85), rgba(22, 160, 133, 0.85));
     color: #ffffff;
     cursor: pointer;
