@@ -1024,10 +1024,6 @@ body {
     opacity: 1;
     overflow-y: auto;
 }
-.thumbnail.selected {
-    border: 4px solid #ffcc00 !important; /* Contour jaune vif pour tester */
-    box-shadow: 0 0 8px rgba(255, 204, 0, 0.8); /* Effet lumineux */
-}
 /* Conteneur du chargement au-dessus de l'image principale */
 .loading-overlay {
     position: absolute;
