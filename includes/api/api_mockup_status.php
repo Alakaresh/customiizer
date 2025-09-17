@@ -10,16 +10,16 @@ add_action('rest_api_init', function() {
 function customiizer_get_mockup_status(WP_REST_Request $request) {
     $task_id = intval($request->get_param('task_id'));
     if (!$task_id) {
-        return new WP_REST_Response(['success' => false, 'message' => 'missing task_id'], 400);
+        return new WP_REST_Response(['success' => false, 'message' => 'Identifiant de tâche manquant.'], 400);
     }
 
     $cache_key = 'customiizer_mockup_result_' . $task_id;
     $rows = get_transient($cache_key);
 
     if (!$rows) {
-        return new WP_REST_Response(['success' => false, 'mockups' => []], 200);
+        return new WP_REST_Response(['success' => false, 'mockups' => [], 'message' => 'Aucune maquette disponible pour le moment.'], 200);
     }
 
     delete_transient($cache_key);
-    return new WP_REST_Response(['success' => true, 'mockups' => $rows], 200);
+    return new WP_REST_Response(['success' => true, 'mockups' => $rows, 'message' => 'Maquettes récupérées avec succès.'], 200);
 }

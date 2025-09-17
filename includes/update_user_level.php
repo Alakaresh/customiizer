@@ -7,14 +7,14 @@ function update_user_level() {
 
     // Vérifier les permissions de l'utilisateur ou d'autres conditions
     if (!is_user_logged_in()) {
-        wp_send_json_error(array('message' => 'User not logged in'));
+        wp_send_json_error(array('message' => 'Utilisateur non connecté.'));
         return;
     }
 
     $userId = isset($_POST['userId']) ? intval($_POST['userId']) : 0;
 
     if ($userId === 0) {
-        wp_send_json_error(array('message' => 'Invalid user ID'));
+        wp_send_json_error(array('message' => 'Identifiant utilisateur invalide.'));
         return;
     }
 
@@ -27,9 +27,9 @@ function update_user_level() {
     );
 
     if ($result === false) {
-        wp_send_json_error(array('message' => 'Database update failed'));
+        wp_send_json_error(array('message' => 'Échec de la mise à jour de la base de données.'));
     } else {
-        wp_send_json_success(array('message' => 'User level updated to 1 successfully'));
+        wp_send_json_success(array('message' => 'Niveau utilisateur mis à jour à 1 avec succès.'));
     }
 
     wp_die(); // Arrête l'exécution du script

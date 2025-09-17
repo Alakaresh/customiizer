@@ -1,17 +1,17 @@
 <?php
 function user_signin() {
 	// Vérifier le nonce
-	if (!isset($_POST['registration_nonce'])) {
-		wp_send_json_error(array('message' => 'Nonce is not set.'));
-		return;
-	}
+        if (!isset($_POST['registration_nonce'])) {
+                wp_send_json_error(array('message' => 'Nonce absent.'));
+                return;
+        }
 
 	// Vérifiez si le nonce est valide
 	$nonce = $_POST['registration_nonce'];
-	if (!wp_verify_nonce($nonce, 'signin_nonce')) {
-		wp_send_json_error(array('message' => 'Nonce verification failed.'));
-		return;
-	}
+        if (!wp_verify_nonce($nonce, 'signin_nonce')) {
+                wp_send_json_error(array('message' => 'Échec de la vérification du nonce.'));
+                return;
+        }
 
 	// Le reste de votre code de connexion
 	$info = array(
@@ -21,11 +21,11 @@ function user_signin() {
 	);
 
 	$user_signon = wp_signon($info, false);
-	if (is_wp_error($user_signon)) {
-		wp_send_json_error(array('message' => 'Wrong email or password.'));
-	} else {
-		wp_send_json_success(array('message' => 'Login successful.'));
-	}
+        if (is_wp_error($user_signon)) {
+                wp_send_json_error(array('message' => 'Adresse e-mail ou mot de passe incorrect.'));
+        } else {
+                wp_send_json_success(array('message' => 'Connexion réussie.'));
+        }
 
 	die();
 }
