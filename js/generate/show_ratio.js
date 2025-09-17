@@ -77,7 +77,29 @@ function loadProductData() {	jQuery.ajax({
 }
 
 function isValidMockupImage(path) {
-	return typeof path === 'string' && path.includes('MKP_1');
+        return typeof path === 'string' && path.trim() !== '';
+}
+
+function deduplicateVariantsById(variants) {
+        const variantsById = new Map();
+
+        variants.forEach(variant => {
+                const existing = variantsById.get(variant.variant_id);
+
+                if (!existing) {
+                        variantsById.set(variant.variant_id, { ...variant });
+                        return;
+                }
+
+                const existingHasImage = isValidMockupImage(existing.image);
+                const currentHasImage = isValidMockupImage(variant.image);
+
+                if (!existingHasImage && currentHasImage) {
+                        existing.image = variant.image;
+                }
+        });
+
+        return Array.from(variantsById.values());
 }
 
 function getVariantOrderValue(variant) {
@@ -100,12 +122,14 @@ function displayVariantsForProduct(normalizedName) {
        if (!container) return;
        container.innerHTML = '';
 
-       const filtered = globalProducts.filter(v => (v.product_name.includes("Clear Case") ? "Clear Case" : v.product_name) === normalizedName && isValidMockupImage(v.image));
-       filtered.forEach(variant => {
+       const filtered = globalProducts.filter(v => (v.product_name.includes("Clear Case") ? "Clear Case" : v.product_name) === normalizedName);
+       const uniqueVariants = deduplicateVariantsById(filtered).filter(variant => isValidMockupImage(variant.image));
+
+       uniqueVariants.forEach(variant => {
                const item = document.createElement('div');
                item.className = 'product-item';
 
-		const image = document.createElement('img');
+                const image = document.createElement('img');
 		image.src = variant.image;
 		image.alt = variant.product_name.includes("Clear Case") ? '' : variant.size;
 		item.appendChild(image);
