@@ -20,16 +20,25 @@
 					<!-- Section texte et options du produit à gauche -->
 					<div class="product-info">
 						<!-- Menu de sélection de produit -->
-						<div class="product-selector">
-							<div class="custom-select">
-								<div class="selected-item">
-									<img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
-								</div>
-								<h1 class="product-name">Nom du produit</h1>
-								<div class="dropdown-icon">▼</div>
-								<ul id="product-options" class="options-list"></ul>
-							</div>
-						</div>
+                                               <div class="product-selector" data-component="variant-selector">
+                                                        <p class="product-selector-label"><?php esc_html_e('Variantes', 'customiizer'); ?></p>
+                                                        <div class="custom-select" data-dropdown>
+                                                                <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
+                                                                        <span class="selected-visual">
+                                                                                <img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
+                                                                        </span>
+                                                                        <span class="selected-text">
+                                                                                <span class="selected-helper"><?php esc_html_e('Variante sélectionnée', 'customiizer'); ?></span>
+                                                                                <span class="product-name" aria-live="polite">Nom du produit</span>
+                                                                        </span>
+                                                                </button>
+                                                                <button type="button" class="dropdown-icon" aria-label="<?php esc_attr_e('Ouvrir la liste des variantes', 'customiizer'); ?>" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
+                                                                        <span class="chevron" aria-hidden="true"></span>
+                                                                </button>
+                                                                <ul id="product-options" class="options-list" role="listbox" aria-hidden="true"></ul>
+                                                        </div>
+                                                        <h1 class="product-title visually-hidden" aria-live="polite">Nom du produit</h1>
+                                                </div>
 
 						<!-- Options de couleur -->
 						<div class="product-colors">

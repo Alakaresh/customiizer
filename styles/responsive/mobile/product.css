@@ -96,14 +96,30 @@
 		width: 100%;
 	}
 
-       .custom-select {
-               justify-content: center;
-               width: 100%;
-       }
-
        .product-selector {
                width: 100%;
                margin-top: 10px;
+               align-items: center;
+       }
+
+       .product-selector-label {
+               margin-left: 0;
+       }
+
+       .custom-select {
+               width: 100%;
+               max-width: 420px;
+               min-height: 64px;
+       }
+
+       .selected-item {
+               padding: 14px 18px;
+       }
+
+       .options-list {
+               left: 0;
+               right: 0;
+               width: 100%;
        }
 
         /* Barre d'aperçu fixée en bas de l'écran */
