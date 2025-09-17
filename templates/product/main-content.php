@@ -21,14 +21,12 @@
 					<div class="product-info">
 						<!-- Menu de sélection de produit -->
                                                <div class="product-selector" data-component="variant-selector">
-                                                        <p class="product-selector-label"><?php esc_html_e('Variantes', 'customiizer'); ?></p>
                                                         <div class="custom-select" data-dropdown>
                                                                 <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
                                                                         <span class="selected-visual">
                                                                                 <img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
                                                                         </span>
                                                                         <span class="selected-text">
-                                                                                <span class="selected-helper"><?php esc_html_e('Variante sélectionnée', 'customiizer'); ?></span>
                                                                                 <span class="product-name" aria-live="polite">Nom du produit</span>
                                                                         </span>
                                                                 </button>

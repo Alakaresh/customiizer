@@ -114,13 +114,14 @@ body {
 
 /* Section d'information du produit à gauche */
 .product-info {
-	position: absolute;
-	top: 0;
-	left: 1%;
-	width: 30%;
-	color: #fff;
-	font-family: Arial, sans-serif;
-	padding-top: 20px;
+        position: absolute;
+        top: 0;
+        left: 0.5%;
+        width: 26%;
+        max-width: 360px;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        padding-top: 12px;
 }
 
 .product-selector {
@@ -128,16 +129,8 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    margin: 0 0 28px 0;
+    margin: 0 0 20px 0;
     max-width: 420px;
-}
-
-.product-selector-label {
-    margin: 0 0 0 12px;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
 }
 
 .product-name {
@@ -151,7 +144,7 @@ body {
 
 .product-description {
     width: 100%;
-    margin: 26px 0 22px;
+    margin: 18px 0 18px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: linear-gradient(135deg, rgba(18, 18, 18, 0.9), rgba(6, 6, 6, 0.94));
@@ -165,8 +158,8 @@ body {
 .product-colors {
     width: 100%;
     max-width: 420px;
-    padding: 20px 22px;
-    margin: 26px 0 20px;
+    padding: 16px 18px;
+    margin: 18px 0 16px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.92));
@@ -329,15 +322,15 @@ body {
 .product-details {
     position: absolute;
     top: 0;
-    right: 1%;
+    right: 0.5%;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 24px;
-    width: 30%;
-    max-width: 420px;
-    min-width: 280px;
-    padding-top: 20px;
+    gap: 18px;
+    width: 26%;
+    max-width: 360px;
+    min-width: 260px;
+    padding-top: 12px;
     color: #fff;
     font-family: Arial, sans-serif;
 }
@@ -345,13 +338,13 @@ body {
 .product-details__cards {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
     width: 100%;
 }
 
 .product-details__card {
     width: 100%;
-    padding: 24px 26px;
+    padding: 18px 22px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.94));
@@ -378,7 +371,7 @@ body {
 
 .price-value {
     margin: 0;
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     color: #f8f8f8;
@@ -407,7 +400,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.75);
 }
 
@@ -721,17 +714,6 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.selected-helper {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-}
-
-.custom-select.open .selected-helper {
-    color: rgba(255, 255, 255, 0.75);
 }
 
 /* Image dans l'élément sélectionné */
