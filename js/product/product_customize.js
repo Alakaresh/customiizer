@@ -846,9 +846,16 @@ jQuery(document).ready(function ($) {
                                 importedFiles = data;
                                 FileLibrary.setImportedFiles(importedFiles);
                         }
+
+                        return data;
                 } catch (error) {
                         console.error("[UserImages] Erreur API :", error);
+                        return null;
                 }
+        }
+
+        if (typeof window !== 'undefined') {
+                window.fetchUserImages = fetchUserImages;
         }
 
 	uploadPcImageButton.on('click', function () {
@@ -887,14 +894,21 @@ jQuery(document).ready(function ($) {
 
                         const result = await response.json();
                         if (result.success) {
-                                fetchUserImages();
-                        } else {
-                                alert("Erreur lors du téléversement.");
+                                await fetchUserImages();
+                                return true;
                         }
+
+                        alert("Erreur lors du téléversement.");
+                        return false;
                 } catch (error) {
                         console.error("[Upload] Erreur serveur :", error);
                         alert("Erreur lors du téléversement.");
+                        return false;
                 }
+        }
+
+        if (typeof window !== 'undefined') {
+                window.uploadFileToServer = uploadFileToServer;
         }
 
         // La recherche est gérée par file_library.js
