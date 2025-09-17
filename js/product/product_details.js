@@ -8,6 +8,8 @@ let currentMockup = null;
 const SINGLE_MOCKUP_PRODUCTS = [382, 585];
 // Au-delà de ce seuil on teste un sélecteur plutôt que des boutons taille
 const PRODUCT_SIZE_SELECT_THRESHOLD = 6;
+const DATA_URL_PLACEHOLDER = window.CUSTOMIZER_DATA_URL_PLACEHOLDER || '__customizer_data_url_trimmed__';
+window.CUSTOMIZER_DATA_URL_PLACEHOLDER = DATA_URL_PLACEHOLDER;
 
 function shouldShowSingleMockup() {
     return SINGLE_MOCKUP_PRODUCTS.includes(parseInt(window.currentProductId));
@@ -48,9 +50,82 @@ window.customizerCache.models = window.customizerCache.models || {};
 window.customizerCache.variants = window.customizerCache.variants || {};
 window.customizerCache.designs = window.customizerCache.designs || {};
 
+function createStorageSnapshot() {
+    const source = window.customizerCache || {};
+    const snapshot = { ...source, models: {} };
+    let trimmedCount = 0;
+
+    const sanitizeUrl = (value) => {
+        if (typeof value === 'string' && value.startsWith('data:')) {
+            trimmedCount += 1;
+            return DATA_URL_PLACEHOLDER;
+        }
+        return value;
+    };
+
+    const sanitizeCanvasState = (layers) => {
+        if (!Array.isArray(layers)) {
+            return [];
+        }
+        return layers
+            .map((layer) => {
+                if (!layer || typeof layer !== 'object') return null;
+                const clone = { ...layer };
+                if (typeof clone.src === 'string') {
+                    clone.src = sanitizeUrl(clone.src);
+                }
+                return clone;
+            })
+            .filter(Boolean);
+    };
+
+    const sanitizeDesign = (design) => {
+        const clone = cloneDesignData(design);
+        if (!clone) return clone;
+        if (clone.design_image_url !== undefined) {
+            clone.design_image_url = sanitizeUrl(clone.design_image_url);
+        }
+        if (clone.canvas_image_url !== undefined) {
+            clone.canvas_image_url = sanitizeUrl(clone.canvas_image_url);
+        }
+        if (Array.isArray(clone.canvas_state)) {
+            clone.canvas_state = sanitizeCanvasState(clone.canvas_state);
+        }
+        return clone;
+    };
+
+    const sanitizedDesigns = {};
+    Object.keys(source.designs || {}).forEach((productId) => {
+        const entry = source.designs[productId];
+        if (!entry || typeof entry !== 'object') {
+            sanitizedDesigns[productId] = entry;
+            return;
+        }
+        const cloneEntry = cloneDesignData(entry) || {};
+        if (cloneEntry.design_image_url !== undefined) {
+            cloneEntry.design_image_url = sanitizeUrl(cloneEntry.design_image_url);
+        }
+        if (cloneEntry.canvas_image_url !== undefined) {
+            cloneEntry.canvas_image_url = sanitizeUrl(cloneEntry.canvas_image_url);
+        }
+        cloneEntry.last = sanitizeDesign(cloneEntry.last);
+        sanitizedDesigns[productId] = cloneEntry;
+    });
+
+    snapshot.designs = sanitizedDesigns;
+    return { snapshot, trimmedCount };
+}
+
 function persistCache() {
-    const tmp = { ...window.customizerCache, models: {} };
-    sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+    const { snapshot, trimmedCount } = createStorageSnapshot();
+    try {
+        if (trimmedCount > 0) {
+            console.debug(`[Cache] Trimmed ${trimmedCount} data URL(s) before persisting customizerCache.`);
+        }
+        sessionStorage.setItem('customizerCache', JSON.stringify(snapshot));
+    } catch (err) {
+        console.warn('[Cache] Failed to persist customizerCache snapshot', err);
+    }
 }
 
 const DESIGN_CACHE_MIRROR_FIELDS = [

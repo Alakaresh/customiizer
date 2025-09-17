@@ -5,8 +5,34 @@ window.skipDesignRestoreOnce = window.skipDesignRestoreOnce || false;
 
 const AUTO_SAVE_DEBOUNCE_MS = 600;
 const SIDEBAR_SIZE_SELECT_THRESHOLD = 6;
+const DATA_URL_PLACEHOLDER = window.CUSTOMIZER_DATA_URL_PLACEHOLDER || '__customizer_data_url_trimmed__';
 let autoSaveTimeoutId = null;
 let lastAutoSaveSignature = null;
+
+function isTrimmedPlaceholder(value) {
+  return typeof value === 'string' && value === DATA_URL_PLACEHOLDER;
+}
+
+function getUsableUrl(value) {
+  if (typeof value !== 'string') return null;
+  if (!value) return null;
+  if (isTrimmedPlaceholder(value)) return null;
+  return value;
+}
+
+function sanitizeCanvasLayers(layers) {
+  if (!Array.isArray(layers)) return [];
+  return layers
+    .map((layer) => {
+      if (!layer || typeof layer !== 'object') return null;
+      const clone = { ...layer };
+      if (!clone.src || isTrimmedPlaceholder(clone.src)) {
+        return null;
+      }
+      return clone;
+    })
+    .filter(Boolean);
+}
 
 function computeDesignSnapshotSignature(data) {
   if (!data || typeof data !== 'object') return null;
@@ -409,24 +435,34 @@ jQuery(document).ready(function ($) {
                                return;
                        }
 
-                       let designData = null;
-                       if (window.DesignCache?.getLastDesign) {
+                      let designData = null;
+                      if (window.DesignCache?.getLastDesign) {
                                designData = window.DesignCache.getLastDesign(window.currentProductId);
-                       } else if (window.customizerCache?.designs?.[window.currentProductId]) {
+                      } else if (window.customizerCache?.designs?.[window.currentProductId]) {
                                designData = window.customizerCache.designs[window.currentProductId];
-                       }
+                      }
 
-                       if (designData && typeof designData === 'object') {
+                      let usableDesignUrl = null;
+                      let usableCanvasUrl = null;
+                      let usableMockupUrl = null;
+
+                      if (designData && typeof designData === 'object') {
                                designData = { ...designData };
-                               if (!designData.canvas_image_url && designData.design_image_url) {
-                                       designData.canvas_image_url = designData.design_image_url;
-                               }
-                       }
+                               usableDesignUrl = getUsableUrl(designData.design_image_url);
+                               usableCanvasUrl = getUsableUrl(designData.canvas_image_url);
+                               usableMockupUrl = getUsableUrl(designData.mockup_url);
 
-                       if (!designData) {
+                               designData.design_image_url = usableDesignUrl;
+                               designData.canvas_image_url = usableCanvasUrl || usableDesignUrl || null;
+                               if (usableMockupUrl !== null || isTrimmedPlaceholder(designData.mockup_url)) {
+                                       designData.mockup_url = usableMockupUrl;
+                               }
+                      }
+
+                      if (!designData) {
                                finish(false);
                                return;
-                       }
+                      }
 
                        const cachedProductId = designData.product_id != null ? String(designData.product_id) : null;
                        const currentProductId = window.currentProductId != null ? String(window.currentProductId) : null;
@@ -442,10 +478,8 @@ jQuery(document).ready(function ($) {
                                return;
                        }
 
-                       const stateLayers = Array.isArray(designData.canvas_state)
-                               ? designData.canvas_state.filter(layer => layer && layer.src)
-                               : [];
-                       if (stateLayers.length && typeof CanvasManager.restoreState === 'function') {
+                      const stateLayers = sanitizeCanvasLayers(designData.canvas_state);
+                      if (stateLayers.length && typeof CanvasManager.restoreState === 'function') {
                                CanvasManager.clearUserImages();
                                const failedLayers = [];
                                try {
@@ -473,29 +507,43 @@ jQuery(document).ready(function ($) {
                                }
                        }
 
-                       const preferredUrl = designData.canvas_image_url || designData.design_image_url;
-                       const renderUrl = (preferredUrl && preferredUrl === designData.mockup_url) ? null : preferredUrl;
-                       if (!renderUrl) {
+                      if (!usableCanvasUrl && designData.canvas_image_url) {
+                               usableCanvasUrl = getUsableUrl(designData.canvas_image_url);
+                      }
+                      if (!usableDesignUrl && designData.design_image_url) {
+                               usableDesignUrl = getUsableUrl(designData.design_image_url);
+                      }
+                      const preferredUrl = usableCanvasUrl || usableDesignUrl;
+                      const renderUrl = (preferredUrl && usableMockupUrl && preferredUrl === usableMockupUrl) ? null : preferredUrl;
+                      if (!renderUrl) {
                                finish(false);
                                return;
-                       }
+                      }
 
-                       let placement = null;
-                       if (window.DesignCache?.getPlacement) {
+                      let placement = null;
+                      if (window.DesignCache?.getPlacement) {
                                placement = window.DesignCache.getPlacement(
                                        window.currentProductId,
                                        renderUrl,
                                        selectedVariant?.variant_id
                                );
 
-                               if (!placement && designData.design_image_url && designData.design_image_url !== renderUrl) {
+                               if (!placement && usableDesignUrl && usableDesignUrl !== renderUrl) {
                                        placement = window.DesignCache.getPlacement(
                                                window.currentProductId,
-                                               designData.design_image_url,
+                                               usableDesignUrl,
                                                selectedVariant?.variant_id
                                        );
                                }
-                       }
+
+                               if (!placement && usableCanvasUrl && usableCanvasUrl !== renderUrl) {
+                                       placement = window.DesignCache.getPlacement(
+                                               window.currentProductId,
+                                               usableCanvasUrl,
+                                               selectedVariant?.variant_id
+                                       );
+                               }
+                      }
 
                        const finalize = () => {
                                finish(true);
