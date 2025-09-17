@@ -227,9 +227,9 @@ jQuery(function($) {
 						? (prompt.text || prompt.prompt || JSON.stringify(prompt))
 						: (prompt || '');
 
-					const $newImage = $('<img>')
-					.attr('src', displayedUrl)
-					.attr('alt', 'Generated Image')
+                                        const $newImage = $('<img>')
+                                        .attr('src', displayedUrl)
+                                        .attr('alt', 'Image générée')
 					.attr('data-display_name', currentUser.display_name || '')
 					.attr('data-user-logo', currentUser.user_logo || '')
 					.attr('data-user-id', currentUser.ID || '')

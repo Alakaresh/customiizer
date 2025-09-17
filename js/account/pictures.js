@@ -67,9 +67,9 @@ var ImageLoader = (function() {
 		imagesToRender.forEach(function(image, index) {
 			var imageDiv = jQuery('<div/>', { class: 'imageContainer' });
 
-			var img = jQuery('<img/>', {
-				src: image.image_url,
-				alt: 'Generated Image',
+                        var img = jQuery('<img/>', {
+                                src: image.image_url,
+                                alt: 'Image générée',
 				class: 'preview-enlarge',
 				css: { 'border-radius': '10px', 'width': '100%' },
 				'data-display_name': image.display_name || '',
