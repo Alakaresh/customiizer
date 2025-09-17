@@ -3,6 +3,188 @@ window.currentProductId = window.currentProductId || null;
 window.mockupTimes = window.mockupTimes || {};
 window.skipDesignRestoreOnce = window.skipDesignRestoreOnce || false;
 
+const AUTO_SAVE_DEBOUNCE_MS = 600;
+let autoSaveTimeoutId = null;
+let lastAutoSaveSignature = null;
+
+function computeDesignSnapshotSignature(data) {
+  if (!data || typeof data !== 'object') return null;
+  try {
+    const payload = {
+      product_id: data.product_id ?? null,
+      variant_id: data.variant_id ?? null,
+      placement: data.placement ?? null,
+      technique: data.technique ?? null,
+      design_width: data.design_width ?? null,
+      design_height: data.design_height ?? null,
+      design_left: data.design_left ?? null,
+      design_top: data.design_top ?? null,
+      design_angle: data.design_angle ?? null,
+      design_flipX: !!data.design_flipX,
+      canvas_state: Array.isArray(data.canvas_state) ? data.canvas_state : []
+    };
+    return JSON.stringify(payload);
+  } catch (err) {
+    console.warn('[Autosave] signature computation failed', err);
+    return null;
+  }
+}
+
+function updateAutoSaveSignature(data) {
+  const signature = computeDesignSnapshotSignature(data);
+  if (signature) {
+    lastAutoSaveSignature = signature;
+  }
+}
+
+function cancelPendingDesignAutosave() {
+  if (autoSaveTimeoutId) {
+    clearTimeout(autoSaveTimeoutId);
+    autoSaveTimeoutId = null;
+  }
+}
+
+function persistDesignLocally(productData) {
+  const productId = window.currentProductId;
+  if (!productId || !productData || typeof productData !== 'object') {
+    return null;
+  }
+  const payload = { ...productData };
+  if (!payload.product_id && productId != null) {
+    payload.product_id = String(productId);
+  }
+
+  if (window.DesignCache?.saveDesign) {
+    try {
+      window.DesignCache.saveDesign(productId, payload);
+    } catch (err) {
+      console.error('[Autosave] DesignCache.saveDesign failed', err);
+    }
+  } else if (window.customizerCache) {
+    window.customizerCache.designs = window.customizerCache.designs || {};
+    window.customizerCache.designs[productId] = payload;
+    if (typeof persistCache === 'function') {
+      try { persistCache(); } catch (err) { console.warn('[Autosave] persistCache failed', err); }
+    }
+  }
+
+  return payload;
+}
+
+function getExistingDesignSnapshot(productId) {
+  if (!productId) return null;
+  if (window.DesignCache?.getLastDesign) {
+    const cached = window.DesignCache.getLastDesign(productId);
+    return cached ? { ...cached } : null;
+  }
+  const legacy = window.customizerCache?.designs?.[productId];
+  return legacy ? { ...legacy } : null;
+}
+
+function cloneCanvasStateLayers(layers) {
+  if (!Array.isArray(layers)) return [];
+  try {
+    return JSON.parse(JSON.stringify(layers));
+  } catch (err) {
+    return layers.map(layer => (layer && typeof layer === 'object') ? { ...layer } : layer);
+  }
+}
+
+function collectCanvasSnapshotForAutosave() {
+  const productId = window.currentProductId;
+  if (!productId || !window.CanvasManager || typeof CanvasManager.exportState !== 'function') {
+    return null;
+  }
+
+  let rawState = [];
+  try {
+    rawState = CanvasManager.exportState();
+  } catch (err) {
+    console.warn('[Autosave] exportState failed', err);
+    return null;
+  }
+  const canvasState = cloneCanvasStateLayers(rawState);
+  const hasLayers = Array.isArray(canvasState) && canvasState.length > 0;
+  const existing = getExistingDesignSnapshot(productId);
+  const hadCachedState = Array.isArray(existing?.canvas_state) && existing.canvas_state.length > 0;
+
+  if (!hasLayers && !hadCachedState) {
+    return null;
+  }
+
+  const payload = existing ? { ...existing } : {};
+  payload.canvas_state = hasLayers ? canvasState : [];
+  if (productId != null) {
+    payload.product_id = String(productId);
+  }
+
+  if (typeof selectedVariant !== 'undefined' && selectedVariant && typeof selectedVariant === 'object') {
+    if (selectedVariant.variant_id != null) {
+      payload.variant_id = selectedVariant.variant_id;
+    }
+    const placementLabel = selectedVariant.placement || selectedVariant.zone_3d_name;
+    if (placementLabel) {
+      payload.placement = placementLabel;
+    }
+    if (selectedVariant.technique) {
+      payload.technique = selectedVariant.technique;
+    }
+  }
+
+  const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
+    ? CanvasManager.getClipWindowBBox()
+    : { left: 0, top: 0 };
+  const placement = (typeof CanvasManager.getCurrentImageData === 'function')
+    ? CanvasManager.getCurrentImageData()
+    : null;
+
+  if (hasLayers && placement) {
+    payload.design_width = placement.width;
+    payload.design_height = placement.height;
+    payload.design_left = (placement.left != null ? placement.left - (bbox.left || 0) : 0);
+    payload.design_top = (placement.top != null ? placement.top - (bbox.top || 0) : 0);
+    payload.design_angle = placement.angle || 0;
+    payload.design_flipX = !!placement.flipX;
+  } else if (!hasLayers) {
+    delete payload.design_width;
+    delete payload.design_height;
+    delete payload.design_left;
+    delete payload.design_top;
+    delete payload.design_angle;
+    delete payload.design_flipX;
+  }
+
+  return payload;
+}
+
+function flushDesignAutosave(reason) {
+  const snapshot = collectCanvasSnapshotForAutosave();
+  if (!snapshot) return;
+  const signature = computeDesignSnapshotSignature(snapshot);
+  if (signature && signature === lastAutoSaveSignature) {
+    return;
+  }
+  const stored = persistDesignLocally(snapshot) || snapshot;
+  updateAutoSaveSignature(stored);
+}
+
+function scheduleDesignAutosave(reason) {
+  if (!window.CanvasManager || typeof CanvasManager.exportState !== 'function') {
+    return;
+  }
+  if (autoSaveTimeoutId) {
+    clearTimeout(autoSaveTimeoutId);
+  }
+  autoSaveTimeoutId = setTimeout(() => {
+    autoSaveTimeoutId = null;
+    try {
+      flushDesignAutosave(reason);
+    } catch (err) {
+      console.error('[Autosave] flush failed', err);
+    }
+  }, AUTO_SAVE_DEBOUNCE_MS);
+}
+
 
 
 jQuery(document).ready(function ($) {
@@ -60,15 +242,9 @@ jQuery(document).ready(function ($) {
                         product_id: window.currentProductId != null ? String(window.currentProductId) : null,
                         canvas_state: Array.isArray(canvasState) ? canvasState : []
                 };
-                if (window.DesignCache?.saveDesign) {
-                        window.DesignCache.saveDesign(window.currentProductId, productData);
-                } else if (window.customizerCache) {
-                        window.customizerCache.designs = window.customizerCache.designs || {};
-                        window.customizerCache.designs[window.currentProductId] = productData;
-                        if (typeof persistCache === 'function') {
-                                persistCache();
-                        }
-                }
+                cancelPendingDesignAutosave();
+                const savedBeforeRequest = persistDesignLocally(productData) || productData;
+                updateAutoSaveSignature(savedBeforeRequest);
 
                 const firstViewName = getFirstMockup(selectedVariant)?.view_name;
 
@@ -102,14 +278,9 @@ jQuery(document).ready(function ($) {
                                 } else {
                                         alert("Erreur lors de la génération du mockup");
                                 }
-                                if (window.DesignCache?.saveDesign) {
-                                        window.DesignCache.saveDesign(window.currentProductId, productData);
-                                } else if (window.customizerCache?.designs?.[window.currentProductId]) {
-                                        window.customizerCache.designs[window.currentProductId] = productData;
-                                        if (typeof persistCache === 'function') {
-                                                persistCache();
-                                        }
-                                }
+                                cancelPendingDesignAutosave();
+                                const savedAfterRequest = persistDesignLocally(productData) || productData;
+                                updateAutoSaveSignature(savedAfterRequest);
                         })
                         .catch(err => {
                                 console.error("❌ Erreur réseau :", err.message);
@@ -139,9 +310,17 @@ jQuery(document).ready(function ($) {
         const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
 
+        window.addEventListener('canvas:image-change', () => scheduleDesignAutosave('canvas-event'));
+
         // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
         window.addEventListener('beforeunload', function (e) {
-                if (customizeModal.is(':visible') && CanvasManager.hasImage()) {
+                cancelPendingDesignAutosave();
+                try {
+                        flushDesignAutosave('beforeunload');
+                } catch (err) {
+                        console.warn('[Autosave] flush beforeunload failed', err);
+                }
+                if (customizeModal.is(':visible') && CanvasManager.hasImage && CanvasManager.hasImage()) {
                         e.preventDefault();
                         e.returnValue = '';
                 }
@@ -223,6 +402,7 @@ jQuery(document).ready(function ($) {
        async function restoreLastDesignToCanvas(done) {
                const finish = (value) => {
                        if (typeof done === 'function') done(value);
+                       scheduleDesignAutosave('restore-finish');
                };
 
                try {
@@ -538,10 +718,16 @@ jQuery(document).ready(function ($) {
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
-                if (CanvasManager.hasImage()) {
+                if (CanvasManager.hasImage && CanvasManager.hasImage()) {
                         unsavedChangesModal.show();
                         trapFocus(unsavedChangesModal);
                         return;
+                }
+                cancelPendingDesignAutosave();
+                try {
+                        flushDesignAutosave('modal-close');
+                } catch (err) {
+                        console.warn('[Autosave] flush modal-close failed', err);
                 }
                 customizeModal.hide();
                 releaseFocus(customizeModal);
@@ -550,6 +736,12 @@ jQuery(document).ready(function ($) {
 
         confirmQuitButton.on('click', function () {
                 unsavedChangesModal.hide();
+                cancelPendingDesignAutosave();
+                try {
+                        flushDesignAutosave('modal-close');
+                } catch (err) {
+                        console.warn('[Autosave] flush modal-close failed', err);
+                }
                 customizeModal.hide();
                 releaseFocus(unsavedChangesModal);
                 releaseFocus(customizeModal);

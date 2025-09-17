@@ -717,8 +717,10 @@ const CanvasManager = {
   },
 
   getCurrentImageData() {
-    const img = canvas?.getActiveObject();
-    if (!img || img.type !== 'image' || img === bgImage) { CM.log("getCurrentImageData: pas d'image active"); return null; }
+    const img = (typeof this.getActiveUserImage === 'function')
+      ? this.getActiveUserImage()
+      : (canvas?.getActiveObject ? canvas.getActiveObject() : null);
+    if (!img || img.type !== 'image' || img === bgImage) { CM.log("getCurrentImageData: pas d'image utilisateur"); return null; }
     const d = {
       left: img.left,
       top: img.top,
