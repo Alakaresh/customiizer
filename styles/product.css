@@ -304,7 +304,7 @@ body {
     align-items: center;
     justify-content: center;
     min-width: 76px;
-    padding: 12px 22px;
+    padding: 10px 18px;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     background: linear-gradient(135deg, rgba(32, 32, 32, 0.86), rgba(14, 14, 14, 0.94));
