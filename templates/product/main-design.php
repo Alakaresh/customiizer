@@ -157,19 +157,3 @@
     </div>
 </div>
 
-<!-- Modal de confirmation de fermeture -->
-<div id="unsavedChangesModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="unsavedChangesTitle">
-    <div class="small-modal">
-        <div class="modal-header">
-            <h3 id="unsavedChangesTitle">Quitter la personnalisation ?</h3>
-            <span class="close-button" aria-label="Annuler">&times;</span>
-        </div>
-        <div class="modal-body">
-            <p>Cette action va annuler la personnalisation en cours.</p>
-            <div class="confirm-buttons">
-                <button id="confirmQuitButton" class="source-button">Quitter</button>
-                <button id="cancelQuitButton" class="source-button">Annuler</button>
-            </div>
-        </div>
-    </div>
-</div>

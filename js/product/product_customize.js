@@ -301,10 +301,6 @@ jQuery(document).ready(function ($) {
         const customizeButton = $('.design-button');
         const customizeModal = $('#customizeModal');
         const closeButtonMain = $('#customizeModal .close-button');
-        const unsavedChangesModal = $('#unsavedChangesModal');
-        const confirmQuitButton = $('#confirmQuitButton');
-        const cancelQuitButton = $('#cancelQuitButton');
-        const closeButtonUnsaved = $('#unsavedChangesModal .close-button');
         const addImageButton = $('#addImageButton');
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
@@ -312,17 +308,13 @@ jQuery(document).ready(function ($) {
 
         window.addEventListener('canvas:image-change', () => scheduleDesignAutosave('canvas-event'));
 
-        // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
-        window.addEventListener('beforeunload', function (e) {
+        // Assurer la sauvegarde avant de quitter la page
+        window.addEventListener('beforeunload', function () {
                 cancelPendingDesignAutosave();
                 try {
                         flushDesignAutosave('beforeunload');
                 } catch (err) {
                         console.warn('[Autosave] flush beforeunload failed', err);
-                }
-                if (customizeModal.is(':visible') && CanvasManager.hasImage && CanvasManager.hasImage()) {
-                        e.preventDefault();
-                        e.returnValue = '';
                 }
         });
 
@@ -718,11 +710,6 @@ jQuery(document).ready(function ($) {
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
-                if (CanvasManager.hasImage && CanvasManager.hasImage()) {
-                        unsavedChangesModal.show();
-                        trapFocus(unsavedChangesModal);
-                        return;
-                }
                 cancelPendingDesignAutosave();
                 try {
                         flushDesignAutosave('modal-close');
@@ -733,28 +720,6 @@ jQuery(document).ready(function ($) {
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
         });
-
-        confirmQuitButton.on('click', function () {
-                unsavedChangesModal.hide();
-                cancelPendingDesignAutosave();
-                try {
-                        flushDesignAutosave('modal-close');
-                } catch (err) {
-                        console.warn('[Autosave] flush modal-close failed', err);
-                }
-                customizeModal.hide();
-                releaseFocus(unsavedChangesModal);
-                releaseFocus(customizeModal);
-                updateAddImageButtonVisibility();
-        });
-
-        function hideUnsavedModal() {
-                unsavedChangesModal.hide();
-                releaseFocus(unsavedChangesModal);
-        }
-
-        cancelQuitButton.on('click', hideUnsavedModal);
-        closeButtonUnsaved.on('click', hideUnsavedModal);
 
         // Afficher le bouton lors du changement de produit
         $(document).on('productSelected', function () {
@@ -855,9 +820,7 @@ jQuery(document).ready(function ($) {
 
         $(document).on('keydown', function (e) {
                 if (e.key === 'Escape') {
-                        if (unsavedChangesModal.is(':visible')) {
-                                hideUnsavedModal();
-                        } else if (imageSourceModal.is(':visible')) {
+                        if (imageSourceModal.is(':visible')) {
                                 imageSourceModal.hide();
                                 releaseFocus(imageSourceModal);
                         } else if (productSidebar.hasClass('open')) {
