@@ -274,12 +274,12 @@ body {
 
 /* Style sombre pour le bouton "Personnaliser le design" */
 .design-button {
-	background-color: #333333;
+background-color: #1abc9c;
 }
 
 .design-button:hover {
-	background-color: #555555;
-	color: #e6e6e6;
+background-color: #34d1af;
+color: #ffffff;
 }
 
 /* Style sombre pour le bouton "Ajouter au panier" */
