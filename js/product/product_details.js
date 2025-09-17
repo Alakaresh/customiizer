@@ -53,6 +53,7 @@ const DESIGN_CACHE_MIRROR_FIELDS = [
     'delivery_price',
     'mockup_url',
     'design_image_url',
+    'canvas_image_url',
     'design_width',
     'design_height',
     'design_left',
@@ -153,6 +154,9 @@ function ensureDesignEntry(productId) {
     } else {
         entry.placements = entry.placements || {};
         if (entry.last && entry.last.design_image_url) {
+            if (!entry.last.canvas_image_url) {
+                entry.last.canvas_image_url = entry.last.design_image_url;
+            }
             const currentPlacement = buildPlacementPayload(entry.last);
             const currentKey = computePlacementKey(entry.last.design_image_url);
             if (currentPlacement && currentKey) {
@@ -169,21 +173,38 @@ function ensureDesignEntry(productId) {
 }
 
 function storePlacement(entry, data) {
-    if (!entry || !data || !data.design_image_url) return;
-    const key = computePlacementKey(data.design_image_url);
-    if (!key) return;
+    if (!entry || !data) return;
     const placement = buildPlacementPayload(data);
     if (!placement) return;
+
+    const keys = [];
+    const canvasKey = computePlacementKey(data.canvas_image_url);
+    if (canvasKey) keys.push(canvasKey);
+    const designKey = computePlacementKey(data.design_image_url);
+    if (designKey && !keys.includes(designKey)) keys.push(designKey);
+    if (!keys.length) return;
+
     entry.placements = entry.placements || {};
-    entry.placements[key] = entry.placements[key] || {};
     const variantKey = placement.variant_id || '_default';
-    entry.placements[key][variantKey] = placement;
+
+    keys.forEach((key) => {
+        entry.placements[key] = entry.placements[key] || {};
+        entry.placements[key][variantKey] = { ...placement };
+    });
 }
 
 function saveDesignToCache(productId, productData) {
     if (!productId) return null;
     const entry = ensureDesignEntry(productId) || { placements: {}, last: null };
     const clone = cloneDesignData(productData);
+    if (clone) {
+        if (!clone.canvas_image_url && clone.design_image_url) {
+            clone.canvas_image_url = clone.design_image_url;
+        }
+        if (!clone.product_id && productId) {
+            clone.product_id = String(productId);
+        }
+    }
     entry.last = clone;
     if (clone && clone.product_id) {
         entry.product_id = clone.product_id;
@@ -641,15 +662,30 @@ jQuery(document).ready(function ($) {
 
         $(document).on('mockupSelected', function (e, variant, mockup) {
                 let designUrl = null;
-                if (typeof productData !== 'undefined' && productData?.design_image_url) {
-                        designUrl = productData.design_image_url;
-                } else if (window.DesignCache?.getLastDesign) {
+                if (typeof productData !== 'undefined') {
+                        if (productData?.canvas_image_url) {
+                                designUrl = productData.canvas_image_url;
+                        } else if (productData?.design_image_url) {
+                                designUrl = productData.design_image_url;
+                        }
+                }
+
+                if (!designUrl && window.DesignCache?.getLastDesign) {
                         const cachedDesign = window.DesignCache.getLastDesign(window.currentProductId);
-                        if (cachedDesign?.design_image_url) {
+                        if (cachedDesign?.canvas_image_url) {
+                                designUrl = cachedDesign.canvas_image_url;
+                        } else if (cachedDesign?.design_image_url) {
                                 designUrl = cachedDesign.design_image_url;
                         }
-                } else if (window.customizerCache?.designs?.[window.currentProductId]?.design_image_url) {
-                        designUrl = window.customizerCache.designs[window.currentProductId].design_image_url;
+                }
+
+                if (!designUrl && window.customizerCache?.designs?.[window.currentProductId]) {
+                        const cached = window.customizerCache.designs[window.currentProductId];
+                        if (cached?.canvas_image_url) {
+                                designUrl = cached.canvas_image_url;
+                        } else if (cached?.design_image_url) {
+                                designUrl = cached.design_image_url;
+                        }
                 }
                 if (designUrl && typeof window.update3DTextureFromImageURL === 'function') {
                         window.update3DTextureFromImageURL(designUrl, variant?.zone_3d_name || null);
@@ -748,6 +784,7 @@ jQuery(document).ready(function ($) {
                                         } else {
                                                 const designButton = document.querySelector('.design-button');
                                                 if (designButton) {
+                                                        window.skipDesignRestoreOnce = true;
                                                         designButton.click();
                                                         const interval = setInterval(() => {
                                                                 if (document.getElementById('productCanvas')) {
@@ -756,6 +793,8 @@ jQuery(document).ready(function ($) {
                                                                 }
                                                         }, 100);
                                                         setTimeout(() => clearInterval(interval), 10000);
+                                                } else {
+                                                        window.skipDesignRestoreOnce = false;
                                                 }
                                         }
                                 };
