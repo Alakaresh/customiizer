@@ -81,14 +81,14 @@ function isValidMockupImage(path) {
 }
 
 function displayVariantsForProduct(normalizedName) {
-	const container = document.getElementById('product-groups-container');
-	if (!container) return;
-	container.innerHTML = '';
+       const container = document.getElementById('product-groups-container');
+       if (!container) return;
+       container.innerHTML = '';
 
-	const filtered = globalProducts.filter(v => (v.product_name.includes("Clear Case") ? "Clear Case" : v.product_name) === normalizedName && isValidMockupImage(v.image));
-	filtered.forEach(variant => {
-		const item = document.createElement('div');
-		item.className = 'product-item';
+       const filtered = globalProducts.filter(v => (v.product_name.includes("Clear Case") ? "Clear Case" : v.product_name) === normalizedName && isValidMockupImage(v.image));
+       filtered.forEach(variant => {
+               const item = document.createElement('div');
+               item.className = 'product-item';
 
 		const image = document.createElement('img');
 		image.src = variant.image;

@@ -28,7 +28,6 @@ function get_product_ratios() {
         INNER JOIN WPC_variants v ON p.product_id = v.product_id
         LEFT JOIN WPC_variant_mockup m ON v.variant_id = m.variant_id
         WHERE p.is_active = 1
-        ORDER BY v.ratio_image ASC
     ", ARRAY_A);
 
     if (!empty($results)) {
