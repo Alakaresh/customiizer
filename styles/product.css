@@ -189,14 +189,17 @@ body {
     backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
-    flex-grow: 0;   /* fermé = hauteur minimale */
+    max-height: 62px; /* fermé par défaut → juste la barre */
     overflow: hidden;
+    transition: max-height 0.3s ease;
 }
 
 .product-description.is-open {
-    flex-grow: 1;   /* ouvert = prend tout l’espace dispo */
+    flex-grow: 1;   /* ouvert → prend toute la hauteur dispo */
+    max-height: none; 
     box-shadow: 0 28px 52px rgba(26, 188, 156, 0.18);
 }
+
 
 .product-colors {
     width: 100%;
@@ -1023,7 +1026,6 @@ body {
     color: #e0e0e0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 
 .description-content.open {
     max-height: 520px;
