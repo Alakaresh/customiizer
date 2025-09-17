@@ -603,16 +603,68 @@ jQuery(document).ready(function ($) {
 			console.warn("Aucune variante trouvée pour cette combinaison !");
 			$('#customize-button').prop('disabled', true).addClass('disabled');
 			$('#no-stock-message').text("❌ Cette combinaison est indisponible.").show();
-		}
-	}
+                }
+        }
 
 
 
-	function updateColors(variants) {
-		const colorsContainer = $('.colors-container').empty();
-		const colorSet = new Set();
+        window.applyVariantSelection = function (variant) {
+                if (!variant) {
+                        return;
+                }
 
-		variants.forEach(v => {
+                if (!Array.isArray(currentVariants) || currentVariants.length === 0) {
+                        return;
+                }
+
+                const matchedVariant = currentVariants.find(v => String(v.variant_id) === String(variant.variant_id));
+                if (!matchedVariant) {
+                        console.warn('[Product] Unable to synchronize variant selection', variant);
+                        return;
+                }
+
+                if (matchedVariant.color) {
+                        const colorOption = $('.color-option').filter(function () {
+                                return $(this).attr('data-color') === matchedVariant.color;
+                        });
+
+                        if (colorOption.length) {
+                                $('.color-option').removeClass('selected');
+                                colorOption.addClass('selected');
+                        }
+                }
+
+                const sizeSelector = $('.size-selector');
+                if (sizeSelector.length) {
+                        if (matchedVariant.size) {
+                                sizeSelector.val(matchedVariant.size);
+                        }
+                } else if (matchedVariant.size) {
+                        const sizeOption = $('.size-option').filter(function () {
+                                return $(this).attr('data-size') === matchedVariant.size;
+                        });
+
+                        if (sizeOption.length) {
+                                $('.size-option')
+                                        .removeClass('selected')
+                                        .attr('aria-selected', 'false');
+                                sizeOption
+                                        .addClass('selected')
+                                        .attr('aria-selected', 'true');
+                        }
+                }
+
+                selectedVariant = matchedVariant;
+                updateSelectedVariant();
+        };
+
+
+
+        function updateColors(variants) {
+                const colorsContainer = $('.colors-container').empty();
+                const colorSet = new Set();
+
+                variants.forEach(v => {
 			if (v.color) {
 				colorSet.add(v.color);
 			}
