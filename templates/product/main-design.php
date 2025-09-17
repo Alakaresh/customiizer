@@ -103,6 +103,7 @@
                     <div class="filter-group" id="format-block">
                         <div class="filter-buttons" id="mainFormatFilters">
                             <button id="filter-all" class="format-main active" data-format="all">Tous</button>
+                            <button id="filter-product-ratio" class="format-main" data-format="product">Produit</button>
                             <button id="open-format-menu" class="format-main">Format</button>
                         </div>
                         <div id="formatOptions" class="format-dropdown">

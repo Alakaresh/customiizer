@@ -154,6 +154,88 @@
         communityImages = options?.community || [];
         importedFiles   = options?.imported || [];
         const sizeBlock = $('#size-block');
+        const productRatioButton = $('#filter-product-ratio');
+
+        function resolveVariant(variantCandidate) {
+            if (variantCandidate && typeof variantCandidate === 'object') {
+                return variantCandidate;
+            }
+            if (typeof selectedVariant !== 'undefined' && selectedVariant && typeof selectedVariant === 'object') {
+                return selectedVariant;
+            }
+            if (window.selectedVariant && typeof window.selectedVariant === 'object') {
+                return window.selectedVariant;
+            }
+            return null;
+        }
+
+        function applyProductRatioFilter(ratio, variantData) {
+            if (!ratio) return;
+            const variant = resolveVariant(variantData);
+            const productName = (variant && variant.product_name)
+                ? variant.product_name
+                : ($('#customizeModalTitle').text() || '').trim() || null;
+            const sizeName = variant?.size || null;
+
+            currentFormatFilter = ratio;
+            currentProduct = null;
+            currentSize = null;
+            productFormats = [];
+            sizeRatioMap = {};
+
+            $('#mainFormatFilters .format-main').removeClass('active');
+            if (productRatioButton.length) {
+                productRatioButton.addClass('active');
+            }
+            $('#formatOptions .format-btn').removeClass('active');
+            $('#product-block').removeClass('active');
+            $('#formatOptions').removeClass('active');
+            sizeBlock.hide();
+            $('#sizeButtons').empty();
+
+            $('#open-format-menu').addClass('active');
+            updateFormatLabel(ratio, !!(productName || sizeName), productName, sizeName);
+
+            currentPage = 1;
+            renderFileList();
+        }
+
+        function updateProductRatioButton(variantCandidate) {
+            if (!productRatioButton.length) return;
+            const variant = resolveVariant(variantCandidate);
+            const ratio = variant?.ratio_image || null;
+            const sizeName = variant?.size || null;
+            const wasActive = productRatioButton.hasClass('active');
+
+            if (ratio) {
+                const labelParts = ['Produit'];
+                if (sizeName) labelParts.push(sizeName);
+                labelParts.push(ratio);
+                productRatioButton
+                    .prop('disabled', false)
+                    .text(labelParts.join(' – '))
+                    .data('ratio', ratio)
+                    .data('variant-size', sizeName || '');
+
+                if (wasActive && currentFormatFilter !== ratio) {
+                    applyProductRatioFilter(ratio, variant);
+                }
+            } else {
+                productRatioButton
+                    .prop('disabled', true)
+                    .removeClass('active')
+                    .text('Produit')
+                    .removeData('ratio')
+                    .removeData('variant-size');
+
+                if (wasActive && currentFormatFilter !== 'all') {
+                    currentFormatFilter = 'all';
+                    $('#open-format-menu').removeClass('active').text('Format');
+                    currentPage = 1;
+                    renderFileList();
+                }
+            }
+        }
         // Écouteurs d'événements
         $('#folder-my').on('click', function () {
             currentFolder = 'my';
@@ -211,6 +293,17 @@
             renderFileList();
         });
 
+        if (productRatioButton.length) {
+            productRatioButton.on('click', function () {
+                if ($(this).prop('disabled')) return;
+                const storedRatio = $(this).data('ratio');
+                const variant = resolveVariant();
+                const ratio = variant?.ratio_image || storedRatio;
+                if (!ratio) return;
+                applyProductRatioFilter(ratio, variant);
+            });
+        }
+
         // Ouverture du menu format
         $('#open-format-menu').on('click', function (e) {
             e.stopPropagation();
@@ -248,6 +341,14 @@
             updateFormatLabel(fmt);
             $('#formatOptions').removeClass('active');
         });
+
+        $(document)
+            .off('variantReady.fileLibrary')
+            .on('variantReady.fileLibrary', function (event, variant) {
+                updateProductRatioButton(variant);
+            });
+
+        updateProductRatioButton(resolveVariant());
 
         // Accès aux produits
         $('#format-product').on('click', function (e) {
