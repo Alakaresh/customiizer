@@ -443,6 +443,10 @@
         // Zone de dépôt et chargement de fichiers
         const dropZone = $('#fileDropZone');
         const fileInput = $('#fileInput');
+        const dropzoneDefault = dropZone.find('.dropzone-default');
+        const uploadFeedback = dropZone.find('.upload-feedback');
+        const uploadFeedbackText = uploadFeedback.find('span');
+        let isUploading = false;
 
         function activateImportedFolder() {
             if (currentFolder !== 'imported') {
@@ -511,28 +515,45 @@
                 return;
             }
 
-            activateImportedFolder();
-
-            let hasSuccess = false;
-
-            for (const file of imageFiles) {
-                try {
-                    const url = await readFileAsDataURL(file);
-                    const uploadResult = await uploadImageFromLibrary({
-                        name: file.name,
-                        size: file.size,
-                        url: url
-                    });
-                    if (uploadResult) {
-                        hasSuccess = true;
-                    }
-                } catch (error) {
-                    // L'erreur est déjà gérée dans uploadImageFromLibrary (console + alert).
-                }
+            if (isUploading) {
+                return;
             }
+            isUploading = true;
 
-            if (hasSuccess) {
-                await refreshImportedImages();
+            dropZone.addClass('is-uploading').attr('aria-busy', 'true');
+            dropzoneDefault.attr('aria-hidden', 'true');
+            uploadFeedback.attr('aria-hidden', 'false');
+            uploadFeedbackText.text(imageFiles.length > 1 ? 'Ajout des images…' : 'Ajout de l’image…');
+
+            try {
+                activateImportedFolder();
+
+                let hasSuccess = false;
+
+                for (const file of imageFiles) {
+                    try {
+                        const url = await readFileAsDataURL(file);
+                        const uploadResult = await uploadImageFromLibrary({
+                            name: file.name,
+                            size: file.size,
+                            url: url
+                        });
+                        if (uploadResult) {
+                            hasSuccess = true;
+                        }
+                    } catch (error) {
+                        // L'erreur est déjà gérée dans uploadImageFromLibrary (console + alert).
+                    }
+                }
+
+                if (hasSuccess) {
+                    await refreshImportedImages();
+                }
+            } finally {
+                dropZone.removeClass('is-uploading').removeAttr('aria-busy');
+                dropzoneDefault.attr('aria-hidden', 'false');
+                uploadFeedback.attr('aria-hidden', 'true');
+                isUploading = false;
             }
         }
 

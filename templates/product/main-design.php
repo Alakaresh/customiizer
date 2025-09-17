@@ -86,8 +86,14 @@
             <button id="folder-community"><i class="fas fa-users" aria-hidden="true"></i><span>Communauté</span></button>
             <button id="folder-imported"><i class="fas fa-file-import" aria-hidden="true"></i><span>Images importées</span></button>
             <div id="fileDropZone" class="file-drop-zone">
-                <i class="fas fa-upload" aria-hidden="true"></i>
-                <span>Glisser-déposer des fichiers<br>ou<br>Recherchez des fichiers</span>
+                <div class="dropzone-default" aria-hidden="false">
+                    <i class="fas fa-upload" aria-hidden="true"></i>
+                    <span>Glisser-déposer des fichiers<br>ou<br>Recherchez des fichiers</span>
+                </div>
+                <div class="upload-feedback" aria-hidden="true" aria-live="polite">
+                    <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                    <span>Ajout de l’image…</span>
+                </div>
                 <input id="fileInput" type="file" accept="image/*" multiple hidden />
             </div>
         </div>
