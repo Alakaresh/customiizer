@@ -3,6 +3,188 @@ window.currentProductId = window.currentProductId || null;
 window.mockupTimes = window.mockupTimes || {};
 window.skipDesignRestoreOnce = window.skipDesignRestoreOnce || false;
 
+const AUTO_SAVE_DEBOUNCE_MS = 600;
+let autoSaveTimeoutId = null;
+let lastAutoSaveSignature = null;
+
+function computeDesignSnapshotSignature(data) {
+  if (!data || typeof data !== 'object') return null;
+  try {
+    const payload = {
+      product_id: data.product_id ?? null,
+      variant_id: data.variant_id ?? null,
+      placement: data.placement ?? null,
+      technique: data.technique ?? null,
+      design_width: data.design_width ?? null,
+      design_height: data.design_height ?? null,
+      design_left: data.design_left ?? null,
+      design_top: data.design_top ?? null,
+      design_angle: data.design_angle ?? null,
+      design_flipX: !!data.design_flipX,
+      canvas_state: Array.isArray(data.canvas_state) ? data.canvas_state : []
+    };
+    return JSON.stringify(payload);
+  } catch (err) {
+    console.warn('[Autosave] signature computation failed', err);
+    return null;
+  }
+}
+
+function updateAutoSaveSignature(data) {
+  const signature = computeDesignSnapshotSignature(data);
+  if (signature) {
+    lastAutoSaveSignature = signature;
+  }
+}
+
+function cancelPendingDesignAutosave() {
+  if (autoSaveTimeoutId) {
+    clearTimeout(autoSaveTimeoutId);
+    autoSaveTimeoutId = null;
+  }
+}
+
+function persistDesignLocally(productData) {
+  const productId = window.currentProductId;
+  if (!productId || !productData || typeof productData !== 'object') {
+    return null;
+  }
+  const payload = { ...productData };
+  if (!payload.product_id && productId != null) {
+    payload.product_id = String(productId);
+  }
+
+  if (window.DesignCache?.saveDesign) {
+    try {
+      window.DesignCache.saveDesign(productId, payload);
+    } catch (err) {
+      console.error('[Autosave] DesignCache.saveDesign failed', err);
+    }
+  } else if (window.customizerCache) {
+    window.customizerCache.designs = window.customizerCache.designs || {};
+    window.customizerCache.designs[productId] = payload;
+    if (typeof persistCache === 'function') {
+      try { persistCache(); } catch (err) { console.warn('[Autosave] persistCache failed', err); }
+    }
+  }
+
+  return payload;
+}
+
+function getExistingDesignSnapshot(productId) {
+  if (!productId) return null;
+  if (window.DesignCache?.getLastDesign) {
+    const cached = window.DesignCache.getLastDesign(productId);
+    return cached ? { ...cached } : null;
+  }
+  const legacy = window.customizerCache?.designs?.[productId];
+  return legacy ? { ...legacy } : null;
+}
+
+function cloneCanvasStateLayers(layers) {
+  if (!Array.isArray(layers)) return [];
+  try {
+    return JSON.parse(JSON.stringify(layers));
+  } catch (err) {
+    return layers.map(layer => (layer && typeof layer === 'object') ? { ...layer } : layer);
+  }
+}
+
+function collectCanvasSnapshotForAutosave() {
+  const productId = window.currentProductId;
+  if (!productId || !window.CanvasManager || typeof CanvasManager.exportState !== 'function') {
+    return null;
+  }
+
+  let rawState = [];
+  try {
+    rawState = CanvasManager.exportState();
+  } catch (err) {
+    console.warn('[Autosave] exportState failed', err);
+    return null;
+  }
+  const canvasState = cloneCanvasStateLayers(rawState);
+  const hasLayers = Array.isArray(canvasState) && canvasState.length > 0;
+  const existing = getExistingDesignSnapshot(productId);
+  const hadCachedState = Array.isArray(existing?.canvas_state) && existing.canvas_state.length > 0;
+
+  if (!hasLayers && !hadCachedState) {
+    return null;
+  }
+
+  const payload = existing ? { ...existing } : {};
+  payload.canvas_state = hasLayers ? canvasState : [];
+  if (productId != null) {
+    payload.product_id = String(productId);
+  }
+
+  if (typeof selectedVariant !== 'undefined' && selectedVariant && typeof selectedVariant === 'object') {
+    if (selectedVariant.variant_id != null) {
+      payload.variant_id = selectedVariant.variant_id;
+    }
+    const placementLabel = selectedVariant.placement || selectedVariant.zone_3d_name;
+    if (placementLabel) {
+      payload.placement = placementLabel;
+    }
+    if (selectedVariant.technique) {
+      payload.technique = selectedVariant.technique;
+    }
+  }
+
+  const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
+    ? CanvasManager.getClipWindowBBox()
+    : { left: 0, top: 0 };
+  const placement = (typeof CanvasManager.getCurrentImageData === 'function')
+    ? CanvasManager.getCurrentImageData()
+    : null;
+
+  if (hasLayers && placement) {
+    payload.design_width = placement.width;
+    payload.design_height = placement.height;
+    payload.design_left = (placement.left != null ? placement.left - (bbox.left || 0) : 0);
+    payload.design_top = (placement.top != null ? placement.top - (bbox.top || 0) : 0);
+    payload.design_angle = placement.angle || 0;
+    payload.design_flipX = !!placement.flipX;
+  } else if (!hasLayers) {
+    delete payload.design_width;
+    delete payload.design_height;
+    delete payload.design_left;
+    delete payload.design_top;
+    delete payload.design_angle;
+    delete payload.design_flipX;
+  }
+
+  return payload;
+}
+
+function flushDesignAutosave(reason) {
+  const snapshot = collectCanvasSnapshotForAutosave();
+  if (!snapshot) return;
+  const signature = computeDesignSnapshotSignature(snapshot);
+  if (signature && signature === lastAutoSaveSignature) {
+    return;
+  }
+  const stored = persistDesignLocally(snapshot) || snapshot;
+  updateAutoSaveSignature(stored);
+}
+
+function scheduleDesignAutosave(reason) {
+  if (!window.CanvasManager || typeof CanvasManager.exportState !== 'function') {
+    return;
+  }
+  if (autoSaveTimeoutId) {
+    clearTimeout(autoSaveTimeoutId);
+  }
+  autoSaveTimeoutId = setTimeout(() => {
+    autoSaveTimeoutId = null;
+    try {
+      flushDesignAutosave(reason);
+    } catch (err) {
+      console.error('[Autosave] flush failed', err);
+    }
+  }, AUTO_SAVE_DEBOUNCE_MS);
+}
+
 
 
 jQuery(document).ready(function ($) {
@@ -35,6 +217,9 @@ jQuery(document).ready(function ($) {
 
                 // Mise en cache locale de la personnalisation pour réouverture future
                 const placement = CanvasManager.getCurrentImageData() || {};
+                const canvasState = (typeof CanvasManager.exportState === 'function')
+                        ? CanvasManager.exportState()
+                        : [];
                 const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
                         ? CanvasManager.getClipWindowBBox()
                         : { left: 0, top: 0 };
@@ -54,17 +239,12 @@ jQuery(document).ready(function ($) {
                         variant_id: selectedVariant?.variant_id,
                         placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
                         technique: selectedVariant?.technique || '',
-                        product_id: window.currentProductId != null ? String(window.currentProductId) : null
+                        product_id: window.currentProductId != null ? String(window.currentProductId) : null,
+                        canvas_state: Array.isArray(canvasState) ? canvasState : []
                 };
-                if (window.DesignCache?.saveDesign) {
-                        window.DesignCache.saveDesign(window.currentProductId, productData);
-                } else if (window.customizerCache) {
-                        window.customizerCache.designs = window.customizerCache.designs || {};
-                        window.customizerCache.designs[window.currentProductId] = productData;
-                        if (typeof persistCache === 'function') {
-                                persistCache();
-                        }
-                }
+                cancelPendingDesignAutosave();
+                const savedBeforeRequest = persistDesignLocally(productData) || productData;
+                updateAutoSaveSignature(savedBeforeRequest);
 
                 const firstViewName = getFirstMockup(selectedVariant)?.view_name;
 
@@ -98,14 +278,9 @@ jQuery(document).ready(function ($) {
                                 } else {
                                         alert("Erreur lors de la génération du mockup");
                                 }
-                                if (window.DesignCache?.saveDesign) {
-                                        window.DesignCache.saveDesign(window.currentProductId, productData);
-                                } else if (window.customizerCache?.designs?.[window.currentProductId]) {
-                                        window.customizerCache.designs[window.currentProductId] = productData;
-                                        if (typeof persistCache === 'function') {
-                                                persistCache();
-                                        }
-                                }
+                                cancelPendingDesignAutosave();
+                                const savedAfterRequest = persistDesignLocally(productData) || productData;
+                                updateAutoSaveSignature(savedAfterRequest);
                         })
                         .catch(err => {
                                 console.error("❌ Erreur réseau :", err.message);
@@ -135,9 +310,17 @@ jQuery(document).ready(function ($) {
         const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
 
+        window.addEventListener('canvas:image-change', () => scheduleDesignAutosave('canvas-event'));
+
         // Avertir en cas de fermeture de la page avec des modifications non sauvegardées
         window.addEventListener('beforeunload', function (e) {
-                if (customizeModal.is(':visible') && CanvasManager.hasImage()) {
+                cancelPendingDesignAutosave();
+                try {
+                        flushDesignAutosave('beforeunload');
+                } catch (err) {
+                        console.warn('[Autosave] flush beforeunload failed', err);
+                }
+                if (customizeModal.is(':visible') && CanvasManager.hasImage && CanvasManager.hasImage()) {
                         e.preventDefault();
                         e.returnValue = '';
                 }
@@ -216,117 +399,157 @@ jQuery(document).ready(function ($) {
        window.updateAddImageButtonVisibility = updateAddImageButtonVisibility;
 
 
-       function restoreLastDesignToCanvas(done) {
-               if (!window.CanvasManager || typeof CanvasManager.addImage !== 'function') {
-                       if (typeof done === 'function') done(false);
-                       return;
-               }
-
-               if (typeof CanvasManager.hasImage === 'function' && CanvasManager.hasImage()) {
-                       if (typeof done === 'function') done(true);
-                       return;
-               }
-
-               let designData = null;
-               if (window.DesignCache?.getLastDesign) {
-                       designData = window.DesignCache.getLastDesign(window.currentProductId);
-               } else if (window.customizerCache?.designs?.[window.currentProductId]) {
-                       designData = window.customizerCache.designs[window.currentProductId];
-               }
-
-               if (designData && typeof designData === 'object') {
-                       designData = { ...designData };
-                       if (!designData.canvas_image_url && designData.design_image_url) {
-                               designData.canvas_image_url = designData.design_image_url;
-                       }
-               }
-
-               if (!designData) {
-                       if (typeof done === 'function') done(false);
-                       return;
-               }
-
-               const cachedProductId = designData.product_id != null ? String(designData.product_id) : null;
-               const currentProductId = window.currentProductId != null ? String(window.currentProductId) : null;
-               if (cachedProductId && currentProductId && cachedProductId !== currentProductId) {
-                       if (typeof done === 'function') done(false);
-                       return;
-               }
-
-               const preferredUrl = designData.canvas_image_url || designData.design_image_url;
-               const renderUrl = (preferredUrl && preferredUrl === designData.mockup_url) ? null : preferredUrl;
-               if (!renderUrl) {
-
-                       if (typeof done === 'function') done(false);
-                       return;
-               }
-
-               const currentVariantId = selectedVariant?.variant_id != null ? String(selectedVariant.variant_id) : null;
-               const cachedVariantId = designData.variant_id != null ? String(designData.variant_id) : null;
-               if (cachedVariantId && currentVariantId && cachedVariantId !== currentVariantId) {
-                       if (typeof done === 'function') done(false);
-                       return;
-               }
-
-               let placement = null;
-               if (window.DesignCache?.getPlacement) {
-                       placement = window.DesignCache.getPlacement(
-                               window.currentProductId,
-                               renderUrl,
-                               selectedVariant?.variant_id
-                       );
-
-                       if (!placement && designData.design_image_url && designData.design_image_url !== renderUrl) {
-                               placement = window.DesignCache.getPlacement(
-                                       window.currentProductId,
-                                       designData.design_image_url,
-                                       selectedVariant?.variant_id
-                               );
-                       }
-               }
-
-               const finalize = () => {
-                       if (typeof done === 'function') done(true);
+       async function restoreLastDesignToCanvas(done) {
+               const finish = (value) => {
+                       if (typeof done === 'function') done(value);
+                       scheduleDesignAutosave('restore-finish');
                };
 
-               if (placement && typeof placement === 'object') {
-                       const mergedPlacement = { ...placement };
-                       if (mergedPlacement.design_width == null && designData.design_width != null) {
-                               mergedPlacement.design_width = designData.design_width;
+               try {
+                       if (!window.CanvasManager || typeof CanvasManager.addImage !== 'function') {
+                               finish(false);
+                               return;
                        }
-                       if (mergedPlacement.design_height == null && designData.design_height != null) {
-                               mergedPlacement.design_height = designData.design_height;
-                       }
-                       if (mergedPlacement.design_left == null && designData.design_left != null) {
-                               mergedPlacement.design_left = designData.design_left;
-                       }
-                       if (mergedPlacement.design_top == null && designData.design_top != null) {
-                               mergedPlacement.design_top = designData.design_top;
-                       }
-                       if (mergedPlacement.design_angle == null && designData.design_angle != null) {
-                               mergedPlacement.design_angle = designData.design_angle;
-                       }
-                       if (typeof mergedPlacement.design_flipX === 'undefined' && typeof designData.design_flipX !== 'undefined') {
-                               mergedPlacement.design_flipX = designData.design_flipX;
-                       }
-                       CanvasManager.addImage(renderUrl, { placement: mergedPlacement }, finalize);
-                       return;
-               }
 
-               const canRestoreFromProduct = typeof CanvasManager.restoreFromProductData === 'function'
-                       && (!cachedVariantId || !currentVariantId || cachedVariantId === currentVariantId);
+                       if (typeof CanvasManager.hasImage === 'function' && CanvasManager.hasImage()) {
+                               finish(true);
+                               return;
+                       }
 
-               if (canRestoreFromProduct) {
-                       const payload = {
-                               ...designData,
-                               design_image_url: renderUrl,
-                               variant_id: selectedVariant?.variant_id || designData.variant_id
+                       let designData = null;
+                       if (window.DesignCache?.getLastDesign) {
+                               designData = window.DesignCache.getLastDesign(window.currentProductId);
+                       } else if (window.customizerCache?.designs?.[window.currentProductId]) {
+                               designData = window.customizerCache.designs[window.currentProductId];
+                       }
+
+                       if (designData && typeof designData === 'object') {
+                               designData = { ...designData };
+                               if (!designData.canvas_image_url && designData.design_image_url) {
+                                       designData.canvas_image_url = designData.design_image_url;
+                               }
+                       }
+
+                       if (!designData) {
+                               finish(false);
+                               return;
+                       }
+
+                       const cachedProductId = designData.product_id != null ? String(designData.product_id) : null;
+                       const currentProductId = window.currentProductId != null ? String(window.currentProductId) : null;
+                       if (cachedProductId && currentProductId && cachedProductId !== currentProductId) {
+                               finish(false);
+                               return;
+                       }
+
+                       const currentVariantId = selectedVariant?.variant_id != null ? String(selectedVariant.variant_id) : null;
+                       const cachedVariantId = designData.variant_id != null ? String(designData.variant_id) : null;
+                       if (cachedVariantId && currentVariantId && cachedVariantId !== currentVariantId) {
+                               finish(false);
+                               return;
+                       }
+
+                       const stateLayers = Array.isArray(designData.canvas_state)
+                               ? designData.canvas_state.filter(layer => layer && layer.src)
+                               : [];
+                       if (stateLayers.length && typeof CanvasManager.restoreState === 'function') {
+                               CanvasManager.clearUserImages();
+                               const failedLayers = [];
+                               try {
+                                       const { restored, failed } = await CanvasManager.restoreState(stateLayers, {
+                                               onLayerError: (layer, error) => {
+                                                       failedLayers.push({ layer, error });
+                                               }
+                                       });
+                                       if (failed > 0) {
+                                               const message = "Certaines images de votre personnalisation n’ont pas pu être rechargées automatiquement.";
+                                               if (typeof window.showToast === 'function') {
+                                                       window.showToast(message);
+                                               } else if (typeof window.displayMessage === 'function') {
+                                                       window.displayMessage(message);
+                                               } else {
+                                                       console.warn('[Restore] canvas_state layer(s) failed', failedLayers);
+                                               }
+                                       }
+                                       if (restored > 0) {
+                                               finish(true);
+                                               return;
+                                       }
+                               } catch (err) {
+                                       console.error('[Restore] Failed to rebuild canvas_state', err);
+                               }
+                       }
+
+                       const preferredUrl = designData.canvas_image_url || designData.design_image_url;
+                       const renderUrl = (preferredUrl && preferredUrl === designData.mockup_url) ? null : preferredUrl;
+                       if (!renderUrl) {
+                               finish(false);
+                               return;
+                       }
+
+                       let placement = null;
+                       if (window.DesignCache?.getPlacement) {
+                               placement = window.DesignCache.getPlacement(
+                                       window.currentProductId,
+                                       renderUrl,
+                                       selectedVariant?.variant_id
+                               );
+
+                               if (!placement && designData.design_image_url && designData.design_image_url !== renderUrl) {
+                                       placement = window.DesignCache.getPlacement(
+                                               window.currentProductId,
+                                               designData.design_image_url,
+                                               selectedVariant?.variant_id
+                                       );
+                               }
+                       }
+
+                       const finalize = () => {
+                               finish(true);
                        };
-                       CanvasManager.restoreFromProductData(payload, finalize);
-                       return;
-               }
 
-               if (typeof done === 'function') done(false);
+                       if (placement && typeof placement === 'object') {
+                               const mergedPlacement = { ...placement };
+                               if (mergedPlacement.design_width == null && designData.design_width != null) {
+                                       mergedPlacement.design_width = designData.design_width;
+                               }
+                               if (mergedPlacement.design_height == null && designData.design_height != null) {
+                                       mergedPlacement.design_height = designData.design_height;
+                               }
+                               if (mergedPlacement.design_left == null && designData.design_left != null) {
+                                       mergedPlacement.design_left = designData.design_left;
+                               }
+                               if (mergedPlacement.design_top == null && designData.design_top != null) {
+                                       mergedPlacement.design_top = designData.design_top;
+                               }
+                               if (mergedPlacement.design_angle == null && designData.design_angle != null) {
+                                       mergedPlacement.design_angle = designData.design_angle;
+                               }
+                               if (typeof mergedPlacement.design_flipX === 'undefined' && typeof designData.design_flipX !== 'undefined') {
+                                       mergedPlacement.design_flipX = designData.design_flipX;
+                               }
+                               CanvasManager.addImage(renderUrl, { placement: mergedPlacement }, finalize);
+                               return;
+                       }
+
+                       const canRestoreFromProduct = typeof CanvasManager.restoreFromProductData === 'function'
+                               && (!cachedVariantId || !currentVariantId || cachedVariantId === currentVariantId);
+
+                       if (canRestoreFromProduct) {
+                               const payload = {
+                                       ...designData,
+                                       design_image_url: renderUrl,
+                                       variant_id: selectedVariant?.variant_id || designData.variant_id
+                               };
+                               CanvasManager.restoreFromProductData(payload, finalize);
+                               return;
+                       }
+
+                       finish(false);
+               } catch (error) {
+                       console.error('[Restore] Unexpected error while restoring design', error);
+                       finish(false);
+               }
        }
 
 
@@ -472,7 +695,10 @@ jQuery(document).ready(function ($) {
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
                         if (!shouldSkipRestore) {
-                                restoreLastDesignToCanvas();
+                                const restorePromise = restoreLastDesignToCanvas();
+                                if (restorePromise && typeof restorePromise.catch === 'function') {
+                                        restorePromise.catch(err => console.error('[Restore] restoreLastDesignToCanvas failed', err));
+                                }
                         }
                         // La personnalisation est restaurée automatiquement lors d'une ouverture manuelle.
 
@@ -492,10 +718,16 @@ jQuery(document).ready(function ($) {
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
-                if (CanvasManager.hasImage()) {
+                if (CanvasManager.hasImage && CanvasManager.hasImage()) {
                         unsavedChangesModal.show();
                         trapFocus(unsavedChangesModal);
                         return;
+                }
+                cancelPendingDesignAutosave();
+                try {
+                        flushDesignAutosave('modal-close');
+                } catch (err) {
+                        console.warn('[Autosave] flush modal-close failed', err);
                 }
                 customizeModal.hide();
                 releaseFocus(customizeModal);
@@ -504,6 +736,12 @@ jQuery(document).ready(function ($) {
 
         confirmQuitButton.on('click', function () {
                 unsavedChangesModal.hide();
+                cancelPendingDesignAutosave();
+                try {
+                        flushDesignAutosave('modal-close');
+                } catch (err) {
+                        console.warn('[Autosave] flush modal-close failed', err);
+                }
                 customizeModal.hide();
                 releaseFocus(unsavedChangesModal);
                 releaseFocus(customizeModal);

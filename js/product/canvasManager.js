@@ -404,6 +404,204 @@ const CanvasManager = {
     notifyChange('clearUserImages');
   },
 
+  exportState() {
+    if (!canvas) return [];
+    const all = canvas.getObjects() || [];
+    const layers = all.filter(o => o && o.type === 'image' && o !== bgImage);
+    const getSrc = (obj) => {
+      if (!obj) return null;
+      try {
+        if (typeof obj.getSrc === 'function') {
+          const src = obj.getSrc();
+          if (src) return src;
+        }
+      } catch (e) {
+        CM.warn('exportState: getSrc error', e);
+      }
+      return obj?._originalElement?.currentSrc
+        || obj?._originalElement?.src
+        || obj?._element?.currentSrc
+        || obj?._element?.src
+        || obj?.src
+        || null;
+    };
+
+    return layers.map((obj, idx) => {
+      const toNumber = (value, fallback) => {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : fallback;
+      };
+
+      const entry = {
+        src: getSrc(obj),
+        left: toNumber(obj?.left, 0),
+        top: toNumber(obj?.top, 0),
+        scaleX: toNumber(obj?.scaleX, 1),
+        scaleY: toNumber(obj?.scaleY, 1),
+        angle: toNumber(obj?.angle, 0),
+        flipX: !!obj?.flipX,
+        flipY: !!obj?.flipY,
+        originX: obj?.originX || 'left',
+        originY: obj?.originY || 'top',
+        skewX: toNumber(obj?.skewX, 0),
+        skewY: toNumber(obj?.skewY, 0),
+        zIndex: idx,
+      };
+
+      const opacity = toNumber(obj?.opacity, null);
+      if (opacity !== null) {
+        entry.opacity = opacity;
+      }
+
+      return entry;
+    });
+  },
+
+  restoreLayerFromState(layer, { onLayerError } = {}) {
+    if (!canvas || !layer || !layer.src) {
+      if (typeof onLayerError === 'function') {
+        onLayerError(layer || null, new Error('restoreLayerFromState: missing data'));
+      }
+      return Promise.resolve(null);
+    }
+
+    const parseNumber = (value, fallback) => {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : fallback;
+    };
+
+    return new Promise((resolve) => {
+      fabric.Image.fromURL(layer.src, (img) => {
+        if (!img) {
+          if (typeof onLayerError === 'function') {
+            onLayerError(layer, new Error('restoreLayerFromState: image load failed'));
+          }
+          resolve(null);
+          return;
+        }
+
+        try {
+          img.set({
+            left: parseNumber(layer.left, 0),
+            top: parseNumber(layer.top, 0),
+            scaleX: parseNumber(layer.scaleX, 1),
+            scaleY: parseNumber(layer.scaleY, 1),
+            angle: parseNumber(layer.angle, 0),
+            flipX: !!layer.flipX,
+            flipY: !!layer.flipY,
+            originX: layer.originX || 'left',
+            originY: layer.originY || 'top',
+            skewX: parseNumber(layer.skewX, 0),
+            skewY: parseNumber(layer.skewY, 0),
+            selectable: true,
+            hasControls: true,
+            lockUniScaling: true,
+          });
+
+          const opacity = parseNumber(layer.opacity, null);
+          if (opacity !== null) {
+            img.set({ opacity });
+          }
+        } catch (err) {
+          CM.error('restoreLayerFromState: set properties failed', err);
+        }
+
+        const finalize = () => {
+          try {
+            canvas.add(img);
+            if (bgImage) {
+              canvas.sendToBack(bgImage);
+            }
+            if (typeof layer.zIndex === 'number') {
+              const baseIndex = bgImage ? 1 : 0;
+              const targetIndex = Math.max(baseIndex, Math.min(baseIndex + layer.zIndex, canvas.getObjects().length - 1));
+              canvas.moveTo(img, targetIndex);
+            }
+            img.setCoords();
+            resolve(img);
+          } catch (err) {
+            CM.error('restoreLayerFromState: finalize failed', err);
+            if (typeof onLayerError === 'function') {
+              onLayerError(layer, err);
+            }
+            resolve(null);
+          }
+        };
+
+        if (maskPath) {
+          maskPath.clone((cp) => {
+            if (cp) {
+              cp.set({
+                absolutePositioned: true,
+                objectCaching: false,
+                selectable: false,
+                evented: false,
+                originX: 'left',
+                originY: 'top',
+              });
+              img.clipPath = cp;
+            }
+            finalize();
+          });
+        } else {
+          finalize();
+        }
+      }, { crossOrigin: 'anonymous' });
+    });
+  },
+
+  async restoreState(state, { onLayerError } = {}) {
+    if (!Array.isArray(state) || !state.length) {
+      return { restored: 0, failed: Array.isArray(state) ? state.length : 0 };
+    }
+
+    try {
+      await Promise.all([bgReady, maskReady]);
+    } catch (err) {
+      CM.warn('restoreState: readiness wait failed', err);
+    }
+
+    const ordered = state
+      .filter(layer => layer && layer.src)
+      .slice()
+      .sort((a, b) => {
+        const za = Number(a?.zIndex);
+        const zb = Number(b?.zIndex);
+        if (Number.isFinite(za) && Number.isFinite(zb)) return za - zb;
+        if (Number.isFinite(za)) return -1;
+        if (Number.isFinite(zb)) return 1;
+        return 0;
+      });
+
+    let restored = 0;
+    let failed = 0;
+    let lastImage = null;
+
+    for (const layer of ordered) {
+      const img = await this.restoreLayerFromState(layer, { onLayerError });
+      if (img) {
+        restored += 1;
+        lastImage = img;
+      } else {
+        failed += 1;
+      }
+    }
+
+    if (restored > 0) {
+      if (lastImage) {
+        canvas.setActiveObject(lastImage);
+      }
+      canvas.requestRenderAll();
+      notifyChange('restoreState');
+    }
+
+    if (failed > 0 && typeof onLayerError === 'function') {
+      // Already reported per-layer, keep count consistent
+    }
+
+    return { restored, failed };
+  },
+
   // Export PNG : crope la fenêtre (print_area si dispo)
   // Par défaut, l'image de fond est masquée pour ne garder que la personnalisation
   exportPNG(includeBackground = false) {
@@ -519,8 +717,10 @@ const CanvasManager = {
   },
 
   getCurrentImageData() {
-    const img = canvas?.getActiveObject();
-    if (!img || img.type !== 'image' || img === bgImage) { CM.log("getCurrentImageData: pas d'image active"); return null; }
+    const img = (typeof this.getActiveUserImage === 'function')
+      ? this.getActiveUserImage()
+      : (canvas?.getActiveObject ? canvas.getActiveObject() : null);
+    if (!img || img.type !== 'image' || img === bgImage) { CM.log("getCurrentImageData: pas d'image utilisateur"); return null; }
     const d = {
       left: img.left,
       top: img.top,
