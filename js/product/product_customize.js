@@ -4,6 +4,7 @@ window.mockupTimes = window.mockupTimes || {};
 window.skipDesignRestoreOnce = window.skipDesignRestoreOnce || false;
 
 const AUTO_SAVE_DEBOUNCE_MS = 600;
+const SIDEBAR_SIZE_SELECT_THRESHOLD = 6;
 let autoSaveTimeoutId = null;
 let lastAutoSaveSignature = null;
 
@@ -549,6 +550,7 @@ jQuery(document).ready(function ($) {
 
                const colorsContainer = productSidebar.find('.colors-container').empty();
                const sizesContainer = productSidebar.find('.sizes-container').empty();
+               sizesContainer.removeClass('sizes-select-mode');
 
                const colorSet = new Set();
                variants.forEach(v => { if (v.color) colorSet.add(v.color); });
@@ -578,22 +580,74 @@ jQuery(document).ready(function ($) {
                                orderedSizes.push({ size: v.size, stock: v.stock });
                        }
                });
-               orderedSizes.forEach(({ size, stock }, idx) => {
-                       const opt = $('<div>').addClass('size-option')
-                               .text(size)
-                               .attr('data-size', size)
-                               .toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
-                               .on('click', function () {
-                                       if ($(this).hasClass('disabled')) return;
-                                       productSidebar.find('.size-option').removeClass('selected');
-                                       $(this).addClass('selected');
-                                       updateSidebarSelectedVariant();
-                               });
-                       sizesContainer.append(opt);
-                       const shouldSelect = preselect ? preselect.size === size : idx === 0;
-                       if (shouldSelect && !opt.hasClass('disabled')) opt.addClass('selected');
+               const shouldUseSelect = orderedSizes.length > SIDEBAR_SIZE_SELECT_THRESHOLD;
 
-               });
+               if (shouldUseSelect) {
+                       sizesContainer.addClass('sizes-select-mode');
+                       const selectWrapper = $('<div>').addClass('size-select-wrapper');
+                       const selectElement = $('<select>').addClass('size-selector');
+
+                       const placeholder = $('<option>')
+                               .val('')
+                               .text('Sélectionner une taille')
+                               .prop('disabled', true)
+                               .prop('hidden', true);
+                       selectElement.append(placeholder);
+
+                       orderedSizes.forEach(({ size, stock }) => {
+                               const isDisabled = stock === 'out of stock' || stock === 'discontinued';
+                               const option = $('<option>')
+                                       .val(size)
+                                       .text(size)
+                                       .attr('data-size', size);
+
+                               if (isDisabled) option.prop('disabled', true);
+                               selectElement.append(option);
+                       });
+
+                       let defaultSize = preselect ? preselect.size : null;
+                       if (defaultSize) {
+                               const preferredEntry = orderedSizes.find(entry => entry.size === defaultSize);
+                               if (preferredEntry && (preferredEntry.stock === 'out of stock' || preferredEntry.stock === 'discontinued')) {
+                                       defaultSize = null;
+                               }
+                       }
+
+                       if (!defaultSize) {
+                               const firstAvailable = orderedSizes.find(({ stock }) => stock !== 'out of stock' && stock !== 'discontinued');
+                               if (firstAvailable) defaultSize = firstAvailable.size;
+                       }
+
+                       if (defaultSize) {
+                               selectElement.val(defaultSize);
+                       }
+
+                       selectElement.on('change', function () {
+                               if (!$(this).val()) return;
+                               updateSidebarSelectedVariant();
+                       });
+
+                       selectWrapper.append(selectElement);
+                       sizesContainer.append(selectWrapper);
+               } else {
+                       // Ancien affichage avec des boutons taille
+                       orderedSizes.forEach(({ size, stock }, idx) => {
+                               const opt = $('<div>').addClass('size-option')
+                                       .text(size)
+                                       .attr('data-size', size)
+                                       .toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
+                                       .on('click', function () {
+                                               if ($(this).hasClass('disabled')) return;
+                                               productSidebar.find('.size-option').removeClass('selected');
+                                               $(this).addClass('selected');
+                                               updateSidebarSelectedVariant();
+                                       });
+                               sizesContainer.append(opt);
+                               const shouldSelect = preselect ? preselect.size === size : idx === 0;
+                               if (shouldSelect && !opt.hasClass('disabled')) opt.addClass('selected');
+
+                       });
+               }
 
                if (colorSet.size <= 1) {
                        productSidebar.find('.product-colors').hide();
@@ -632,13 +686,18 @@ jQuery(document).ready(function ($) {
 
        function updateSidebarSelectedVariant() {
                const selectedColor = productSidebar.find('.color-option.selected').attr('data-color');
-               const selectedSize = productSidebar.find('.size-option.selected').attr('data-size');
+               const sizeSelector = productSidebar.find('.size-selector');
+               const selectedSizeFromSelect = sizeSelector.length ? sizeSelector.val() : null;
+               const selectedSize = productSidebar.find('.size-option.selected').attr('data-size') || selectedSizeFromSelect;
                const variant = sidebarVariants.find(v =>
                        (!selectedColor || v.color === selectedColor) &&
                        (!selectedSize || v.size === selectedSize)
                );
                if (variant) {
                        selectedVariant = variant;
+                       if (sizeSelector.length && variant.size) {
+                               sizeSelector.val(variant.size);
+                       }
                        loadVariantInCustomizer(variant);
                        $(document).trigger('variantReady', [variant]);
                        productSidebar.removeClass('open');
