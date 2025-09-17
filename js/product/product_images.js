@@ -94,9 +94,22 @@ tooltip.classList.add("dynamic-tooltip");
 tooltip.innerText = "Prévisualisez ce design sur le produit";
 document.body.appendChild(tooltip);
 
+function shuffleImages(images) {
+        if (!Array.isArray(images)) {
+                return [];
+        }
+
+        const shuffled = [...images];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+}
+
 // Affichage des images et ajout du clic pour générer un mockup
 function displayImagesInBottomBar(images) {
-        bottomBarImages = images || [];
+        bottomBarImages = shuffleImages(images);
         currentGroupIndex = 0;
         renderCurrentGroup();
         updateArrows();
