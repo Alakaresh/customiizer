@@ -8,17 +8,18 @@
         var baseUrl = window.location.origin;
     }
     // État interne
-    let currentFolder = 'my';      // 'my' (mes images), 'community' ou 'imported'
-    let currentSort   = 'date';    // 'name' ou 'date'
-    let importedFiles = [];        // Images importées par l'utilisateur
-    let myImages = [];             // Images générées par l'utilisateur
-    let communityImages = [];      // Images de la communauté
-    let currentPage   = 1;         // Page courante
-    let currentFormatFilter = 'all'; // 'all' ou ratio sélectionné
-    let currentProduct = null;       // ID du produit sélectionné
-    let currentSize = null;          // Taille sélectionnée
-    let productFormats = [];         // Ratios disponibles pour le produit
-    let sizeRatioMap = {};           // Association taille -> ratio
+    let currentFolder = 'my';         // 'my' (mes images), 'community' ou 'imported'
+    let currentSort   = 'date';       // 'name' ou 'date'
+    let importedFiles = [];           // Images importées par l'utilisateur
+    let myImages = [];                // Images générées par l'utilisateur
+    let communityImages = [];         // Images de la communauté
+    let currentPage   = 1;            // Page courante
+    let currentFormatFilter = 'all';  // 'all' ou ratio sélectionné
+    let currentProduct = null;        // ID du produit sélectionné
+    let currentSize = null;           // Taille sélectionnée
+    let productFormats = [];          // Ratios disponibles pour le produit
+    let sizeRatioMap = {};            // Association taille -> ratio
+    const CURRENT_PRODUCT_FILTER_LABEL = 'Format en cours';
     const itemsPerPage = 40;       // Nombre d'images par page
     let searchTimeout;             // Délai pour la recherche distante
 
@@ -191,7 +192,7 @@
             $('#sizeButtons').empty();
             $('#open-format-menu').removeClass('active').text('Format');
             if (productRatioButton.length) {
-                productRatioButton.removeClass('active');
+                productRatioButton.removeClass('active').text(CURRENT_PRODUCT_FILTER_LABEL);
             }
         }
 
@@ -234,12 +235,9 @@
             const wasActive = productRatioButton.hasClass('active');
 
             if (ratio) {
-                const labelParts = ['Produit'];
-                if (sizeName) labelParts.push(sizeName);
-                labelParts.push(ratio);
                 productRatioButton
                     .prop('disabled', false)
-                    .text(labelParts.join(' – '))
+                    .text(CURRENT_PRODUCT_FILTER_LABEL)
                     .data('ratio', ratio)
                     .data('variant-size', sizeName || '');
 
@@ -250,7 +248,7 @@
                 productRatioButton
                     .prop('disabled', true)
                     .removeClass('active')
-                    .text('Produit')
+                    .text(CURRENT_PRODUCT_FILTER_LABEL)
                     .removeData('ratio')
                     .removeData('variant-size');
 
@@ -412,7 +410,7 @@
                                     currentPage = 1;
                                     renderFileList();
                                     if (currentFormatFilter !== 'all') {
-                                        updateFormatLabel(currentFormatFilter, true, p.name, sz);
+                                        updateFormatLabel(currentFormatFilter, true);
                                     } else {
                                         $('#open-format-menu').text('Format');
                                     }
