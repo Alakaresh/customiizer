@@ -225,18 +225,21 @@ body {
     padding: 0 26px 26px;    /* padding complet */
 }
 
-.product-colors {
+.product-colors,
+.product-sizes {
     width: 100%;
     max-width: 420px;
-    padding: 10px 10px;
+    padding: 16px 18px;
     margin: 5px 0 5px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.92));
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.92), rgba(6, 6, 6, 0.94));
     box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(12px);
     display: flex;
     flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
 }
 .colors-container {
     display: flex;
@@ -281,22 +284,14 @@ body {
 
 /* Section de sélection de taille */
 .product-sizes {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0 5px;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.88), rgba(8, 8, 8, 0.9));
-    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(12px);
-    display: flex;
-    flex-direction: column;
+    gap: 16px;
 }
 
 .product-sizes .sizes-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px 12px;
+    align-items: center;
 }
 
 .sizes-container.sizes-select-mode {
@@ -307,67 +302,77 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 62px;
-    padding: 10px 18px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(16, 16, 16, 0.78);
-    color: #f8f8f8;
+    min-width: 72px;
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.88), rgba(10, 10, 10, 0.94));
+    color: #f6f6f6;
     font-size: 0.85rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    line-height: 1;
     cursor: pointer;
-    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
+    transition: transform 0.2s ease, border-color 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     appearance: none;
 }
 
 .size-option:hover,
 .size-option:focus-visible {
-    background: rgba(30, 30, 30, 0.9);
-    border-color: rgba(26, 188, 156, 0.45);
-    box-shadow: 0 16px 26px rgba(26, 188, 156, 0.25);
+    background: linear-gradient(135deg, rgba(26, 188, 156, 0.22), rgba(26, 188, 156, 0.08));
+    border-color: rgba(26, 188, 156, 0.55);
+    box-shadow: 0 18px 32px rgba(26, 188, 156, 0.28);
     transform: translateY(-1px);
+    color: #f9fffd;
     outline: none;
 }
 
 .size-option.selected {
-    background: linear-gradient(135deg, rgba(26, 188, 156, 0.38), rgba(26, 188, 156, 0.1));
-    border-color: rgba(26, 188, 156, 0.75);
-    box-shadow: 0 18px 32px rgba(26, 188, 156, 0.35);
-    color: #e9fffa;
+    background: linear-gradient(135deg, rgba(26, 188, 156, 0.42), rgba(26, 188, 156, 0.16));
+    border-color: rgba(26, 188, 156, 0.85);
+    box-shadow: 0 20px 36px rgba(26, 188, 156, 0.35);
+    color: #ecfffa;
 }
 
 .size-option:disabled {
-    opacity: 0.35;
+    opacity: 0.4;
     cursor: not-allowed;
-    border-color: rgba(255, 255, 255, 0.08);
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.16);
     box-shadow: none;
 }
 
 .size-select-wrapper {
     position: relative;
     width: 100%;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.88), rgba(10, 10, 10, 0.94));
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.38);
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .size-selector {
     width: 100%;
-    padding: 16px 54px 16px 18px;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.88), rgba(8, 8, 8, 0.92));
-    color: #f7f7f7;
-    font-size: 0.95rem;
-    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.38);
+    padding: 14px 56px 14px 22px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #f6f6f6;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.1;
     cursor: pointer;
     appearance: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .size-selector:focus {
     outline: none;
-    border-color: rgba(26, 188, 156, 0.75);
-    box-shadow: 0 24px 46px rgba(26, 188, 156, 0.25);
 }
 
 .size-selector option {
@@ -378,14 +383,19 @@ body {
     content: '';
     position: absolute;
     top: 50%;
-    right: 20px;
+    right: 22px;
     width: 12px;
     height: 12px;
     border-right: 2px solid rgba(255, 255, 255, 0.7);
     border-bottom: 2px solid rgba(255, 255, 255, 0.7);
-    transform: translateY(-70%) rotate(45deg);
+    transform: translateY(-60%) rotate(45deg);
     pointer-events: none;
     transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.size-select-wrapper:focus-within {
+    border-color: rgba(26, 188, 156, 0.75);
+    box-shadow: 0 24px 46px rgba(26, 188, 156, 0.25);
 }
 
 .size-select-wrapper:focus-within::after {
