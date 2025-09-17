@@ -222,11 +222,12 @@
             const wasActive = productRatioButton.hasClass('active');
 
             if (ratio) {
+                const sizeLabel = variant?.size || variant?.size_name || '';
                 productRatioButton
                     .prop('disabled', false)
                     .text(CURRENT_PRODUCT_FILTER_LABEL)
                     .data('ratio', ratio)
-                    .data('variant-size', sizeName || '');
+                    .data('variant-size', sizeLabel);
 
                 if (wasActive && currentFormatFilter !== ratio) {
                     applyProductRatioFilter(ratio);
