@@ -697,18 +697,24 @@
 
         const searchValue = skipSearch ? '' : $('#searchInput').val().toLowerCase();
 
+        const isImportedFolder = currentFolder === 'imported';
+
         let selectedFormat = null;
-        if (currentSize && sizeRatioMap[currentSize]) {
-            selectedFormat = sizeRatioMap[currentSize];
-        } else if (currentFormatFilter !== 'all') {
-            selectedFormat = currentFormatFilter;
+        if (!isImportedFolder) {
+            if (currentSize && sizeRatioMap[currentSize]) {
+                selectedFormat = sizeRatioMap[currentSize];
+            } else if (currentFormatFilter !== 'all') {
+                selectedFormat = currentFormatFilter;
+            }
         }
-        const allowedFormats = currentProduct ? productFormats : null;
+        const allowedFormats = (!isImportedFolder && currentProduct) ? productFormats : null;
 
         // Filtrage par recherche/format/produit/taille
         const filtered = images.filter(img => {
-            if (selectedFormat && img.format !== selectedFormat) return false;
-            if (!selectedFormat && allowedFormats && !allowedFormats.includes(img.format)) return false;
+            if (!isImportedFolder) {
+                if (selectedFormat && img.format !== selectedFormat) return false;
+                if (!selectedFormat && allowedFormats && !allowedFormats.includes(img.format)) return false;
+            }
             const rawUrl = img.url || img.image_url || '';
             const name = img.name || img.image_prefix || rawUrl.split('/').pop();
             const prompt = typeof img.prompt === 'object'
