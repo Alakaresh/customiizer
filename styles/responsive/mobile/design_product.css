@@ -9,9 +9,16 @@
     /* Sidebar buttons row at top */
     #customizeModal .modal-sidebar {
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: center;
+        align-items: stretch;
         width: 100%;
-        padding: 10px 0;
+        min-width: 0;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    #customizeModal .sidebar-btn {
+        flex: 1 1 0;
     }
 
     /* Variant selection sidebar full width */
@@ -32,7 +39,7 @@
     /* Display 2D/3D containers vertically */
     #customizeModal .visual-containers {
         flex-direction: column;
-        padding: 10px;
+        padding: 16px;
         height: auto; /* allow 2D and 3D containers to size naturally */
     }
 
