@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (button.classList.contains('google')) return;
                 button.addEventListener('click', function(e) {
                         e.preventDefault();  // Empêche toute action par défaut (comme la soumission d'un formulaire)
-                        alert("This feature is not yet active.");  // Affiche une alerte
+                        alert("Cette fonctionnalité n'est pas encore active.");  // Affiche une alerte
                 });
         });
 

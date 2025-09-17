@@ -14,17 +14,17 @@
         if(data.success){
           window.location.reload();
         }else{
-          alert(data.data.message || 'Google login failed');
+          alert(data.data.message || 'La connexion Google a échoué.');
         }
       }).catch(err=>{
         console.error('Google login error', err);
-        alert('Google login failed');
+        alert('La connexion Google a échoué.');
 
       });
     }
     function missingIdAlert(e){
       e.preventDefault();
-      alert('Google login is not configured.');
+      alert("La connexion Google n'est pas configurée.");
     }
     function init(){
       if(!googleLogin.clientId){

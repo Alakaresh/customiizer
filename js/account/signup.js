@@ -20,15 +20,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		const confirmPassword = signupForm.querySelectorAll('.input-box[type="password"]')[1].value;
 
 		let errors = [];
-		if (!email.includes('@')) {
-			errors.push("Please enter a valid email address.");
-		}
-		if (password.length < 8) {
-			errors.push("Password must be at least 8 characters long.");
-		}
-		if (password !== confirmPassword) {
-			errors.push("Passwords do not match.");
-		}
+                if (!email.includes('@')) {
+                        errors.push("Veuillez entrer une adresse e-mail valide.");
+                }
+                if (password.length < 8) {
+                        errors.push("Le mot de passe doit contenir au moins 8 caractères.");
+                }
+                if (password !== confirmPassword) {
+                        errors.push("Les mots de passe ne correspondent pas.");
+                }
 		if (errors.length > 0) {
 			alert(errors.join("\n"));
 		} else {
@@ -84,9 +84,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		})
 			.catch(error => {
-			console.error('Error:', error);
-			alert('An error occurred. Please try again.');
-		});
-	}
+                        console.error('Error:', error);
+                        alert('Une erreur est survenue. Veuillez réessayer.');
+                });
+        }
 
 });
