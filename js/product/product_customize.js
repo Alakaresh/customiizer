@@ -4,6 +4,113 @@ window.mockupTimes = window.mockupTimes || {};
 window.skipDesignRestoreOnce = window.skipDesignRestoreOnce || false;
 
 
+function debounce(fn, wait = 200) {
+        let timeoutId = null;
+        return function (...args) {
+                if (timeoutId) {
+                        clearTimeout(timeoutId);
+                }
+                timeoutId = setTimeout(() => {
+                        timeoutId = null;
+                        fn.apply(this, args);
+                }, wait);
+        };
+}
+
+function collectCurrentDesignData(overrides = {}) {
+        if (!window.CanvasManager) {
+                const hasOverrides = overrides && Object.keys(overrides).length > 0;
+                return hasOverrides ? { ...overrides } : null;
+        }
+
+        const placement = (typeof CanvasManager.getCurrentImageData === 'function'
+                ? CanvasManager.getCurrentImageData()
+                : null) || {};
+        const canvasState = (typeof CanvasManager.exportState === 'function'
+                ? CanvasManager.exportState()
+                : []) || [];
+        const bbox = (typeof CanvasManager.getClipWindowBBox === 'function'
+                ? CanvasManager.getClipWindowBBox()
+                : null) || { left: 0, top: 0 };
+
+        const normalizedCanvasState = Array.isArray(canvasState) ? canvasState : [];
+        const firstLayer = normalizedCanvasState.find(layer => layer && layer.src);
+        const $ = window.jQuery || window.$ || null;
+        const productName = $ ? $('.product-name').text().trim() : '';
+        const variant = typeof selectedVariant !== 'undefined' ? selectedVariant : null;
+        const bboxLeft = typeof bbox.left === 'number' ? bbox.left : Number(bbox.left) || 0;
+        const bboxTop = typeof bbox.top === 'number' ? bbox.top : Number(bbox.top) || 0;
+
+        const baseData = {
+                product_name: productName,
+                product_price: variant?.price,
+                delivery_price: variant?.delivery_price,
+                mockup_url: '',
+                design_image_url: firstLayer?.src || '',
+                canvas_image_url: firstLayer?.src || '',
+                design_width: placement.width || variant?.print_area_width,
+                design_height: placement.height || variant?.print_area_height,
+                design_left: (placement.left != null ? placement.left - bboxLeft : 0),
+                design_top: (placement.top != null ? placement.top - bboxTop : 0),
+                design_angle: placement.angle || 0,
+                design_flipX: placement.flipX || false,
+                variant_id: variant?.variant_id,
+                placement: variant?.placement || variant?.zone_3d_name || '',
+                technique: variant?.technique || '',
+                product_id: window.currentProductId != null ? String(window.currentProductId) : null,
+                canvas_state: normalizedCanvasState
+        };
+
+        if (!baseData.canvas_image_url && baseData.design_image_url) {
+                baseData.canvas_image_url = baseData.design_image_url;
+        }
+
+        return { ...baseData, ...overrides };
+}
+
+const autoSaveDesignFromCanvasChange = debounce((detail = {}) => {
+        if (!window.currentProductId) {
+                return;
+        }
+
+        window.customizerCache = window.customizerCache || {};
+
+        const hasImage = typeof detail.hasImage === 'boolean'
+                ? detail.hasImage
+                : (typeof CanvasManager?.hasImage === 'function' ? CanvasManager.hasImage() : false);
+
+        if (!hasImage) {
+                if (window.customizerCache?.designs?.[window.currentProductId]) {
+                        delete window.customizerCache.designs[window.currentProductId];
+                }
+                if (typeof persistCache === 'function') {
+                        try { persistCache(); } catch (e) {}
+                }
+                return;
+        }
+
+        const data = collectCurrentDesignData();
+        if (!data) {
+                return;
+        }
+
+        if (window.DesignCache?.saveDesign) {
+                window.DesignCache.saveDesign(window.currentProductId, data);
+        } else if (window.customizerCache) {
+                window.customizerCache.designs = window.customizerCache.designs || {};
+                window.customizerCache.designs[window.currentProductId] = data;
+        }
+
+        if (typeof persistCache === 'function') {
+                try { persistCache(); } catch (e) {}
+        }
+}, 300);
+
+window.addEventListener('canvas:image-change', (event) => {
+        autoSaveDesignFromCanvasChange(event?.detail || {});
+});
+
+
 
 jQuery(document).ready(function ($) {
         jQuery('#saveDesignButton').on('click', function () {
@@ -34,32 +141,11 @@ jQuery(document).ready(function ($) {
                 window.mockupTimes.requestSent = requestStart;
 
                 // Mise en cache locale de la personnalisation pour réouverture future
-                const placement = CanvasManager.getCurrentImageData() || {};
-                const canvasState = (typeof CanvasManager.exportState === 'function')
-                        ? CanvasManager.exportState()
-                        : [];
-                const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
-                        ? CanvasManager.getClipWindowBBox()
-                        : { left: 0, top: 0 };
-                const productData = {
-                        product_name: jQuery('.product-name').text().trim(),
-                        product_price: selectedVariant.price,
-                        delivery_price: selectedVariant?.delivery_price,
+                let productData = collectCurrentDesignData({
                         mockup_url: '',
                         design_image_url: base64,
-                        canvas_image_url: base64,
-                        design_width: placement.width || selectedVariant.print_area_width,
-                        design_height: placement.height || selectedVariant.print_area_height,
-                        design_left: (placement.left != null ? placement.left - bbox.left : 0),
-                        design_top: (placement.top != null ? placement.top - bbox.top : 0),
-                        design_angle: placement.angle || 0,
-                        design_flipX: placement.flipX || false,
-                        variant_id: selectedVariant?.variant_id,
-                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
-                        technique: selectedVariant?.technique || '',
-                        product_id: window.currentProductId != null ? String(window.currentProductId) : null,
-                        canvas_state: Array.isArray(canvasState) ? canvasState : []
-                };
+                        canvas_image_url: base64
+                });
                 if (window.DesignCache?.saveDesign) {
                         window.DesignCache.saveDesign(window.currentProductId, productData);
                 } else if (window.customizerCache) {
