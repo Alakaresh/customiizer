@@ -147,10 +147,6 @@
                align-items: center;
        }
 
-       .product-selector-label {
-               margin-left: 0;
-       }
-
        .custom-select {
                width: 100%;
                max-width: 420px;
