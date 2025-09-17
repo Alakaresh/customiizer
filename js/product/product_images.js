@@ -91,7 +91,7 @@ function getFirstMockup(variant) {
 // Création de l'info-bulle globale
 const tooltip = document.createElement("div");
 tooltip.classList.add("dynamic-tooltip");
-tooltip.innerText = "Preview this design on the product";
+tooltip.innerText = "Prévisualisez ce design sur le produit";
 document.body.appendChild(tooltip);
 
 // Affichage des images et ajout du clic pour générer un mockup
