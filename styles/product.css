@@ -22,7 +22,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: calc(100dvh - 65px);
+    height: calc(100dvh - 75px);
 }
 
 /* Section principale */
