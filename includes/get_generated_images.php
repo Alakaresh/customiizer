@@ -10,12 +10,13 @@ function get_generated_images2() {
     if (!empty($results)) {
         // Envoyer une réponse JSON de succès avec les images
         wp_send_json_success(array(
-            'images' => $results
+            'images' => $results,
+            'message' => 'Images générées récupérées avec succès.'
         ));
     } else {
         // Si aucune image n'est trouvée, renvoyer une réponse JSON d'erreur
         wp_send_json_error(array(
-            'message' => 'No images found'
+            'message' => 'Aucune image trouvée.'
         ));
     }
 

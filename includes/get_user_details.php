@@ -16,7 +16,7 @@ function get_user_customiizer() {
 
         wp_send_json($data);
     } else {
-        wp_send_json(array('error' => 'No user is logged in'));
+        wp_send_json(array('error' => 'Aucun utilisateur n’est connecté.'));
     }
 }
 

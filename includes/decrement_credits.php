@@ -2,7 +2,7 @@
 function decrement_user_credits() {
     $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
     if ($user_id === 0) {
-        wp_send_json_error(['message' => 'Invalid user ID']);
+        wp_send_json_error(['message' => 'Identifiant utilisateur invalide.']);
         return;
     }
 
@@ -13,14 +13,14 @@ function decrement_user_credits() {
     );
 
     if ($result === false) {
-        wp_send_json_error(['message' => 'Failed to decrement credits']);
+        wp_send_json_error(['message' => 'Impossible de diminuer les crédits.']);
     } else {
         $completed = array();
         if ( function_exists( 'customiizer_process_mission_action' ) ) {
             $completed = customiizer_process_mission_action( 'image_generated', $user_id, 1 );
         }
         wp_send_json_success([
-            'message' => 'Credits decremented successfully',
+            'message' => 'Crédits déduits avec succès.',
             'missions_completed' => $completed,
         ]);
     }

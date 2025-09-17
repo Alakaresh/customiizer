@@ -121,18 +121,18 @@ function customiizer_verify_google_id_token($token) {
 
 function customiizer_google_login(){
     if (empty($_POST['id_token'])) {
-        wp_send_json_error(['message' => 'Missing ID token']);
+        wp_send_json_error(['message' => 'Jeton ID manquant.']);
     }
 
     $payload = customiizer_verify_google_id_token($_POST['id_token']);
     if (!$payload) {
         // error_log('Google verify failed after JWKS + tokeninfo fallback');
-        wp_send_json_error(['message' => 'Google verification failed']);
+        wp_send_json_error(['message' => 'Échec de la vérification Google.']);
     }
 
     // Vérif d’audience contre la constante configurée
     if (empty($payload['email']) || $payload['aud'] !== GOOGLE_CLIENT_ID) {
-        wp_send_json_error(['message' => 'Invalid token']);
+        wp_send_json_error(['message' => 'Jeton invalide.']);
     }
 
     $email = sanitize_email($payload['email']);
@@ -145,7 +145,7 @@ function customiizer_google_login(){
         $password = wp_generate_password();
         $user_id = wp_create_user($username, $password, $email);
         if (is_wp_error($user_id)) {
-            wp_send_json_error(['message'=>'User creation failed']);
+            wp_send_json_error(['message' => 'Échec de création de l’utilisateur.']);
         }
         if ($name) {
             wp_update_user(['ID'=>$user_id,'display_name'=>$name]);
@@ -157,7 +157,7 @@ function customiizer_google_login(){
 
     wp_set_current_user($user->ID);
     wp_set_auth_cookie($user->ID);
-    wp_send_json_success(['message'=>'Login successful']);
+    wp_send_json_success(['message' => 'Connexion réussie.']);
 }
 
 add_action('wp_ajax_nopriv_google_login','customiizer_google_login');

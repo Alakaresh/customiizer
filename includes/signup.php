@@ -1,22 +1,22 @@
 <?php
 function user_signup() {
 	// Vérification de la méthode POST pour sécuriser le traitement des données
-	if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-		wp_send_json_error(array('message' => 'Invalid request method.'));
-		return;
-	}
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+                wp_send_json_error(array('message' => 'Méthode de requête invalide.'));
+                return;
+        }
 
-	if (!isset($_POST['registration_nonce'])) {
-		wp_send_json_error(array('message' => 'Nonce is not set.'));
-		return;
-	}
+        if (!isset($_POST['registration_nonce'])) {
+                wp_send_json_error(array('message' => 'Nonce absent.'));
+                return;
+        }
 
 	// Vérifiez si le nonce est valide
 	$nonce = $_POST['registration_nonce'];
-	if (!wp_verify_nonce($nonce, 'signup_nonce')) {
-		wp_send_json_error(array('message' => 'Nonce verification failed.'));
-		return;
-	}
+        if (!wp_verify_nonce($nonce, 'signup_nonce')) {
+                wp_send_json_error(array('message' => 'Échec de la vérification du nonce.'));
+                return;
+        }
 
 	// Collecter et nettoyer les données du formulaire
 	$username = sanitize_user($_POST['username']);
@@ -25,10 +25,10 @@ function user_signup() {
 	$confirm_password = sanitize_text_field($_POST['confirm_password']);
 
 	// Valider les données
-	if (empty($email) || empty($password) || empty($confirm_password)) {
-		wp_send_json_error(array('message' => 'Please fill all required fields.'));
-		return;
-	}
+        if (empty($email) || empty($password) || empty($confirm_password)) {
+                wp_send_json_error(array('message' => 'Veuillez remplir tous les champs obligatoires.'));
+                return;
+        }
 
 	// Générer un user_login unique basé sur le timestamp actuel
 	$user_login = 'user-' . time();
@@ -37,15 +37,15 @@ function user_signup() {
 		$username = $user_login;  // Utiliser user_login comme user_nicename si aucun username n'est fourni
 	}
 
-	if (username_exists($user_login) || email_exists($email)) {
-		wp_send_json_error(array('message' => 'Username or email already exists.'));
-		return;
-	}
+        if (username_exists($user_login) || email_exists($email)) {
+                wp_send_json_error(array('message' => 'Le nom d’utilisateur ou l’e-mail existe déjà.'));
+                return;
+        }
 
-	if ($password !== $confirm_password) {
-		wp_send_json_error(array('message' => 'Passwords do not match.'));
-		return;
-	}
+        if ($password !== $confirm_password) {
+                wp_send_json_error(array('message' => 'Les mots de passe ne correspondent pas.'));
+                return;
+        }
 
 	// Préparation des données utilisateur
 	$userdata = array(
@@ -63,10 +63,10 @@ function user_signup() {
                 customiizer_log( 'signup', "wp_insert_user returned {$user_id}" );
         }
 
-	if (is_wp_error($user_id)) {
-		wp_send_json_error(array('message' => 'Failed to create user: ' . $user_id->get_error_message()));
-		return;
-	}
+        if (is_wp_error($user_id)) {
+                wp_send_json_error(array('message' => 'Échec de création de l’utilisateur : ' . $user_id->get_error_message()));
+                return;
+        }
 
 	// ⚠️ Nécessaire pour mettre à jour correctement le display_name
 	wp_update_user(array(
