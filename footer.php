@@ -41,7 +41,7 @@ if ( $user_logged_in ) {
                 </div>
                 <!-- Lower Black Band for Copyright -->
                 <div class="lower-band">
-                        <p>Droits d'auteur &copy; 2024 Customiizer | Propulsé par Customiizer</p>
+                        <p>© 2025 Customiizer | Développé par Customiizer</p>
                 </div>
         </footer>
         <?php wp_footer(); ?>
