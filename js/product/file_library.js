@@ -8,17 +8,18 @@
         var baseUrl = window.location.origin;
     }
     // État interne
-    let currentFolder = 'my';      // 'my' (mes images), 'community' ou 'imported'
-    let currentSort   = 'date';    // 'name' ou 'date'
-    let importedFiles = [];        // Images importées par l'utilisateur
-    let myImages = [];             // Images générées par l'utilisateur
-    let communityImages = [];      // Images de la communauté
-    let currentPage   = 1;         // Page courante
-    let currentFormatFilter = 'all'; // 'all' ou ratio sélectionné
-    let currentProduct = null;       // ID du produit sélectionné
-    let currentSize = null;          // Taille sélectionnée
-    let productFormats = [];         // Ratios disponibles pour le produit
-    let sizeRatioMap = {};           // Association taille -> ratio
+    let currentFolder = 'my';         // 'my' (mes images), 'community' ou 'imported'
+    let currentSort   = 'date';       // 'name' ou 'date'
+    let importedFiles = [];           // Images importées par l'utilisateur
+    let myImages = [];                // Images générées par l'utilisateur
+    let communityImages = [];         // Images de la communauté
+    let currentPage   = 1;            // Page courante
+    let currentFormatFilter = 'all';  // 'all' ou ratio sélectionné
+    let currentProduct = null;        // ID du produit sélectionné
+    let currentSize = null;           // Taille sélectionnée
+    let productFormats = [];          // Ratios disponibles pour le produit
+    let sizeRatioMap = {};            // Association taille -> ratio
+    const CURRENT_PRODUCT_FILTER_LABEL = 'Format en cours';
     const itemsPerPage = 40;       // Nombre d'images par page
     let searchTimeout;             // Délai pour la recherche distante
 
@@ -104,27 +105,21 @@
 
     /**
      * Met à jour le libellé du format sélectionné.
-     * @param {string} fmt                 Ratio de l'image.
-     * @param {boolean} [showProductName]  Affiche le nom du produit associé si true.
-     * @param {string|null} productName    Nom du produit sélectionné.
-     * @param {string|null} variantName    Nom de la variante sélectionnée.
+     * @param {string} fmt                       Ratio de l'image.
+     * @param {boolean} [showCurrentDesignLabel] Affiche un libellé générique lié au produit en cours.
      */
-    function updateFormatLabel(fmt, showProductName = false, productName = null, variantName = null) {
+    function updateFormatLabel(fmt, showCurrentDesignLabel = false) {
         const btn = $('#open-format-menu');
-        btn.addClass('active').text(`Format: ${fmt}`);
-        if (showProductName) {
-            const parts = [];
-            if (productName) parts.push(productName);
-            if (variantName) parts.push(variantName);
-            if (parts.length > 0) {
-                btn.addClass('active').text(`Format: ${parts.join(' – ')}`);
-            } else {
-                getProductNameForFormat(fmt).then(name => {
-                    if (name) {
-                        btn.addClass('active').text(`Format: ${name}`);
-                    }
-                });
-            }
+        btn.addClass('active');
+        if (showCurrentDesignLabel) {
+            btn.text(`Format: ${CURRENT_PRODUCT_FILTER_LABEL}`);
+            return;
+        }
+
+        if (fmt) {
+            btn.text(`Format: ${fmt}`);
+        } else {
+            btn.text('Format');
         }
     }
 
@@ -191,18 +186,12 @@
             $('#sizeButtons').empty();
             $('#open-format-menu').removeClass('active').text('Format');
             if (productRatioButton.length) {
-                productRatioButton.removeClass('active');
+                productRatioButton.removeClass('active').text(CURRENT_PRODUCT_FILTER_LABEL);
             }
         }
 
-        function applyProductRatioFilter(ratio, variantData) {
+        function applyProductRatioFilter(ratio) {
             if (!ratio) return;
-            const variant = resolveVariant(variantData);
-            const productName = (variant && variant.product_name)
-                ? variant.product_name
-                : ($('#customizeModalTitle').text() || '').trim() || null;
-            const sizeName = variant?.size || null;
-
             currentFormatFilter = ratio;
             currentProduct = null;
             currentSize = null;
@@ -220,7 +209,7 @@
             $('#sizeButtons').empty();
 
             $('#open-format-menu').addClass('active');
-            updateFormatLabel(ratio, !!(productName || sizeName), productName, sizeName);
+            updateFormatLabel(ratio, true);
 
             currentPage = 1;
             renderFileList();
@@ -230,29 +219,23 @@
             if (!productRatioButton.length) return;
             const variant = resolveVariant(variantCandidate);
             const ratio = variant?.ratio_image || null;
-            const sizeName = variant?.size || null;
             const wasActive = productRatioButton.hasClass('active');
 
             if (ratio) {
-                const labelParts = ['Produit'];
-                if (sizeName) labelParts.push(sizeName);
-                labelParts.push(ratio);
                 productRatioButton
                     .prop('disabled', false)
-                    .text(labelParts.join(' – '))
-                    .data('ratio', ratio)
-                    .data('variant-size', sizeName || '');
+                    .text(CURRENT_PRODUCT_FILTER_LABEL)
+                    .data('ratio', ratio);
 
                 if (wasActive && currentFormatFilter !== ratio) {
-                    applyProductRatioFilter(ratio, variant);
+                    applyProductRatioFilter(ratio);
                 }
             } else {
                 productRatioButton
                     .prop('disabled', true)
                     .removeClass('active')
-                    .text('Produit')
-                    .removeData('ratio')
-                    .removeData('variant-size');
+                    .text(CURRENT_PRODUCT_FILTER_LABEL)
+                    .removeData('ratio');
 
                 if (wasActive && currentFormatFilter !== 'all') {
                     currentFormatFilter = 'all';
@@ -317,7 +300,7 @@
                 const variant = resolveVariant();
                 const ratio = variant?.ratio_image || storedRatio;
                 if (!ratio) return;
-                applyProductRatioFilter(ratio, variant);
+                applyProductRatioFilter(ratio);
             });
         }
 
@@ -412,7 +395,7 @@
                                     currentPage = 1;
                                     renderFileList();
                                     if (currentFormatFilter !== 'all') {
-                                        updateFormatLabel(currentFormatFilter, true, p.name, sz);
+                                        updateFormatLabel(currentFormatFilter, true);
                                     } else {
                                         $('#open-format-menu').text('Format');
                                     }
