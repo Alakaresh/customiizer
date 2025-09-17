@@ -748,6 +748,7 @@ jQuery(document).ready(function ($) {
                                         } else {
                                                 const designButton = document.querySelector('.design-button');
                                                 if (designButton) {
+                                                        window.skipDesignRestoreOnce = true;
                                                         designButton.click();
                                                         const interval = setInterval(() => {
                                                                 if (document.getElementById('productCanvas')) {
@@ -756,6 +757,8 @@ jQuery(document).ready(function ($) {
                                                                 }
                                                         }, 100);
                                                         setTimeout(() => clearInterval(interval), 10000);
+                                                } else {
+                                                        window.skipDesignRestoreOnce = false;
                                                 }
                                         }
                                 };
