@@ -107,6 +107,21 @@
                         </div>
 
 		</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const description = document.querySelector(".product-description");
+    const toggleBtn = description.querySelector(".toggle-description");
+    const content = description.querySelector(".description-content");
+
+    toggleBtn.addEventListener("click", () => {
+        const isOpen = description.classList.toggle("is-open");
+        
+        // Accessibilité
+        toggleBtn.setAttribute("aria-expanded", isOpen);
+        content.setAttribute("aria-hidden", !isOpen);
+    });
+});
+</script>
 
 	</body>
 </html>
