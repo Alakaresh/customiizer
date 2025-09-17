@@ -8,7 +8,8 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,.8);
+  background: rgba(4, 4, 4, 0.86);
+  backdrop-filter: blur(14px);
 }
 
 /* Petite modale centrée (librairie images / confirmation) */
@@ -30,6 +31,12 @@
 /* ================================
    SQUELETTE DE BASE
 ================================ */
+#customizeModal {
+  padding: clamp(16px, 4vh, 56px) clamp(16px, 5vw, 72px);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
 .modal-content {
   display: flex;
   flex-direction: column;
@@ -38,6 +45,21 @@
   color: #e0e0e0;
   border: 1px solid #333;
   box-sizing: border-box;
+}
+
+#customizeModal .modal-content {
+  margin: 0 auto;
+  width: min(1180px, 100%);
+  height: 100%;
+  max-height: 100%;
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(18, 18, 18, 0.94), rgba(4, 4, 4, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 28px 68px rgba(0, 0, 0, 0.62),
+    0 18px 46px rgba(26, 188, 156, 0.14);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
 }
 
 .modal-header {
@@ -68,6 +90,44 @@
 .close-button:hover,
 .close-button:focus { color: #fff; }
 
+#customizeModal .modal-header {
+  padding: clamp(20px, 3vh, 32px) clamp(26px, 4vw, 42px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(24, 24, 24, 0.9), rgba(10, 10, 10, 0.94));
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.42);
+}
+
+#customizeModal .modal-header h2 {
+  margin: 0;
+  padding: 0;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  letter-spacing: 0.02em;
+  color: #f6f6f6;
+}
+
+#customizeModal .close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  color: #fdfdfd;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+#customizeModal .close-button:hover,
+#customizeModal .close-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(26, 188, 156, 0.6);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.28), rgba(26, 188, 156, 0.06));
+  box-shadow: 0 16px 32px rgba(26, 188, 156, 0.25);
+  color: #ecfffa;
+  outline: none;
+}
+
 .modal-body {
   flex: 1 1 auto;
   display: flex;
@@ -75,16 +135,29 @@
   padding: 0;
 }
 
+#customizeModal .modal-body {
+  padding: 0 clamp(28px, 4vw, 42px) clamp(24px, 4vh, 40px);
+  gap: clamp(18px, 3vw, 32px);
+  background: transparent;
+  align-items: stretch;
+}
+
 /* ================================
    SIDEBAR GAUCHE
 ================================ */
 #customizeModal .modal-sidebar {
-  background: #2a2a2a;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  gap: 8px;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: clamp(12px, 2.2vh, 18px);
+  padding: clamp(18px, 3vh, 26px);
+  min-width: 120px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(150deg, rgba(24, 24, 24, 0.92), rgba(10, 10, 10, 0.94));
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.46);
+  backdrop-filter: blur(16px);
 }
 
 #customizeModal .sidebar-btn {
@@ -92,46 +165,92 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   width: 100%;
-  padding: 8px 0;
-  background: none;
-  border: none;
-  color: #e0e0e0;
+  padding: 14px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.85), rgba(12, 12, 12, 0.94));
+  color: #f4f4f4;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, border-color 0.3s ease, background 0.3s ease,
+    box-shadow 0.3s ease, color 0.3s ease;
 }
+
 #customizeModal .sidebar-btn i {
-  font-size: 20px; margin-bottom: 4px;
+  font-size: 1.25rem;
+  margin-bottom: 0;
+  color: inherit;
 }
-#customizeModal .sidebar-btn:hover { background: #3a3a3a; }
+
+#customizeModal .sidebar-btn:hover,
+#customizeModal .sidebar-btn:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(26, 188, 156, 0.55);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.22), rgba(26, 188, 156, 0.08));
+  box-shadow: 0 18px 36px rgba(26, 188, 156, 0.28);
+  color: #ecfffa;
+  outline: none;
+}
+
+#customizeModal .sidebar-btn.is-active {
+  border-color: rgba(26, 188, 156, 0.85);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.42), rgba(26, 188, 156, 0.18));
+  box-shadow: 0 22px 42px rgba(26, 188, 156, 0.32);
+  color: #ecfffa;
+}
 
 /* Sidebar produit (coulisses variantes) */
 #product-sidebar {
   position: relative;
-  width: 300px;
+  width: clamp(260px, 22vw, 320px);
   height: 100%;
-  background: #2a2a2a;
-  color: #e0e0e0;
-  padding: 20px;
-  box-shadow: -2px 0 5px rgba(0,0,0,.5);
-  z-index: 1100;
+  color: #f4f4f4;
+  padding: clamp(22px, 3vh, 28px);
   display: none;
   flex-direction: column;
-  gap: 15px;
+  gap: clamp(16px, 2.5vh, 24px);
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(8, 8, 8, 0.95));
+  box-shadow: 0 26px 52px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+  z-index: 1100;
 }
 #product-sidebar.open { display: flex; }
 
 #hideProductSidebar {
   position: absolute;
   top: 50%;
-  right: -15px;
+  right: -18px;
   transform: translateY(-50%);
-  background: #444;
-  border: none;
-  color: #fff;
-  border-radius: 0 4px 4px 0;
-  padding: 5px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 0 16px 16px 0;
+  border: 1px solid rgba(26, 188, 156, 0.45);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.25), rgba(26, 188, 156, 0.08));
+  color: #ecfffa;
   cursor: pointer;
+  box-shadow: 0 16px 32px rgba(26, 188, 156, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+#hideProductSidebar:hover,
+#hideProductSidebar:focus-visible {
+  transform: translateY(-50%) translateX(2px);
+  border-color: rgba(26, 188, 156, 0.75);
+  box-shadow: 0 20px 42px rgba(26, 188, 156, 0.35);
+  outline: none;
 }
 
 #product-sidebar .product-sizes {
@@ -219,7 +338,7 @@
   width: 100%;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(135deg, rgba(20, 20, 20, 0.88), rgba(10, 10, 10, 0.94));
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(10, 10, 10, 0.96));
   box-shadow: 0 18px 32px rgba(0, 0, 0, 0.38);
   overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -227,7 +346,7 @@
 
 #product-sidebar .size-selector {
   width: 100%;
-  padding: 14px 56px 14px 22px;
+  padding: 14px 54px 14px 22px;
   border: none;
   border-radius: 999px;
   background: transparent;
@@ -273,6 +392,133 @@
   transform: translateY(-30%) rotate(-135deg);
 }
 
+#product-sidebar .size-select-wrapper:focus-within {
+  border-color: rgba(26, 188, 156, 0.75);
+  box-shadow: 0 24px 46px rgba(26, 188, 156, 0.25);
+}
+
+#product-sidebar .product-colors,
+#product-sidebar .product-sizes {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.92), rgba(6, 6, 6, 0.94));
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+#product-sidebar .product-colors p,
+#product-sidebar .product-sizes p {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#product-sidebar .colors-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#product-sidebar .color-option {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 30%);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+#product-sidebar .color-option:not(.disabled):hover {
+  transform: translateY(-2px);
+  border-color: rgba(26, 188, 156, 0.65);
+  box-shadow: 0 16px 32px rgba(26, 188, 156, 0.22);
+}
+
+#product-sidebar .color-option:not(.disabled):focus-visible {
+  outline: none;
+  border-color: rgba(26, 188, 156, 0.75);
+  box-shadow: 0 18px 36px rgba(26, 188, 156, 0.26);
+}
+
+#product-sidebar .color-option.selected {
+  border-color: rgba(26, 188, 156, 0.85);
+  box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.25), 0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+#product-sidebar .color-option.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+#product-sidebar .product-sizes {
+  gap: 16px;
+}
+
+#product-sidebar .product-sizes .sizes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: center;
+}
+
+#product-sidebar .size-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.88), rgba(10, 10, 10, 0.94));
+  color: #f6f6f6;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
+  transition: transform 0.2s ease, border-color 0.3s ease, background 0.3s ease,
+    color 0.3s ease, box-shadow 0.3s ease;
+  appearance: none;
+}
+
+#product-sidebar .size-option:hover,
+#product-sidebar .size-option:focus-visible {
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.22), rgba(26, 188, 156, 0.08));
+  border-color: rgba(26, 188, 156, 0.55);
+  box-shadow: 0 18px 32px rgba(26, 188, 156, 0.28);
+  transform: translateY(-1px);
+  color: #f9fffd;
+  outline: none;
+}
+
+#product-sidebar .size-option.selected {
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.42), rgba(26, 188, 156, 0.16));
+  border-color: rgba(26, 188, 156, 0.85);
+  box-shadow: 0 20px 36px rgba(26, 188, 156, 0.35);
+  color: #ecfffa;
+}
+
+#product-sidebar .size-option:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+}
+
 /* ================================
    ZONE VISUELLE (tools + 2D + 3D)
 ================================ */
@@ -294,6 +540,17 @@
   min-height: 0;                /* important en flex pour éviter overflow */
 }
 
+#customizeModal .visual-zone {
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(160deg, rgba(22, 22, 22, 0.92), rgba(8, 8, 8, 0.94));
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(18px);
+  padding: clamp(18px, 2.5vw, 28px);
+  gap: clamp(14px, 2.2vh, 20px);
+  color: #e3e3e3;
+}
+
 /* HEADER D’OUTILS (dans le flux, caché tant qu’il n’y a pas d’image) */
 .visual-header {
   display: none;                /* visible quand .has-user-image sur #customizeModal */
@@ -305,6 +562,15 @@
   background: transparent;
 }
 #customizeModal.has-user-image .visual-header { display: flex; }
+
+#customizeModal .visual-header {
+  padding: 12px clamp(16px, 3vw, 24px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(140deg, rgba(24, 24, 24, 0.9), rgba(10, 10, 10, 0.94));
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(14px);
+}
 
 .image-controls {
   display: flex;
@@ -330,6 +596,50 @@
 .remove-image-button { background: #b23b3b; }
 .remove-image-button:hover { background: #d9534f; }
 
+#customizeModal .image-controls {
+  gap: clamp(8px, 2vw, 16px);
+}
+
+#customizeModal .image-controls button,
+#customizeModal #bringForwardButton,
+#customizeModal #sendBackwardButton {
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.85), rgba(12, 12, 12, 0.94));
+  color: #f8f8f8;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease, border-color 0.3s ease, background 0.3s ease,
+    box-shadow 0.3s ease, color 0.3s ease;
+}
+
+#customizeModal .image-controls button:hover,
+#customizeModal .image-controls button:focus-visible,
+#customizeModal #bringForwardButton:hover,
+#customizeModal #bringForwardButton:focus-visible,
+#customizeModal #sendBackwardButton:hover,
+#customizeModal #sendBackwardButton:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(26, 188, 156, 0.55);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.22), rgba(26, 188, 156, 0.08));
+  box-shadow: 0 16px 32px rgba(26, 188, 156, 0.25);
+  color: #ecfffa;
+  outline: none;
+}
+
+#customizeModal .remove-image-button {
+  border-color: rgba(255, 93, 93, 0.65);
+  background: linear-gradient(135deg, rgba(178, 59, 59, 0.92), rgba(178, 59, 59, 0.68));
+  box-shadow: 0 18px 34px rgba(178, 59, 59, 0.28);
+}
+
+#customizeModal .remove-image-button:hover,
+#customizeModal .remove-image-button:focus-visible {
+  background: linear-gradient(135deg, rgba(217, 83, 79, 0.96), rgba(217, 83, 79, 0.74));
+  border-color: rgba(217, 83, 79, 0.85);
+  box-shadow: 0 22px 44px rgba(217, 83, 79, 0.32);
+}
+
 /* CONTENEURS VISUELS (2D + 3D) */
 .visual-containers {
   width: 100%;
@@ -341,6 +651,11 @@
   padding: 20px;
   min-height: 0;        /* évite overflow vertical */
   box-sizing: border-box;
+}
+
+#customizeModal .visual-containers {
+  gap: clamp(18px, 3vw, 28px);
+  padding: clamp(18px, 2.8vw, 32px);
 }
 
 /* 2D */
@@ -357,6 +672,19 @@
 
   background: #1f1f1f;
   border: 1px solid #555;
+}
+
+#customizeModal #product2DContainer,
+#customizeModal #product3DContainer {
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: radial-gradient(circle at 20% 20%, rgba(40, 40, 40, 0.36), rgba(8, 8, 8, 0.94));
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.48);
+  overflow: hidden;
+}
+
+#customizeModal #product2DContainer {
+  background: radial-gradient(circle at 20% 20%, rgba(40, 40, 40, 0.32), rgba(6, 6, 6, 0.96));
 }
 
 /* Wrapper Fabric + canvas */
@@ -401,6 +729,31 @@
 /* Cache le bouton si une image est présente (classe posée par JS) */
 #customizeModal.has-user-image #addImageButton { display: none; }
 
+#customizeModal .add-image-button {
+  padding: 16px 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(26, 188, 156, 0.65);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.85), rgba(26, 188, 156, 0.58));
+  color: #04201a;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 22px 44px rgba(26, 188, 156, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease,
+    border-color 0.3s ease, color 0.3s ease;
+}
+
+#customizeModal .add-image-button:hover,
+#customizeModal .add-image-button:focus-visible {
+  transform: translate(-50%, -50%) translateY(-1px);
+  border-color: rgba(26, 188, 156, 0.85);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.95), rgba(26, 188, 156, 0.72));
+  box-shadow: 0 28px 52px rgba(26, 188, 156, 0.4);
+  color: #021610;
+  outline: none;
+}
+
 /* 3D */
 #product3DContainer {
   width: 100%;
@@ -421,6 +774,10 @@
   display: block;
 }
 
+#customizeModal #product3DContainer {
+  background: radial-gradient(circle at 20% 20%, rgba(40, 40, 40, 0.28), rgba(4, 4, 4, 0.94));
+}
+
 /* Loader 3D */
 #product3DContainer .loading-overlay {
   position: absolute; inset: 0;
@@ -436,6 +793,15 @@
   animation: spin 1s linear infinite;
 }
 @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+
+#customizeModal #product3DContainer .loading-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+#customizeModal #product3DContainer .loading-spinner {
+  border: 5px solid rgba(26, 188, 156, 0.18);
+  border-top: 5px solid rgba(26, 188, 156, 0.75);
+}
 
 /* ================================
    FOOTER
@@ -467,6 +833,64 @@
   transition: background-color .3s;
 }
 .modal-footer button:hover { background: #666; }
+
+#customizeModal .modal-footer {
+  padding: clamp(18px, 3vh, 28px) clamp(28px, 4vw, 42px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(16, 16, 16, 0.92), rgba(4, 4, 4, 0.94));
+  box-shadow: 0 -18px 46px rgba(0, 0, 0, 0.55);
+  gap: clamp(18px, 3vw, 28px);
+}
+
+#customizeModal .modal-footer .product-summary {
+  gap: 16px;
+  color: #f6f6f6;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+#customizeModal .modal-footer .product-summary img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+#customizeModal .modal-footer .summary-price {
+  color: rgba(26, 188, 156, 0.85);
+}
+
+#customizeModal .modal-footer button {
+  padding: 14px 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(26, 188, 156, 0.65);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.85), rgba(26, 188, 156, 0.6));
+  color: #04201a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 20px 40px rgba(26, 188, 156, 0.32);
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.3s ease,
+    border-color 0.3s ease, color 0.3s ease;
+}
+
+#customizeModal .modal-footer button:hover,
+#customizeModal .modal-footer button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(26, 188, 156, 0.85);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.95), rgba(26, 188, 156, 0.72));
+  box-shadow: 0 26px 52px rgba(26, 188, 156, 0.38);
+  color: #021610;
+  outline: none;
+}
+
+#customizeModal .modal-footer button:active {
+  transform: translateY(0);
+}
 
 /* ================================
    MODALE BIBLIOTHÈQUE / UPLOAD
