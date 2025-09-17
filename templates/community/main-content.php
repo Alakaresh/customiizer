@@ -3,11 +3,11 @@
 </div>
 <div class="search-and-sort-container">
 	<div class="sorting-container">
-		<button id="sort-explore">Explore</button>
-		<button id="sort-likes">Likes</button>
+                <button id="sort-explore">Explorer</button>
+                <button id="sort-likes">J'aime</button>
 	</div>
 	<div class="search-container">
-		<input type="text" id="search-input" placeholder="Search...">
+                <input type="text" id="search-input" placeholder="Rechercher...">
 		<button id="search-button"><i class="fas fa-search"></i></button>
 	</div>
 </div>

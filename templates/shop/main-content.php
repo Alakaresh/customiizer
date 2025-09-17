@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Shop</title>
+                <title>Boutique</title>
 	</head>
 	<body>
 		<div class="product-list">
