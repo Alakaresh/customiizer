@@ -134,6 +134,33 @@
   cursor: pointer;
 }
 
+#product-sidebar .sizes-container.sizes-select-mode {
+  display: block;
+}
+
+#product-sidebar .size-select-wrapper {
+  width: 100%;
+}
+
+#product-sidebar .size-selector {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: #fff;
+  border: 1px solid #555;
+  cursor: pointer;
+}
+
+#product-sidebar .size-selector:focus {
+  outline: none;
+  border-color: #888;
+}
+
+#product-sidebar .size-selector option {
+  color: #111;
+}
+
 /* ================================
    ZONE VISUELLE (tools + 2D + 3D)
 ================================ */

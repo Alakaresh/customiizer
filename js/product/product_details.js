@@ -6,6 +6,8 @@ let currentMockup = null;
 
 // Certains produits n'ont qu'un seul mockup initial pertinent
 const SINGLE_MOCKUP_PRODUCTS = [382, 585];
+// Au-delà de ce seuil on teste un sélecteur plutôt que des boutons taille
+const PRODUCT_SIZE_SELECT_THRESHOLD = 6;
 
 function shouldShowSingleMockup() {
     return SINGLE_MOCKUP_PRODUCTS.includes(parseInt(window.currentProductId));
@@ -416,13 +418,22 @@ jQuery(document).ready(function ($) {
                 if (!variantParam) {
                         const firstColor = $('.color-option:not(.disabled)').first();
                         if (firstColor.length) firstColor.trigger('click');
-                        const firstSize = $('.size-option:not(.disabled)').first();
-                        if (firstSize.length) firstSize.trigger('click');
+                        const sizeSelector = $('.size-selector');
+                        if (sizeSelector.length) {
+                                const firstSelectable = sizeSelector.find('option:not([disabled])').first();
+                                if (firstSelectable.length) {
+                                        sizeSelector.val(firstSelectable.val());
+                                        sizeSelector.trigger('change');
+                                }
+                        } else {
+                                const firstSize = $('.size-option:not(.disabled)').first();
+                                if (firstSize.length) firstSize.trigger('click');
+                        }
                 }
 
-		// ✅ Si un paramètre variant est présent dans l'URL
-		if (variantParam) {
-			const foundVariant = variants.find(v => v.variant_id == variantParam);
+                // ✅ Si un paramètre variant est présent dans l'URL
+                if (variantParam) {
+                        const foundVariant = variants.find(v => v.variant_id == variantParam);
 			if (foundVariant) {
 				selectedVariant = foundVariant;
 
@@ -430,10 +441,16 @@ jQuery(document).ready(function ($) {
 				$('.color-option').removeClass('selected');
 				$(`.color-option[data-color="${selectedVariant.color}"]`).addClass('selected');
 
-				$('.size-option').removeClass('selected');
-				$(`.size-option[data-size="${selectedVariant.size}"]`).addClass('selected');
-			}
-		}
+                                const sizeSelector = $('.size-selector');
+                                if (sizeSelector.length) {
+                                        sizeSelector.val(selectedVariant.size);
+                                        sizeSelector.trigger('change');
+                                } else {
+                                        $('.size-option').removeClass('selected');
+                                        $(`.size-option[data-size="${selectedVariant.size}"]`).addClass('selected');
+                                }
+                        }
+                }
 
 		updateSelectedVariant();
 	}
@@ -458,8 +475,10 @@ jQuery(document).ready(function ($) {
         }
 
 	function updateSelectedVariant() {
-		const selectedColor = $('.color-option.selected').attr('data-color');
-		const selectedSize = $('.size-option.selected').attr('data-size');
+                const selectedColor = $('.color-option.selected').attr('data-color');
+                const sizeSelector = $('.size-selector');
+                const selectedSizeFromSelect = sizeSelector.length ? sizeSelector.val() : null;
+                const selectedSize = $('.size-option.selected').attr('data-size') || selectedSizeFromSelect;
 
 		const newVariant = currentVariants.find(variant =>
 												(!selectedColor || variant.color === selectedColor) &&
@@ -467,7 +486,11 @@ jQuery(document).ready(function ($) {
 											   );
 
 		if (newVariant) {
-			selectedVariant = newVariant;
+                        selectedVariant = newVariant;
+
+                        if (sizeSelector.length && selectedVariant.size) {
+                                sizeSelector.val(selectedVariant.size);
+                        }
 
 			// 🔄 Mise à jour de l'URL
 			const url = new URL(window.location.href);
@@ -550,6 +573,7 @@ jQuery(document).ready(function ($) {
 
         function updateSizes(variants) {
                 const sizesContainer = $('.sizes-container').empty();
+                sizesContainer.removeClass('sizes-select-mode');
                 const seenSizes = new Set();
                 const orderedSizes = [];
 
@@ -560,25 +584,80 @@ jQuery(document).ready(function ($) {
                         }
                 });
 
-                orderedSizes.forEach(({ size, stock }, index) => {
-                        const sizeOption = $('<div>')
-                        .addClass('size-option')
-                        .text(size)
-                        .attr('data-size', size)
-                        .toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
-			.on('click', function () {
-				if ($(this).hasClass('disabled')) return;
-				$('.size-option').removeClass('selected');
-				$(this).addClass('selected');
-				updateSelectedVariant();
-			});
+                const shouldUseSelect = orderedSizes.length > PRODUCT_SIZE_SELECT_THRESHOLD;
 
-			sizesContainer.append(sizeOption);
-			if (index === 0 && !sizeOption.hasClass('disabled')) {
-				sizeOption.addClass('selected');
-			}
-		});
-	}
+                if (shouldUseSelect) {
+                        sizesContainer.addClass('sizes-select-mode');
+                        const selectWrapper = $('<div>').addClass('size-select-wrapper');
+                        const selectElement = $('<select>').addClass('size-selector');
+
+                        const placeholder = $('<option>')
+                                .val('')
+                                .text('Sélectionner une taille')
+                                .prop('disabled', true)
+                                .prop('hidden', true);
+                        selectElement.append(placeholder);
+
+                        orderedSizes.forEach(({ size, stock }) => {
+                                const isDisabled = stock === 'out of stock' || stock === 'discontinued';
+                                const option = $('<option>')
+                                        .val(size)
+                                        .text(size)
+                                        .attr('data-size', size);
+
+                                if (isDisabled) option.prop('disabled', true);
+                                selectElement.append(option);
+                        });
+
+                        const preferredSize = selectedVariant && orderedSizes.some(entry => entry.size === selectedVariant.size)
+                                ? selectedVariant.size
+                                : null;
+
+                        let defaultSize = preferredSize;
+                        if (defaultSize) {
+                                const preferredEntry = orderedSizes.find(entry => entry.size === defaultSize);
+                                if (preferredEntry && (preferredEntry.stock === 'out of stock' || preferredEntry.stock === 'discontinued')) {
+                                        defaultSize = null;
+                                }
+                        }
+                        if (!defaultSize) {
+                                const firstAvailable = orderedSizes.find(({ stock }) => stock !== 'out of stock' && stock !== 'discontinued');
+                                if (firstAvailable) defaultSize = firstAvailable.size;
+                        }
+
+                        if (defaultSize) {
+                                selectElement.val(defaultSize);
+                        }
+
+                        selectElement.on('change', function () {
+                                if (!$(this).val()) return;
+                                updateSelectedVariant();
+                        });
+
+                        selectWrapper.append(selectElement);
+                        sizesContainer.append(selectWrapper);
+                } else {
+                        // Ancien affichage avec des boutons individuels
+                        orderedSizes.forEach(({ size, stock }, index) => {
+                                const sizeOption = $('<div>')
+                                .addClass('size-option')
+                                .text(size)
+                                .attr('data-size', size)
+                                .toggleClass('disabled', stock === 'out of stock' || stock === 'discontinued')
+                                .on('click', function () {
+                                        if ($(this).hasClass('disabled')) return;
+                                        $('.size-option').removeClass('selected');
+                                        $(this).addClass('selected');
+                                        updateSelectedVariant();
+                                });
+
+                                sizesContainer.append(sizeOption);
+                                if (index === 0 && !sizeOption.hasClass('disabled')) {
+                                        sizeOption.addClass('selected');
+                                }
+                        });
+                }
+        }
 
 	function updatePriceAndDelivery(variant) {
 		const priceHT = variant.price ? variant.price : 0;
