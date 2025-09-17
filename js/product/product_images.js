@@ -157,6 +157,7 @@ function renderCurrentGroup() {
                         } else {
                                 const designButton = document.querySelector('.design-button');
                                 if (designButton) {
+                                        window.skipDesignRestoreOnce = true;
                                         designButton.click();
                                         const interval = setInterval(() => {
                                                 if (document.getElementById('productCanvas')) {
@@ -165,6 +166,8 @@ function renderCurrentGroup() {
                                                 }
                                         }, 100);
                                         setTimeout(() => clearInterval(interval), 10000);
+                                } else {
+                                        window.skipDesignRestoreOnce = false;
                                 }
                         }
                 });
