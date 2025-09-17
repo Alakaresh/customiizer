@@ -225,7 +225,8 @@
                 productRatioButton
                     .prop('disabled', false)
                     .text(CURRENT_PRODUCT_FILTER_LABEL)
-                    .data('ratio', ratio);
+                    .data('ratio', ratio)
+                    .data('variant-size', sizeName || '');
 
                 if (wasActive && currentFormatFilter !== ratio) {
                     applyProductRatioFilter(ratio);
@@ -235,7 +236,8 @@
                     .prop('disabled', true)
                     .removeClass('active')
                     .text(CURRENT_PRODUCT_FILTER_LABEL)
-                    .removeData('ratio');
+                    .removeData('ratio')
+                    .removeData('variant-size');
 
                 if (wasActive && currentFormatFilter !== 'all') {
                     currentFormatFilter = 'all';
