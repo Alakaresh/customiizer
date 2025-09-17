@@ -127,13 +127,20 @@
        }
 
 
-	.image-thumbnails {
-		position: static;
-		transform: none;
-		justify-content: center;
-		margin: 10px auto;
-		flex-wrap: wrap;
-	}
+        .image-thumbnails {
+                position: static;
+                transform: none;
+                justify-content: center;
+                margin: 10px auto;
+                flex-wrap: wrap;
+                padding: 14px 18px;
+                gap: 12px;
+        }
+
+        .image-thumbnails .thumbnail {
+                width: 72px;
+                height: 72px;
+        }
 
 	.options-list {
 		top: 45px;
@@ -169,11 +176,29 @@
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                height: 100px;
+                min-height: 96px;
+                padding: 18px 20px;
+                gap: 16px;
                 z-index: 1000;
         }
 
         .bottom-bar .image-wrapper {
                 overflow-x: auto;
+                max-width: none;
+        }
+
+        .bottom-bar .content {
+                gap: 12px;
+        }
+
+        .bottom-bar .content .thumbnail {
+                width: 72px;
+                height: 72px;
+        }
+
+        .bottom-arrow {
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
         }
 }
