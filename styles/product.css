@@ -838,7 +838,7 @@ body {
 }
 
 .dropdown-icon:hover {
-    background: linear-gradient(135deg, rgba(30, 210, 175, 0.9), rgba(24, 178, 148, 0.9));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
 }
 
 .custom-select.open .dropdown-icon {
