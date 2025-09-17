@@ -201,7 +201,9 @@ body {
     box-shadow: 0 28px 52px rgba(26, 188, 156, 0.18);
 }
 .product-description .description-content {
-    display: none; /* contenu caché par défaut */
+    flex-grow: 1;       /* occupe tout l’espace dispo */
+    overflow-y: auto;   /* scroll si trop de texte */
+    display: none;      /* caché par défaut */
 }
 
 .product-description.is-open .description-content {
