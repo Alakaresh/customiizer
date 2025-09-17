@@ -5,7 +5,7 @@ window.skipDesignRestoreOnce = window.skipDesignRestoreOnce || false;
 
 const AUTO_SAVE_DEBOUNCE_MS = 600;
 const SIDEBAR_SIZE_SELECT_THRESHOLD = 6;
-const DATA_URL_PLACEHOLDER = window.CUSTOMIZER_DATA_URL_PLACEHOLDER || '__customizer_data_url_trimmed__';
+//const DATA_URL_PLACEHOLDER = window.CUSTOMIZER_DATA_URL_PLACEHOLDER || '__customizer_data_url_trimmed__';
 let autoSaveTimeoutId = null;
 let lastAutoSaveSignature = null;
 
