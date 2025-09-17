@@ -343,27 +343,95 @@
         const dropZone = $('#fileDropZone');
         const fileInput = $('#fileInput');
 
-        function handleFiles(files) {
-            let added = false;
-            files.forEach(file => {
-                if (!file.type.startsWith('image/')) return;
-                const reader = new FileReader();
-                reader.onload = function (ev) {
-                    importedFiles.push({ name: file.name, url: ev.target.result });
-                    if (currentFolder === 'imported') {
-                        renderFileList();
-                    }
-                };
-                reader.readAsDataURL(file);
-                added = true;
-            });
-
-            if (added && currentFolder !== 'imported') {
+        function activateImportedFolder() {
+            if (currentFolder !== 'imported') {
                 currentFolder = 'imported';
                 currentPage = 1;
                 $('#folder-selector button').removeClass('active');
                 $('#folder-imported').addClass('active');
-                renderFileList();
+            }
+            renderFileList();
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function uploadImageFromLibrary(fileData) {
+            if (typeof window.uploadFileToServer === 'function') {
+                return window.uploadFileToServer(fileData);
+            }
+            try {
+                const response = await fetch('/wp-json/customiizer/v1/upload-image/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: fileData.url,
+                        name: fileData.name,
+                        size: fileData.size,
+                        user_id: currentUser.ID
+                    })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error('Upload failed');
+                }
+                return true;
+            } catch (error) {
+                console.error('[Upload] Erreur serveur :', error);
+                alert('Erreur lors du téléversement.');
+                throw error;
+            }
+        }
+
+        async function refreshImportedImages() {
+            if (typeof window.fetchUserImages === 'function') {
+                return window.fetchUserImages();
+            }
+            try {
+                const response = await fetch(`/wp-json/customiizer/v1/user-images/?user_id=${currentUser.ID}`);
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    setImportedFiles(data);
+                }
+            } catch (error) {
+                console.error('[UserImages] Erreur API :', error);
+            }
+        }
+
+        async function handleFiles(files) {
+            const imageFiles = files.filter(file => file.type && file.type.startsWith('image/'));
+            if (imageFiles.length === 0) {
+                return;
+            }
+
+            activateImportedFolder();
+
+            let hasSuccess = false;
+
+            for (const file of imageFiles) {
+                try {
+                    const url = await readFileAsDataURL(file);
+                    const uploadResult = await uploadImageFromLibrary({
+                        name: file.name,
+                        size: file.size,
+                        url: url
+                    });
+                    if (uploadResult) {
+                        hasSuccess = true;
+                    }
+                } catch (error) {
+                    // L'erreur est déjà gérée dans uploadImageFromLibrary (console + alert).
+                }
+            }
+
+            if (hasSuccess) {
+                await refreshImportedImages();
             }
         }
 
@@ -376,11 +444,11 @@
             dropZone.removeClass('drag-over');
         });
 
-        dropZone.on('drop', function (e) {
+        dropZone.on('drop', async function (e) {
             e.preventDefault();
             dropZone.removeClass('drag-over');
             const files = Array.from(e.originalEvent.dataTransfer.files || []);
-            handleFiles(files);
+            await handleFiles(files);
         });
 
         dropZone.on('click', function (e) {
@@ -388,9 +456,9 @@
             fileInput.trigger('click');
         });
 
-        fileInput.on('change', function (e) {
+        fileInput.on('change', async function (e) {
             const files = Array.from(e.target.files || []);
-            handleFiles(files);
+            await handleFiles(files);
             fileInput.val('');
         });
 
