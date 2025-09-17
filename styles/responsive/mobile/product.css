@@ -43,13 +43,17 @@
                display: none;
        }
 
-	.product-info,
-	.product-details {
-		position: static;
-		width: 100%;
-		padding: 10px;
-		text-align: center;
-	}
+        .product-info,
+        .product-details {
+                position: static;
+                width: 100%;
+                padding: 10px;
+                text-align: center;
+        }
+
+        .product-details {
+                align-items: center;
+        }
 
 	.product-name {
 		font-size: 1.3rem;
@@ -96,10 +100,21 @@
                 width: 100%;
         }
 
-	.price-info,
-	.delivery-info {
-		margin: 10px 0;
-	}
+        .product-details__cards {
+                gap: 16px;
+        }
+
+        .product-details__card {
+                margin: 0 auto;
+                max-width: 420px;
+                text-align: left;
+        }
+
+        .product-actions.product-actions--secondary {
+                max-width: 420px;
+                width: 100%;
+                margin: 0 auto;
+        }
 
        .product-image {
                /* En version mobile, on force l'image principale à ne pas être décalée */
