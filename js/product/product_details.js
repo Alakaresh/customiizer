@@ -60,6 +60,7 @@ const DESIGN_CACHE_MIRROR_FIELDS = [
     'design_top',
     'design_angle',
     'design_flipX',
+    'canvas_state',
     'variant_id',
     'placement',
     'technique',
@@ -203,6 +204,12 @@ function saveDesignToCache(productId, productData) {
         }
         if (!clone.product_id && productId) {
             clone.product_id = String(productId);
+        }
+        if (!Array.isArray(clone.canvas_state)) {
+            clone.canvas_state = [];
+        } else {
+            clone.canvas_state = clone.canvas_state
+                .filter(layer => layer && typeof layer === 'object');
         }
     }
     entry.last = clone;
