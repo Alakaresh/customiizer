@@ -189,7 +189,7 @@ function scheduleDesignAutosave(reason) {
 
 jQuery(document).ready(function ($) {
         jQuery('#saveDesignButton').on('click', function () {
-                // Démarre le suivi du temps dès le clic sur "Save to template"
+                // Démarre le suivi du temps dès le clic sur "Valider la personnalisation"
                 window.mockupTimes.pending = Date.now();
 
                 jQuery('#customizeModal').hide();
