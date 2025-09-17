@@ -105,27 +105,21 @@
 
     /**
      * Met à jour le libellé du format sélectionné.
-     * @param {string} fmt                 Ratio de l'image.
-     * @param {boolean} [showProductName]  Affiche le nom du produit associé si true.
-     * @param {string|null} productName    Nom du produit sélectionné.
-     * @param {string|null} variantName    Nom de la variante sélectionnée.
+     * @param {string} fmt                       Ratio de l'image.
+     * @param {boolean} [showCurrentDesignLabel] Affiche un libellé générique lié au produit en cours.
      */
-    function updateFormatLabel(fmt, showProductName = false, productName = null, variantName = null) {
+    function updateFormatLabel(fmt, showCurrentDesignLabel = false) {
         const btn = $('#open-format-menu');
-        btn.addClass('active').text(`Format: ${fmt}`);
-        if (showProductName) {
-            const parts = [];
-            if (productName) parts.push(productName);
-            if (variantName) parts.push(variantName);
-            if (parts.length > 0) {
-                btn.addClass('active').text(`Format: ${parts.join(' – ')}`);
-            } else {
-                getProductNameForFormat(fmt).then(name => {
-                    if (name) {
-                        btn.addClass('active').text(`Format: ${name}`);
-                    }
-                });
-            }
+        btn.addClass('active');
+        if (showCurrentDesignLabel) {
+            btn.text(`Format: ${CURRENT_PRODUCT_FILTER_LABEL}`);
+            return;
+        }
+
+        if (fmt) {
+            btn.text(`Format: ${fmt}`);
+        } else {
+            btn.text('Format');
         }
     }
 
@@ -196,14 +190,8 @@
             }
         }
 
-        function applyProductRatioFilter(ratio, variantData) {
+        function applyProductRatioFilter(ratio) {
             if (!ratio) return;
-            const variant = resolveVariant(variantData);
-            const productName = (variant && variant.product_name)
-                ? variant.product_name
-                : ($('#customizeModalTitle').text() || '').trim() || null;
-            const sizeName = variant?.size || null;
-
             currentFormatFilter = ratio;
             currentProduct = null;
             currentSize = null;
@@ -221,7 +209,7 @@
             $('#sizeButtons').empty();
 
             $('#open-format-menu').addClass('active');
-            updateFormatLabel(ratio, !!(productName || sizeName), productName, sizeName);
+            updateFormatLabel(ratio, true);
 
             currentPage = 1;
             renderFileList();
@@ -231,7 +219,6 @@
             if (!productRatioButton.length) return;
             const variant = resolveVariant(variantCandidate);
             const ratio = variant?.ratio_image || null;
-            const sizeName = variant?.size || null;
             const wasActive = productRatioButton.hasClass('active');
 
             if (ratio) {
@@ -242,7 +229,7 @@
                     .data('variant-size', sizeName || '');
 
                 if (wasActive && currentFormatFilter !== ratio) {
-                    applyProductRatioFilter(ratio, variant);
+                    applyProductRatioFilter(ratio);
                 }
             } else {
                 productRatioButton
@@ -315,7 +302,7 @@
                 const variant = resolveVariant();
                 const ratio = variant?.ratio_image || storedRatio;
                 if (!ratio) return;
-                applyProductRatioFilter(ratio, variant);
+                applyProductRatioFilter(ratio);
             });
         }
 
