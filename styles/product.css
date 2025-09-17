@@ -653,7 +653,7 @@ body {
         display: flex;
         align-items: center;
         gap: 16px;
-        padding: 16px 22px;
+        padding: 6px 6px;
         border-radius: 28px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.88));
