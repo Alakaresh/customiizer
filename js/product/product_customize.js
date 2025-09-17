@@ -256,6 +256,7 @@ jQuery(document).ready(function ($) {
                const preferredUrl = designData.canvas_image_url || designData.design_image_url;
                const renderUrl = (preferredUrl && preferredUrl === designData.mockup_url) ? null : preferredUrl;
                if (!renderUrl) {
+
                        if (typeof done === 'function') done(false);
                        return;
                }
