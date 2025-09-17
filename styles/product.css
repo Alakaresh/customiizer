@@ -151,6 +151,12 @@ body {
         color: #fff;
         font-family: Arial, sans-serif;
         padding-top: 12px;
+        bottom: 120px;
+        overflow-y: auto;
+        padding-right: 14px;
+        padding-bottom: 20px;
+        box-sizing: border-box;
+        scrollbar-gutter: stable;
 }
 
 .product-selector {
@@ -360,6 +366,12 @@ body {
     max-width: 360px;
     min-width: 260px;
     padding-top: 12px;
+    bottom: 120px;
+    overflow-y: auto;
+    padding-right: 14px;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+    scrollbar-gutter: stable;
     color: #fff;
     font-family: Arial, sans-serif;
 }
