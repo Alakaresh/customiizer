@@ -41,30 +41,35 @@
                                                 </div>
 
 						<!-- Options de couleur -->
-						<div class="product-colors">
-							<p>Couleurs :</p>
-							<div class="colors-container"></div>
-						</div>
+                                                <div class="product-colors">
+                                                        <p class="product-section-label"><?php esc_html_e('Couleurs', 'customiizer'); ?></p>
+                                                        <div class="colors-container"></div>
+                                                </div>
 
-						<!-- Options de taille -->
-						<div class="product-sizes">
-							<p>Tailles :</p>
-							<div class="sizes-container"></div>
-						</div>
+                                                <!-- Options de taille -->
+                                                <div class="product-sizes" data-component="size-selector">
+                                                        <p class="product-section-label"><?php esc_html_e('Tailles', 'customiizer'); ?></p>
+                                                        <div class="sizes-container" data-label="<?php esc_attr_e('Tailles disponibles', 'customiizer'); ?>"></div>
+                                                </div>
 
-						<div class="product-description">
-							<button class="toggle-description">Description</button>
-							<div class="description-content">
-								<p>Chargement de la description...</p> <!-- Contenu mis à jour dynamiquement -->
-							</div>
-						</div>
+                                                <div class="product-description" data-component="product-description">
+                                                        <button class="toggle-description" type="button" aria-expanded="false">
+                                                                <span class="toggle-label"><?php esc_html_e('Description', 'customiizer'); ?></span>
+                                                                <span class="toggle-icon" aria-hidden="true"></span>
+                                                        </button>
+                                                        <div class="description-content" aria-hidden="true">
+                                                                <p>Chargement de la description...</p> <!-- Contenu mis à jour dynamiquement -->
+                                                        </div>
+                                                </div>
 
 
-						<!-- Boutons d'action -->
-						<!-- Boutons d'action -->
-						<div class="product-actions">
-							<button id="customize-button" class="design-button">Personnaliser le design</button>
-						</div>
+                                                <!-- Boutons d'action -->
+                                                <!-- Boutons d'action -->
+                                                <div class="product-actions product-actions--primary">
+                                                        <button id="customize-button" class="design-button" type="button">
+                                                                <span class="design-button__label"><?php esc_html_e('Personnaliser le design', 'customiizer'); ?></span>
+                                                        </button>
+                                                </div>
 
 						<p id="no-stock-message" style="display:none; color:red; margin-top:10px;">
 							❌ Ce produit n’est actuellement pas disponible.
