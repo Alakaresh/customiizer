@@ -227,9 +227,9 @@ function appendImage(image, columns, columnIndex) {
 		'data-prompt': promptText.toLowerCase()
 	});
 
-	const likeIcon = $('<i/>', {
-		class: image.liked_by_user ? 'fas fa-heart like-icon liked' : 'far fa-heart like-icon',
-		title: 'Like'
+        const likeIcon = $('<i/>', {
+                class: image.liked_by_user ? 'fas fa-heart like-icon liked' : 'far fa-heart like-icon',
+                title: 'J’aime'
 	}).toggleClass('disabled', !userId);
 
 	const starIcon = $('<i/>', {
@@ -237,9 +237,9 @@ function appendImage(image, columns, columnIndex) {
 		title: 'Favori'
 	}).toggleClass('disabled', !userId);
 
-	const img = $('<img/>', {
-		src: imageUrl,
-		alt: 'Generated Image',
+        const img = $('<img/>', {
+                src: imageUrl,
+                alt: 'Image générée',
 		class: 'preview-enlarge',
 		'data-user-id': userId || '',
 		'data-display_name': image.display_name || '',
