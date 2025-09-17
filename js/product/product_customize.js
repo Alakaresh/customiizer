@@ -44,16 +44,18 @@ jQuery(document).ready(function ($) {
                         delivery_price: selectedVariant?.delivery_price,
                         mockup_url: '',
                         design_image_url: base64,
-                       design_width: placement.width || selectedVariant.print_area_width,
-                       design_height: placement.height || selectedVariant.print_area_height,
-                       design_left: (placement.left != null ? placement.left - bbox.left : 0),
-                       design_top: (placement.top != null ? placement.top - bbox.top : 0),
-                       design_angle: placement.angle || 0,
-                       design_flipX: placement.flipX || false,
-                       variant_id: selectedVariant?.variant_id,
-                       placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
-                       technique: selectedVariant?.technique || ''
-               };
+                        canvas_image_url: base64,
+                        design_width: placement.width || selectedVariant.print_area_width,
+                        design_height: placement.height || selectedVariant.print_area_height,
+                        design_left: (placement.left != null ? placement.left - bbox.left : 0),
+                        design_top: (placement.top != null ? placement.top - bbox.top : 0),
+                        design_angle: placement.angle || 0,
+                        design_flipX: placement.flipX || false,
+                        variant_id: selectedVariant?.variant_id,
+                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
+                        technique: selectedVariant?.technique || '',
+                        product_id: window.currentProductId != null ? String(window.currentProductId) : null
+                };
                 if (window.DesignCache?.saveDesign) {
                         window.DesignCache.saveDesign(window.currentProductId, productData);
                 } else if (window.customizerCache) {
@@ -232,22 +234,55 @@ jQuery(document).ready(function ($) {
                        designData = window.customizerCache.designs[window.currentProductId];
                }
 
-               if (!designData || !designData.design_image_url) {
+               if (designData && typeof designData === 'object') {
+                       designData = { ...designData };
+                       if (!designData.canvas_image_url && designData.design_image_url) {
+                               designData.canvas_image_url = designData.design_image_url;
+                       }
+               }
+
+               if (!designData) {
+                       if (typeof done === 'function') done(false);
+                       return;
+               }
+
+               const cachedProductId = designData.product_id != null ? String(designData.product_id) : null;
+               const currentProductId = window.currentProductId != null ? String(window.currentProductId) : null;
+               if (cachedProductId && currentProductId && cachedProductId !== currentProductId) {
+                       if (typeof done === 'function') done(false);
+                       return;
+               }
+
+               const preferredUrl = designData.canvas_image_url || designData.design_image_url;
+               const renderUrl = (preferredUrl && preferredUrl === designData.mockup_url) ? null : preferredUrl;
+               if (!renderUrl) {
+
                        if (typeof done === 'function') done(false);
                        return;
                }
 
                const currentVariantId = selectedVariant?.variant_id != null ? String(selectedVariant.variant_id) : null;
                const cachedVariantId = designData.variant_id != null ? String(designData.variant_id) : null;
-               const sameVariant = !currentVariantId || !cachedVariantId || currentVariantId === cachedVariantId;
+               if (cachedVariantId && currentVariantId && cachedVariantId !== currentVariantId) {
+                       if (typeof done === 'function') done(false);
+                       return;
+               }
 
                let placement = null;
                if (window.DesignCache?.getPlacement) {
                        placement = window.DesignCache.getPlacement(
                                window.currentProductId,
-                               designData.design_image_url,
+                               renderUrl,
                                selectedVariant?.variant_id
                        );
+
+                       if (!placement && designData.design_image_url && designData.design_image_url !== renderUrl) {
+                               placement = window.DesignCache.getPlacement(
+                                       window.currentProductId,
+                                       designData.design_image_url,
+                                       selectedVariant?.variant_id
+                               );
+                       }
                }
 
                const finalize = () => {
@@ -274,17 +309,24 @@ jQuery(document).ready(function ($) {
                        if (typeof mergedPlacement.design_flipX === 'undefined' && typeof designData.design_flipX !== 'undefined') {
                                mergedPlacement.design_flipX = designData.design_flipX;
                        }
-                       CanvasManager.addImage(designData.design_image_url, { placement: mergedPlacement }, finalize);
+                       CanvasManager.addImage(renderUrl, { placement: mergedPlacement }, finalize);
                        return;
                }
 
-               if (sameVariant && typeof CanvasManager.restoreFromProductData === 'function') {
-                       const payload = { ...designData, variant_id: selectedVariant?.variant_id || designData.variant_id };
+               const canRestoreFromProduct = typeof CanvasManager.restoreFromProductData === 'function'
+                       && (!cachedVariantId || !currentVariantId || cachedVariantId === currentVariantId);
+
+               if (canRestoreFromProduct) {
+                       const payload = {
+                               ...designData,
+                               design_image_url: renderUrl,
+                               variant_id: selectedVariant?.variant_id || designData.variant_id
+                       };
                        CanvasManager.restoreFromProductData(payload, finalize);
                        return;
                }
 
-               CanvasManager.addImage(designData.design_image_url, finalize);
+               if (typeof done === 'function') done(false);
        }
 
 

@@ -286,12 +286,16 @@ function buildProductData(mockupData) {
 	const productName = jQuery('.product-name').text().trim();
 	const productPrice = selectedVariant.price;
 
+        const designUrl = mockupData.image_url;
+        const canvasUrl = mockupData.canvas_image_url || designUrl;
+
         const productData = {
                 product_name: productName,
                 product_price: productPrice,
                 delivery_price: selectedVariant?.delivery_price,
                 mockup_url: mockupData.generated_mockup_url || "",
-                design_image_url: mockupData.image_url,
+                design_image_url: designUrl,
+                canvas_image_url: canvasUrl,
                 design_width: mockupData.width,
                 design_height: mockupData.height,
                 design_left: mockupData.left,
@@ -300,7 +304,8 @@ function buildProductData(mockupData) {
                 design_flipX: mockupData.flipX || false,
                 variant_id: mockupData.variant_id,
                 placement: mockupData.placement,
-                technique: mockupData.technique
+                technique: mockupData.technique,
+                product_id: window.currentProductId != null ? String(window.currentProductId) : null
         };
 
         if (window.DesignCache?.saveDesign) {
