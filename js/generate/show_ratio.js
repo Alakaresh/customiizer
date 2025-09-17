@@ -80,6 +80,21 @@ function isValidMockupImage(path) {
 	return typeof path === 'string' && path.includes('MKP_1');
 }
 
+function getVariantOrderValue(variant) {
+	if (!variant || typeof variant !== 'object') {
+		return Number.MAX_SAFE_INTEGER;
+	}
+
+	const rawOrder = variant.variant_order ??
+		variant.display_order ??
+		variant.order ??
+		variant.order_index ??
+		variant.variant_id;
+
+	const orderNumber = Number(rawOrder);
+	return Number.isFinite(orderNumber) ? orderNumber : Number.MAX_SAFE_INTEGER;
+}
+
 function displayVariantsForProduct(normalizedName) {
        const container = document.getElementById('product-groups-container');
        if (!container) return;
