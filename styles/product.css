@@ -154,7 +154,7 @@ body {
 
     display: flex;
     flex-direction: column;
-    height: 100%; /* occupe toute la hauteur dispo */
+    height: 95%; /* occupe toute la hauteur dispo */
 }
 
 .product-info > * {
