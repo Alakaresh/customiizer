@@ -365,6 +365,7 @@ jQuery(document).ready(function ($) {
         const hideProductSidebarButton = $('#hideProductSidebar');
         let sidebarVariants = [];
         let threeDInitialized = false;
+        let hasAppliedInitialFormatFilter = false;
 
         FileLibrary.init({
                 my: typeof myGeneratedImages !== 'undefined' ? myGeneratedImages : [],
@@ -853,15 +854,21 @@ jQuery(document).ready(function ($) {
         });
 
 	// 4) Ouvrir le sélecteur d’image
-        addImageButton.on('click', function () {
-                imageSourceModal.show();
-                trapFocus(imageSourceModal);
-        });
+        function openImageModal() {
+                if (!hasAppliedInitialFormatFilter && window.FileLibrary && typeof window.FileLibrary.selectCurrentProductFormat === 'function') {
+                        const applied = window.FileLibrary.selectCurrentProductFormat();
+                        if (applied) {
+                                hasAppliedInitialFormatFilter = true;
+                        }
+                }
 
-        sidebarAddImageButton.on('click', function () {
                 imageSourceModal.show();
                 trapFocus(imageSourceModal);
-        });
+        }
+
+        addImageButton.on('click', openImageModal);
+
+        sidebarAddImageButton.on('click', openImageModal);
 
         async function openProductSidebar() {
                 try {

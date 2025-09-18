@@ -215,6 +215,19 @@
             renderFileList();
         }
 
+        function selectCurrentProductFormat() {
+            const variant = resolveVariant();
+            const storedRatio = productRatioButton.data('ratio');
+            const ratio = (variant && variant.ratio_image) ? variant.ratio_image : storedRatio;
+
+            if (!ratio) {
+                return false;
+            }
+
+            applyProductRatioFilter(ratio);
+            return true;
+        }
+
         function updateProductRatioButton(variantCandidate) {
             if (!productRatioButton.length) return;
             const variant = resolveVariant(variantCandidate);
@@ -352,6 +365,7 @@
             });
 
         updateProductRatioButton(resolveVariant());
+        window.FileLibrary.selectCurrentProductFormat = selectCurrentProductFormat;
 
         // Accès aux produits
         $('#format-product').on('click', function (e) {
@@ -869,6 +883,7 @@
         setImportedFiles: setImportedFiles,
         setMyImages: setMyImages,
         setCommunityImages: setCommunityImages,
-        render: renderFileList
+        render: renderFileList,
+        selectCurrentProductFormat: () => false
     };
 })(jQuery);
