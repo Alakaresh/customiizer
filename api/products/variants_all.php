@@ -9,7 +9,7 @@ function get_all_product_variants_basic() {
     global $wpdb;
     $prefix = 'WPC_';
 
-    $query = "SELECT product_id, variant_id, size, ratio_image FROM {$prefix}variants";
+    $query = "SELECT product_id, variant_id, size, ratio_image, color FROM {$prefix}variants";
     $results = $wpdb->get_results($query, ARRAY_A);
 
     if (empty($results)) {
@@ -22,6 +22,7 @@ function get_all_product_variants_basic() {
             'variant_id'  => (int)$row['variant_id'],
             'size'        => $row['size'],
             'ratio_image' => $row['ratio_image'],
+            'color'       => $row['color'],
         ];
     }, $results);
 
