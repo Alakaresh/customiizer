@@ -19,6 +19,7 @@
     let currentSize = null;           // Taille sélectionnée
     let productFormats = [];          // Ratios disponibles pour le produit
     let sizeRatioMap = {};            // Association taille -> ratio
+    let resetFormatFilters = () => {};
     const CURRENT_PRODUCT_FILTER_LABEL = 'Produit en cours';
     const itemsPerPage = 40;       // Nombre d'images par page
     let searchTimeout;             // Délai pour la recherche distante
@@ -181,7 +182,7 @@
             return null;
         }
 
-        function resetFormatFilters() {
+        resetFormatFilters = function () {
             currentFormatFilter = 'all';
             currentProduct = null;
             currentSize = null;
@@ -200,7 +201,7 @@
             if (productRatioButton.length) {
                 productRatioButton.removeClass('active').text(CURRENT_PRODUCT_FILTER_LABEL);
             }
-        }
+        };
 
         function applyProductRatioFilter(ratio) {
             if (!ratio) return;
@@ -883,7 +884,7 @@
                         if (hasSearchFilter) {
                             $('#searchInput').val('');
                         }
-                        if (hasFormatFilter) {
+                        if (hasFormatFilter && typeof resetFormatFilters === 'function') {
                             resetFormatFilters();
                         }
                         currentPage = 1;
@@ -1031,6 +1032,11 @@
         setMyImages: setMyImages,
         setCommunityImages: setCommunityImages,
         render: renderFileList,
-        selectCurrentProductFormat: () => false
+        selectCurrentProductFormat: () => false,
+        resetFilters: () => {
+            if (typeof resetFormatFilters === 'function') {
+                resetFormatFilters();
+            }
+        }
     };
 })(jQuery);
