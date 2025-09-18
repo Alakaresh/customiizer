@@ -29,8 +29,115 @@
     let variantCache = {};
     try {
         variantCache = window.customizerCache?.variantBasics || {};
+        if (window.customizerCache) {
+            window.customizerCache.formatProducts = window.customizerCache.formatProducts || {};
+        }
     } catch (e) {
         variantCache = {};
+    }
+
+    function normalizeRatio(value) {
+        return (value || '').toString().trim();
+    }
+
+    function buildLocalFormatMap(source) {
+        if (!source || typeof source !== 'object') {
+            return {};
+        }
+
+        const productNameMap = {};
+        (window.customizerCache?.products || []).forEach((product) => {
+            if (!product) {
+                return;
+            }
+
+            const pid = Number(product.product_id);
+            if (Number.isNaN(pid)) {
+                return;
+            }
+
+            productNameMap[pid] = product.name || null;
+        });
+
+        const dedupe = new Set();
+        const map = {};
+
+        Object.entries(source).forEach(([productId, variants]) => {
+            const pid = Number(productId);
+            const productName = productNameMap[pid] || null;
+
+            (Array.isArray(variants) ? variants : []).forEach((variant) => {
+                if (!variant) {
+                    return;
+                }
+
+                const ratio = normalizeRatio(variant.ratio_image);
+                if (!ratio) {
+                    return;
+                }
+
+                const variantId = Number(variant.variant_id);
+                if (!variantId) {
+                    return;
+                }
+
+                const dedupeKey = `${ratio}:${variantId}`;
+                if (dedupe.has(dedupeKey)) {
+                    return;
+                }
+                dedupe.add(dedupeKey);
+
+                const choice = {
+                    product_id: pid,
+                    product_name: productName,
+                    variant_id: variantId,
+                    variant_size: variant?.size || null,
+                    color: typeof variant?.color === 'string' && variant.color.trim() ? variant.color : null,
+                    ratio_image: ratio
+                };
+
+                if (!map[ratio]) {
+                    map[ratio] = { success: true, choices: [] };
+                }
+                map[ratio].choices.push(choice);
+            });
+        });
+
+        return map;
+    }
+
+    function rememberFormatProducts(source, context) {
+        const cache = window.formatProductsCache;
+
+        try {
+            let map = {};
+            if (cache && typeof cache.buildCacheEntriesFromVariants === 'function') {
+                ({ map } = cache.buildCacheEntriesFromVariants(
+                    source,
+                    window.customizerCache?.products || []
+                ));
+            } else {
+                map = buildLocalFormatMap(source);
+            }
+
+            if (!map || typeof map !== 'object' || Object.keys(map).length === 0) {
+                return;
+            }
+
+            window.customizerCache = window.customizerCache || {};
+            window.customizerCache.formatProducts = {
+                ...(window.customizerCache.formatProducts || {}),
+                ...map
+            };
+
+            console.log('[file-library] ratios produits mémorisés', {
+                contexte: context,
+                formatsAjoutes: Object.keys(map).length,
+                totalFormats: Object.keys(window.customizerCache.formatProducts).length
+            });
+        } catch (error) {
+            console.warn('[file-library] impossible de mémoriser les ratios produits', { contexte: context, erreur: error });
+        }
     }
 
     async function ensureVariantCache() {
@@ -44,22 +151,49 @@
                     grouped[v.product_id].push({
                         variant_id: v.variant_id,
                         size: v.size,
-                        ratio_image: v.ratio_image
+                        ratio_image: v.ratio_image,
+                        color: v.color || null
                     });
                 });
                 variantCache = grouped;
                 window.customizerCache = window.customizerCache || {};
                 window.customizerCache.variantBasics = variantCache;
+                rememberFormatProducts(variantCache, 'variants_fetch');
                 try {
                     const tmp = { ...window.customizerCache, models: {} };
                     sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
                 } catch (e) {}
+
+                try {
+                    if (window.formatProductsCache?.hydrateFromVariants) {
+                        window.formatProductsCache.hydrateFromVariants(
+                            variantCache,
+                            window.customizerCache.products || [],
+                            'file_library'
+                        );
+                    }
+                } catch (error) {
+                    console.warn('[file-library] hydratation cache formats impossible', error);
+                }
+
+                return true;
             } catch (err) {
                 console.error('❌ preload variants', err);
+                return false;
             }
         }
+
+        return false;
     }
-    ensureVariantCache();
+    ensureVariantCache().then((fetched) => {
+        if (!fetched && Object.keys(variantCache).length > 0) {
+            rememberFormatProducts(variantCache, 'variants_existing');
+            try {
+                const tmp = { ...window.customizerCache, models: {} };
+                sessionStorage.setItem('customizerCache', JSON.stringify(tmp));
+            } catch (e) {}
+        }
+    });
 
     async function getProductNameForFormat(fmt) {
         if (!fmt || !window.formatProductsCache) {

@@ -42,6 +42,10 @@ function collectRatiosFromCacheSources() {
         });
     }
 
+    const formatProducts = window.customizerCache?.formatProducts;
+    if (formatProducts && typeof formatProducts === 'object') {
+        Object.keys(formatProducts).forEach(addRatio);
+    }
     return ratios;
 }
 
@@ -62,7 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    cache.preloadFormats(ratios);
+    const missing = ratios.filter((format) => typeof cache.get(format) === 'undefined');
+
+    if (missing.length === 0) {
+        console.log('[preview] tous les ratios DB sont déjà en cache', { formats: ratios.length });
+        return;
+    }
+
+    console.log('[preview] préchargement des ratios manquants', { formats: missing.length });
+    cache.preloadFormats(missing);
 });
 
 

@@ -10,12 +10,30 @@
         }
     }
 
+    function cloneCustomizerFormatCache() {
+        try {
+            const source = global.customizerCache?.formatProducts;
+            if (!source || typeof source !== 'object') {
+                return {};
+            }
+
+            return JSON.parse(JSON.stringify(source));
+        } catch (error) {
+            return {};
+        }
+    }
+
     const cache = {
         ...readFromStorage(),
-        ...(global.previewFormatCache || {})
+        ...(global.previewFormatCache || {}),
+        ...cloneCustomizerFormatCache()
     };
 
     global.previewFormatCache = cache;
+
+    function normalizeFormatValue(value) {
+        return (value || '').toString().trim();
+    }
 
     function logCacheSnapshot(context) {
         try {
@@ -100,6 +118,120 @@
         return extractProductName(data);
     }
 
+    function buildCacheEntriesFromVariants(variantBasics = {}, products = []) {
+        const safeResult = { map: {}, formats: 0, variants: 0 };
+
+        if (!variantBasics || typeof variantBasics !== 'object') {
+            return safeResult;
+        }
+
+        const entries = Object.entries(variantBasics).filter(([, variants]) => Array.isArray(variants) && variants.length > 0);
+        if (entries.length === 0) {
+            return safeResult;
+        }
+
+        const productNameMap = {};
+        (Array.isArray(products) ? products : []).forEach((product) => {
+            if (!product || typeof product.product_id === 'undefined') {
+                return;
+            }
+
+            const pid = Number(product.product_id);
+            if (Number.isNaN(pid)) {
+                return;
+            }
+
+            productNameMap[pid] = product.name || null;
+        });
+
+        const dedupe = new Set();
+        const ratioMap = new Map();
+        let totalVariants = 0;
+
+        entries.forEach(([productId, variants]) => {
+            const pid = Number(productId);
+            const productName = productNameMap[pid] || null;
+
+            (variants || []).forEach((variant) => {
+                if (!variant) {
+                    return;
+                }
+
+                const ratio = normalizeFormatValue(variant.ratio_image);
+                if (!ratio) {
+                    return;
+                }
+
+                const variantId = Number(variant.variant_id);
+                if (!variantId) {
+                    return;
+                }
+
+                const dedupeKey = `${ratio}:${variantId}`;
+                if (dedupe.has(dedupeKey)) {
+                    return;
+                }
+                dedupe.add(dedupeKey);
+
+                const choice = {
+                    product_id: pid,
+                    product_name: productName,
+                    variant_id: variantId,
+                    variant_size: variant?.size || null,
+                    color: typeof variant?.color === 'string' && variant.color.trim() ? variant.color : null,
+                    ratio_image: ratio
+                };
+
+                if (!ratioMap.has(ratio)) {
+                    ratioMap.set(ratio, []);
+                }
+                ratioMap.get(ratio).push(choice);
+                totalVariants += 1;
+            });
+        });
+
+        if (ratioMap.size === 0) {
+            return safeResult;
+        }
+
+        const plainMap = {};
+        ratioMap.forEach((choices, ratio) => {
+            plainMap[ratio] = { success: true, choices };
+        });
+
+        return { map: plainMap, formats: ratioMap.size, variants: totalVariants };
+    }
+
+    function hydrateFromVariants(variantBasics = {}, products = [], context = 'hydrate') {
+        try {
+            const { map, formats, variants } = buildCacheEntriesFromVariants(variantBasics, products);
+
+            if (!map || Object.keys(map).length === 0) {
+                if (variantBasics && typeof variantBasics === 'object' && Object.keys(variantBasics).length > 0) {
+                    console.warn('[preview] hydratation cache ratios ignorée', { contexte: context, raison: 'no_valid_ratios' });
+                }
+                return { hydrated: false, reason: 'no_valid_ratios' };
+            }
+
+            Object.entries(map).forEach(([ratio, payload]) => {
+                cache[ratio] = payload;
+            });
+
+            persist(`hydrate:${context}`);
+
+            console.log('[preview] cache formats hydraté depuis variantes', {
+                contexte: context,
+                formats,
+                variantes: variants
+            });
+
+            return { hydrated: true, formats, variants };
+        } catch (error) {
+            console.error('[preview] échec hydratation cache formats', { contexte: context, erreur: error });
+            return { hydrated: false, reason: 'error', error };
+        }
+    }
+
     function preloadFormats(formats = []) {
         const uniqueFormats = Array.from(new Set((formats || []).filter(Boolean)));
         return Promise.all(
@@ -122,6 +254,8 @@
         ensureFormat,
         getProductName,
         extractProductName,
-        preloadFormats
+        preloadFormats,
+        hydrateFromVariants,
+        buildCacheEntriesFromVariants
     };
 })(window);
