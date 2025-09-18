@@ -117,14 +117,20 @@
             return;
         }
 
-        const ratioLabel = `Format: ${fmt}`;
+        const currentVariantSize = $('#filter-product-ratio').data('variant-size');
+        const variantSuffix = currentVariantSize ? ` — ${currentVariantSize}` : '';
+
+        const ratioLabel = `Format: ${fmt}${variantSuffix}`;
         btn.text(ratioLabel);
 
         if (showCurrentDesignLabel && fmt !== 'all') {
             getProductNameForFormat(fmt).then(productName => {
                 if (!productName) return;
                 if (currentFormatFilter !== fmt) return;
-                btn.text(`Format: ${productName}`);
+
+                const activeVariantSize = $('#filter-product-ratio').data('variant-size');
+                const asyncVariantSuffix = activeVariantSize ? ` — ${activeVariantSize}` : '';
+                btn.text(`Format: ${productName}${asyncVariantSuffix}`);
             });
         }
     }
