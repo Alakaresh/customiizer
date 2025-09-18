@@ -66,4 +66,14 @@
     #format-block .format-dropdown button {
         flex: none;
     }
+
+    .filter-sort {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .sort-wrapper {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
