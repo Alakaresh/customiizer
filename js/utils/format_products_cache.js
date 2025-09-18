@@ -17,12 +17,30 @@
 
     global.previewFormatCache = cache;
 
-    function persist() {
+    function logCacheSnapshot(context) {
+        try {
+            const snapshot = JSON.parse(JSON.stringify(cache));
+            console.log('[preview] cache ratios enregistré', {
+                contexte: context,
+                totalFormats: Object.keys(snapshot).length,
+                contenu: snapshot
+            });
+        } catch (error) {
+            console.warn('[preview] impossible de journaliser le cache ratios', {
+                contexte: context,
+                erreur: error
+            });
+        }
+    }
+
+    function persist(context = 'persist') {
         try {
             if (global.sessionStorage) {
                 global.sessionStorage.setItem(CACHE_KEY, JSON.stringify(cache));
             }
         } catch (error) {}
+
+        logCacheSnapshot(context);
     }
 
     async function fetchFormat(format) {
@@ -33,7 +51,7 @@
         const response = await fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(format)}`);
         const data = await response.json();
         cache[format] = data;
-        persist();
+        persist('fetchFormat');
         return data;
     }
 
@@ -60,7 +78,7 @@
 
         cache[format] = data;
         if (shouldPersist) {
-            persist();
+            persist('set');
         }
     }
 
