@@ -294,6 +294,87 @@
         text-align: left;
 }
 
+.product-choice-toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+}
+
+.product-choice-select-label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.8rem;
+        letter-spacing: 0.02em;
+        color: rgba(226, 226, 226, 0.75);
+}
+
+.product-choice-select {
+        background: rgba(24, 24, 24, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        color: #f5f5f5;
+        padding: 10px 12px;
+        font: inherit;
+        cursor: pointer;
+}
+
+.product-choice-select:focus-visible {
+        outline: 2px solid rgba(112, 138, 255, 0.7);
+        outline-offset: 2px;
+}
+
+.product-choice-single-format {
+        font-size: 0.82rem;
+        color: rgba(226, 226, 226, 0.8);
+        background: rgba(72, 72, 72, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 10px 12px;
+}
+
+.product-choice-info {
+        font-size: 0.82rem;
+        color: rgba(214, 221, 255, 0.85);
+        background: rgba(112, 138, 255, 0.14);
+        border: 1px solid rgba(112, 138, 255, 0.35);
+        border-radius: 10px;
+        padding: 10px 12px;
+}
+
+.product-choice-status {
+        font-size: 0.8rem;
+        color: rgba(226, 226, 226, 0.8);
+}
+
+.product-choice-status--error {
+        color: #ffb4b4;
+}
+
+.product-choice-empty {
+        font-size: 0.85rem;
+        color: rgba(226, 226, 226, 0.75);
+        text-align: center;
+        padding: 24px 12px;
+        background: rgba(56, 56, 56, 0.35);
+        border-radius: 12px;
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+@media (min-width: 520px) {
+        .product-choice-toolbar {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+        }
+
+        .product-choice-select-label {
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+        }
+}
+
 .product-choice-list {
         display: flex;
         flex-direction: column;

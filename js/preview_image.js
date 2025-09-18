@@ -155,6 +155,42 @@ function refreshKnownDbRatios() {
     return knownDbRatios;
 }
 
+function collectAvailableFormats(targetFormat, dbRatios, cacheInstance) {
+    const normalizedTarget = normalizeFormatValue(targetFormat);
+    const ordered = [];
+    const extras = new Set();
+
+    const pushExtra = (value) => {
+        const normalized = normalizeFormatValue(value);
+        if (!normalized || extras.has(normalized) || normalized === normalizedTarget) {
+            return;
+        }
+        extras.add(normalized);
+    };
+
+    if (dbRatios && typeof dbRatios.forEach === 'function') {
+        dbRatios.forEach(pushExtra);
+    }
+
+    if (cacheInstance && typeof cacheInstance.getCache === 'function') {
+        try {
+            const cacheMap = cacheInstance.getCache();
+            if (cacheMap && typeof cacheMap === 'object') {
+                Object.keys(cacheMap).forEach(pushExtra);
+            }
+        } catch (error) {
+            console.warn('[preview] impossible de parcourir le cache formats', { erreur: error });
+        }
+    }
+
+    if (normalizedTarget) {
+        ordered.push(normalizedTarget);
+    }
+
+    const sortedExtras = Array.from(extras).sort();
+    return ordered.concat(sortedExtras);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const cache = window.formatProductsCache;
     if (!cache) {
@@ -429,24 +465,35 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 
                 renderFormatProductList(formatTextElement, grouped, productIds, defaultFormatLabel, targetFormat);
 
+                const normalizedTarget = normalizeFormatValue(targetFormat);
+                const sanitizedChoices = data.choices.filter(Boolean);
+                const availableFormats = collectAvailableFormats(targetFormat, dbRatios, cacheInstance);
+                const hasAlternativeFormats = availableFormats.some((fmt) => fmt && fmt !== normalizedTarget);
+
+                const singleProductId = productIds.length === 1 ? productIds[0] : null;
+                const singleProductGroup = singleProductId ? grouped[singleProductId] : null;
+                const singleVariant = (singleProductGroup && singleProductGroup.variants.length === 1)
+                        ? singleProductGroup.variants[0]
+                        : null;
+                const productNameOverride = singleProductGroup ? singleProductGroup.name : null;
+
                 useImageButton.disabled = false;
 
-                if (productIds.length === 1) {
-                        const { name, variants } = grouped[productIds[0]];
-                        useImageButton.addEventListener('click', () => {
-                                if (variants.length === 1) {
-                                        const v = variants[0];
-                                        redirectToConfigurator(name, v.product_id, src, prompt, targetFormat, v.variant_id);
-                                } else {
-                                        showProductChooserOverlay(variants, src, prompt, targetFormat, name);
-                                }
-                        }, { once: true });
-                } else {
-                        useImageButton.addEventListener('click', () => {
-                                const allVariants = Object.values(grouped).flatMap(p => p.variants);
-                                showProductChooserOverlay(allVariants, src, prompt, targetFormat);
-                        }, { once: true });
-                }
+                useImageButton.addEventListener('click', () => {
+                        const shouldOpenChooser = hasAlternativeFormats || !singleVariant;
+
+                        if (!shouldOpenChooser && singleVariant) {
+                                const targetName = productNameOverride || singleVariant.product_name || defaultFormatLabel;
+                                redirectToConfigurator(targetName, singleVariant.product_id, src, prompt, targetFormat, singleVariant.variant_id);
+                                return;
+                        }
+
+                        showProductChooserOverlay(sanitizedChoices, src, prompt, targetFormat, productNameOverride, {
+                                availableFormats,
+                                cacheInstance,
+                                defaultFormatLabel
+                        });
+                }, { once: true });
         };
 
         const loadProductInfo = () => {
@@ -513,176 +560,394 @@ function redirectToConfigurator(name, id, src, prompt, format, variantId) {
 	window.location.href = url.toString();
 }
 
-function showProductChooserOverlay(choices, src, prompt, format, productNameOverride = null) {
-        const safeChoices = Array.isArray(choices) ? choices.filter(Boolean) : [];
-        if (safeChoices.length === 0) {
-                return;
-        }
 
-        console.table(safeChoices.map(choice => ({
-                variant_id: choice.variant_id,
-                product_id: choice.product_id,
-                name: choice.product_name,
-                size: choice.variant_size,
-                color: choice.color,
-                ratio: choice.ratio_image
-        })));
+function showProductChooserOverlay(choices, src, prompt, format, productNameOverride = null, options = {}) {
+	const safeInitialChoices = Array.isArray(choices) ? choices.filter(Boolean) : [];
+	const availableOptionList = Array.isArray(options && options.availableFormats) ? options.availableFormats : [];
+	if (safeInitialChoices.length === 0 && availableOptionList.length === 0) {
+		return;
+	}
 
-        const overlay = document.createElement('div');
-        overlay.classList.add('product-chooser-overlay');
+	const { cacheInstance = null, defaultFormatLabel = null } = options || {};
+	const normalizedTarget = normalizeFormatValue(format);
+	const originalFormatLabel = defaultFormatLabel || (normalizedTarget || 'Format non communiqué');
 
-        const box = document.createElement('div');
-        box.classList.add('product-chooser-box');
+	const overlay = document.createElement('div');
+	overlay.classList.add('product-chooser-overlay');
 
-        const choiceList = document.createElement('div');
-        choiceList.classList.add('product-choice-list');
-        box.appendChild(choiceList);
+	const box = document.createElement('div');
+	box.classList.add('product-chooser-box');
 
-        const productGroups = [];
-        const groupIndex = new Map();
+	const toolbar = document.createElement('div');
+	toolbar.classList.add('product-choice-toolbar');
 
-        safeChoices.forEach((choice) => {
-                const productKey = typeof choice.product_id !== 'undefined'
-                        ? String(choice.product_id)
-                        : `unknown-${choice.variant_id || productGroups.length}`;
+	const infoEl = document.createElement('div');
+	infoEl.classList.add('product-choice-info');
+	infoEl.hidden = true;
 
-                if (!groupIndex.has(productKey)) {
-                        groupIndex.set(productKey, productGroups.length);
-                        productGroups.push({
-                                productId: productKey,
-                                name: null,
-                                variants: [],
-                                seenVariantIds: new Set()
-                        });
-                }
+	const statusEl = document.createElement('div');
+	statusEl.classList.add('product-choice-status');
+	statusEl.setAttribute('role', 'status');
+	statusEl.hidden = true;
 
-                const group = productGroups[groupIndex.get(productKey)];
-                const variantId = typeof choice.variant_id !== 'undefined' ? String(choice.variant_id) : null;
+	const choiceList = document.createElement('div');
+	choiceList.classList.add('product-choice-list');
 
-                if (variantId && group.seenVariantIds.has(variantId)) {
-                        return;
-                }
+	const formatLabelMap = new Map();
+	if (normalizedTarget) {
+		formatLabelMap.set(normalizedTarget, originalFormatLabel);
+	}
 
-                if (variantId) {
-                        group.seenVariantIds.add(variantId);
-                }
+	const normalizedFormats = [];
+	const seenFormats = new Set();
+	const pushFormat = (value) => {
+		const normalized = normalizeFormatValue(value);
+		if (!normalized || seenFormats.has(normalized)) {
+			return;
+		}
+		seenFormats.add(normalized);
+		normalizedFormats.push(normalized);
+	};
 
-                const baseName = (productNameOverride && productGroups.length === 1)
-                        ? productNameOverride
-                        : choice.product_name;
+	pushFormat(normalizedTarget);
+	availableOptionList.forEach(pushFormat);
 
-                if (!group.name) {
-                        group.name = baseName || 'Produit disponible';
-                }
+	const shouldShowFormatSwitcher = normalizedFormats.length > 1;
 
-                group.variants.push(choice);
-        });
+	const formatSelect = document.createElement('select');
+	formatSelect.classList.add('product-choice-select');
+	formatSelect.setAttribute('aria-label', 'Choisir un format');
 
-        productGroups.forEach((group) => {
-                if (!group || group.variants.length === 0) {
-                        return;
-                }
+	const getFormatLabel = (value) => {
+		const normalized = normalizeFormatValue(value);
+		if (!normalized) {
+			if (normalizedTarget === '' && defaultFormatLabel) {
+				return defaultFormatLabel;
+			}
+			return 'Format inconnu';
+		}
+		if (formatLabelMap.has(normalized)) {
+			return formatLabelMap.get(normalized);
+		}
+		if (normalized === normalizedTarget && defaultFormatLabel) {
+			return defaultFormatLabel;
+		}
+		return normalized;
+	};
 
-                const groupEl = document.createElement('section');
-                groupEl.classList.add('product-choice-group');
+	normalizedFormats.forEach((fmt) => {
+		const option = document.createElement('option');
+		option.value = fmt;
+		option.textContent = getFormatLabel(fmt);
+		formatSelect.appendChild(option);
+	});
 
-                const headerEl = document.createElement('div');
-                headerEl.classList.add('product-choice-group-header');
+	const initialFormatSelection = normalizedFormats.includes(normalizedTarget)
+		? normalizedTarget
+		: (normalizedFormats[0] || null);
 
-                const nameEl = document.createElement('span');
-                nameEl.classList.add('product-choice-group-name');
-                nameEl.textContent = group.name || 'Produit disponible';
-                headerEl.appendChild(nameEl);
+	if (shouldShowFormatSwitcher) {
+		const label = document.createElement('label');
+		label.classList.add('product-choice-select-label');
+		const labelText = document.createElement('span');
+		labelText.textContent = 'Format';
+		label.appendChild(labelText);
+		label.appendChild(formatSelect);
+		toolbar.appendChild(label);
+	} else if (normalizedFormats.length === 1) {
+		const single = document.createElement('div');
+		single.classList.add('product-choice-single-format');
+		single.textContent = `Format disponible : ${getFormatLabel(normalizedFormats[0])}`;
+		toolbar.appendChild(single);
+	}
 
-                if (group.variants.length > 1) {
-                        const countEl = document.createElement('span');
-                        countEl.classList.add('product-choice-group-count');
-                        countEl.textContent = `${group.variants.length} variantes`;
-                        headerEl.appendChild(countEl);
-                }
+	const setStatus = (message, isError = false) => {
+		if (!message) {
+			statusEl.textContent = '';
+			statusEl.hidden = true;
+			statusEl.classList.remove('product-choice-status--error');
+			return;
+		}
+		statusEl.textContent = message;
+		statusEl.hidden = false;
+		statusEl.classList.toggle('product-choice-status--error', Boolean(isError));
+	};
 
-                groupEl.appendChild(headerEl);
+	const updateInfo = (activeFormat) => {
+		const normalized = normalizeFormatValue(activeFormat);
+		const targetLabel = normalizedTarget ? getFormatLabel(normalizedTarget) : originalFormatLabel;
+		if (!normalizedTarget && !normalized) {
+			infoEl.hidden = true;
+			infoEl.textContent = '';
+			return;
+		}
+		if (!normalizedTarget) {
+			infoEl.textContent = `Format sélectionné : ${getFormatLabel(normalized)}`;
+			infoEl.hidden = false;
+			return;
+		}
+		if (!normalized || normalized === normalizedTarget) {
+			infoEl.textContent = `Format de l'image : ${targetLabel}`;
+		} else {
+			infoEl.textContent = `Format sélectionné : ${getFormatLabel(normalized)} – Image : ${targetLabel}`;
+		}
+		infoEl.hidden = false;
+	};
 
-                const variantList = document.createElement('div');
-                variantList.classList.add('product-choice-variants');
+	const renderChoices = (entries, activeFormat) => {
+		choiceList.innerHTML = '';
+		const safeEntries = Array.isArray(entries) ? entries.filter(Boolean) : [];
 
-                group.variants.forEach((variantChoice) => {
-                        const btn = document.createElement('button');
-                        btn.type = 'button';
-                        btn.classList.add('product-choice-button');
+		if (safeEntries.length === 0) {
+			const emptyEl = document.createElement('p');
+			emptyEl.classList.add('product-choice-empty');
+			emptyEl.textContent = 'Aucun produit disponible pour ce format.';
+			choiceList.appendChild(emptyEl);
+			return;
+		}
 
-                        const metaParts = [];
-                        if (variantChoice.variant_size) {
-                                metaParts.push(variantChoice.variant_size);
-                        }
-                        if (variantChoice.variant_label && variantChoice.variant_label !== variantChoice.variant_size) {
-                                metaParts.push(variantChoice.variant_label);
-                        }
+		console.table(safeEntries.map((choice) => ({
+			variant_id: choice.variant_id,
+			product_id: choice.product_id,
+			name: choice.product_name,
+			size: choice.variant_size,
+			color: choice.color,
+			ratio: choice.ratio_image
+		})));
 
-                        const colorLabel = (variantChoice.color || '').toString().trim();
+		const productGroups = [];
+		const groupIndex = new Map();
 
-                        const accessibleParts = [];
-                        if (metaParts.length) {
-                                accessibleParts.push(metaParts.join(' • '));
-                        }
-                        if (colorLabel) {
-                                accessibleParts.push(colorLabel);
-                        }
+		safeEntries.forEach((choice) => {
+			const productKey = typeof choice.product_id !== 'undefined'
+				? String(choice.product_id)
+				: `unknown-${choice.variant_id || productGroups.length}`;
 
-                        const ariaLabel = accessibleParts.length
-                                ? `${group.name} – ${accessibleParts.join(' • ')}`
-                                : group.name;
-                        btn.setAttribute('aria-label', ariaLabel);
-                        btn.title = ariaLabel;
+			if (!groupIndex.has(productKey)) {
+				groupIndex.set(productKey, productGroups.length);
+				productGroups.push({
+					productId: productKey,
+					name: null,
+					variants: [],
+					seenVariantIds: new Set()
+				});
+			}
 
-                        const variantNameEl = document.createElement('span');
-                        variantNameEl.classList.add('product-choice-name');
-                        const primaryLabel = metaParts.length
-                                ? metaParts[0]
-                                : (colorLabel || 'Variante disponible');
-                        variantNameEl.textContent = primaryLabel;
-                        btn.appendChild(variantNameEl);
+			const group = productGroups[groupIndex.get(productKey)];
+			const variantId = typeof choice.variant_id !== 'undefined' ? String(choice.variant_id) : null;
 
-                        if (metaParts.length > 1) {
-                                const descriptionEl = document.createElement('span');
-                                descriptionEl.classList.add('product-choice-description');
-                                descriptionEl.textContent = metaParts.slice(1).join(' • ');
-                                btn.appendChild(descriptionEl);
-                        }
+			if (variantId && group.seenVariantIds.has(variantId)) {
+				return;
+			}
 
-                        const shouldShowColorBadge = Boolean(colorLabel) && colorLabel !== primaryLabel;
+			if (variantId) {
+				group.seenVariantIds.add(variantId);
+			}
 
-                        if (shouldShowColorBadge) {
-                                const badgeWrapper = document.createElement('div');
-                                badgeWrapper.classList.add('product-choice-badges');
+			const activeNormalized = normalizeFormatValue(activeFormat);
+			const baseName = (activeNormalized === normalizedTarget && productNameOverride && productGroups.length === 1)
+				? productNameOverride
+				: choice.product_name;
 
-                                const badge = document.createElement('span');
-                                badge.classList.add('product-choice-badge', 'product-choice-badge--color');
-                                badge.textContent = colorLabel;
-                                badgeWrapper.appendChild(badge);
+			if (!group.name) {
+				group.name = baseName || 'Produit disponible';
+			}
 
-                                btn.appendChild(badgeWrapper);
-                        }
+			group.variants.push(choice);
+		});
 
-                        btn.addEventListener('click', () => {
-                                redirectToConfigurator(group.name, variantChoice.product_id, src, prompt, format, variantChoice.variant_id);
-                        });
+		productGroups.forEach((group) => {
+			if (!group || group.variants.length === 0) {
+				return;
+			}
 
-                        variantList.appendChild(btn);
-                });
+			const groupEl = document.createElement('section');
+			groupEl.classList.add('product-choice-group');
 
-                groupEl.appendChild(variantList);
-                choiceList.appendChild(groupEl);
-        });
+			const headerEl = document.createElement('div');
+			headerEl.classList.add('product-choice-group-header');
 
-        const closeBtn = document.createElement('button');
-        closeBtn.textContent = "Fermer";
-        closeBtn.classList.add('close-choice-button');
-        closeBtn.type = 'button';
-        closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+			const nameEl = document.createElement('span');
+			nameEl.classList.add('product-choice-group-name');
+			nameEl.textContent = group.name || 'Produit disponible';
+			headerEl.appendChild(nameEl);
 
-        box.appendChild(closeBtn);
-        overlay.appendChild(box);
-        document.body.appendChild(overlay);
+			if (group.variants.length > 1) {
+				const countEl = document.createElement('span');
+				countEl.classList.add('product-choice-group-count');
+				countEl.textContent = `${group.variants.length} variantes`;
+				headerEl.appendChild(countEl);
+			}
+
+			groupEl.appendChild(headerEl);
+
+			const variantList = document.createElement('div');
+			variantList.classList.add('product-choice-variants');
+
+			group.variants.forEach((variantChoice) => {
+				const btn = document.createElement('button');
+				btn.type = 'button';
+				btn.classList.add('product-choice-button');
+
+				const metaParts = [];
+				if (variantChoice.variant_size) {
+					metaParts.push(variantChoice.variant_size);
+				}
+				if (variantChoice.variant_label && variantChoice.variant_label !== variantChoice.variant_size) {
+					metaParts.push(variantChoice.variant_label);
+				}
+
+				const colorLabel = (variantChoice.color || '').toString().trim();
+				const ratioLabel = normalizeFormatValue(variantChoice.ratio_image);
+				const activeNormalized = normalizeFormatValue(activeFormat);
+
+				const accessibleParts = [];
+				if (metaParts.length) {
+					accessibleParts.push(metaParts.join(' • '));
+				}
+				if (colorLabel) {
+					accessibleParts.push(colorLabel);
+				}
+				if (ratioLabel && ratioLabel !== activeNormalized) {
+					accessibleParts.push(`Ratio ${ratioLabel}`);
+				}
+
+				const ariaLabel = accessibleParts.length
+					? `${group.name} – ${accessibleParts.join(' • ')}`
+					: group.name;
+				btn.setAttribute('aria-label', ariaLabel);
+				btn.title = ariaLabel;
+
+				const variantNameEl = document.createElement('span');
+				variantNameEl.classList.add('product-choice-name');
+				const primaryLabel = metaParts.length
+					? metaParts[0]
+					: (colorLabel || 'Variante disponible');
+				variantNameEl.textContent = primaryLabel;
+				btn.appendChild(variantNameEl);
+
+				if (metaParts.length > 1) {
+					const descriptionEl = document.createElement('span');
+					descriptionEl.classList.add('product-choice-description');
+					descriptionEl.textContent = metaParts.slice(1).join(' • ');
+					btn.appendChild(descriptionEl);
+				}
+
+				const badges = [];
+				if (colorLabel && colorLabel !== primaryLabel) {
+					badges.push({ text: colorLabel, className: 'product-choice-badge--color' });
+				}
+				if (ratioLabel && ratioLabel !== activeNormalized) {
+					badges.push({ text: ratioLabel, className: 'product-choice-badge--ratio' });
+				}
+
+				if (badges.length > 0) {
+					const badgeWrapper = document.createElement('div');
+					badgeWrapper.classList.add('product-choice-badges');
+					badges.forEach((badge) => {
+						const badgeEl = document.createElement('span');
+						badgeEl.classList.add('product-choice-badge');
+						if (badge.className) {
+							badgeEl.classList.add(badge.className);
+						}
+						badgeEl.textContent = badge.text;
+						badgeWrapper.appendChild(badgeEl);
+					});
+					btn.appendChild(badgeWrapper);
+				}
+
+				btn.addEventListener('click', () => {
+					redirectToConfigurator(group.name, variantChoice.product_id, src, prompt, activeFormat, variantChoice.variant_id);
+				});
+
+				variantList.appendChild(btn);
+			});
+
+			groupEl.appendChild(variantList);
+			choiceList.appendChild(groupEl);
+		});
+	};
+
+	let currentRequestId = 0;
+
+	const loadChoicesForFormat = async (requestedFormat) => {
+		const formatKey = normalizeFormatValue(requestedFormat);
+		updateInfo(formatKey);
+
+		if (!formatKey) {
+			setStatus('');
+			renderChoices(safeInitialChoices, formatKey);
+			return;
+		}
+
+		const requestId = ++currentRequestId;
+		let entries = (formatKey === normalizedTarget) ? safeInitialChoices : null;
+
+		if (!entries || entries.length === 0) {
+			const cached = cacheInstance && typeof cacheInstance.get === 'function'
+				? cacheInstance.get(formatKey)
+				: undefined;
+			if (cached && cached.success && Array.isArray(cached.choices)) {
+				entries = cached.choices.filter(Boolean);
+			} else if (cacheInstance && typeof cacheInstance.ensureFormat === 'function') {
+				try {
+					setStatus('Chargement...', false);
+					const result = await cacheInstance.ensureFormat(formatKey);
+					if (requestId !== currentRequestId) {
+						return;
+					}
+					if (result && result.success && Array.isArray(result.choices)) {
+						entries = result.choices.filter(Boolean);
+					} else {
+						entries = [];
+					}
+				} catch (error) {
+					if (requestId !== currentRequestId) {
+						return;
+					}
+					console.error('[preview] erreur chargement produits pour format alternatif', { format: formatKey, error });
+					setStatus('Impossible de charger ce format pour le moment.', true);
+					renderChoices([], formatKey);
+					return;
+				}
+			}
+		}
+
+		if (requestId !== currentRequestId) {
+			return;
+		}
+
+		setStatus('');
+		renderChoices(entries, formatKey);
+	};
+
+	if (toolbar.children.length > 0) {
+		box.appendChild(toolbar);
+	}
+
+	box.appendChild(infoEl);
+	box.appendChild(statusEl);
+	box.appendChild(choiceList);
+
+	const closeBtn = document.createElement('button');
+	closeBtn.textContent = "Fermer";
+	closeBtn.classList.add('close-choice-button');
+	closeBtn.type = 'button';
+	closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+	box.appendChild(closeBtn);
+	overlay.appendChild(box);
+	document.body.appendChild(overlay);
+
+	if (shouldShowFormatSwitcher) {
+		formatSelect.value = initialFormatSelection || '';
+		formatSelect.addEventListener('change', (event) => {
+			loadChoicesForFormat(event.target.value);
+		});
+		loadChoicesForFormat(initialFormatSelection);
+	} else {
+		updateInfo(normalizedTarget);
+		renderChoices(safeInitialChoices, normalizedTarget);
+	}
 }
 
