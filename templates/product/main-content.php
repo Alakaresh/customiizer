@@ -21,8 +21,9 @@
 					<div class="product-info">
 						<!-- Menu de sélection de produit -->
                                                <div class="product-selector" data-component="variant-selector">
-                                                        <div class="custom-select" data-dropdown>
-                                                                <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
+                                                        <p class="product-selector__label"><?php esc_html_e('Choisir un produit', 'customiizer'); ?></p>
+                                                        <div class="custom-select product-selector__card" data-dropdown>
+                                                                <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options" aria-describedby="product-selector-helper">
                                                                         <span class="selected-visual">
                                                                                 <img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
                                                                         </span>
@@ -30,11 +31,12 @@
                                                                                 <span class="product-name" aria-live="polite">Nom du produit</span>
                                                                         </span>
                                                                 </button>
-                                                                <button type="button" class="dropdown-icon" aria-label="<?php esc_attr_e('Ouvrir la liste des variantes', 'customiizer'); ?>" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
+                                                                <button type="button" class="dropdown-icon" aria-label="<?php esc_attr_e('Ouvrir la liste des variantes', 'customiizer'); ?>" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options" aria-describedby="product-selector-helper">
                                                                         <span class="chevron" aria-hidden="true"></span>
                                                                 </button>
                                                                 <ul id="product-options" class="options-list" role="listbox" aria-hidden="true"></ul>
                                                         </div>
+                                                        <p id="product-selector-helper" class="product-selector__helper"><?php esc_html_e('Sélectionnez une variante pour afficher ses options de couleur et de taille.', 'customiizer'); ?></p>
                                                         <h1 class="product-title visually-hidden" aria-live="polite">Nom du produit</h1>
                                                 </div>
 
