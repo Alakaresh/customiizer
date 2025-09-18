@@ -1,10 +1,68 @@
+let knownDbRatios = new Set();
+
+function normalizeFormatValue(value) {
+    const raw = (value || '').toString().trim();
+    if (!raw) {
+        return '';
+    }
+
+    if (raw.toLowerCase() === 'inconnu') {
+        return '';
+    }
+
+    return raw;
+}
+
+function collectRatiosFromCacheSources() {
+    const ratios = new Set();
+
+    const addRatio = (ratio) => {
+        const normalized = normalizeFormatValue(ratio);
+        if (normalized) {
+            ratios.add(normalized);
+        }
+    };
+
+    const variantBasics = window.customizerCache?.variantBasics;
+    if (variantBasics && typeof variantBasics === 'object') {
+        Object.values(variantBasics).forEach((variants) => {
+            (Array.isArray(variants) ? variants : []).forEach((variant) => {
+                addRatio(variant?.ratio_image);
+            });
+        });
+    }
+
+    const variantDetails = window.customizerCache?.variants;
+    if (variantDetails && typeof variantDetails === 'object') {
+        Object.values(variantDetails).forEach((productEntry) => {
+            const productVariants = productEntry?.variants;
+            (Array.isArray(productVariants) ? productVariants : []).forEach((variant) => {
+                addRatio(variant?.ratio_image);
+            });
+        });
+    }
+
+    return ratios;
+}
+
+function refreshKnownDbRatios() {
+    knownDbRatios = collectRatiosFromCacheSources();
+    return knownDbRatios;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const cache = window.formatProductsCache;
     if (!cache) {
         return;
     }
 
-    cache.preloadFormats(['1:1', '3:4', '4:3', '16:9', '9:16']);
+    const ratios = Array.from(refreshKnownDbRatios());
+    if (ratios.length === 0) {
+        console.warn('[preview] aucun ratio issu de la base pour précharger le cache formats');
+        return;
+    }
+
+    cache.preloadFormats(ratios);
 });
 
 
@@ -64,10 +122,23 @@ function handleImageClick(event) {
 
 
 function openImageOverlay(src, userId, username, formatImage, prompt) {
-	const displayOnlyFormats = ['1:1', '3:4', '4:3', '16:9', '9:16'];
+        const targetFormat = normalizeFormatValue(formatImage);
+        const defaultFormatLabel = targetFormat || 'Format non communiqué';
+        const dbRatios = refreshKnownDbRatios();
+        const cacheInstance = window.formatProductsCache || null;
+        const initialCachedEntry = cacheInstance && targetFormat ? cacheInstance.get(targetFormat) : undefined;
+        const hasInitialCache = typeof initialCachedEntry !== 'undefined';
+        const isDbRatio = targetFormat ? dbRatios.has(targetFormat) : false;
 
-	const overlay = document.createElement('div');
-	overlay.classList.add('preview-overlay');
+        console.log('[preview] ouverture overlay', {
+                format: targetFormat || null,
+                userId,
+                knownInDb: isDbRatio,
+                hasCachedEntry: hasInitialCache
+        });
+
+        const overlay = document.createElement('div');
+        overlay.classList.add('preview-overlay');
 
 	const mainContainer = document.createElement('div');
 	mainContainer.classList.add('preview-main-container');
@@ -212,16 +283,15 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 		e.stopPropagation(); // ✅ empêche la fermeture au clic à l’intérieur
 	});
 
-        const isNeutral = displayOnlyFormats.includes(formatImage);
-
         const processData = (data) => {
-                if (!data.success || data.choices.length === 0) {
-                        if (isNeutral) {
-                                useImageButton.disabled = true;
-                        } else {
-                                formatTextElement.textContent = "Aucun produit trouvé.";
-                                useImageButton.disabled = true;
-                        }
+                console.log('[preview] processing cached product data', {
+                        format: targetFormat || null,
+                        success: data ? data.success : undefined,
+                        choices: data && Array.isArray(data.choices) ? data.choices.length : undefined
+                });
+                if (!data || !data.success || !Array.isArray(data.choices) || data.choices.length === 0) {
+                        formatTextElement.textContent = "Aucun produit trouvé.";
+                        useImageButton.disabled = true;
                         return;
                 }
 
@@ -237,10 +307,20 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 });
 
                 const productIds = Object.keys(grouped);
-                if (!isNeutral) {
-                        if (productIds.length === 1) {
-                                formatTextElement.textContent = grouped[productIds[0]].name;
+                console.log('[preview] affichage ratio via cache', {
+                        format: targetFormat || null,
+                        products: productIds.length,
+                        variants: data.choices.length,
+                        productNames: productIds.map((id) => grouped[id].name).filter(Boolean)
+                });
+
+                if (productIds.length === 1) {
+                        const { name } = grouped[productIds[0]];
+                        if (name) {
+                                formatTextElement.textContent = name;
                         }
+                } else {
+                        formatTextElement.textContent = defaultFormatLabel;
                 }
 
                 useImageButton.disabled = false;
@@ -250,16 +330,16 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         useImageButton.addEventListener('click', () => {
                                 if (variants.length === 1) {
                                         const v = variants[0];
-                                        redirectToConfigurator(name, v.product_id, src, prompt, formatImage, v.variant_id);
+                                        redirectToConfigurator(name, v.product_id, src, prompt, targetFormat, v.variant_id);
                                 } else {
-                                        showProductChooserOverlay(variants, src, prompt, formatImage, name);
+                                        showProductChooserOverlay(variants, src, prompt, targetFormat, name);
                                 }
-                        });
+                        }, { once: true });
                 } else {
                         useImageButton.addEventListener('click', () => {
                                 const allVariants = Object.values(grouped).flatMap(p => p.variants);
-                                showProductChooserOverlay(allVariants, src, prompt, formatImage);
-                        });
+                                showProductChooserOverlay(allVariants, src, prompt, targetFormat);
+                        }, { once: true });
                 }
         };
 
@@ -272,40 +352,48 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 };
 
                 if (!cache) {
-                        fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
-                                .then(res => res.json())
-                                .then(processData)
-                                .catch(handleError);
+                        console.warn('[preview] formatProductsCache indisponible, impossible de charger', { format: targetFormat || null });
                         return;
                 }
 
-                const cached = cache.get(formatImage);
-                if (cached) {
+                if (!targetFormat) {
+                        console.warn('[preview] format image absent ou invalide, chargement abandonné', { userId });
+                        useImageButton.disabled = true;
+                        return;
+                }
+
+                const cached = cache.get(targetFormat);
+                if (typeof cached === 'undefined') {
+                        const availableFormats = cache.getCache ? Object.keys(cache.getCache()) : [];
+                        console.warn('[preview] format absent du cache – aucune requête API lancée', {
+                                format: targetFormat,
+                                knownInDb: dbRatios.has(targetFormat),
+                                availableFormats
+                        });
+                        useImageButton.disabled = true;
+                        formatTextElement.textContent = defaultFormatLabel;
+                        return;
+                }
+
+                try {
                         processData(cached);
-                        return;
+                } catch (error) {
+                        handleError(error);
                 }
-
-                cache.ensureFormat(formatImage)
-                        .then(data => {
-                                if (!data) {
-                                        useImageButton.disabled = true;
-                                        return;
-                                }
-                                processData(data);
-                        })
-                        .catch(handleError);
         };
 
-        if (isNeutral) {
-                // ✅ Format "neutre" : afficher le ratio, mais permettre l'action
-                formatTextElement.textContent = formatImage;
-                useImageButton.disabled = true; // Désactivé pendant le chargement
-                loadProductInfo();
-        } else {
-                // ❌ On n'affiche rien en attendant — on va charger un produit
-                formatTextElement.textContent = '';
-                loadProductInfo();
+        formatTextElement.textContent = defaultFormatLabel;
+        useImageButton.disabled = true;
+
+        if (!targetFormat) {
+                console.warn('[preview] aucun format exploitable fourni par l\'image, bouton désactivé', {
+                        format: formatImage,
+                        userId
+                });
+                return;
         }
+
+        loadProductInfo();
 
 
 }
