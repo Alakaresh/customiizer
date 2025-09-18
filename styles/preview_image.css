@@ -340,6 +340,9 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 12px;
+        max-height: min(42vh, 320px);
+        overflow-y: auto;
+        padding-right: 4px;
 }
 
 .product-choice-button {
