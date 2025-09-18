@@ -802,10 +802,10 @@
                 const emptyState = $(
                     `<div class="file-library-empty">
                         <p class="file-library-empty-title">Vous n'avez pas encore d'image enregistrée.</p>
-                        <p class="file-library-empty-subtitle">Générez une image sur Customiize ou ouvrez l'onglet Communauté de la bibliothèque pour utiliser les visuels partagés.</p>
+                        <p class="file-library-empty-subtitle">Générez une image sur Customiize ou explorez la Communauté pour utiliser les visuels partagés.</p>
                         <div class="file-library-empty-actions">
                             <a href="/customiize" class="file-library-empty-primary" target="_blank" rel="noopener">Générer une image</a>
-                            <button type="button" class="file-library-empty-secondary">Ouvrir l'onglet Communauté</button>
+                            <button type="button" class="file-library-empty-secondary">Communauté</button>
                         </div>
                     </div>`
                 );
