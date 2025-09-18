@@ -1,4 +1,5 @@
 let knownDbRatios = new Set();
+const STANDARD_RATIOS = new Set(['1:1', '3:4', '4:3', '16:9', '9:16']);
 
 function buildVariantLabel(variant) {
         if (!variant || typeof variant !== 'object') {
@@ -22,14 +23,17 @@ function buildVariantLabel(variant) {
         return parts.join(' – ');
 }
 
-function renderFormatProductList(container, grouped, productIds, defaultFormatLabel) {
+function renderFormatProductList(container, grouped, productIds, defaultFormatLabel, targetFormat) {
         if (!container) {
                 return;
         }
 
         container.innerHTML = '';
 
-        if (defaultFormatLabel) {
+        const normalizedFormat = normalizeFormatValue(targetFormat);
+        const shouldDisplayRatioLabel = Boolean(defaultFormatLabel) && (!normalizedFormat || STANDARD_RATIOS.has(normalizedFormat));
+
+        if (shouldDisplayRatioLabel) {
                 const ratioLabel = document.createElement('div');
                 ratioLabel.classList.add('format-ratio-label');
                 ratioLabel.textContent = defaultFormatLabel;
@@ -423,7 +427,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         productNames: productIds.map((id) => grouped[id].name).filter(Boolean)
                 });
 
-                renderFormatProductList(formatTextElement, grouped, productIds, defaultFormatLabel);
+                renderFormatProductList(formatTextElement, grouped, productIds, defaultFormatLabel, targetFormat);
 
                 useImageButton.disabled = false;
 
