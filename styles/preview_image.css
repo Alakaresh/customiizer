@@ -117,9 +117,48 @@
     word-wrap: break-word;
 }
 
+.format-ratio-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #f1f1f1;
+}
+
+.format-product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.format-product-item {
+    background-color: #2a2a2a;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.format-product-name {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.format-variant-list {
+    margin: 0;
+    padding-left: 18px;
+    color: #dcdcdc;
+}
+
+.format-variant-item {
+    margin: 4px 0;
+    list-style: disc;
+}
+
 .prompt-text {
     max-height: 30dvh;
     overflow: auto;
+}
+
+.format-text {
+    max-height: 25dvh;
+    overflow-y: auto;
 }
 
 /* Styles pour le bouton de copie */
