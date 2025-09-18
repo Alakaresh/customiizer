@@ -526,36 +526,97 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
 	const overlay = document.createElement('div');
 	overlay.classList.add('product-chooser-overlay');
 
-	const box = document.createElement('div');
-	box.classList.add('product-chooser-box');
+        const box = document.createElement('div');
+        box.classList.add('product-chooser-box');
 
-	const title = document.createElement('h3');
-	title.textContent = "Choisissez une variante";
-	box.appendChild(title);
+        const title = document.createElement('h3');
+        title.textContent = "Choisissez une variante";
+        box.appendChild(title);
 
-	choices.forEach(choice => {
-		const btn = document.createElement('button');
-		btn.classList.add('product-choice-button');
+        const choiceList = document.createElement('div');
+        choiceList.classList.add('product-choice-list');
+        box.appendChild(choiceList);
 
-		const displayName = productNameOverride || choice.product_name;
-                const sizeLabel = choice.variant_size || "?";
-                const label = `${displayName} – ${sizeLabel}`;
-		btn.textContent = label;
+        choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.classList.add('product-choice-button');
 
-		btn.addEventListener('click', () => {
-			redirectToConfigurator(displayName, choice.product_id, src, prompt, format, choice.variant_id);
-		});
+                const displayName = productNameOverride || choice.product_name || "Produit";
+                const metaLineParts = [];
+                if (choice.variant_size) {
+                        metaLineParts.push(choice.variant_size);
+                }
+                if (choice.variant_label && choice.variant_label !== choice.variant_size) {
+                        metaLineParts.push(choice.variant_label);
+                }
 
-		box.appendChild(btn);
-	});
+                const accessibleParts = [];
+                if (metaLineParts.length) {
+                        accessibleParts.push(metaLineParts.join(' • '));
+                }
+                if (choice.color) {
+                        accessibleParts.push(choice.color);
+                }
+                if (choice.ratio_image) {
+                        accessibleParts.push(`ratio ${choice.ratio_image}`);
+                }
 
-	const closeBtn = document.createElement('button');
-	closeBtn.textContent = "Fermer";
-	closeBtn.classList.add('close-choice-button');
-	closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+                const ariaLabel = accessibleParts.length
+                        ? `${displayName} – ${accessibleParts.join(' • ')}`
+                        : displayName;
+                btn.setAttribute('aria-label', ariaLabel);
+                btn.title = ariaLabel;
 
-	box.appendChild(closeBtn);
-	overlay.appendChild(box);
-	document.body.appendChild(overlay);
+                const nameEl = document.createElement('span');
+                nameEl.classList.add('product-choice-name');
+                nameEl.textContent = displayName;
+                btn.appendChild(nameEl);
+
+                if (metaLineParts.length) {
+                        const descriptionEl = document.createElement('span');
+                        descriptionEl.classList.add('product-choice-description');
+                        descriptionEl.textContent = metaLineParts.join(' • ');
+                        btn.appendChild(descriptionEl);
+                }
+
+                const badgeData = [
+                        choice.color ? { text: choice.color, modifier: 'color' } : null,
+                        choice.ratio_image ? { text: choice.ratio_image, modifier: 'ratio' } : null
+                ].filter(Boolean);
+
+                if (badgeData.length) {
+                        const badgeWrapper = document.createElement('div');
+                        badgeWrapper.classList.add('product-choice-badges');
+
+                        badgeData.forEach(({ text, modifier }) => {
+                                const badge = document.createElement('span');
+                                badge.classList.add('product-choice-badge');
+                                if (modifier) {
+                                        badge.classList.add(`product-choice-badge--${modifier}`);
+                                }
+                                badge.textContent = text;
+                                badgeWrapper.appendChild(badge);
+                        });
+
+                        btn.appendChild(badgeWrapper);
+                }
+
+                btn.addEventListener('click', () => {
+                        redirectToConfigurator(displayName, choice.product_id, src, prompt, format, choice.variant_id);
+                });
+
+                choiceList.appendChild(btn);
+        });
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = "Fermer";
+        closeBtn.classList.add('close-choice-button');
+        closeBtn.type = 'button';
+        closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+        box.appendChild(closeBtn);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
 }
 
