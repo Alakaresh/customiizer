@@ -46,7 +46,6 @@ function collectRatiosFromCacheSources() {
     if (formatProducts && typeof formatProducts === 'object') {
         Object.keys(formatProducts).forEach(addRatio);
     }
-
     return ratios;
 }
 
