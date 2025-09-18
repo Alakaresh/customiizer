@@ -514,48 +514,179 @@ function redirectToConfigurator(name, id, src, prompt, format, variantId) {
 }
 
 function showProductChooserOverlay(choices, src, prompt, format, productNameOverride = null) {
-	console.table(choices.map(choice => ({
-		variant_id: choice.variant_id,
-		product_id: choice.product_id,
-		name: choice.product_name,
-		size: choice.variant_size,
-		color: choice.color,
-		ratio: choice.ratio_image
-	})));
+        const safeChoices = Array.isArray(choices) ? choices.filter(Boolean) : [];
+        if (safeChoices.length === 0) {
+                return;
+        }
 
-	const overlay = document.createElement('div');
-	overlay.classList.add('product-chooser-overlay');
+        console.table(safeChoices.map(choice => ({
+                variant_id: choice.variant_id,
+                product_id: choice.product_id,
+                name: choice.product_name,
+                size: choice.variant_size,
+                color: choice.color,
+                ratio: choice.ratio_image
+        })));
 
-	const box = document.createElement('div');
-	box.classList.add('product-chooser-box');
+        const overlay = document.createElement('div');
+        overlay.classList.add('product-chooser-overlay');
 
-	const title = document.createElement('h3');
-	title.textContent = "Choisissez une variante";
-	box.appendChild(title);
+        const box = document.createElement('div');
+        box.classList.add('product-chooser-box');
 
-	choices.forEach(choice => {
-		const btn = document.createElement('button');
-		btn.classList.add('product-choice-button');
+        const title = document.createElement('h3');
+        title.textContent = "Choisissez un produit";
+        box.appendChild(title);
 
-		const displayName = productNameOverride || choice.product_name;
-                const sizeLabel = choice.variant_size || "?";
-                const label = `${displayName} – ${sizeLabel}`;
-		btn.textContent = label;
+        const choiceList = document.createElement('div');
+        choiceList.classList.add('product-choice-list');
+        box.appendChild(choiceList);
 
-		btn.addEventListener('click', () => {
-			redirectToConfigurator(displayName, choice.product_id, src, prompt, format, choice.variant_id);
-		});
+        const productGroups = [];
+        const groupIndex = new Map();
 
-		box.appendChild(btn);
-	});
+        safeChoices.forEach((choice) => {
+                const productKey = typeof choice.product_id !== 'undefined'
+                        ? String(choice.product_id)
+                        : `unknown-${choice.variant_id || productGroups.length}`;
 
-	const closeBtn = document.createElement('button');
-	closeBtn.textContent = "Fermer";
-	closeBtn.classList.add('close-choice-button');
-	closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+                if (!groupIndex.has(productKey)) {
+                        groupIndex.set(productKey, productGroups.length);
+                        productGroups.push({
+                                productId: productKey,
+                                name: null,
+                                variants: [],
+                                seenVariantIds: new Set()
+                        });
+                }
 
-	box.appendChild(closeBtn);
-	overlay.appendChild(box);
-	document.body.appendChild(overlay);
+                const group = productGroups[groupIndex.get(productKey)];
+                const variantId = typeof choice.variant_id !== 'undefined' ? String(choice.variant_id) : null;
+
+                if (variantId && group.seenVariantIds.has(variantId)) {
+                        return;
+                }
+
+                if (variantId) {
+                        group.seenVariantIds.add(variantId);
+                }
+
+                const baseName = (productNameOverride && productGroups.length === 1)
+                        ? productNameOverride
+                        : choice.product_name;
+
+                if (!group.name) {
+                        group.name = baseName || 'Produit disponible';
+                }
+
+                group.variants.push(choice);
+        });
+
+        productGroups.forEach((group) => {
+                if (!group || group.variants.length === 0) {
+                        return;
+                }
+
+                const groupEl = document.createElement('section');
+                groupEl.classList.add('product-choice-group');
+
+                const headerEl = document.createElement('div');
+                headerEl.classList.add('product-choice-group-header');
+
+                const nameEl = document.createElement('span');
+                nameEl.classList.add('product-choice-group-name');
+                nameEl.textContent = group.name || 'Produit disponible';
+                headerEl.appendChild(nameEl);
+
+                if (group.variants.length > 1) {
+                        const countEl = document.createElement('span');
+                        countEl.classList.add('product-choice-group-count');
+                        countEl.textContent = `${group.variants.length} variantes`;
+                        headerEl.appendChild(countEl);
+                }
+
+                groupEl.appendChild(headerEl);
+
+                const variantList = document.createElement('div');
+                variantList.classList.add('product-choice-variants');
+
+                group.variants.forEach((variantChoice) => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.classList.add('product-choice-button');
+
+                        const metaParts = [];
+                        if (variantChoice.variant_size) {
+                                metaParts.push(variantChoice.variant_size);
+                        }
+                        if (variantChoice.variant_label && variantChoice.variant_label !== variantChoice.variant_size) {
+                                metaParts.push(variantChoice.variant_label);
+                        }
+
+                        const colorLabel = (variantChoice.color || '').toString().trim();
+
+                        const accessibleParts = [];
+                        if (metaParts.length) {
+                                accessibleParts.push(metaParts.join(' • '));
+                        }
+                        if (colorLabel) {
+                                accessibleParts.push(colorLabel);
+                        }
+
+                        const ariaLabel = accessibleParts.length
+                                ? `${group.name} – ${accessibleParts.join(' • ')}`
+                                : group.name;
+                        btn.setAttribute('aria-label', ariaLabel);
+                        btn.title = ariaLabel;
+
+                        const variantNameEl = document.createElement('span');
+                        variantNameEl.classList.add('product-choice-name');
+                        const primaryLabel = metaParts.length
+                                ? metaParts[0]
+                                : (colorLabel || 'Variante disponible');
+                        variantNameEl.textContent = primaryLabel;
+                        btn.appendChild(variantNameEl);
+
+                        if (metaParts.length > 1) {
+                                const descriptionEl = document.createElement('span');
+                                descriptionEl.classList.add('product-choice-description');
+                                descriptionEl.textContent = metaParts.slice(1).join(' • ');
+                                btn.appendChild(descriptionEl);
+                        }
+
+                        const shouldShowColorBadge = Boolean(colorLabel) && colorLabel !== primaryLabel;
+
+                        if (shouldShowColorBadge) {
+                                const badgeWrapper = document.createElement('div');
+                                badgeWrapper.classList.add('product-choice-badges');
+
+                                const badge = document.createElement('span');
+                                badge.classList.add('product-choice-badge', 'product-choice-badge--color');
+                                badge.textContent = colorLabel;
+                                badgeWrapper.appendChild(badge);
+
+                                btn.appendChild(badgeWrapper);
+                        }
+
+                        btn.addEventListener('click', () => {
+                                redirectToConfigurator(group.name, variantChoice.product_id, src, prompt, format, variantChoice.variant_id);
+                        });
+
+                        variantList.appendChild(btn);
+                });
+
+                groupEl.appendChild(variantList);
+                choiceList.appendChild(groupEl);
+        });
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = "Fermer";
+        closeBtn.classList.add('close-choice-button');
+        closeBtn.type = 'button';
+        closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+        box.appendChild(closeBtn);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
 }
 
