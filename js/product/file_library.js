@@ -785,6 +785,35 @@
         const start = (currentPage - 1) * itemsPerPage;
         const pageItems = sorted.slice(start, start + itemsPerPage);
 
+        if (pageItems.length === 0) {
+            if (currentFolder === 'my') {
+                const emptyState = $(
+                    `<div class="file-library-empty">
+                        <p class="file-library-empty-title">Vous n'avez pas encore d'image enregistrée.</p>
+                        <p class="file-library-empty-subtitle">Générez une image sur Customiize ou ouvrez l'onglet Communauté de la bibliothèque pour utiliser les visuels partagés.</p>
+                        <div class="file-library-empty-actions">
+                            <a href="/customiize" class="file-library-empty-primary" target="_blank" rel="noopener">Générer une image</a>
+                            <button type="button" class="file-library-empty-secondary">Ouvrir l'onglet Communauté</button>
+                        </div>
+                    </div>`
+                );
+                emptyState.find('.file-library-empty-secondary').on('click', function () {
+                    const communityButton = $('#folder-community');
+                    communityButton.trigger('click');
+                    communityButton.trigger('focus');
+                });
+                container.append(emptyState);
+            } else {
+                container.append(
+                    `<div class="file-library-empty">
+                        <p class="file-library-empty-message">Aucune image disponible pour le moment.</p>
+                    </div>`
+                );
+            }
+            renderPagination(totalPages);
+            return;
+        }
+
         // Rendu
         pageItems.forEach(img => {
             const rawUrl = img.url || img.image_url;
