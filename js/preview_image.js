@@ -65,7 +65,6 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
                         if (!variant) {
                                 return;
                         }
-
                         const variantKey = variant.variant_id || (variant.variant_size || '').toLowerCase();
                         if (variantKey && seenKeys.has(variantKey)) {
                                 return;
