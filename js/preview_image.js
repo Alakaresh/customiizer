@@ -534,10 +534,6 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
         const box = document.createElement('div');
         box.classList.add('product-chooser-box');
 
-        const title = document.createElement('h3');
-        title.textContent = "Choisissez un produit";
-        box.appendChild(title);
-
         const choiceList = document.createElement('div');
         choiceList.classList.add('product-choice-list');
         box.appendChild(choiceList);
