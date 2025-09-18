@@ -111,15 +111,21 @@
     function updateFormatLabel(fmt, showCurrentDesignLabel = false) {
         const btn = $('#open-format-menu');
         btn.addClass('active');
-        if (showCurrentDesignLabel) {
-            btn.text(`Format: ${CURRENT_PRODUCT_FILTER_LABEL}`);
+
+        if (!fmt) {
+            btn.text('Format');
             return;
         }
 
-        if (fmt) {
-            btn.text(`Format: ${fmt}`);
-        } else {
-            btn.text('Format');
+        const ratioLabel = `Format: ${fmt}`;
+        btn.text(ratioLabel);
+
+        if (showCurrentDesignLabel && fmt !== 'all') {
+            getProductNameForFormat(fmt).then(productName => {
+                if (!productName) return;
+                if (currentFormatFilter !== fmt) return;
+                btn.text(`Format: ${productName}`);
+            });
         }
     }
 
