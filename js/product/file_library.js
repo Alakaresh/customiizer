@@ -21,6 +21,7 @@
     let sizeRatioMap = {};            // Association taille -> ratio
     let resetFormatFilters = () => {};
     const CURRENT_PRODUCT_FILTER_LABEL = 'Produit en cours';
+    const PRODUCT_NAME_PLACEHOLDER_PATTERN = /^\s*(nom du produit|product name)\s*$/i;
     const itemsPerPage = 40;       // Nombre d'images par page
     let searchTimeout;             // Délai pour la recherche distante
 
@@ -129,6 +130,14 @@
                 if (!productName) return;
                 if (currentFormatFilter !== fmt) return;
 
+                const productRatioButton = $('#filter-product-ratio');
+                if (productRatioButton.length) {
+                    const trimmed = (productName || '').trim();
+                    if (trimmed) {
+                        productRatioButton.data('productLabel', trimmed);
+                    }
+                }
+
                 const activeVariantSize = $('#filter-product-ratio').data('variant-size');
                 const asyncVariantSuffix = activeVariantSize ? ` — ${activeVariantSize}` : '';
                 btn.text(`Format: ${productName}${asyncVariantSuffix}`);
@@ -165,8 +174,53 @@
         const productRatioButton = $('#filter-product-ratio');
         const formatBlock = $('#format-block');
 
+        function readProductNameFromDom() {
+            const label = ($('.product-name').first().text() || '').trim();
+            if (!label || PRODUCT_NAME_PLACEHOLDER_PATTERN.test(label)) {
+                return '';
+            }
+            return label;
+        }
+
+        function rememberProductRatioName(label) {
+            if (!productRatioButton.length) return;
+            const normalized = (label || '').trim();
+            if (!normalized) return;
+            if (productRatioButton.data('productLabel') === normalized) return;
+            productRatioButton.data('productLabel', normalized);
+        }
+
+        function syncProductRatioNameFromDom() {
+            rememberProductRatioName(readProductNameFromDom());
+        }
+
         if (formatBlock.length) {
             formatBlock.show();
+        }
+
+        syncProductRatioNameFromDom();
+
+        if (productRatioButton.length && typeof MutationObserver !== 'undefined') {
+            const existingObserver = productRatioButton.data('productNameObserver');
+            if (existingObserver && typeof existingObserver.disconnect === 'function') {
+                existingObserver.disconnect();
+            }
+
+            const productNameElement = $('.product-name').first().get(0);
+            if (productNameElement) {
+                const observer = new MutationObserver(() => {
+                    const freshLabel = readProductNameFromDom();
+                    if (!freshLabel) return;
+                    const previous = productRatioButton.data('productLabel');
+                    if (previous === freshLabel) return;
+                    productRatioButton.data('productLabel', freshLabel);
+                    if (productRatioButton.hasClass('active') && currentFormatFilter !== 'all') {
+                        updateFormatLabel(currentFormatFilter, true);
+                    }
+                });
+                observer.observe(productNameElement, { childList: true, characterData: true, subtree: true });
+                productRatioButton.data('productNameObserver', observer);
+            }
         }
 
         function resolveVariant(variantCandidate) {
@@ -261,10 +315,9 @@
                     .data('ratio', ratio)
                     .data('variant-size', sizeLabel);
 
-                if (productLabel) {
-                    productRatioButton.data('productLabel', productLabel);
-                } else {
-                    productRatioButton.removeData('productLabel');
+                const freshProductName = readProductNameFromDom();
+                if (freshProductName) {
+                    rememberProductRatioName(freshProductName);
                 }
 
                 if (wasActive && currentFormatFilter !== ratio) {
@@ -388,6 +441,12 @@
             .off('variantReady.fileLibrary')
             .on('variantReady.fileLibrary', function (event, variant) {
                 updateProductRatioButton(variant);
+            });
+
+        $(document)
+            .off('productSelected.fileLibrary')
+            .on('productSelected.fileLibrary', function () {
+                syncProductRatioNameFromDom();
             });
 
         updateProductRatioButton(resolveVariant());
