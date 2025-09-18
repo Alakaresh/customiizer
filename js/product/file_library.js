@@ -199,7 +199,12 @@
             $('#sizeButtons').empty();
             $('#open-format-menu').removeClass('active').text('Format');
             if (productRatioButton.length) {
-                productRatioButton.removeClass('active').text(CURRENT_PRODUCT_FILTER_LABEL);
+                productRatioButton
+                    .removeClass('active')
+                    .text(CURRENT_PRODUCT_FILTER_LABEL)
+                    .removeData('productLabel')
+                    .removeData('ratio')
+                    .removeData('variant-size');
             }
         };
 
@@ -249,11 +254,18 @@
 
             if (ratio) {
                 const sizeLabel = variant?.size || variant?.size_name || '';
+                const productLabel = ($('.product-name').first().text() || '').trim();
                 productRatioButton
                     .prop('disabled', false)
                     .text(CURRENT_PRODUCT_FILTER_LABEL)
                     .data('ratio', ratio)
                     .data('variant-size', sizeLabel);
+
+                if (productLabel) {
+                    productRatioButton.data('productLabel', productLabel);
+                } else {
+                    productRatioButton.removeData('productLabel');
+                }
 
                 if (wasActive && currentFormatFilter !== ratio) {
                     applyProductRatioFilter(ratio);
@@ -263,6 +275,7 @@
                     .prop('disabled', true)
                     .removeClass('active')
                     .text(CURRENT_PRODUCT_FILTER_LABEL)
+                    .removeData('productLabel')
                     .removeData('ratio')
                     .removeData('variant-size');
 
@@ -815,10 +828,28 @@
                     const productLabel = ($('#product-block button.active').first().text() || '').trim();
                     const sizeLabel = ($('#sizeButtons button.active').first().text() || '').trim();
                     const ratioLabel = ($('#formatOptions .format-btn.active').not('#format-product').first().text() || '').trim();
+                    const productRatioButton = $('#filter-product-ratio');
+                    const productRatioActive = productRatioButton.hasClass('active');
+                    const productRatioName = productRatioActive
+                        ? (productRatioButton.data('productLabel') || '').toString().trim()
+                        : '';
+                    const productVariantSize = productRatioActive
+                        ? (productRatioButton.data('variant-size') || '').toString().trim()
+                        : '';
 
                     const formatParts = [];
-                    if (productLabel) formatParts.push(productLabel);
-                    if (sizeLabel) formatParts.push(sizeLabel);
+                    if (productLabel) {
+                        formatParts.push(productLabel);
+                    } else if (productRatioName) {
+                        formatParts.push(productRatioName);
+                    }
+
+                    const sizeParts = [];
+                    if (sizeLabel) sizeParts.push(sizeLabel);
+                    if (productVariantSize && !sizeParts.includes(productVariantSize)) {
+                        sizeParts.push(productVariantSize);
+                    }
+                    formatParts.push(...sizeParts);
 
                     let display = formatParts.join(' — ');
                     if (!display) {
@@ -833,7 +864,7 @@
 
                     if (!display) return null;
 
-                    const prefix = productLabel ? 'pour' : 'au format';
+                    const prefix = (productLabel || productRatioName) ? 'pour' : 'au format';
                     return { display, prefix };
                 })();
 
