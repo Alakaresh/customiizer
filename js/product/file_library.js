@@ -747,7 +747,9 @@
         }
         if (!Array.isArray(images)) return;
 
-        const searchValue = skipSearch ? '' : $('#searchInput').val().toLowerCase();
+        const rawSearchValue = $('#searchInput').val() || '';
+        const searchValue = skipSearch ? '' : rawSearchValue.toLowerCase();
+        const hasSearchFilter = rawSearchValue.trim().length > 0;
 
         const isImportedFolder = currentFolder === 'imported';
 
@@ -760,6 +762,13 @@
             }
         }
         const allowedFormats = (!isImportedFolder && currentProduct) ? productFormats : null;
+
+        const hasFormatFilter = !isImportedFolder && (
+            (currentFormatFilter && currentFormatFilter !== 'all') ||
+            (currentProduct !== null && currentProduct !== undefined) ||
+            (currentSize !== null && currentSize !== undefined)
+        );
+        const filterActive = hasSearchFilter || hasFormatFilter;
 
         // Filtrage par recherche/format/produit/taille
         const filtered = images.filter(img => {
@@ -798,7 +807,104 @@
         const pageItems = sorted.slice(start, start + itemsPerPage);
 
         if (pageItems.length === 0) {
-            if (currentFolder === 'my') {
+            if (filterActive) {
+                const formatContext = (() => {
+                    if (!hasFormatFilter) return null;
+
+                    const productLabel = ($('#product-block button.active').first().text() || '').trim();
+                    const sizeLabel = ($('#sizeButtons button.active').first().text() || '').trim();
+                    const ratioLabel = ($('#formatOptions .format-btn.active').not('#format-product').first().text() || '').trim();
+
+                    const formatParts = [];
+                    if (productLabel) formatParts.push(productLabel);
+                    if (sizeLabel) formatParts.push(sizeLabel);
+
+                    let display = formatParts.join(' — ');
+                    if (!display) {
+                        if (ratioLabel) {
+                            display = ratioLabel;
+                        } else if (currentSize) {
+                            display = currentSize;
+                        } else if (currentFormatFilter && currentFormatFilter !== 'all') {
+                            display = currentFormatFilter;
+                        }
+                    }
+
+                    if (!display) return null;
+
+                    const prefix = productLabel ? 'pour' : 'au format';
+                    return { display, prefix };
+                })();
+
+                const trimmedSearch = rawSearchValue.trim();
+                const descriptorParts = [];
+                if (formatContext) descriptorParts.push(`${formatContext.prefix} ${formatContext.display}`);
+                if (trimmedSearch) descriptorParts.push(`correspondant à « ${trimmedSearch} »`);
+                const combinedDescription = descriptorParts.join(' et ');
+
+                let titleText = 'Aucune image ne correspond à vos filtres.';
+                if (formatContext && !trimmedSearch) {
+                    titleText = `Aucune image ${formatContext.prefix} ${formatContext.display}.`;
+                } else if (!formatContext && trimmedSearch) {
+                    titleText = `Aucun résultat pour « ${trimmedSearch} ».`;
+                }
+
+                const baseSubtitle = 'Générez une image sur Customiize ou explorez la Communauté pour découvrir des visuels partagés.';
+                const subtitleText = combinedDescription
+                    ? `Générez une image ${combinedDescription} sur Customiize ou explorez la Communauté pour découvrir des visuels partagés.`
+                    : baseSubtitle;
+
+                let primaryLabel = 'Générer une image adaptée à ces filtres';
+                if (formatContext) {
+                    primaryLabel = `Générer une image ${formatContext.prefix} ${formatContext.display}`;
+                } else if (!formatContext && trimmedSearch) {
+                    primaryLabel = 'Générer une image correspondant à votre recherche';
+                }
+
+                const emptyState = $(
+                    `<div class="file-library-empty">
+                        <p class="file-library-empty-title"></p>
+                        <p class="file-library-empty-subtitle"></p>
+                        <div class="file-library-empty-actions">
+                            <a href="/customiize" class="file-library-empty-primary" target="_blank" rel="noopener"></a>
+                            <button type="button" class="file-library-empty-secondary">Communauté</button>
+                        </div>
+                    </div>`
+                );
+                emptyState.find('.file-library-empty-title').text(titleText.trim());
+                const subtitleParagraph = emptyState.find('.file-library-empty-subtitle');
+                subtitleParagraph.text(subtitleText);
+                emptyState.find('.file-library-empty-primary').text(primaryLabel);
+
+                if (filterActive) {
+                    const resetLink = $('<a href="#" class="file-library-reset-filters">Réinitialiser les filtres</a>');
+                    resetLink.on('click', function (e) {
+                        e.preventDefault();
+                        if (hasSearchFilter) {
+                            $('#searchInput').val('');
+                        }
+                        if (hasFormatFilter) {
+                            resetFormatFilters();
+                        }
+                        currentPage = 1;
+                        if (currentFolder === 'community') {
+                            clearTimeout(searchTimeout);
+                            fetchCommunityImages('');
+                        } else {
+                            renderFileList();
+                        }
+                    });
+                    subtitleParagraph.append(' Vous pouvez aussi ');
+                    subtitleParagraph.append(resetLink);
+                    subtitleParagraph.append('.');
+                }
+                emptyState.find('.file-library-empty-secondary').on('click', function () {
+                    const communityButton = $('#folder-community');
+                    communityButton.trigger('click');
+                    communityButton.trigger('focus');
+                });
+                container.append(emptyState);
+            } else if (currentFolder === 'my') {
                 const emptyState = $(
                     `<div class="file-library-empty">
                         <p class="file-library-empty-title">Vous n'avez pas encore d'image enregistrée.</p>
