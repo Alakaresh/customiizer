@@ -308,6 +308,7 @@
 
             if (ratio) {
                 const sizeLabel = variant?.size || variant?.size_name || '';
+                const productLabel = ($('.product-name').first().text() || '').trim();
                 productRatioButton
                     .prop('disabled', false)
                     .text(CURRENT_PRODUCT_FILTER_LABEL)
