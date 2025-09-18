@@ -21,7 +21,6 @@
                                 <button id="hideProductSidebar" aria-label="Masquer la sidebar">
                                         <i class="fas fa-chevron-left"></i>
                                 </button>
-                                <h3>Choisir une variante</h3>
                                 <div class="product-colors">
                                         <p>Couleurs :</p>
                                         <div class="colors-container"></div>
