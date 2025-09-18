@@ -5,9 +5,52 @@ let selectedProduct = '';
 
 let globalProducts = [];
 
-document.addEventListener('DOMContentLoaded', function () {	loadProductData();
+document.addEventListener('DOMContentLoaded', function () {
+	loadProductData();
 	addRatioButtonsEventListeners();
+	applyInitialRatioFromQuery();
 });
+
+function getRatioFromQueryParam() {
+	try {
+		const params = new URLSearchParams(window.location.search);
+		const raw = params.get('ratio');
+		return raw ? raw.trim() : '';
+	} catch (error) {
+		console.error('[Ratio] Impossible de lire le paramètre ratio depuis l\'URL', error);
+		return '';
+	}
+}
+
+function applyInitialRatioFromQuery() {
+	const ratioFromQuery = getRatioFromQueryParam();
+	if (!ratioFromQuery) {
+		return;
+	}
+
+	selectedProduct = '';
+
+	const normalizedRatio = ratioFromQuery;
+	const ratioButtons = Array.from(document.querySelectorAll('.ratio-button'));
+	const matchingButton = ratioButtons.find(btn => {
+		const dataRatio = (btn.getAttribute('data-ratio') || '').trim();
+		return dataRatio === normalizedRatio;
+	});
+
+	if (matchingButton) {
+		matchingButton.click();
+		return;
+	}
+
+	selectedRatio = normalizedRatio;
+	const selectedInfo = document.getElementById('selected-info');
+	if (selectedInfo) {
+		selectedInfo.textContent = selectedRatio;
+	}
+	if (typeof loadImages === 'function') {
+		loadImages();
+	}
+}
 
 function toggleRatioMenu() {
 	const ratioMenu = document.getElementById('ratio-menu');
