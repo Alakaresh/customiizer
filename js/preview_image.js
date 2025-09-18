@@ -1,33 +1,10 @@
-// Cache local pour les correspondances format → produits
-try {
-    const saved = sessionStorage.getItem('previewFormatCache');
-    window.previewFormatCache = {
-        ...(saved ? JSON.parse(saved) : {}),
-        ...(window.previewFormatCache || {})
-    };
-} catch (e) {
-    window.previewFormatCache = window.previewFormatCache || {};
-}
-
-function persistPreviewCache() {
-    try {
-        sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
-    } catch (e) {}
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-    const formats = ['1:1', '3:4', '4:3', '16:9', '9:16'];
-    formats.forEach(fmt => {
-        if (!window.previewFormatCache[fmt]) {
-            fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`)
-                .then(res => res.json())
-                .then(data => {
-                    window.previewFormatCache[fmt] = data;
-                    persistPreviewCache();
-                })
-                .catch(err => console.error('❌ Preload format', fmt, err));
-        }
-    });
+    const cache = window.formatProductsCache;
+    if (!cache) {
+        return;
+    }
+
+    cache.preloadFormats(['1:1', '3:4', '4:3', '16:9', '9:16']);
 });
 
 
@@ -287,22 +264,36 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
         };
 
         const loadProductInfo = () => {
-                const cached = window.previewFormatCache[formatImage];
+                const cache = window.formatProductsCache;
+
+                const handleError = (err) => {
+                        console.error("❌ Erreur chargement produits compatibles :", err);
+                        useImageButton.disabled = true;
+                };
+
+                if (!cache) {
+                        fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
+                                .then(res => res.json())
+                                .then(processData)
+                                .catch(handleError);
+                        return;
+                }
+
+                const cached = cache.get(formatImage);
                 if (cached) {
                         processData(cached);
                         return;
                 }
-                fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(formatImage)}`)
-                        .then(res => res.json())
-                        .then(data => {                                window.previewFormatCache[formatImage] = data;
-                                persistPreviewCache();
 
+                cache.ensureFormat(formatImage)
+                        .then(data => {
+                                if (!data) {
+                                        useImageButton.disabled = true;
+                                        return;
+                                }
                                 processData(data);
                         })
-                        .catch(err => {
-                                console.error("❌ Erreur chargement produits compatibles :", err);
-                                useImageButton.disabled = true;
-                        });
+                        .catch(handleError);
         };
 
         if (isNeutral) {

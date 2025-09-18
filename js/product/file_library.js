@@ -61,48 +61,16 @@
     }
     ensureVariantCache();
 
-    // -------- Cache format -> produits --------
-    try {
-        const saved = sessionStorage.getItem('previewFormatCache');
-        window.previewFormatCache = {
-            ...(saved ? JSON.parse(saved) : {}),
-            ...(window.previewFormatCache || {})
-        };
-    } catch (e) {
-        window.previewFormatCache = window.previewFormatCache || {};
-    }
-
-    function persistPreviewCache() {
-        try {
-            sessionStorage.setItem('previewFormatCache', JSON.stringify(window.previewFormatCache));
-        } catch (e) {}
-    }
-
     async function getProductNameForFormat(fmt) {
-        const cached = window.previewFormatCache[fmt];
-        if (cached) {
-            return extractProductName(cached);
+        if (!fmt || !window.formatProductsCache) {
+            return null;
         }
         try {
-            const res = await fetch(`/wp-json/api/v1/products/format?format=${encodeURIComponent(fmt)}`);
-            const data = await res.json();
-            window.previewFormatCache[fmt] = data;
-            persistPreviewCache();
-            return extractProductName(data);
+            return await window.formatProductsCache.getProductName(fmt);
         } catch (err) {
             console.error('❌ format fetch', fmt, err);
             return null;
         }
-    }
-
-    function extractProductName(data) {
-        if (data && data.success && Array.isArray(data.choices)) {
-            const ids = Array.from(new Set(data.choices.map(c => c.product_id)));
-            if (ids.length === 1 && data.choices[0]) {
-                return data.choices[0].product_name;
-            }
-        }
-        return null;
     }
 
     function buildCustomizeUrl(options = {}) {
