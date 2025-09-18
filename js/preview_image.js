@@ -1,19 +1,5 @@
 let knownDbRatios = new Set();
 
-const COLOR_TRANSLATIONS = {
-        black: "Noir",
-        white: "Blanc",
-};
-
-function translateColorName(color) {
-        if (!color || typeof color !== 'string') {
-                return '';
-        }
-
-        const normalized = color.trim().toLowerCase();
-        return COLOR_TRANSLATIONS[normalized] || color;
-}
-
 function buildVariantLabel(variant) {
         if (!variant || typeof variant !== 'object') {
                 return '';
@@ -23,11 +9,6 @@ function buildVariantLabel(variant) {
 
         if (variant.variant_size) {
                 parts.push(variant.variant_size);
-        }
-
-        const translatedColor = translateColorName(variant.color);
-        if (translatedColor) {
-                parts.push(translatedColor);
         }
 
         if (parts.length === 0 && variant.variant_id) {
@@ -85,8 +66,7 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
                         if (!variant) {
                                 return;
                         }
-
-                        const variantKey = variant.variant_id || `${variant.variant_size || ''}|${(variant.color || '').toLowerCase()}`;
+                        const variantKey = variant.variant_id || (variant.variant_size || '').toLowerCase();
                         if (variantKey && seenKeys.has(variantKey)) {
                                 return;
                         }
@@ -554,8 +534,8 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
 		btn.classList.add('product-choice-button');
 
 		const displayName = productNameOverride || choice.product_name;
-		const translatedColor = translateColorName(choice.color);
-		const label = `${displayName} – ${choice.variant_size || "?"}${translatedColor ? " – " + translatedColor : ""}`;
+                const sizeLabel = choice.variant_size || "?";
+                const label = `${displayName} – ${sizeLabel}`;
 		btn.textContent = label;
 
 		btn.addEventListener('click', () => {
