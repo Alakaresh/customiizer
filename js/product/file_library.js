@@ -126,15 +126,25 @@
         btn.text(ratioLabel);
 
         if (showCurrentDesignLabel && fmt !== 'all') {
+            const productRatioButton = $('#filter-product-ratio');
+            if (productRatioButton.length) {
+                const storedProductLabel = (productRatioButton.data('productLabel') || '').toString().trim();
+                if (storedProductLabel) {
+                    const storedVariantSize = (productRatioButton.data('variant-size') || '').toString().trim();
+                    const storedSuffix = storedVariantSize ? ` — ${storedVariantSize}` : variantSuffix;
+                    btn.text(`Format: ${storedProductLabel}${storedSuffix}`);
+                }
+            }
+
             getProductNameForFormat(fmt).then(productName => {
                 if (!productName) return;
                 if (currentFormatFilter !== fmt) return;
 
-                const productRatioButton = $('#filter-product-ratio');
-                if (productRatioButton.length) {
+                const productRatioButtonAsync = $('#filter-product-ratio');
+                if (productRatioButtonAsync.length) {
                     const trimmed = (productName || '').trim();
                     if (trimmed) {
-                        productRatioButton.data('productLabel', trimmed);
+                        productRatioButtonAsync.data('productLabel', trimmed);
                     }
                 }
 
