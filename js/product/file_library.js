@@ -19,7 +19,7 @@
     let currentSize = null;           // Taille sélectionnée
     let productFormats = [];          // Ratios disponibles pour le produit
     let sizeRatioMap = {};            // Association taille -> ratio
-    const CURRENT_PRODUCT_FILTER_LABEL = 'Format en cours';
+    const CURRENT_PRODUCT_FILTER_LABEL = 'Produit en cours';
     const itemsPerPage = 40;       // Nombre d'images par page
     let searchTimeout;             // Délai pour la recherche distante
 
