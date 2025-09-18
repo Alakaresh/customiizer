@@ -290,6 +290,73 @@
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 }
 
+.file-library-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-color);
+}
+
+.file-library-empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.file-library-empty-subtitle,
+.file-library-empty-message {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 420px;
+    opacity: 0.85;
+}
+
+.file-library-empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.file-library-empty-actions a,
+.file-library-empty-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.file-library-empty-primary {
+    background: #ffffff;
+    color: #1f1f1f;
+    border: none;
+}
+
+.file-library-empty-primary:hover {
+    background: #e6e6e6;
+}
+
+.file-library-empty-secondary {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.file-library-empty-secondary:hover {
+    border-color: var(--text-color);
+}
+
 /* Style d’un élément de fichier */
 .file-item {
     position: relative;
