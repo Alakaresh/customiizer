@@ -72,7 +72,8 @@ function customiizer_enqueue_customize_assets() {
 	// ===============================
 	// SCRIPTS GLOBAUX
 	// ===============================
-        wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', [], $ver, true);
+        wp_enqueue_script('format-products-cache', get_stylesheet_directory_uri() . '/js/utils/format_products_cache.js', [], $ver, true);
+        wp_enqueue_script('preview_image-js', get_stylesheet_directory_uri() . '/js/preview_image.js', ['format-products-cache'], $ver, true);
        wp_enqueue_script('signin-script', get_stylesheet_directory_uri() . '/js/account/signin.js', ['jquery'], $ver, true);
        wp_enqueue_script('signup-script', get_stylesheet_directory_uri() . '/js/account/signup.js', ['jquery'], $ver, true);
        wp_enqueue_script('sign-modal-script', get_stylesheet_directory_uri() . '/js/account/sign_modal.js', ['jquery'], $ver, true);
@@ -165,7 +166,7 @@ function customiizer_enqueue_customize_assets() {
                 wp_enqueue_script('product-canvas', get_stylesheet_directory_uri() . '/js/product/canvasManager.js', ['jquery'], $ver, true);
                 wp_enqueue_script('product-cart', get_stylesheet_directory_uri() . '/js/product/product_add_to_cart.js', ['jquery'], $ver, true);
                wp_enqueue_script('product-imageManager', get_stylesheet_directory_uri() . '/js/product/imageManager.js', ['jquery'], $ver, true);
-               wp_enqueue_script('file-library', get_stylesheet_directory_uri() . '/js/product/file_library.js', ['jquery', 'product-custom', 'product-canvas'], $ver, true);
+               wp_enqueue_script('file-library', get_stylesheet_directory_uri() . '/js/product/file_library.js', ['jquery', 'product-custom', 'product-canvas', 'format-products-cache'], $ver, true);
 
                if (get_option('customiizer_position_editor')) {
                        wp_enqueue_script('position-editor', get_stylesheet_directory_uri() . '/js/product/position_editor.js', ['jquery'], $ver, true);
