@@ -105,6 +105,29 @@
         return null;
     }
 
+    function buildCustomizeUrl(options = {}) {
+        const basePath = '/customiize';
+        const params = new URLSearchParams();
+
+        const ratio = (options.ratio || '').toString().trim();
+        if (ratio) {
+            params.set('ratio', ratio);
+        }
+
+        const product = options.product;
+        if (product) {
+            params.set('product', product);
+        }
+
+        const size = (options.size || '').toString().trim();
+        if (size) {
+            params.set('size', size);
+        }
+
+        const query = params.toString();
+        return query ? `${basePath}?${query}` : basePath;
+    }
+
     /**
      * Met à jour le libellé du format sélectionné.
      * @param {string} fmt                       Ratio de l'image.
@@ -891,6 +914,36 @@
 
         if (pageItems.length === 0) {
             if (filterActive) {
+                const ratioForCustomize = (() => {
+                    if (selectedFormat) {
+                        return selectedFormat;
+                    }
+                    if (currentFormatFilter && currentFormatFilter !== 'all') {
+                        return currentFormatFilter;
+                    }
+                    if (currentSize && sizeRatioMap[currentSize]) {
+                        return sizeRatioMap[currentSize];
+                    }
+                    if (allowedFormats && Array.isArray(allowedFormats)) {
+                        const uniqueFormats = Array.from(new Set(allowedFormats.filter(Boolean)));
+                        if (uniqueFormats.length === 1) {
+                            return uniqueFormats[0];
+                        }
+                    }
+                    const productRatioButton = $('#filter-product-ratio');
+                    const storedRatio = productRatioButton.data('ratio');
+                    if (storedRatio) {
+                        return storedRatio;
+                    }
+                    return null;
+                })();
+
+                const customizeUrl = buildCustomizeUrl({
+                    ratio: ratioForCustomize,
+                    product: currentProduct,
+                    size: currentSize,
+                });
+
                 const formatContext = (() => {
                     if (!hasFormatFilter) return null;
 
@@ -967,7 +1020,7 @@
                         <p class="file-library-empty-title"></p>
                         <p class="file-library-empty-subtitle"></p>
                         <div class="file-library-empty-actions">
-                            <a href="/customiize" class="file-library-empty-primary" target="_blank" rel="noopener"></a>
+                            <a class="file-library-empty-primary" target="_blank" rel="noopener"></a>
                             <button type="button" class="file-library-empty-secondary">Communauté</button>
                         </div>
                     </div>`
@@ -975,7 +1028,9 @@
                 emptyState.find('.file-library-empty-title').text(titleText.trim());
                 const subtitleParagraph = emptyState.find('.file-library-empty-subtitle');
                 subtitleParagraph.text(subtitleText);
-                emptyState.find('.file-library-empty-primary').text(primaryLabel);
+                const customizeLink = emptyState.find('.file-library-empty-primary');
+                customizeLink.text(primaryLabel);
+                customizeLink.attr('href', customizeUrl);
 
                 if (filterActive) {
                     const resetLink = $('<a href="#" class="file-library-reset-filters">Réinitialiser les filtres</a>');
@@ -1011,11 +1066,14 @@
                         <p class="file-library-empty-title">Vous n'avez pas encore d'image enregistrée.</p>
                         <p class="file-library-empty-subtitle">Générez une image sur Customiize ou explorez la Communauté pour utiliser les visuels partagés.</p>
                         <div class="file-library-empty-actions">
-                            <a href="/customiize" class="file-library-empty-primary" target="_blank" rel="noopener">Générer une image</a>
+                            <a class="file-library-empty-primary" target="_blank" rel="noopener">Générer une image</a>
                             <button type="button" class="file-library-empty-secondary">Communauté</button>
                         </div>
                     </div>`
                 );
+                emptyState
+                    .find('.file-library-empty-primary')
+                    .attr('href', buildCustomizeUrl());
                 emptyState.find('.file-library-empty-secondary').on('click', function () {
                     const communityButton = $('#folder-community');
                     communityButton.trigger('click');
