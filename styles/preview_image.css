@@ -152,7 +152,7 @@
 }
 
 .prompt-text {
-    max-height: 30dvh;
+    max-height: 25dvh;
     overflow: auto;
 }
 
