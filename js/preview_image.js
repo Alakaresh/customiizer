@@ -307,6 +307,13 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 });
 
                 const productIds = Object.keys(grouped);
+                console.log('[preview] affichage ratio via cache', {
+                        format: targetFormat || null,
+                        products: productIds.length,
+                        variants: data.choices.length,
+                        productNames: productIds.map((id) => grouped[id].name).filter(Boolean)
+                });
+
                 if (productIds.length === 1) {
                         const { name } = grouped[productIds[0]];
                         if (name) {
