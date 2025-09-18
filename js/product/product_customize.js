@@ -9,6 +9,59 @@ const SIDEBAR_SIZE_SELECT_THRESHOLD = 6;
 let autoSaveTimeoutId = null;
 let lastAutoSaveSignature = null;
 
+(function bootstrapVariantColorNormalizer(global) {
+  if (typeof global.resolveVariantColorAppearance === 'function') {
+    return;
+  }
+
+  const tester = typeof document !== 'undefined' ? document.createElement('option') : null;
+
+  function isValidCssColor(value) {
+    if (!tester || !value) {
+      return false;
+    }
+    tester.style.color = '';
+    tester.style.color = value;
+    return tester.style.color !== '';
+  }
+
+  function extractEmbeddedColor(value) {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const hexMatch = value.match(/#([0-9a-f]{3,8})/i);
+    if (hexMatch && isValidCssColor(hexMatch[0])) {
+      return hexMatch[0];
+    }
+    const rgbMatch = value.match(/rgba?\([^)]*\)/i);
+    if (rgbMatch && isValidCssColor(rgbMatch[0])) {
+      return rgbMatch[0];
+    }
+    return null;
+  }
+
+  function formatLabel(value) {
+    if (!value) {
+      return 'Couleur';
+    }
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  global.resolveVariantColorAppearance = function resolveVariantColorAppearance(rawColor) {
+    const original = typeof rawColor === 'string' ? rawColor.trim() : '';
+    const normalizedKey = original.toLowerCase();
+    const cssColor =
+      isValidCssColor(original) ? original : extractEmbeddedColor(original) || '#333333';
+
+    return {
+      cssColor,
+      label: formatLabel(original || 'Couleur'),
+      originalValue: rawColor,
+      normalizedKey
+    };
+  };
+})(window);
+
 function isTrimmedPlaceholder(value) {
   return typeof value === 'string' && value === DATA_URL_PLACEHOLDER;
 }
@@ -605,10 +658,15 @@ jQuery(document).ready(function ($) {
                variants.forEach(v => { if (v.color) colorSet.add(v.color); });
 
                Array.from(colorSet).forEach((color, idx) => {
+                       const appearance = typeof window.resolveVariantColorAppearance === 'function'
+                               ? window.resolveVariantColorAppearance(color)
+                               : { cssColor: color, label: color };
                        const disabled = !variants.some(v => v.color === color && v.stock !== 'out of stock' && v.stock !== 'discontinued');
                        const opt = $('<div>').addClass('color-option')
-                               .css('background-color', color)
+                               .css('background-color', appearance.cssColor)
                                .attr('data-color', color)
+                               .attr('title', appearance.label)
+                               .attr('aria-label', appearance.label)
                                .toggleClass('disabled', disabled)
                                .on('click', function () {
                                        if ($(this).hasClass('disabled')) return;
