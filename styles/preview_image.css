@@ -157,7 +157,7 @@
 }
 
 .format-text {
-    max-height: 10dvh; /* ≃ 10 % de la hauteur de l'écran */
+    max-height: 20dvh; /* ≃ 10 % de la hauteur de l'écran */
     overflow-y: auto;
 }
 
