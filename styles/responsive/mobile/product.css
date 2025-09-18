@@ -158,10 +158,33 @@
                width: 100%;
                max-width: 420px;
                min-height: 64px;
+               padding: 16px 18px 18px;
+               gap: 12px;
+       }
+
+       .custom-select__label {
+               gap: 4px;
+       }
+
+       .custom-select__badge {
+               font-size: 0.62rem;
+               letter-spacing: 0.22em;
        }
 
        .selected-item {
-               padding: 14px 18px;
+               padding: 14px 16px;
+       }
+
+       .custom-select__title {
+               font-size: 1rem;
+       }
+
+       .custom-select__subtitle {
+               font-size: 0.78rem;
+       }
+
+       .dropdown-icon {
+               width: 60px;
        }
 
        .options-list {

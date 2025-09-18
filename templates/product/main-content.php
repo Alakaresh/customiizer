@@ -22,18 +22,25 @@
 						<!-- Menu de sélection de produit -->
                                                <div class="product-selector" data-component="variant-selector">
                                                         <div class="custom-select" data-dropdown>
-                                                                <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
-                                                                        <span class="selected-visual">
-                                                                                <img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
-                                                                        </span>
-                                                                        <span class="selected-text">
-                                                                                <span class="product-name" aria-live="polite">Nom du produit</span>
-                                                                        </span>
-                                                                </button>
-                                                                <button type="button" class="dropdown-icon" aria-label="<?php esc_attr_e('Ouvrir la liste des variantes', 'customiizer'); ?>" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options">
-                                                                        <span class="chevron" aria-hidden="true"></span>
-                                                                </button>
-                                                                <ul id="product-options" class="options-list" role="listbox" aria-hidden="true"></ul>
+                                                                <div class="custom-select__label" id="product-selector-helper">
+                                                                        <span class="custom-select__badge"><?php esc_html_e('Prévisualisation', 'customiizer'); ?></span>
+                                                                        <span class="custom-select__title"><?php esc_html_e('Produit sélectionné', 'customiizer'); ?></span>
+                                                                        <span class="custom-select__subtitle"><?php esc_html_e('Choisissez la déclinaison à afficher', 'customiizer'); ?></span>
+                                                                </div>
+                                                                <div class="custom-select__control">
+                                                                        <button type="button" class="selected-item" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options" aria-describedby="product-selector-helper">
+                                                                                <span class="selected-visual">
+                                                                                        <img id="dropdown-image" alt="Produit sélectionné" class="dropdown-image">
+                                                                                </span>
+                                                                                <span class="selected-text">
+                                                                                        <span class="product-name" aria-live="polite">Nom du produit</span>
+                                                                                </span>
+                                                                        </button>
+                                                                        <button type="button" class="dropdown-icon" aria-label="<?php esc_attr_e('Ouvrir la liste des variantes', 'customiizer'); ?>" aria-haspopup="listbox" aria-expanded="false" aria-controls="product-options" aria-describedby="product-selector-helper">
+                                                                                <span class="chevron" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <ul id="product-options" class="options-list" role="listbox" aria-hidden="true"></ul>
+                                                                </div>
                                                         </div>
                                                         <h1 class="product-title visually-hidden" aria-live="polite">Nom du produit</h1>
                                                 </div>
