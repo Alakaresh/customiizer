@@ -719,12 +719,13 @@
         function applyProductRatioFilter(ratio) {
             const normalizedRatio = normalizeRatio(ratio);
             if (!normalizedRatio) return;
+        
             currentFormatFilter = normalizedRatio;
             currentProduct = null;
             currentSize = null;
             productFormats = [];
             sizeRatioMap = {};
-
+        
             $('#mainFormatFilters .format-main').removeClass('active');
             if (productRatioButton.length) {
                 productRatioButton.addClass('active');
@@ -734,20 +735,27 @@
             $('#formatOptions').removeClass('active');
             sizeBlock.hide();
             $('#sizeButtons').empty();
-
+        
             $('#open-format-menu').addClass('active');
-            updateFormatLabel(normalizedRatio, buildCurrentDesignFormatContext());
+        
+            // 🔥 Patch ici : récupérer la size directement du variant si pas dans le bouton
+            let size = readVariantSizeFromButton(productRatioButton);
+            if (!size) {
+                const variant = resolveVariant();
+                size = variant?.size || variant?.variant_size || '';
+            }
+        
             updateFormatLabel(normalizedRatio, {
                 showCurrentDesignLabel: true,
                 productLabel: normalizeLabel(productRatioButton.data('productName')),
                 variantLabel: normalizeLabel(productRatioButton.data('variantLabel')),
-                sizeLabel: readVariantSizeFromButton(productRatioButton), // ← ça garantit la taille
+                sizeLabel: size,   // ← garanti non vide si dispo
             });
-
-
+        
             currentPage = 1;
             renderFileList();
         }
+
 
         function selectCurrentProductFormat() {
             const variant = resolveVariant();
