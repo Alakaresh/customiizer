@@ -255,7 +255,14 @@
         if (showCurrentDesignLabel && fmt !== 'all') {
             const productRatioButton = $('#filter-product-ratio');
             if (productRatioButton.length) {
-                const storedProductLabel = (productRatioButton.data('productLabel') || '').toString().trim();
+                let storedProductLabel = (productRatioButton.data('productLabel') || '').toString().trim();
+                if (!storedProductLabel) {
+                    const fallbackProductLabel = ($('.product-name').first().text() || '').toString().trim();
+                    if (fallbackProductLabel && !PRODUCT_NAME_PLACEHOLDER_PATTERN.test(fallbackProductLabel)) {
+                        storedProductLabel = fallbackProductLabel;
+                        productRatioButton.data('productLabel', storedProductLabel);
+                    }
+                }
                 if (storedProductLabel) {
                     const storedVariantSize = (productRatioButton.data('variant-size') || '').toString().trim();
                     const storedSuffix = storedVariantSize ? ` — ${storedVariantSize}` : variantSuffix;
