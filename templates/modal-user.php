@@ -1,8 +1,3 @@
-<!-- Bouton utilisateur (avatar ou icône) -->
-<a href="#" id="profileLink" class="user-menu-toggle">
-    <i class="fas fa-user-circle"></i>
-</a>
-
 <!-- Dropdown utilisateur -->
 <div id="userDropdown" class="user-dropdown" style="display:none;">
     <div class="user-header">
