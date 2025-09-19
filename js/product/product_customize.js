@@ -442,6 +442,7 @@ jQuery(document).ready(function ($) {
         const mirrorImageButton = $('#mirrorImageButton');
         const bringForwardButton = $('#bringForwardButton');
         const sendBackwardButton = $('#sendBackwardButton');
+        const resetImageButton = $('#resetImageButton');
         const removeImageButton = $('#removeImageButton');
         const imageControls = $('.image-controls');
         const visualHeader = $('.visual-header');
@@ -458,6 +459,8 @@ jQuery(document).ready(function ($) {
                 community: typeof communityImages !== 'undefined' ? communityImages : [],
                 imported: importedFiles
         });
+
+        resetImageButton.prop('disabled', true);
 
         function trapFocus(modal) {
                 const focusable = modal.find('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
@@ -488,7 +491,8 @@ jQuery(document).ready(function ($) {
        window.releaseFocus = releaseFocus;
 
        function updateAddImageButtonVisibility() {
-               if (CanvasManager.hasImage()) {
+               const hasImage = CanvasManager.hasImage();
+               if (hasImage) {
                        addImageButton.hide();
                        visualHeader.css('display', 'flex');
                        $('.visual-zone').addClass('with-header');
@@ -501,6 +505,7 @@ jQuery(document).ready(function ($) {
                        $('.visual-zone').removeClass('with-header');
                        CanvasManager.resizeToContainer('product2DContainer');
                }
+               resetImageButton.prop('disabled', !hasImage);
        }
        window.updateAddImageButtonVisibility = updateAddImageButtonVisibility;
 
@@ -1051,6 +1056,11 @@ jQuery(document).ready(function ($) {
         });
         sendBackwardButton.on('click', function () {
                 CanvasManager.sendImageBackward();
+        });
+        resetImageButton.on('click', function () {
+                if (typeof CanvasManager.resetActiveImage === 'function') {
+                        CanvasManager.resetActiveImage();
+                }
         });
 
         removeImageButton.on('click', function () {

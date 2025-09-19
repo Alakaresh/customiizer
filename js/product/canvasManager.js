@@ -129,6 +129,66 @@ function notifyChange(src = 'unknown') {
   try { toggleUI(hasImage); } catch (e) { CM.warn('notifyChange: toggleUI KO', e); }
 }
 
+const INITIAL_PLACEMENT_KEY = '__customizerInitialPlacement';
+
+function toFiniteNumber(value, fallback) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function captureImagePlacementSnapshot(image) {
+  if (!image) return null;
+  return {
+    left: toFiniteNumber(image.left, 0),
+    top: toFiniteNumber(image.top, 0),
+    scaleX: toFiniteNumber(image.scaleX, 1),
+    scaleY: toFiniteNumber(image.scaleY, 1),
+    angle: toFiniteNumber(image.angle, 0),
+    flipX: !!image.flipX,
+    flipY: !!image.flipY,
+    skewX: toFiniteNumber(image.skewX, 0),
+    skewY: toFiniteNumber(image.skewY, 0),
+    originX: image.originX || 'left',
+    originY: image.originY || 'top',
+    opacity: typeof image.opacity === 'number' ? image.opacity : undefined,
+  };
+}
+
+function rememberInitialPlacement(image) {
+  if (!image) return null;
+  const snapshot = captureImagePlacementSnapshot(image);
+  if (snapshot) {
+    image[INITIAL_PLACEMENT_KEY] = snapshot;
+  }
+  return snapshot;
+}
+
+function applyImagePlacementSnapshot(image, snapshot) {
+  if (!image || !snapshot) return false;
+  try {
+    image.set({
+      left: toFiniteNumber(snapshot.left, image.left || 0),
+      top: toFiniteNumber(snapshot.top, image.top || 0),
+      scaleX: toFiniteNumber(snapshot.scaleX, image.scaleX || 1),
+      scaleY: toFiniteNumber(snapshot.scaleY, image.scaleY || 1),
+      angle: toFiniteNumber(snapshot.angle, image.angle || 0),
+      flipX: !!snapshot.flipX,
+      flipY: !!snapshot.flipY,
+      skewX: toFiniteNumber(snapshot.skewX, image.skewX || 0),
+      skewY: toFiniteNumber(snapshot.skewY, image.skewY || 0),
+      originX: snapshot.originX || image.originX || 'left',
+      originY: snapshot.originY || image.originY || 'top',
+    });
+    if (typeof snapshot.opacity === 'number') {
+      image.set({ opacity: snapshot.opacity });
+    }
+    return true;
+  } catch (err) {
+    CM.error('applyImagePlacementSnapshot: set failed', err);
+    return false;
+  }
+}
+
 // =============================
 // CanvasManager
 // =============================
@@ -367,6 +427,7 @@ const CanvasManager = {
           canvas.setActiveObject(img); // sélection auto
           if (bgImage) canvas.sendToBack(bgImage);
           canvas.requestRenderAll();
+          rememberInitialPlacement(img);
           CM.log('addImage: finalize -> objets =', canvas.getObjects().length);
 
           // Double salve de resize anti-lag (si layout bouge après affichage)
@@ -535,6 +596,7 @@ const CanvasManager = {
               canvas.moveTo(img, targetIndex);
             }
             img.setCoords();
+            rememberInitialPlacement(img);
             resolve(img);
           } catch (err) {
             CM.error('restoreLayerFromState: finalize failed', err);
@@ -731,6 +793,35 @@ const CanvasManager = {
     canvas.requestRenderAll();
     CM.log('removeImage: supprimé');
     notifyChange('removeImage');
+  },
+
+  resetActiveImage() {
+    const img = this.getActiveUserImage();
+    if (!img) {
+      CM.warn("resetActiveImage: pas d'image active");
+      return;
+    }
+
+    const snapshot = img[INITIAL_PLACEMENT_KEY];
+    if (!snapshot) {
+      CM.warn('resetActiveImage: état initial introuvable');
+      return;
+    }
+
+    const copy = { ...snapshot };
+    const applied = applyImagePlacementSnapshot(img, copy);
+    if (!applied) {
+      CM.warn("resetActiveImage: application de l'état initial échouée");
+      return;
+    }
+
+    img.setCoords();
+    canvas.setActiveObject(img);
+    canvas.requestRenderAll();
+    emitObjectModified(img, 'reset');
+    rememberInitialPlacement(img);
+    CM.log('resetActiveImage: restauré');
+    notifyChange('resetActiveImage');
   },
 
   getCurrentImageData() {
@@ -957,6 +1048,7 @@ const CanvasManager = {
           canvas.setActiveObject(img);
           if (bgImage) canvas.sendToBack(bgImage);
           canvas.requestRenderAll();
+          rememberInitialPlacement(img);
           notifyChange('restoreFromProductData');
           if (typeof callback === 'function') callback();
         };
