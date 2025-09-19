@@ -1,52 +1,51 @@
 document.addEventListener('DOMContentLoaded', function() {
-
-    if (userIsLoggedIn) {
+    if (typeof userIsLoggedIn !== "undefined" && userIsLoggedIn) {
         const profileLink = document.getElementById('profileLink');
-        const userModal = document.getElementById('userModal');
-        let openedByClick = false;  // Track if opened by click
-        let mouseInModal = false;   // Track if the mouse is inside the modal
+        const userDropdown = document.getElementById('userDropdown');
+        let openedByClick = false;
+        let mouseInDropdown = false;
 
-        // Open modal on mouseover
+        // Ouvrir au survol
         profileLink.addEventListener('mouseover', function() {
-            userModal.style.display = 'block';
+            userDropdown.style.display = 'block';
             openedByClick = false;
         });
 
-        // Open modal on click
+        // Ouvrir au clic
         profileLink.addEventListener('click', function(event) {
             event.preventDefault();
-            userModal.style.display = 'block';
+            userDropdown.style.display = 'block';
             openedByClick = true;
         });
 
-        // Track if the mouse is over the modal
-        userModal.addEventListener('mouseenter', function() {
-            mouseInModal = true;
+        // Survol dans le dropdown
+        userDropdown.addEventListener('mouseenter', function() {
+            mouseInDropdown = true;
         });
 
-        // Track if the mouse leaves the modal
-        userModal.addEventListener('mouseleave', function() {
-            mouseInModal = false;
+        // Quitte le dropdown
+        userDropdown.addEventListener('mouseleave', function() {
+            mouseInDropdown = false;
             if (!openedByClick) {
-                userModal.style.display = 'none';
+                userDropdown.style.display = 'none';
             }
         });
 
-        // Close modal if the mouse leaves the link and the mouse is not over the modal
+        // Quitte le bouton profil
         profileLink.addEventListener('mouseleave', function() {
-            if (!openedByClick && !mouseInModal) {
+            if (!openedByClick && !mouseInDropdown) {
                 setTimeout(() => {
-                    if (!openedByClick && !mouseInModal) {
-                        userModal.style.display = 'none';
+                    if (!openedByClick && !mouseInDropdown) {
+                        userDropdown.style.display = 'none';
                     }
-                }, 500); // Delay before closing
+                }, 400);
             }
         });
 
-        // Close the modal if the user clicks outside the modal content
+        // Fermer si clic en dehors
         window.addEventListener('click', function(event) {
-            if (!userModal.contains(event.target) && !profileLink.contains(event.target)) {
-                userModal.style.display = 'none';
+            if (!userDropdown.contains(event.target) && !profileLink.contains(event.target)) {
+                userDropdown.style.display = 'none';
                 openedByClick = false;
             }
         });
