@@ -408,7 +408,6 @@
             const detailParts = [];
             pushUniqueLabel(detailParts, parsedContext.variantLabel);
             pushUniqueLabel(detailParts, parsedContext.sizeLabel);
-            pushUniqueLabel(detailParts, parsedContext.colorLabel);
 
             if (parsedContext.productLabel || detailParts.length > 0) {
                 const displayParts = [`Format: ${parsedContext.productLabel || normalizedFormat}`];
@@ -466,8 +465,6 @@
                         pushUniqueLabel(variantParts, parsedContext.variantLabel);
                         pushUniqueLabel(variantParts, currentVariantSize);
                         pushUniqueLabel(variantParts, parsedContext.sizeLabel);
-                        pushUniqueLabel(variantParts, variantColorFromButton);
-                        pushUniqueLabel(variantParts, parsedContext.colorLabel);
 
                         if (storedProductName) {
                             const pieces = [`Format: ${storedProductName}`];
@@ -740,6 +737,13 @@
 
             $('#open-format-menu').addClass('active');
             updateFormatLabel(normalizedRatio, buildCurrentDesignFormatContext());
+            updateFormatLabel(normalizedRatio, {
+                showCurrentDesignLabel: true,
+                productLabel: normalizeLabel(productRatioButton.data('productName')),
+                variantLabel: normalizeLabel(productRatioButton.data('variantLabel')),
+                sizeLabel: readVariantSizeFromButton(productRatioButton), // ← ça garantit la taille
+            });
+
 
             currentPage = 1;
             renderFileList();
