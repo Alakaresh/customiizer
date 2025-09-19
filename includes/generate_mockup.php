@@ -143,33 +143,52 @@ function handle_generate_mockup() {
     error_log('[Mockup] Invalid response format');
     wp_send_json_error(['message' => 'Réponse invalide du service de mockup.']);
 }
-function convert_webp_to_png_server($image_url) {
-        $parts = wp_parse_url($image_url);
-        $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+function convert_webp_to_png_server($image_source) {
+        $downloaded = null;
+        $ext = null;
 
-        if (!$parts || !in_array($parts['scheme'] ?? '', ['http', 'https'], true)) {
-                return ['success' => false, 'message' => "URL d'image invalide."];
+        if (is_string($image_source) && preg_match('#^data:image/([a-zA-Z0-9.+-]+);base64,#i', $image_source, $matches)) {
+                $ext = strtolower($matches[1]);
+                $base64 = substr($image_source, strpos($image_source, ',') + 1);
+                $downloaded = base64_decode($base64, true);
+                if ($downloaded === false) {
+                        return ['success' => false, 'message' => 'Données image base64 invalides.'];
+                }
+        } else {
+                $parts = wp_parse_url($image_source);
+                $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+
+                if (!$parts || !in_array($parts['scheme'] ?? '', ['http', 'https'], true)) {
+                        return ['success' => false, 'message' => "URL d'image invalide."];
+                }
+
+                if (defined('ALLOWED_IMAGE_HOSTS') && !in_array($parts['host'], ALLOWED_IMAGE_HOSTS, true)) {
+                        return ['success' => false, 'message' => 'Hôte non autorisé.'];
+                }
+
+                $response = wp_remote_get($image_source, [
+                        'timeout' => REMOTE_IMAGE_TIMEOUT,
+                        'limit_response_size' => REMOTE_IMAGE_MAX_BYTES,
+                ]);
+
+                if (is_wp_error($response)) {
+                        return ['success' => false, 'message' => "Téléchargement échoué."];
+                }
+
+                $downloaded = wp_remote_retrieve_body($response);
+                if (!$downloaded) {
+                        return ['success' => false, 'message' => "Échec du téléchargement de l'image."];
+                }
         }
 
-        if (defined('ALLOWED_IMAGE_HOSTS') && !in_array($parts['host'], ALLOWED_IMAGE_HOSTS, true)) {
-                return ['success' => false, 'message' => 'Hôte non autorisé.'];
-        }
-
-        $response = wp_remote_get($image_url, [
-                'timeout' => REMOTE_IMAGE_TIMEOUT,
-                'limit_response_size' => REMOTE_IMAGE_MAX_BYTES,
-        ]);
-
-        if (is_wp_error($response)) {
-                return ['success' => false, 'message' => "Téléchargement échoué."];
-        }
-
-        $downloaded = wp_remote_retrieve_body($response);
         if (!$downloaded) {
-                return ['success' => false, 'message' => "Échec du téléchargement de l'image."];
+                return ['success' => false, 'message' => "Données d'image introuvables."];
         }
 
         $upload_dir = wp_upload_dir();
+        if (!empty($upload_dir['error'])) {
+                return ['success' => false, 'message' => $upload_dir['error']];
+        }
         $output_dir = $upload_dir['path'];
         $output_filename = uniqid('converted_', true) . '.png';
         $output_path = $output_dir . '/' . $output_filename;
