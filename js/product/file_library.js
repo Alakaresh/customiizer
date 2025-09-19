@@ -44,6 +44,24 @@
         return (value || '').toString().trim();
     }
 
+    function pushUniqueLabel(target, value) {
+        if (!Array.isArray(target)) {
+            return target;
+        }
+
+        const label = normalizeLabel(value);
+        if (!label) {
+            return target;
+        }
+
+        const alreadyPresent = target.some(existing => existing.toLowerCase() === label.toLowerCase());
+        if (!alreadyPresent) {
+            target.push(label);
+        }
+
+        return target;
+    }
+
     function composeVariantDisplayLabel({ productName, variantLabel, variantSize, variantColor }) {
         const normalizedProduct = normalizeLabel(productName);
         const detailParts = [];
@@ -319,29 +337,92 @@
     /**
      * Met à jour le libellé du format sélectionné.
      * @param {string} fmt                       Ratio de l'image.
-     * @param {boolean} [showCurrentDesignLabel] Affiche un libellé générique lié au produit en cours.
+     * @param {boolean|Object} [context]         Options de formatage du libellé.
+     *        context.showCurrentDesignLabel     Forcer l'utilisation du produit en cours.
+     *        context.productLabel               Nom du produit sélectionné.
+     *        context.variantLabel               Nom de la variante sélectionnée.
+     *        context.sizeLabel                  Taille sélectionnée.
+     *        context.colorLabel                 Couleur sélectionnée.
      */
-    function updateFormatLabel(fmt, showCurrentDesignLabel = false) {
-        const btn = $('#open-format-menu');
-        btn.addClass('active');
-
-        if (!fmt) {
-            btn.text('Format');
+    function updateFormatLabel(fmt, context = {}) {
+        const button = $('#open-format-menu');
+        if (!button.length) {
             return;
         }
 
-        const currentVariantSize = $('#filter-product-ratio').data('variant-size');
-        const variantSuffix = currentVariantSize ? ` — ${currentVariantSize}` : '';
+        const normalizedFormat = normalizeRatio(fmt);
+        const parsedContext = (() => {
+            if (typeof context === 'boolean') {
+                return {
+                    showCurrentDesignLabel: context,
+                    productLabel: '',
+                    variantLabel: '',
+                    sizeLabel: '',
+                    colorLabel: ''
+                };
+            }
 
-        const ratioLabel = `Format: ${fmt}${variantSuffix}`;
-        btn.text(ratioLabel);
+            if (context && typeof context === 'object') {
+                return {
+                    showCurrentDesignLabel: !!context.showCurrentDesignLabel,
+                    productLabel: normalizeLabel(context.productLabel),
+                    variantLabel: normalizeLabel(context.variantLabel),
+                    sizeLabel: normalizeLabel(context.sizeLabel),
+                    colorLabel: normalizeLabel(context.colorLabel)
+                };
+            }
 
-        if (showCurrentDesignLabel && fmt !== 'all') {
+            return {
+                showCurrentDesignLabel: false,
+                productLabel: '',
+                variantLabel: '',
+                sizeLabel: '',
+                colorLabel: ''
+            };
+        })();
+
+        if (!normalizedFormat || normalizedFormat === 'all') {
+            button.removeClass('active').text('Format');
+            return;
+        }
+
+        button.addClass('active');
+
+        if (!parsedContext.showCurrentDesignLabel) {
+            const detailParts = [];
+            pushUniqueLabel(detailParts, parsedContext.variantLabel);
+            pushUniqueLabel(detailParts, parsedContext.sizeLabel);
+            pushUniqueLabel(detailParts, parsedContext.colorLabel);
+
+            if (parsedContext.productLabel || detailParts.length > 0) {
+                const displayParts = [`Format: ${parsedContext.productLabel || normalizedFormat}`];
+                const trailingParts = [];
+
+                if (parsedContext.productLabel) {
+                    pushUniqueLabel(trailingParts, normalizedFormat);
+                }
+
+                detailParts.forEach(part => pushUniqueLabel(trailingParts, part));
+
+                if (trailingParts.length > 0) {
+                    displayParts.push(trailingParts.join(' • '));
+                }
+
+                button.text(displayParts.join(' — '));
+                return;
+            }
+        }
+
+        const ratioLabel = `Format: ${normalizedFormat}`;
+        let customLabelApplied = false;
+
+        if (parsedContext.showCurrentDesignLabel) {
             const productRatioButton = $('#filter-product-ratio');
             if (productRatioButton.length) {
                 const storedDisplayLabel = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButton));
                 if (storedDisplayLabel) {
-                    btn.text(`Format: ${storedDisplayLabel}`);
+                    button.text(`Format: ${storedDisplayLabel}`);
+                    customLabelApplied = true;
                 } else {
                     let storedProductName = normalizeLabel(productRatioButton.data('productName'));
                     if (!storedProductName) {
@@ -351,42 +432,76 @@
                             productRatioButton.data('productName', storedProductName);
                             const refreshed = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButton));
                             if (refreshed) {
-                                btn.text(`Format: ${refreshed}`);
-                                return;
+                                button.text(`Format: ${refreshed}`);
+                                customLabelApplied = true;
                             }
                         }
                     }
-                    if (storedProductName) {
-                        const storedVariantSize = normalizeLabel(productRatioButton.data('variant-size'));
-                        const storedSuffix = storedVariantSize ? ` — ${storedVariantSize}` : variantSuffix;
-                        btn.text(`Format: ${storedProductName}${storedSuffix}`);
+
+                    if (!customLabelApplied) {
+                        const variantParts = [];
+                        pushUniqueLabel(variantParts, productRatioButton.data('variantLabel'));
+                        pushUniqueLabel(variantParts, productRatioButton.data('variant-size'));
+                        pushUniqueLabel(variantParts, productRatioButton.data('variantColor'));
+
+                        if (storedProductName) {
+                            const pieces = [`Format: ${storedProductName}`];
+                            if (variantParts.length > 0) {
+                                pieces.push(variantParts.join(' • '));
+                            }
+                            button.text(pieces.join(' — '));
+                            customLabelApplied = true;
+                        } else if (variantParts.length > 0) {
+                            button.text(`Format: ${variantParts.join(' • ')}`);
+                            customLabelApplied = true;
+                        }
                     }
                 }
             }
+        }
 
-            getProductNameForFormat(fmt).then(productName => {
+        if (!customLabelApplied) {
+            button.text(ratioLabel);
+        }
+
+        if (parsedContext.showCurrentDesignLabel) {
+            getProductNameForFormat(normalizedFormat).then(productName => {
                 if (!productName) return;
-                if (currentFormatFilter !== fmt) return;
+                if (currentFormatFilter !== normalizedFormat) return;
 
                 const productRatioButtonAsync = $('#filter-product-ratio');
-                if (productRatioButtonAsync.length) {
-                    const trimmed = normalizeLabel(productName);
-                    if (trimmed) {
-                        productRatioButtonAsync.data('productName', trimmed);
-                    } else {
-                        productRatioButtonAsync.removeData('productName');
-                    }
-                    const refreshedDisplay = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButtonAsync));
-                    if (refreshedDisplay) {
-                        btn.text(`Format: ${refreshedDisplay}`);
-                        return;
-                    }
+                if (!productRatioButtonAsync.length) return;
+
+                const trimmed = normalizeLabel(productName);
+                if (trimmed) {
+                    productRatioButtonAsync.data('productName', trimmed);
+                } else {
+                    productRatioButtonAsync.removeData('productName');
                 }
 
-                const activeVariantSize = $('#filter-product-ratio').data('variant-size');
-                const asyncVariantSuffix = activeVariantSize ? ` — ${activeVariantSize}` : '';
-                const asyncProductName = normalizeLabel(productName);
-                btn.text(`Format: ${asyncProductName || fmt}${asyncVariantSuffix}`);
+                const refreshedDisplay = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButtonAsync));
+                if (refreshedDisplay) {
+                    button.text(`Format: ${refreshedDisplay}`);
+                    return;
+                }
+
+                const variantParts = [];
+                pushUniqueLabel(variantParts, productRatioButtonAsync.data('variantLabel'));
+                pushUniqueLabel(variantParts, productRatioButtonAsync.data('variant-size'));
+                pushUniqueLabel(variantParts, productRatioButtonAsync.data('variantColor'));
+
+                const pieces = [];
+                if (trimmed) {
+                    pieces.push(`Format: ${trimmed}`);
+                } else {
+                    pieces.push(ratioLabel);
+                }
+
+                if (variantParts.length > 0) {
+                    pieces.push(variantParts.join(' • '));
+                }
+
+                button.text(pieces.join(' — '));
             });
         }
     }
@@ -451,7 +566,7 @@
                     const changed = rememberProductRatioName(productRatioButton, freshLabel);
                     if (!changed) return;
                     if (productRatioButton.hasClass('active') && currentFormatFilter !== 'all') {
-                        updateFormatLabel(currentFormatFilter, true);
+                        updateFormatLabel(currentFormatFilter, { showCurrentDesignLabel: true });
                     }
                 });
                 observer.observe(productNameElement, { childList: true, characterData: true, subtree: true });
@@ -558,8 +673,9 @@
         };
 
         function applyProductRatioFilter(ratio) {
-            if (!ratio) return;
-            currentFormatFilter = ratio;
+            const normalizedRatio = normalizeRatio(ratio);
+            if (!normalizedRatio) return;
+            currentFormatFilter = normalizedRatio;
             currentProduct = null;
             currentSize = null;
             productFormats = [];
@@ -576,7 +692,7 @@
             $('#sizeButtons').empty();
 
             $('#open-format-menu').addClass('active');
-            updateFormatLabel(ratio, true);
+            updateFormatLabel(normalizedRatio, { showCurrentDesignLabel: true });
 
             currentPage = 1;
             renderFileList();
@@ -585,7 +701,7 @@
         function selectCurrentProductFormat() {
             const variant = resolveVariant();
             const storedRatio = productRatioButton.data('ratio');
-            const ratio = (variant && variant.ratio_image) ? variant.ratio_image : storedRatio;
+            const ratio = normalizeRatio((variant && variant.ratio_image) ? variant.ratio_image : storedRatio);
 
             if (!ratio) {
                 return false;
@@ -598,7 +714,7 @@
         function updateProductRatioButton(variantCandidate) {
             if (!productRatioButton.length) return;
             const variant = resolveVariant(variantCandidate);
-            const ratio = variant?.ratio_image || null;
+            const ratio = normalizeRatio(variant?.ratio_image);
             const wasActive = productRatioButton.hasClass('active');
 
             if (ratio) {
@@ -704,9 +820,9 @@
         if (productRatioButton.length) {
             productRatioButton.on('click', function () {
                 if ($(this).prop('disabled')) return;
-                const storedRatio = $(this).data('ratio');
+                const storedRatio = normalizeRatio($(this).data('ratio'));
                 const variant = resolveVariant();
-                const ratio = variant?.ratio_image || storedRatio;
+                const ratio = normalizeRatio(variant?.ratio_image) || storedRatio;
                 if (!ratio) return;
                 applyProductRatioFilter(ratio);
             });
@@ -787,32 +903,113 @@
                         $('#format-block .format-btn').removeClass('active');
                         $(this).addClass('active');
                         $('#mainFormatFilters .format-main').removeClass('active');
-                        $('#open-format-menu').addClass('active').text('Format');
+                        $('#open-format-menu').removeClass('active').text('Format');
+
+                        const productLabel = normalizeLabel(p.name);
 
                         const handleVariants = (variants) => {
                             productFormats = [];
                             sizeRatioMap = {};
-                            const sizes = [];
-                            (variants || []).forEach(v => {
-                                if (!sizes.includes(v.size)) sizes.push(v.size);
-                                sizeRatioMap[v.size] = v.ratio_image;
-                                if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
+                            const sizeEntries = [];
+                            const seenSizes = new Set();
+
+                            (variants || []).forEach(variant => {
+                                if (!variant) {
+                                    return;
+                                }
+
+                                const ratio = normalizeRatio(variant.ratio_image);
+                                if (!ratio) {
+                                    return;
+                                }
+
+                                const rawSize = (variant.size || '').toString();
+                                const sizeLabel = normalizeLabel(rawSize);
+                                if (!sizeLabel) {
+                                    return;
+                                }
+
+                                const dedupeKey = sizeLabel.toLowerCase();
+                                if (!seenSizes.has(dedupeKey)) {
+                                    seenSizes.add(dedupeKey);
+
+                                    const variantLabel = normalizeLabel(
+                                        variant.variant_label
+                                        || variant.variantLabel
+                                        || variant.label
+                                        || variant.name
+                                        || variant.variant_name
+                                        || variant.variantName
+                                        || variant.size_label
+                                        || variant.sizeLabel
+                                    );
+
+                                    const colorLabel = normalizeLabel(
+                                        variant.color
+                                        || variant.color_label
+                                        || variant.colorLabel
+                                        || variant.colour
+                                        || variant.colour_label
+                                        || variant.colourLabel
+                                    );
+
+                                    sizeEntries.push({
+                                        rawSize,
+                                        sizeLabel,
+                                        ratio,
+                                        variantLabel,
+                                        colorLabel
+                                    });
+                                }
+
+                                sizeRatioMap[sizeLabel] = ratio;
+                                if (rawSize && rawSize !== sizeLabel) {
+                                    sizeRatioMap[rawSize] = ratio;
+                                }
+
+                                if (!productFormats.includes(ratio)) {
+                                    productFormats.push(ratio);
+                                }
                             });
+
                             const sizeContainer = $('#sizeButtons');
                             sizeContainer.empty();
-                            sizes.forEach(sz => {
-                                const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+
+                            if (sizeEntries.length === 0) {
+                                sizeBlock.hide();
+                                currentPage = 1;
+                                renderFileList();
+                                return;
+                            }
+
+                            sizeEntries.forEach(entry => {
+                                const label = entry.sizeLabel || entry.rawSize;
+                                const sbtn = $('<button type="button" class="size-btn"></button>').text(label);
+                                sbtn.data('formatMeta', {
+                                    ratio: entry.ratio,
+                                    productLabel,
+                                    variantLabel: entry.variantLabel,
+                                    sizeLabel: entry.sizeLabel,
+                                    rawSize: entry.rawSize,
+                                    colorLabel: entry.colorLabel
+                                });
                                 sbtn.on('click', function () {
-                                    currentSize = sz;
-                                    currentFormatFilter = sizeRatioMap[sz] || 'all';
+                                    const meta = $(this).data('formatMeta') || {};
+                                    currentSize = meta.sizeLabel || meta.rawSize || '';
+                                    currentFormatFilter = meta.ratio || 'all';
                                     $('.size-btn').removeClass('active');
                                     $(this).addClass('active');
                                     currentPage = 1;
                                     renderFileList();
                                     if (currentFormatFilter !== 'all') {
-                                        updateFormatLabel(currentFormatFilter, true);
+                                        updateFormatLabel(currentFormatFilter, {
+                                            productLabel: meta.productLabel,
+                                            variantLabel: meta.variantLabel,
+                                            sizeLabel: meta.sizeLabel || meta.rawSize,
+                                            colorLabel: meta.colorLabel
+                                        });
                                     } else {
-                                        $('#open-format-menu').text('Format');
+                                        $('#open-format-menu').removeClass('active').text('Format');
                                     }
                                     $('#formatOptions').removeClass('active');
                                 });
@@ -834,7 +1031,9 @@
                                     variantCache[p.product_id] = (variants || []).map(v => ({
                                         variant_id: v.variant_id,
                                         size: v.size,
-                                        ratio_image: v.ratio_image
+                                        ratio_image: v.ratio_image,
+                                        color: v.color || null,
+                                        hexa: v.hexa || null
                                     }));
                                     try {
                                         window.customizerCache = window.customizerCache || {};
