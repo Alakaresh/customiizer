@@ -8,6 +8,7 @@ const SIDEBAR_SIZE_SELECT_THRESHOLD = 6;
 //const DATA_URL_PLACEHOLDER = window.CUSTOMIZER_DATA_URL_PLACEHOLDER || '__customizer_data_url_trimmed__';
 let autoSaveTimeoutId = null;
 let lastAutoSaveSignature = null;
+const base64UploadCache = new Map();
 
 (function bootstrapVariantColorNormalizer(global) {
   if (typeof global.resolveVariantColorAppearance === 'function') {
@@ -104,6 +105,116 @@ function getUsableUrl(value) {
   if (!value) return null;
   if (isTrimmedPlaceholder(value)) return null;
   return value;
+}
+
+function isHttpUrl(value) {
+  if (typeof value !== 'string') return false;
+  return /^https?:\/\//i.test(value.trim());
+}
+
+function toAbsoluteHttpUrl(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (isHttpUrl(trimmed)) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('//')) {
+    return `${window.location.protocol}${trimmed}`;
+  }
+  if (trimmed.startsWith('/')) {
+    return `${window.location.origin}${trimmed}`;
+  }
+  try {
+    const url = new URL(trimmed, window.location.origin);
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url.href;
+    }
+  } catch (err) {
+    // ignore
+  }
+  return null;
+}
+
+function sanitizeFilenameHint(name, fallback = 'image') {
+  const base = (typeof name === 'string' && name.trim()) ? name.trim() : fallback;
+  const withoutExt = base.replace(/\.[^./\\]+$/i, '');
+  const slug = withoutExt
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || fallback;
+  return `${slug}.png`;
+}
+
+async function uploadBase64Image(base64, filenameHint) {
+  if (typeof base64 !== 'string') return null;
+  const trimmed = base64.trim();
+  if (!trimmed) return null;
+  if (isTrimmedPlaceholder(trimmed)) return null;
+  if (base64UploadCache.has(trimmed)) {
+    return base64UploadCache.get(trimmed);
+  }
+
+  const uploadPromise = (async () => {
+    try {
+      const endpoint = typeof ajaxurl === 'string' && ajaxurl
+        ? ajaxurl
+        : '/wp-admin/admin-ajax.php';
+      const formData = new FormData();
+      formData.append('action', 'save_image_from_base64');
+      formData.append('image_base64', trimmed);
+      if (filenameHint) {
+        formData.append('filename', sanitizeFilenameHint(filenameHint));
+      }
+      const response = await fetch(endpoint, { method: 'POST', body: formData });
+      if (!response.ok) {
+        console.error('[ImageUpload] HTTP error while uploading base64 image', response.status, response.statusText);
+        return null;
+      }
+      const payload = await response.json();
+      if (payload?.success && payload.data?.image_url) {
+        const absoluteUrl = toAbsoluteHttpUrl(payload.data.image_url) || payload.data.image_url;
+        if (absoluteUrl) {
+          return absoluteUrl;
+        }
+      } else {
+        console.error('[ImageUpload] Unexpected response while uploading base64 image', payload);
+      }
+    } catch (error) {
+      console.error('[ImageUpload] Failed to upload base64 image', error);
+    }
+    return null;
+  })();
+
+  base64UploadCache.set(trimmed, uploadPromise);
+  const resolvedUrl = await uploadPromise;
+  if (!resolvedUrl) {
+    base64UploadCache.delete(trimmed);
+  }
+  return resolvedUrl;
+}
+
+async function deriveImageUrlFromFile(file, { fallbackBase64 = null, filenameHint = null } = {}) {
+  if (!file || typeof file !== 'object') {
+    if (fallbackBase64) {
+      return uploadBase64Image(fallbackBase64, filenameHint);
+    }
+    return null;
+  }
+
+  const directUrl = toAbsoluteHttpUrl(file.url);
+  if (directUrl) {
+    return directUrl;
+  }
+
+  const candidateBase64 = (typeof file.base64 === 'string' && !isTrimmedPlaceholder(file.base64))
+    ? file.base64
+    : fallbackBase64;
+  if (candidateBase64) {
+    return uploadBase64Image(candidateBase64, filenameHint || file.filename || file.name);
+  }
+
+  return null;
 }
 
 function sanitizeCanvasLayers(layers) {
@@ -311,10 +422,10 @@ jQuery(document).ready(function ($) {
                         window.showLoadingOverlay();
                 }
 
-                const base64 = CanvasManager.exportPrintAreaPNG();
+                const designBase64 = CanvasManager.exportPrintAreaPNG();
                 const formData = new FormData();
                 formData.append('action', 'generate_mockup');
-                formData.append('image_base64', base64);
+                formData.append('image_base64', designBase64);
                 formData.append('product_id', window.currentProductId || '');
                 formData.append('variant_id', selectedVariant?.variant_id || '');
                 formData.append('placement', selectedVariant?.placement || selectedVariant?.zone_3d_name || '');
@@ -341,8 +452,8 @@ jQuery(document).ready(function ($) {
                         product_price: selectedVariant.price,
                         delivery_price: selectedVariant?.delivery_price,
                         mockup_url: '',
-                        design_image_url: base64,
-                        canvas_image_url: base64,
+                        design_image_url: null,
+                        canvas_image_url: null,
                         design_width: placement.width || selectedVariant.print_area_width,
                         design_height: placement.height || selectedVariant.print_area_height,
                         design_left: (placement.left != null ? placement.left - bbox.left : 0),
@@ -356,6 +467,7 @@ jQuery(document).ready(function ($) {
                         canvas_state: Array.isArray(canvasState) ? canvasState : []
                 };
                 cancelPendingDesignAutosave();
+                window.productData = productData;
                 const savedBeforeRequest = persistDesignLocally(productData) || productData;
                 updateAutoSaveSignature(savedBeforeRequest);
 
@@ -363,31 +475,67 @@ jQuery(document).ready(function ($) {
 
                 fetch(ajaxurl, { method: 'POST', body: formData })
                         .then(res => res.json())
-                        .then(data => {
+                        .then(async data => {
                                 if (data.data?.timings) {                                }
 
                                 if (data.success && Array.isArray(data.data?.files)) {
                                         window.mockupTimes.pending = null;
-                                        const designFile = data.data.files.find(f => f.name === 'design');
-                                        const mockupFile = data.data.files.find(f => f.name !== 'design' && f.name !== 'texture') || data.data.files[0];
-                                        if (designFile) {
-                                                productData.design_image_url = designFile.base64 || designFile.url;
+                                        const eligibleFiles = data.data.files.filter(f => f && f.name !== 'texture');
+                                        const designFile = eligibleFiles.find(f => f.name === 'design');
+                                        const otherFiles = eligibleFiles.filter(f => f !== designFile);
+
+                                        const designUrl = await deriveImageUrlFromFile(designFile, {
+                                                fallbackBase64: designBase64,
+                                                filenameHint: designFile?.name || 'design'
+                                        });
+
+                                        if (designUrl) {
+                                                productData.design_image_url = designUrl;
+                                                productData.canvas_image_url = designUrl;
                                         }
-                                        if (mockupFile) {
-                                                productData.mockup_url = mockupFile.base64 || mockupFile.url;
+
+                                        const mockupResults = [];
+                                        for (const file of otherFiles) {
+                                                const viewName = file?.name;
+                                                if (!viewName) {
+                                                        continue;
+                                                }
+                                                const filenameHint = viewName || 'mockup';
+                                                const resolvedUrl = await deriveImageUrlFromFile(file, { filenameHint });
+                                                if (resolvedUrl) {
+                                                        mockupResults.push({ viewName, url: resolvedUrl });
+                                                        updateMockupThumbnail(viewName, resolvedUrl);
+                                                } else {
+                                                        console.warn('[Mockup] Unable to derive URL for view', viewName);
+                                                }
                                         }
-                                        data.data.files
-                                                .filter(f => f.name !== 'texture')
-                                                .forEach(f => updateMockupThumbnail(f.name, f.base64 || f.url));
+
+                                        if (!productData.mockup_url) {
+                                                const preferredView = mockupResults.find(entry => entry.viewName === firstViewName)
+                                                        || mockupResults[0];
+                                                if (preferredView) {
+                                                        productData.mockup_url = preferredView.url;
+                                                }
+                                        }
 
                                 } else if (data.success && data.data?.url && firstViewName) {
                                         window.mockupTimes.pending = null;
-                                        productData.mockup_url = data.data.url;
-                                        updateMockupThumbnail(firstViewName, data.data.url);
+                                        const absoluteUrl = toAbsoluteHttpUrl(data.data.url);
+                                        if (absoluteUrl) {
+                                                productData.mockup_url = absoluteUrl;
+                                                updateMockupThumbnail(firstViewName, absoluteUrl);
+                                        } else {
+                                                console.warn('[Mockup] Received non-URL mockup response');
+                                        }
                                 } else if (data.success && data.data?.mockup_url && firstViewName) {
                                         window.mockupTimes.pending = null;
-                                        productData.mockup_url = data.data.mockup_url;
-                                        updateMockupThumbnail(firstViewName, data.data.mockup_url);
+                                        const absoluteUrl = toAbsoluteHttpUrl(data.data.mockup_url);
+                                        if (absoluteUrl) {
+                                                productData.mockup_url = absoluteUrl;
+                                                updateMockupThumbnail(firstViewName, absoluteUrl);
+                                        } else {
+                                                console.warn('[Mockup] Received non-URL mockup response');
+                                        }
                                 } else {
                                         alert("Erreur lors de la génération du mockup");
                                 }
