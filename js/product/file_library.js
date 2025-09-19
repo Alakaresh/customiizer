@@ -44,6 +44,40 @@
         return (value || '').toString().trim();
     }
 
+    function readVariantSizeFromButton(button) {
+        if (!button || typeof button.data !== 'function') {
+            return '';
+        }
+
+        const keys = ['variantSize', 'variant-size'];
+        for (const key of keys) {
+            const value = normalizeLabel(button.data(key));
+            if (value) {
+                return value;
+            }
+        }
+
+        return '';
+    }
+
+    function pushUniqueLabel(target, value) {
+        if (!Array.isArray(target)) {
+            return target;
+        }
+
+        const label = normalizeLabel(value);
+        if (!label) {
+            return target;
+        }
+
+        const alreadyPresent = target.some(existing => existing.toLowerCase() === label.toLowerCase());
+        if (!alreadyPresent) {
+            target.push(label);
+        }
+
+        return target;
+    }
+
     function composeVariantDisplayLabel({ productName, variantLabel, variantSize, variantColor }) {
         const normalizedProduct = normalizeLabel(productName);
         const detailParts = [];
@@ -85,7 +119,7 @@
 
         const productName = normalizeLabel(button.data('productName'));
         const variantLabel = normalizeLabel(button.data('variantLabel'));
-        const variantSize = normalizeLabel(button.data('variant-size'));
+        const variantSize = readVariantSizeFromButton(button);
         const variantColor = normalizeLabel(button.data('variantColor'));
 
         const displayLabel = composeVariantDisplayLabel({
@@ -319,31 +353,97 @@
     /**
      * Met à jour le libellé du format sélectionné.
      * @param {string} fmt                       Ratio de l'image.
-     * @param {boolean} [showCurrentDesignLabel] Affiche un libellé générique lié au produit en cours.
+     * @param {boolean|Object} [context]         Options de formatage du libellé.
+     *        context.showCurrentDesignLabel     Forcer l'utilisation du produit en cours.
+     *        context.productLabel               Nom du produit sélectionné.
+     *        context.variantLabel               Nom de la variante sélectionnée.
+     *        context.sizeLabel                  Taille sélectionnée.
+     *        context.colorLabel                 Couleur sélectionnée.
      */
-    function updateFormatLabel(fmt, showCurrentDesignLabel = false) {
-        const btn = $('#open-format-menu');
-        btn.addClass('active');
-
-        if (!fmt) {
-            btn.text('Format');
+    function updateFormatLabel(fmt, context = {}) {
+        const button = $('#open-format-menu');
+        if (!button.length) {
             return;
         }
 
-        const currentVariantSize = $('#filter-product-ratio').data('variant-size');
-        const variantSuffix = currentVariantSize ? ` — ${currentVariantSize}` : '';
+        const normalizedFormat = normalizeRatio(fmt);
+        const parsedContext = (() => {
+            if (typeof context === 'boolean') {
+                return {
+                    showCurrentDesignLabel: context,
+                    productLabel: '',
+                    variantLabel: '',
+                    sizeLabel: '',
+                    colorLabel: ''
+                };
+            }
 
-        const ratioLabel = `Format: ${fmt}${variantSuffix}`;
-        btn.text(ratioLabel);
+            if (context && typeof context === 'object') {
+                return {
+                    showCurrentDesignLabel: !!context.showCurrentDesignLabel,
+                    productLabel: normalizeLabel(context.productLabel),
+                    variantLabel: normalizeLabel(context.variantLabel),
+                    sizeLabel: normalizeLabel(context.sizeLabel),
+                    colorLabel: normalizeLabel(context.colorLabel)
+                };
+            }
 
-        if (showCurrentDesignLabel && fmt !== 'all') {
+            return {
+                showCurrentDesignLabel: false,
+                productLabel: '',
+                variantLabel: '',
+                sizeLabel: '',
+                colorLabel: ''
+            };
+        })();
+
+        if (!normalizedFormat || normalizedFormat === 'all') {
+            button.removeClass('active').text('Format');
+            return;
+        }
+
+        button.addClass('active');
+
+        if (!parsedContext.showCurrentDesignLabel) {
+            const detailParts = [];
+            pushUniqueLabel(detailParts, parsedContext.variantLabel);
+            pushUniqueLabel(detailParts, parsedContext.sizeLabel);
+            pushUniqueLabel(detailParts, parsedContext.colorLabel);
+
+            if (parsedContext.productLabel || detailParts.length > 0) {
+                const displayParts = [`Format: ${parsedContext.productLabel || normalizedFormat}`];
+                const trailingParts = [];
+
+                if (parsedContext.productLabel) {
+                    pushUniqueLabel(trailingParts, normalizedFormat);
+                }
+
+                detailParts.forEach(part => pushUniqueLabel(trailingParts, part));
+
+                if (trailingParts.length > 0) {
+                    displayParts.push(trailingParts.join(' • '));
+                }
+
+                button.text(displayParts.join(' — '));
+                return;
+            }
+        }
+
+        const ratioLabel = `Format: ${normalizedFormat}`;
+        let customLabelApplied = false;
+
+        if (parsedContext.showCurrentDesignLabel) {
             const productRatioButton = $('#filter-product-ratio');
             if (productRatioButton.length) {
                 const storedDisplayLabel = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButton));
                 if (storedDisplayLabel) {
-                    btn.text(`Format: ${storedDisplayLabel}`);
+                    button.text(`Format: ${storedDisplayLabel}`);
+                    customLabelApplied = true;
                 } else {
                     let storedProductName = normalizeLabel(productRatioButton.data('productName'));
+                    if (!storedProductName) {
+                        storedProductName = parsedContext.productLabel;
+                    }
                     if (!storedProductName) {
                         const fallbackProductName = normalizeLabel($('.product-name').first().text());
                         if (fallbackProductName && !PRODUCT_NAME_PLACEHOLDER_PATTERN.test(fallbackProductName)) {
@@ -351,42 +451,88 @@
                             productRatioButton.data('productName', storedProductName);
                             const refreshed = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButton));
                             if (refreshed) {
-                                btn.text(`Format: ${refreshed}`);
-                                return;
+                                button.text(`Format: ${refreshed}`);
+                                customLabelApplied = true;
                             }
                         }
                     }
-                    if (storedProductName) {
-                        const storedVariantSize = normalizeLabel(productRatioButton.data('variant-size'));
-                        const storedSuffix = storedVariantSize ? ` — ${storedVariantSize}` : variantSuffix;
-                        btn.text(`Format: ${storedProductName}${storedSuffix}`);
+
+                    if (!customLabelApplied) {
+                        const variantParts = [];
+                        const variantLabelFromButton = productRatioButton.data('variantLabel');
+                        const variantColorFromButton = productRatioButton.data('variantColor');
+                        const currentVariantSize = readVariantSizeFromButton(productRatioButton);
+                        pushUniqueLabel(variantParts, variantLabelFromButton);
+                        pushUniqueLabel(variantParts, parsedContext.variantLabel);
+                        pushUniqueLabel(variantParts, currentVariantSize);
+                        pushUniqueLabel(variantParts, parsedContext.sizeLabel);
+                        pushUniqueLabel(variantParts, variantColorFromButton);
+                        pushUniqueLabel(variantParts, parsedContext.colorLabel);
+
+                        if (storedProductName) {
+                            const pieces = [`Format: ${storedProductName}`];
+                            if (variantParts.length > 0) {
+                                pieces.push(variantParts.join(' • '));
+                            }
+                            button.text(pieces.join(' — '));
+                            customLabelApplied = true;
+                        } else if (variantParts.length > 0) {
+                            button.text(`Format: ${variantParts.join(' • ')}`);
+                            customLabelApplied = true;
+                        }
                     }
                 }
             }
+        }
 
-            getProductNameForFormat(fmt).then(productName => {
+        if (!customLabelApplied) {
+            button.text(ratioLabel);
+        }
+
+        if (parsedContext.showCurrentDesignLabel) {
+            getProductNameForFormat(normalizedFormat).then(productName => {
                 if (!productName) return;
-                if (currentFormatFilter !== fmt) return;
+                if (currentFormatFilter !== normalizedFormat) return;
 
                 const productRatioButtonAsync = $('#filter-product-ratio');
-                if (productRatioButtonAsync.length) {
-                    const trimmed = normalizeLabel(productName);
-                    if (trimmed) {
-                        productRatioButtonAsync.data('productName', trimmed);
-                    } else {
-                        productRatioButtonAsync.removeData('productName');
-                    }
-                    const refreshedDisplay = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButtonAsync));
-                    if (refreshedDisplay) {
-                        btn.text(`Format: ${refreshedDisplay}`);
-                        return;
-                    }
+                if (!productRatioButtonAsync.length) return;
+
+                const trimmed = normalizeLabel(productName) || parsedContext.productLabel;
+                if (trimmed) {
+                    productRatioButtonAsync.data('productName', trimmed);
+                } else {
+                    productRatioButtonAsync.removeData('productName');
                 }
 
-                const activeVariantSize = $('#filter-product-ratio').data('variant-size');
-                const asyncVariantSuffix = activeVariantSize ? ` — ${activeVariantSize}` : '';
-                const asyncProductName = normalizeLabel(productName);
-                btn.text(`Format: ${asyncProductName || fmt}${asyncVariantSuffix}`);
+                const refreshedDisplay = normalizeLabel(refreshProductRatioDisplayLabel(productRatioButtonAsync));
+                if (refreshedDisplay) {
+                    button.text(`Format: ${refreshedDisplay}`);
+                    return;
+                }
+
+                const variantParts = [];
+                const asyncVariantSize = readVariantSizeFromButton(productRatioButtonAsync);
+                const asyncVariantLabel = productRatioButtonAsync.data('variantLabel');
+                const asyncVariantColor = productRatioButtonAsync.data('variantColor');
+                pushUniqueLabel(variantParts, asyncVariantLabel);
+                pushUniqueLabel(variantParts, parsedContext.variantLabel);
+                pushUniqueLabel(variantParts, asyncVariantSize);
+                pushUniqueLabel(variantParts, parsedContext.sizeLabel);
+                pushUniqueLabel(variantParts, asyncVariantColor);
+                pushUniqueLabel(variantParts, parsedContext.colorLabel);
+
+                const pieces = [];
+                if (trimmed) {
+                    pieces.push(`Format: ${trimmed}`);
+                } else {
+                    pieces.push(ratioLabel);
+                }
+
+                if (variantParts.length > 0) {
+                    pieces.push(variantParts.join(' • '));
+                }
+
+                button.text(pieces.join(' — '));
             });
         }
     }
@@ -438,6 +584,20 @@
 
         syncProductRatioNameFromDom();
 
+        function buildCurrentDesignFormatContext() {
+            if (!productRatioButton.length) {
+                return { showCurrentDesignLabel: true };
+            }
+
+            return {
+                showCurrentDesignLabel: true,
+                productLabel: normalizeLabel(productRatioButton.data('productName')),
+                variantLabel: normalizeLabel(productRatioButton.data('variantLabel')),
+                sizeLabel: readVariantSizeFromButton(productRatioButton),
+                colorLabel: normalizeLabel(productRatioButton.data('variantColor'))
+            };
+        }
+
         if (productRatioButton.length && typeof MutationObserver !== 'undefined') {
             const existingObserver = productRatioButton.data('productNameObserver');
             if (existingObserver && typeof existingObserver.disconnect === 'function') {
@@ -451,7 +611,7 @@
                     const changed = rememberProductRatioName(productRatioButton, freshLabel);
                     if (!changed) return;
                     if (productRatioButton.hasClass('active') && currentFormatFilter !== 'all') {
-                        updateFormatLabel(currentFormatFilter, true);
+                        updateFormatLabel(currentFormatFilter, buildCurrentDesignFormatContext());
                     }
                 });
                 observer.observe(productNameElement, { childList: true, characterData: true, subtree: true });
@@ -553,13 +713,15 @@
                     .removeData('variantColor')
                     .removeData('displayLabel')
                     .removeData('ratio')
+                    .removeData('variantSize')
                     .removeData('variant-size');
             }
         };
 
         function applyProductRatioFilter(ratio) {
-            if (!ratio) return;
-            currentFormatFilter = ratio;
+            const normalizedRatio = normalizeRatio(ratio);
+            if (!normalizedRatio) return;
+            currentFormatFilter = normalizedRatio;
             currentProduct = null;
             currentSize = null;
             productFormats = [];
@@ -576,7 +738,7 @@
             $('#sizeButtons').empty();
 
             $('#open-format-menu').addClass('active');
-            updateFormatLabel(ratio, true);
+            updateFormatLabel(normalizedRatio, buildCurrentDesignFormatContext());
 
             currentPage = 1;
             renderFileList();
@@ -585,7 +747,7 @@
         function selectCurrentProductFormat() {
             const variant = resolveVariant();
             const storedRatio = productRatioButton.data('ratio');
-            const ratio = (variant && variant.ratio_image) ? variant.ratio_image : storedRatio;
+            const ratio = normalizeRatio((variant && variant.ratio_image) ? variant.ratio_image : storedRatio);
 
             if (!ratio) {
                 return false;
@@ -598,7 +760,7 @@
         function updateProductRatioButton(variantCandidate) {
             if (!productRatioButton.length) return;
             const variant = resolveVariant(variantCandidate);
-            const ratio = variant?.ratio_image || null;
+            const ratio = normalizeRatio(variant?.ratio_image);
             const wasActive = productRatioButton.hasClass('active');
 
             if (ratio) {
@@ -609,8 +771,11 @@
                     .data('ratio', ratio);
 
                 if (size) {
-                    productRatioButton.data('variant-size', size);
+                    productRatioButton
+                        .data('variantSize', size)
+                        .data('variant-size', size);
                 } else {
+                    productRatioButton.removeData('variantSize');
                     productRatioButton.removeData('variant-size');
                 }
 
@@ -630,8 +795,12 @@
 
                 rememberProductRatioName(productRatioButton, readProductNameFromDom());
 
-                if (wasActive && currentFormatFilter !== ratio) {
-                    applyProductRatioFilter(ratio);
+                if (wasActive) {
+                    if (currentFormatFilter !== ratio) {
+                        applyProductRatioFilter(ratio);
+                    } else {
+                        updateFormatLabel(currentFormatFilter, buildCurrentDesignFormatContext());
+                    }
                 }
             } else {
                 productRatioButton
@@ -643,6 +812,7 @@
                     .removeData('variantColor')
                     .removeData('displayLabel')
                     .removeData('ratio')
+                    .removeData('variantSize')
                     .removeData('variant-size');
 
                 if (wasActive && currentFormatFilter !== 'all') {
@@ -704,9 +874,9 @@
         if (productRatioButton.length) {
             productRatioButton.on('click', function () {
                 if ($(this).prop('disabled')) return;
-                const storedRatio = $(this).data('ratio');
+                const storedRatio = normalizeRatio($(this).data('ratio'));
                 const variant = resolveVariant();
-                const ratio = variant?.ratio_image || storedRatio;
+                const ratio = normalizeRatio(variant?.ratio_image) || storedRatio;
                 if (!ratio) return;
                 applyProductRatioFilter(ratio);
             });
@@ -787,32 +957,113 @@
                         $('#format-block .format-btn').removeClass('active');
                         $(this).addClass('active');
                         $('#mainFormatFilters .format-main').removeClass('active');
-                        $('#open-format-menu').addClass('active').text('Format');
+                        $('#open-format-menu').removeClass('active').text('Format');
+
+                        const productLabel = normalizeLabel(p.name);
 
                         const handleVariants = (variants) => {
                             productFormats = [];
                             sizeRatioMap = {};
-                            const sizes = [];
-                            (variants || []).forEach(v => {
-                                if (!sizes.includes(v.size)) sizes.push(v.size);
-                                sizeRatioMap[v.size] = v.ratio_image;
-                                if (!productFormats.includes(v.ratio_image)) productFormats.push(v.ratio_image);
+                            const sizeEntries = [];
+                            const seenSizes = new Set();
+
+                            (variants || []).forEach(variant => {
+                                if (!variant) {
+                                    return;
+                                }
+
+                                const ratio = normalizeRatio(variant.ratio_image);
+                                if (!ratio) {
+                                    return;
+                                }
+
+                                const rawSize = (variant.size || '').toString();
+                                const sizeLabel = normalizeLabel(rawSize);
+                                if (!sizeLabel) {
+                                    return;
+                                }
+
+                                const dedupeKey = sizeLabel.toLowerCase();
+                                if (!seenSizes.has(dedupeKey)) {
+                                    seenSizes.add(dedupeKey);
+
+                                    const variantLabel = normalizeLabel(
+                                        variant.variant_label
+                                        || variant.variantLabel
+                                        || variant.label
+                                        || variant.name
+                                        || variant.variant_name
+                                        || variant.variantName
+                                        || variant.size_label
+                                        || variant.sizeLabel
+                                    );
+
+                                    const colorLabel = normalizeLabel(
+                                        variant.color
+                                        || variant.color_label
+                                        || variant.colorLabel
+                                        || variant.colour
+                                        || variant.colour_label
+                                        || variant.colourLabel
+                                    );
+
+                                    sizeEntries.push({
+                                        rawSize,
+                                        sizeLabel,
+                                        ratio,
+                                        variantLabel,
+                                        colorLabel
+                                    });
+                                }
+
+                                sizeRatioMap[sizeLabel] = ratio;
+                                if (rawSize && rawSize !== sizeLabel) {
+                                    sizeRatioMap[rawSize] = ratio;
+                                }
+
+                                if (!productFormats.includes(ratio)) {
+                                    productFormats.push(ratio);
+                                }
                             });
+
                             const sizeContainer = $('#sizeButtons');
                             sizeContainer.empty();
-                            sizes.forEach(sz => {
-                                const sbtn = $('<button type="button" class="size-btn"></button>').text(sz);
+
+                            if (sizeEntries.length === 0) {
+                                sizeBlock.hide();
+                                currentPage = 1;
+                                renderFileList();
+                                return;
+                            }
+
+                            sizeEntries.forEach(entry => {
+                                const label = entry.sizeLabel || entry.rawSize;
+                                const sbtn = $('<button type="button" class="size-btn"></button>').text(label);
+                                sbtn.data('formatMeta', {
+                                    ratio: entry.ratio,
+                                    productLabel,
+                                    variantLabel: entry.variantLabel,
+                                    sizeLabel: entry.sizeLabel,
+                                    rawSize: entry.rawSize,
+                                    colorLabel: entry.colorLabel
+                                });
                                 sbtn.on('click', function () {
-                                    currentSize = sz;
-                                    currentFormatFilter = sizeRatioMap[sz] || 'all';
+                                    const meta = $(this).data('formatMeta') || {};
+                                    currentSize = meta.sizeLabel || meta.rawSize || '';
+                                    currentFormatFilter = meta.ratio || 'all';
                                     $('.size-btn').removeClass('active');
                                     $(this).addClass('active');
                                     currentPage = 1;
                                     renderFileList();
                                     if (currentFormatFilter !== 'all') {
-                                        updateFormatLabel(currentFormatFilter, true);
+                                        updateFormatLabel(currentFormatFilter, {
+                                            productLabel: meta.productLabel,
+                                            variantLabel: meta.variantLabel,
+                                            sizeLabel: meta.sizeLabel || meta.rawSize,
+                                            colorLabel: meta.colorLabel
+                                        });
                                     } else {
-                                        $('#open-format-menu').text('Format');
+                                        $('#open-format-menu').removeClass('active').text('Format');
                                     }
                                     $('#formatOptions').removeClass('active');
                                 });
@@ -834,7 +1085,9 @@
                                     variantCache[p.product_id] = (variants || []).map(v => ({
                                         variant_id: v.variant_id,
                                         size: v.size,
-                                        ratio_image: v.ratio_image
+                                        ratio_image: v.ratio_image,
+                                        color: v.color || null,
+                                        hexa: v.hexa || null
                                     }));
                                     try {
                                         window.customizerCache = window.customizerCache || {};
@@ -1239,7 +1492,7 @@
                         ? (productRatioButton.data('productName') || '').toString().trim()
                         : '';
                     const productVariantSize = productRatioActive
-                        ? (productRatioButton.data('variant-size') || '').toString().trim()
+                        ? readVariantSizeFromButton(productRatioButton)
                         : '';
                     const productVariantColor = productRatioActive
                         ? (productRatioButton.data('variantColor') || '').toString().trim()
