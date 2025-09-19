@@ -206,6 +206,105 @@ function ensure_png_for_order(string $source): string {
     return $source;
 }
 
+/**
+ * Récupère les dimensions de zone d'impression en pixels et en pouces pour un variant donné.
+ */
+function get_variant_print_dimensions(int $variant_id): array {
+    static $cache = [];
+
+    if (isset($cache[$variant_id])) {
+        return $cache[$variant_id];
+    }
+
+    global $wpdb;
+
+    $template = $wpdb->get_row(
+        $wpdb->prepare(
+            'SELECT print_area_width, print_area_height FROM WPC_variant_templates WHERE variant_id = %d LIMIT 1',
+            $variant_id
+        ),
+        ARRAY_A
+    ) ?: [];
+
+    $print = $wpdb->get_row(
+        $wpdb->prepare(
+            'SELECT print_area_width, print_area_height FROM WPC_variant_print WHERE variant_id = %d LIMIT 1',
+            $variant_id
+        ),
+        ARRAY_A
+    ) ?: [];
+
+    $cache[$variant_id] = [
+        'area_width_px'  => isset($template['print_area_width']) ? floatval($template['print_area_width']) : 0.0,
+        'area_height_px' => isset($template['print_area_height']) ? floatval($template['print_area_height']) : 0.0,
+        'area_width_in'  => isset($print['print_area_width']) ? floatval($print['print_area_width']) : 0.0,
+        'area_height_in' => isset($print['print_area_height']) ? floatval($print['print_area_height']) : 0.0,
+    ];
+
+    return $cache[$variant_id];
+}
+
+/**
+ * Convertit les métadonnées de placement (en pixels) vers les unités attendues par Printful (pouces).
+ */
+function normalize_design_position_for_printful(array $meta, int $variant_id): array {
+    $position = [
+        'width'  => max(0.0, floatval($meta['design_width']  ?? 0)),
+        'height' => max(0.0, floatval($meta['design_height'] ?? 0)),
+        'top'    => max(0.0, floatval($meta['design_top']    ?? 0)),
+        'left'   => max(0.0, floatval($meta['design_left']   ?? 0)),
+    ];
+
+    $dims = get_variant_print_dimensions($variant_id);
+
+    $areaWidthIn  = $dims['area_width_in'];
+    $areaHeightIn = $dims['area_height_in'];
+    $areaWidthPx  = $dims['area_width_px'];
+    $areaHeightPx = $dims['area_height_px'];
+
+    $scaleX = ($areaWidthPx > 0 && $areaWidthIn > 0) ? ($areaWidthIn / $areaWidthPx) : null;
+    $scaleY = ($areaHeightPx > 0 && $areaHeightIn > 0) ? ($areaHeightIn / $areaHeightPx) : null;
+
+    if ($scaleX !== null) {
+        $position['width'] = round($position['width'] * $scaleX, 4);
+        $position['left']  = round($position['left']  * $scaleX, 4);
+    }
+
+    if ($scaleY !== null) {
+        $position['height'] = round($position['height'] * $scaleY, 4);
+        $position['top']    = round($position['top']    * $scaleY, 4);
+    }
+
+    if ($areaWidthIn > 0) {
+        $position['width'] = min($position['width'], $areaWidthIn);
+        $maxLeft = max(0.0, $areaWidthIn - $position['width']);
+        $position['left'] = min(max(0.0, $position['left']), $maxLeft);
+    }
+
+    if ($areaHeightIn > 0) {
+        $position['height'] = min($position['height'], $areaHeightIn);
+        $maxTop = max(0.0, $areaHeightIn - $position['height']);
+        $position['top'] = min(max(0.0, $position['top']), $maxTop);
+    }
+
+    if (($scaleX === null || $scaleY === null) && ($areaWidthIn > 0 || $areaHeightIn > 0)) {
+        customiizer_log(
+            'Printful',
+            sprintf(
+                '⚠️ Conversion px→pouces incomplète pour variant_id=%d (scaleX=%s, scaleY=%s)',
+                $variant_id,
+                var_export($scaleX, true),
+                var_export($scaleY, true)
+            )
+        );
+    }
+
+    $position['area_width']  = $areaWidthIn;
+    $position['area_height'] = $areaHeightIn;
+
+    return $position;
+}
+
 // === Préparation commande Printful ===
 function preparer_commande_pour_printful(array $commande): array {
     $items = [];
@@ -229,9 +328,12 @@ function preparer_commande_pour_printful(array $commande): array {
 
         $url_png = ensure_png_for_order($meta['design_image_url']);
 
+        $variant_id = intval($meta['variant_id']);
+        $position = normalize_design_position_for_printful($meta, $variant_id);
+
         $items[] = [
             'source'       => 'catalog',
-            'variant_id'   => intval($meta['variant_id']),
+            'variant_id'   => $variant_id,
             'name'         => $item['name'],
             'quantity'     => $item['quantity'],
             'placements'   => [[
@@ -241,12 +343,7 @@ function preparer_commande_pour_printful(array $commande): array {
                 'layers'          => [[
                     'type'     => 'file',
                     'url'      => $url_png,
-                    'position' => [
-                        'width'  => floatval($meta['design_width']),
-                        'height' => floatval($meta['design_height']),
-                        'top'    => floatval($meta['design_top']),
-                        'left'   => floatval($meta['design_left']),
-                    ]
+                    'position' => $position,
                 ]]
             ]]
         ];
