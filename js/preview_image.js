@@ -363,6 +363,19 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 	useImageButton.classList.add('use-button');
 	useImageButton.disabled = true;
 
+	const updateUseImageButtonHandler = (handler) => {
+		if (useImageButton._currentHandler) {
+			useImageButton.removeEventListener('click', useImageButton._currentHandler);
+		}
+
+		if (typeof handler === 'function') {
+			useImageButton._currentHandler = handler;
+			useImageButton.addEventListener('click', handler);
+		} else {
+			useImageButton._currentHandler = null;
+		}
+	};
+
 	const useContainer = document.createElement('div');
 	useContainer.classList.add('use-container');
 	useContainer.appendChild(usePromptButton);
@@ -404,6 +417,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 });
                 if (!data || !data.success || !Array.isArray(data.choices) || data.choices.length === 0) {
                         formatTextElement.textContent = "Aucun produit trouvé.";
+                        updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
                         return;
                 }
@@ -433,19 +447,19 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 
                 if (productIds.length === 1) {
                         const { name, variants } = grouped[productIds[0]];
-                        useImageButton.addEventListener('click', () => {
+                        updateUseImageButtonHandler(() => {
                                 if (variants.length === 1) {
                                         const v = variants[0];
                                         redirectToConfigurator(name, v.product_id, src, prompt, targetFormat, v.variant_id);
                                 } else {
                                         showProductChooserOverlay(variants, src, prompt, targetFormat, name);
                                 }
-                        }, { once: true });
+                        });
                 } else {
-                        useImageButton.addEventListener('click', () => {
+                        updateUseImageButtonHandler(() => {
                                 const allVariants = Object.values(grouped).flatMap(p => p.variants);
                                 showProductChooserOverlay(allVariants, src, prompt, targetFormat);
-                        }, { once: true });
+                        });
                 }
         };
 
@@ -454,16 +468,19 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 
                 const handleError = (err) => {
                         console.error("❌ Erreur chargement produits compatibles :", err);
+                        updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
                 };
 
                 if (!cache) {
                         console.warn('[preview] formatProductsCache indisponible, impossible de charger', { format: targetFormat || null });
+                        updateUseImageButtonHandler(null);
                         return;
                 }
 
                 if (!targetFormat) {
                         console.warn('[preview] format image absent ou invalide, chargement abandonné', { userId });
+                        updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
                         return;
                 }
@@ -476,6 +493,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                                 knownInDb: dbRatios.has(targetFormat),
                                 availableFormats
                         });
+                        updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
                         formatTextElement.textContent = defaultFormatLabel;
                         return;
@@ -489,6 +507,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
         };
 
         formatTextElement.textContent = defaultFormatLabel;
+        updateUseImageButtonHandler(null);
         useImageButton.disabled = true;
 
         if (!targetFormat) {
