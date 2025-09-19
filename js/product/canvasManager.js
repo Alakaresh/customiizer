@@ -932,7 +932,22 @@ const CanvasManager = {
   sendImageBackward() {
     const obj = canvas?.getActiveObject();
     if (!obj) { CM.warn("sendImageBackward: pas d'objet actif"); return; }
-    canvas.sendBackwards(obj);
+    if (obj === bgImage) { CM.log('sendImageBackward: ignore background'); return; }
+
+    const objects = canvas.getObjects();
+    const currentIndex = objects.indexOf(obj);
+    if (currentIndex < 0) { CM.warn('sendImageBackward: objet introuvable'); return; }
+
+    const bgIndex = bgImage ? objects.indexOf(bgImage) : -1;
+    const minIndex = bgIndex >= 0 ? bgIndex + 1 : 0;
+    const targetIndex = Math.max(minIndex, currentIndex - 1);
+
+    if (targetIndex === currentIndex) {
+      CM.log("sendImageBackward: déjà à l'arrière plan utilisateur");
+      return;
+    }
+
+    canvas.moveTo(obj, targetIndex);
     canvas.requestRenderAll();
     emitObjectModified(obj, 'sendBackward');
     CM.log('sendImageBackward');
@@ -951,8 +966,10 @@ const CanvasManager = {
   sendToBack() {
     const img = this.getActiveUserImage();
     if (!img) return;
-    canvas.sendToBack(img);
-    if (bgImage) canvas.bringToFront(bgImage); // assure le BG reste au fond
+    const objects = canvas.getObjects();
+    const bgIndex = bgImage ? objects.indexOf(bgImage) : -1;
+    const targetIndex = bgIndex >= 0 ? bgIndex + 1 : 0;
+    canvas.moveTo(img, targetIndex);
     canvas.requestRenderAll();
     emitObjectModified(img, 'sendToBack');
     notifyChange('sendToBack');
