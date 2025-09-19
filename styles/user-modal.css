@@ -1,117 +1,53 @@
-#userModal {
-    position: fixed;
-    z-index: 1000;
-    right: 50px;
-    top: 65px;
-    width: 220px;
-    display: block;
-    box-sizing: border-box;
-    max-height: calc(100% - 65px);
-    overflow: auto;
-    background-color: transparent;
-    border: none;
+.user-menu-toggle {
+  cursor: pointer;
+  font-size: 28px;
+  color: #f0f0f0;
+  margin-left: 16px;
 }
 
-#userModal .modal-content {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-    color: #fff;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(135deg, rgba(16, 16, 16, 0.92), rgba(4, 4, 4, 0.94));
-    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(16px);
-    overflow: hidden;
+.user-dropdown {
+  position: absolute;
+  right: 20px;
+  top: 60px;
+  width: 200px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  overflow: hidden;
+  font-size: 0.9rem;
+  z-index: 1000;
 }
 
-#userModal .user-info {
-    padding: 20px 18px 18px;
-    text-align: center;
-    background: linear-gradient(135deg, rgba(22, 22, 22, 0.92), rgba(10, 10, 10, 0.94));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+.user-dropdown .user-header {
+  padding: 12px;
+  background: #222;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
 }
 
-#userModal .user-logo,
-#userModal .user-name,
-#userModal .user-credits {
-    margin-bottom: 10px;
+.user-dropdown .user-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-#userModal .user-name {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: #f2f2f2;
+.user-dropdown .user-links li a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: #eee;
+  text-decoration: none;
+  transition: background 0.2s;
 }
 
-#userModal .lower-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 18px;
-    background: linear-gradient(135deg, rgba(20, 20, 20, 0.92), rgba(6, 6, 6, 0.94));
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+.user-dropdown .user-links li a:hover {
+  background: rgba(255,255,255,0.1);
 }
 
-#userModal .modal-button {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
-        padding: 12px 18px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.94));
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #f3f3f3;
-        text-align: left;
-        cursor: pointer;
-        text-decoration: none; /* pour <a> */
-        border-radius: 16px;
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(14px);
-        transition: transform 0.2s ease, border-color 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-}
-
-#userModal .modal-button:hover,
-#userModal .modal-button:focus-visible {
-        transform: translateY(-1px);
-        background: linear-gradient(135deg, rgba(26, 188, 156, 0.25), rgba(26, 188, 156, 0.05));
-        border-color: rgba(26, 188, 156, 0.6);
-        color: #f8fffb;
-        box-shadow: 0 22px 44px rgba(26, 188, 156, 0.25);
-        outline: none;
-}
-
-#userModal .modal-button i {
-        font-size: 18px;
-        min-width: 20px;
-        text-align: center;
-        color: inherit;
-}
-
-#userModal .modal-button:focus-visible {
-        outline: none;
-}
-
-#userModal .modal-button--logout {
-        justify-content: center;
-        color: #ff9f9f;
-        border-color: rgba(255, 99, 99, 0.28);
-        background: linear-gradient(135deg, rgba(42, 18, 18, 0.82), rgba(28, 10, 10, 0.92));
-        box-shadow: 0 18px 36px rgba(130, 0, 0, 0.35);
-}
-
-#userModal .modal-button--logout:hover,
-#userModal .modal-button--logout:focus-visible {
-        background: linear-gradient(135deg, rgba(255, 88, 88, 0.35), rgba(255, 88, 88, 0.12));
-        border-color: rgba(255, 128, 128, 0.6);
-        color: #fff;
-        box-shadow: 0 22px 44px rgba(255, 88, 88, 0.3);
+.user-dropdown .user-links li.logout a {
+  color: #ff6b6b;
 }
