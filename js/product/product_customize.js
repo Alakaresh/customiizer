@@ -40,6 +40,32 @@ let lastAutoSaveSignature = null;
     return null;
   }
 
+  function normalizeHexCandidate(value) {
+    if (typeof value !== 'string') {
+      return '';
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return '';
+    }
+    if (/^#?[0-9a-f]{3,8}$/i.test(trimmed)) {
+      return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+    }
+    return trimmed;
+  }
+
+  function pickFirstValidColor(candidates, fallback = '#333333') {
+    if (!Array.isArray(candidates)) {
+      return fallback;
+    }
+    for (const candidate of candidates) {
+      if (candidate && isValidCssColor(candidate)) {
+        return candidate;
+      }
+    }
+    return fallback;
+  }
+
   function formatLabel(value) {
     if (!value) {
       return 'Couleur';
@@ -47,17 +73,24 @@ let lastAutoSaveSignature = null;
     return value.charAt(0).toUpperCase() + value.slice(1);
   }
 
-  global.resolveVariantColorAppearance = function resolveVariantColorAppearance(rawColor) {
+  global.resolveVariantColorAppearance = function resolveVariantColorAppearance(rawColor, fallbackHex = null) {
     const original = typeof rawColor === 'string' ? rawColor.trim() : '';
     const normalizedKey = original.toLowerCase();
-    const cssColor =
-      isValidCssColor(original) ? original : extractEmbeddedColor(original) || '#333333';
+    const preferredHex = normalizeHexCandidate(fallbackHex);
+    const embedded = extractEmbeddedColor(original);
+    const cssColor = pickFirstValidColor([
+      preferredHex,
+      original,
+      embedded
+    ]);
 
     return {
       cssColor,
       label: formatLabel(original || 'Couleur'),
       originalValue: rawColor,
-      normalizedKey
+      normalizedKey,
+      providedHex: preferredHex || null,
+      resolvedHex: cssColor
     };
   };
 })(window);
@@ -655,16 +688,26 @@ jQuery(document).ready(function ($) {
                sizesContainer.removeClass('sizes-select-mode');
 
                const colorSet = new Set();
-               variants.forEach(v => { if (v.color) colorSet.add(v.color); });
+               const colorHexMap = new Map();
+               variants.forEach(v => {
+                       if (v.color) {
+                               colorSet.add(v.color);
+                               if (v.hexa && !colorHexMap.has(v.color)) {
+                                       colorHexMap.set(v.color, v.hexa);
+                               }
+                       }
+               });
 
                Array.from(colorSet).forEach((color, idx) => {
+                       const fallbackHex = colorHexMap.get(color) || null;
                        const appearance = typeof window.resolveVariantColorAppearance === 'function'
-                               ? window.resolveVariantColorAppearance(color)
-                               : { cssColor: color, label: color };
+                               ? window.resolveVariantColorAppearance(color, fallbackHex)
+                               : { cssColor: fallbackHex || color, label: color };
                        const disabled = !variants.some(v => v.color === color && v.stock !== 'out of stock' && v.stock !== 'discontinued');
                        const opt = $('<div>').addClass('color-option')
                                .css('background-color', appearance.cssColor)
                                .attr('data-color', color)
+                               .attr('data-color-hex', fallbackHex || '')
                                .attr('title', appearance.label)
                                .attr('aria-label', appearance.label)
                                .toggleClass('disabled', disabled)
@@ -792,14 +835,25 @@ jQuery(document).ready(function ($) {
        }
 
        function updateSidebarSelectedVariant() {
-               const selectedColor = productSidebar.find('.color-option.selected').attr('data-color');
+               const selectedColorElement = productSidebar.find('.color-option.selected').first();
+               const selectedColor = selectedColorElement.attr('data-color');
+               const selectedHexRaw = selectedColorElement.attr('data-color-hex');
+               const normalizedSelectedHex = typeof selectedHexRaw === 'string' && selectedHexRaw.trim()
+                       ? selectedHexRaw.trim().toLowerCase()
+                       : null;
                const sizeSelector = productSidebar.find('.size-selector');
                const selectedSizeFromSelect = sizeSelector.length ? sizeSelector.val() : null;
                const selectedSize = productSidebar.find('.size-option.selected').attr('data-size') || selectedSizeFromSelect;
-               const variant = sidebarVariants.find(v =>
-                       (!selectedColor || v.color === selectedColor) &&
-                       (!selectedSize || v.size === selectedSize)
-               );
+               const variant = sidebarVariants.find(v => {
+                       const variantHex = typeof v.hexa === 'string' && v.hexa.trim()
+                               ? v.hexa.trim().toLowerCase()
+                               : null;
+                       const matchesColor = (!selectedColor && !normalizedSelectedHex)
+                               || (typeof v.color === 'string' && v.color === selectedColor)
+                               || (normalizedSelectedHex && variantHex === normalizedSelectedHex);
+                       const matchesSize = !selectedSize || v.size === selectedSize;
+                       return matchesColor && matchesSize;
+               });
                if (variant) {
                        selectedVariant = variant;
                        if (sizeSelector.length && variant.size) {
