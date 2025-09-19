@@ -80,6 +80,17 @@ function toggleUI(hasImage) {
   }
 }
 
+// Harmonise la remontée d'un changement manuel pour profiter des listeners Fabric
+function emitObjectModified(target, reason = 'manual-update') {
+  if (!canvas || !target) { return; }
+  try {
+    canvas.fire('object:modified', { target, reason });
+    CM.log('emitObjectModified', reason);
+  } catch (err) {
+    CM.warn('emitObjectModified KO', err);
+  }
+}
+
 // notifyChange : évènements + compat UI + fallback DOM
 function notifyChange(src = 'unknown') {
   const hasImage = CanvasManager.hasImage ? CanvasManager.hasImage() : false;
@@ -752,6 +763,7 @@ const CanvasManager = {
 
     img.setCoords();
     canvas.requestRenderAll();
+    emitObjectModified(img, `align:${position}`);
     CM.log('alignImage:', position);
     notifyChange('alignImage');
   },
@@ -770,6 +782,7 @@ const CanvasManager = {
     img.rotate((img.angle || 0) + angle);
     img.setCoords();
     canvas.requestRenderAll();
+    emitObjectModified(img, `rotate:${angle}`);
     CM.log('rotateImage:', angle);
     notifyChange('rotateImage');
   },
@@ -782,6 +795,7 @@ const CanvasManager = {
     img.rotate(target);
     img.setCoords();
     canvas.requestRenderAll();
+    emitObjectModified(img, 'rotateLeft');
     notifyChange('rotateLeft');
   },
 
@@ -793,6 +807,7 @@ const CanvasManager = {
     img.rotate(target);
     img.setCoords();
     canvas.requestRenderAll();
+    emitObjectModified(img, 'rotateRight');
     notifyChange('rotateRight');
   },
 
@@ -802,6 +817,7 @@ const CanvasManager = {
     img.flipX = !img.flipX;
     img.setCoords();
     canvas.requestRenderAll();
+    emitObjectModified(img, 'mirror');
     CM.log('mirrorImage: flipX =', img.flipX);
     notifyChange('mirrorImage');
   },
@@ -811,6 +827,7 @@ const CanvasManager = {
     if (!obj) { CM.warn("bringImageForward: pas d'objet actif"); return; }
     canvas.bringForward(obj);
     canvas.requestRenderAll();
+    emitObjectModified(obj, 'bringForward');
     CM.log('bringImageForward');
     notifyChange('bringImageForward');
   },
@@ -820,6 +837,7 @@ const CanvasManager = {
     if (!obj) { CM.warn("sendImageBackward: pas d'objet actif"); return; }
     canvas.sendBackwards(obj);
     canvas.requestRenderAll();
+    emitObjectModified(obj, 'sendBackward');
     CM.log('sendImageBackward');
     notifyChange('sendImageBackward');
   },
@@ -829,6 +847,7 @@ const CanvasManager = {
     if (!img) return;
     canvas.bringToFront(img);
     canvas.requestRenderAll();
+    emitObjectModified(img, 'bringToFront');
     notifyChange('bringToFront');
   },
 
@@ -838,6 +857,7 @@ const CanvasManager = {
     canvas.sendToBack(img);
     if (bgImage) canvas.bringToFront(bgImage); // assure le BG reste au fond
     canvas.requestRenderAll();
+    emitObjectModified(img, 'sendToBack');
     notifyChange('sendToBack');
   },
 
