@@ -991,6 +991,37 @@
   transform: translateY(0);
 }
 
+#customizeModal .modal-footer .modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+#customizeModal .modal-footer #resetDesignButton {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(246, 246, 246, 0.92);
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+#customizeModal .modal-footer #resetDesignButton:hover,
+#customizeModal .modal-footer #resetDesignButton:focus-visible {
+  transform: translateY(0);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  color: #f6f6f6;
+  outline: none;
+}
+
+#customizeModal .modal-footer #resetDesignButton:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+}
+
 /* ================================
    MODALE BIBLIOTHÈQUE / UPLOAD
 ================================ */
