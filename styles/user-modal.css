@@ -1,77 +1,53 @@
-#userModal {
-    position: fixed;
-    z-index: 1000;
-    right: 50px;
-    top: 65px;
-    width: 220px;
-    display: block;
-    box-sizing: border-box;
-    max-height: calc(100% - 65px);
-    overflow: auto;
-    background-color: transparent;
-    border: none;
+.user-menu-toggle {
+  cursor: pointer;
+  font-size: 28px;
+  color: #f0f0f0;
+  margin-left: 16px;
 }
 
-#userModal .modal-content {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    width: 100%;
-    box-sizing: border-box;
+.user-dropdown {
+  position: absolute;
+  right: 20px;
+  top: 60px;
+  width: 200px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  overflow: hidden;
+  font-size: 0.9rem;
+  z-index: 1000;
 }
 
-#userModal .user-info {
-    text-align: center; /* Centrer tout le contenu de user-info */
+.user-dropdown .user-header {
+  padding: 12px;
+  background: #222;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
 }
 
-#userModal .user-logo, #userModal .user-name, #userModal .user-credits {
-    margin-bottom: 10px; /* Espacement uniforme entre les éléments */
+.user-dropdown .user-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-#userModal .lower-container {
-    padding: 10px;
-    background-color: #2a2a2a; /* Un fond légèrement différent pour distinguer cette section */
+.user-dropdown .user-links li a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: #eee;
+  text-decoration: none;
+  transition: background 0.2s;
 }
 
-#userModal .modal-button {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	width: 100%;
-	padding: 10px 15px;
-	font-size: 15px;
-	font-weight: 600;
-	background-color: transparent;
-	border: none;
-	color: white;
-	text-align: left;
-	cursor: pointer;
-	text-decoration: none; /* pour <a> */
-	border-radius: 6px;
-	transition: background-color 0.3s;
+.user-dropdown .user-links li a:hover {
+  background: rgba(255,255,255,0.1);
 }
 
-#userModal .modal-button:hover {
-	background-color: #444;
-	color: #ddd;
-}
-
-#userModal .modal-button i {
-	font-size: 18px;
-	min-width: 20px;
-	text-align: center;
-}
-
-#userModal .modal-button:last-child {
-        background-color: transparent;
-        color: #d14343;
-        justify-content: center;
-        text-align: center;
-}
-
-#userModal .modal-button:last-child:hover {
-        background-color: #d14343;
-        color: white;
+.user-dropdown .user-links li.logout a {
+  color: #ff6b6b;
 }

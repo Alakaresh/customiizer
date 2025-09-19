@@ -612,6 +612,7 @@
                     if (!changed) return;
                     if (productRatioButton.hasClass('active') && currentFormatFilter !== 'all') {
                         updateFormatLabel(currentFormatFilter, buildCurrentDesignFormatContext());
+
                     }
                 });
                 observer.observe(productNameElement, { childList: true, characterData: true, subtree: true });
