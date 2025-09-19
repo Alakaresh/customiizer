@@ -42,8 +42,9 @@
                                         <button id="rotateLeftButton" class="align-button" title="Pivoter à gauche"><i class="fas fa-undo"></i></button>
                                         <button id="rotateRightButton" class="align-button" title="Pivoter à droite"><i class="fas fa-redo"></i></button>
                                         <button id="mirrorImageButton" class="align-button" title="Retourner horizontalement"><i class="fas fa-retweet"></i></button>
-                                        <button id="bringForwardButton" class="align-button" title="Mettre au premier plan"><i class="fas fa-arrow-circle-up"></i></button>
-                                        <button id="sendBackwardButton" class="align-button" title="Envoyer à l'arrière-plan"><i class="fas fa-arrow-circle-down"></i></button>
+                                        <button id="bringForwardButton" class="align-button" title="Mettre au premier plan"><i class="fas fa-layer-group"></i></button>
+                                        <button id="sendBackwardButton" class="align-button" title="Envoyer à l'arrière-plan"><i class="fas fa-layer-group"></i></button>
+                                        <button id="resetImageButton" class="align-button" title="Réinitialiser l'image" aria-label="Réinitialiser l'image"><i class="fas fa-history"></i></button>
                                         <button id="removeImageButton" class="remove-image-button" title="Supprimer l'image"><i class="fas fa-trash"></i></button>
                                 </div>
                         </div>
