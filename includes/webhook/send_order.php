@@ -170,15 +170,40 @@ if (!function_exists('convert_webp_to_png_server')) {
     require_once __DIR__ . '/../generate_mockup.php';
 }
 
-function ensure_png_for_order(string $url): string {
-    $parts = wp_parse_url($url);
-    $ext   = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
-    if ($ext === 'png') {
-        return $url;
+function ensure_png_for_order(string $source): string {
+    $looks_like_data_uri = stripos($source, 'data:image/') === 0 || strpos($source, ';base64,') !== false;
+
+    if ($looks_like_data_uri) {
+        customiizer_log('Printful', 'Conversion base64 → PNG détectée pour un design.');
+        $result = convert_webp_to_png_server($source);
+        if (!empty($result['success']) && !empty($result['png_url'])) {
+            return $result['png_url'];
+        }
+
+        $message = $result['message'] ?? 'motif inconnu';
+        customiizer_log('Printful', 'Échec conversion base64 → PNG: ' . $message);
+        return $source;
     }
 
-    $result = convert_webp_to_png_server($url);
-    return $result['success'] ? $result['png_url'] : $url;
+    $parts = wp_parse_url($source);
+    if (!$parts) {
+        customiizer_log('Printful', 'URL de design invalide, impossible de convertir.');
+        return $source;
+    }
+
+    $ext = strtolower(pathinfo($parts['path'] ?? '', PATHINFO_EXTENSION));
+    if ($ext === 'png') {
+        return $source;
+    }
+
+    $result = convert_webp_to_png_server($source);
+    if (!empty($result['success']) && !empty($result['png_url'])) {
+        return $result['png_url'];
+    }
+
+    $message = $result['message'] ?? 'motif inconnu';
+    customiizer_log('Printful', 'Échec conversion URL → PNG: ' . $message);
+    return $source;
 }
 
 // === Préparation commande Printful ===
