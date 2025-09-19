@@ -16,6 +16,49 @@ function customiizer_generate_product() {
         $product_price = floatval($data['product_price'] ?? 0);
         $mockup_url = esc_url_raw($data['mockup_url'] ?? '');
 
+        $variant_id = intval($data['variant_id'] ?? 0);
+
+        $normalize_field = static function ($value, $fallback_key = null) {
+                if (is_object($value)) {
+                        $value = (array) $value;
+                }
+                if (is_array($value)) {
+                        if ($fallback_key && isset($value[$fallback_key])) {
+                                $value = $value[$fallback_key];
+                        } elseif (isset($value['value'])) {
+                                $value = $value['value'];
+                        } elseif (isset($value[0]) && !is_array($value[0]) && !is_object($value[0])) {
+                                $value = $value[0];
+                        } else {
+                                $value = '';
+                        }
+                }
+                return sanitize_text_field($value ?? '');
+        };
+
+        $placement = $normalize_field($data['placement'] ?? '', 'placement');
+        $technique = $normalize_field($data['technique'] ?? '', 'technique');
+
+        if ($variant_id && (!$placement || !$technique)) {
+                global $wpdb;
+                $row = $wpdb->get_row(
+                        $wpdb->prepare(
+                                'SELECT technique, placement FROM WPC_variant_print WHERE variant_id = %d LIMIT 1',
+                                $variant_id
+                        ),
+                        ARRAY_A
+                );
+
+                if ($row) {
+                        if (!$placement && !empty($row['placement'])) {
+                                $placement = sanitize_text_field($row['placement']);
+                        }
+                        if (!$technique && !empty($row['technique'])) {
+                                $technique = sanitize_text_field($row['technique']);
+                        }
+                }
+        }
+
         customiizer_log("➡️ create_product : {$product_name} ({$product_price}€)");
 
         // Provide a fallback image if none supplied
@@ -44,9 +87,9 @@ function customiizer_generate_product() {
 	update_post_meta($product_id, 'design_height', floatval($data['design_height'] ?? 0));
 	update_post_meta($product_id, 'design_left', floatval($data['design_left'] ?? 0));
 	update_post_meta($product_id, 'design_top', floatval($data['design_top'] ?? 0));
-	update_post_meta($product_id, 'variant_id', intval($data['variant_id'] ?? 0));
-	update_post_meta($product_id, 'placement', sanitize_text_field($data['placement'] ?? ''));
-	update_post_meta($product_id, 'technique', sanitize_text_field($data['technique'] ?? ''));
+        update_post_meta($product_id, 'variant_id', $variant_id);
+        update_post_meta($product_id, 'placement', $placement);
+        update_post_meta($product_id, 'technique', $technique);
 
 	// Importer et associer l'image mockup comme image produit
 	if (!empty($mockup_url)) {
