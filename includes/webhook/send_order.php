@@ -71,8 +71,7 @@ function startConsumerLoop() {
                     }
 
                 } catch (AMQPTimeoutException $e) {
-                    // Simple keepalive → rien reçu
-                    customiizer_log("⏳ Timeout RabbitMQ, pas de message");
+                    // Simple keepalive → rien reçu (silencieux pour éviter le bruit de log)
                 }
             }
         } catch (\Throwable $e) {
