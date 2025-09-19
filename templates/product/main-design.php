@@ -70,7 +70,10 @@
                                 <img id="footerProductImage" alt="Produit" />
                                 <span class="summary-name"></span> - <span class="summary-price"></span>
                         </div>
-                        <button id="saveDesignButton">Valider la personnalisation</button>
+                        <div class="modal-actions">
+                                <button id="resetDesignButton" type="button">Réinitialiser</button>
+                                <button id="saveDesignButton">Valider la personnalisation</button>
+                        </div>
                 </div>
 </div>
 </div>

@@ -415,6 +415,7 @@ jQuery(document).ready(function ($) {
         const customizeModal = $('#customizeModal');
         const closeButtonMain = $('#customizeModal .close-button');
         const addImageButton = $('#addImageButton');
+        const resetDesignButton = $('#resetDesignButton');
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
@@ -452,6 +453,52 @@ jQuery(document).ready(function ($) {
         let sidebarVariants = [];
         let threeDInitialized = false;
         let hasAppliedInitialFormatFilter = false;
+        let initialCanvasSnapshot = { canvasState: [] };
+
+        function captureInitialSnapshotFromCanvas() {
+                if (!window.CanvasManager || typeof CanvasManager.exportState !== 'function') {
+                        initialCanvasSnapshot.canvasState = [];
+                        return;
+                }
+
+                try {
+                        const exported = CanvasManager.exportState();
+                        initialCanvasSnapshot.canvasState = cloneCanvasStateLayers(exported);
+                } catch (error) {
+                        console.warn('[Reset] Failed to capture canvas state', error);
+                        initialCanvasSnapshot.canvasState = [];
+                }
+        }
+
+        async function preloadSidebarVariants(preselectVariant) {
+                if (Array.isArray(sidebarVariants) && sidebarVariants.length) {
+                        if (preselectVariant) {
+                                renderSidebarOptions(sidebarVariants, preselectVariant);
+                        }
+                        return sidebarVariants;
+                }
+
+                try {
+                        let data;
+                        if (window.customizerCache?.variants?.[window.currentProductId]) {
+                                data = window.customizerCache.variants[window.currentProductId];
+                        } else {
+                                const res = await fetch(`/wp-json/api/v1/products/${window.currentProductId}`);
+                                data = await res.json();
+                                if (window.customizerCache) {
+                                        window.customizerCache.variants[window.currentProductId] = data;
+                                }
+                        }
+                        sidebarVariants = Array.isArray(data?.variants) ? data.variants : [];
+                        if (preselectVariant) {
+                                renderSidebarOptions(sidebarVariants, preselectVariant);
+                        }
+                } catch (error) {
+                        console.error('[Reset] Failed to preload variants', error);
+                }
+
+                return sidebarVariants;
+        }
 
         FileLibrary.init({
                 my: typeof myGeneratedImages !== 'undefined' ? myGeneratedImages : [],
@@ -882,6 +929,7 @@ jQuery(document).ready(function ($) {
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function (event) {
                 threeDInitialized = false;
+                initialCanvasSnapshot = { canvasState: [] };
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
                 const productImageSrc = jQuery("#product-main-image").attr("src");
@@ -920,11 +968,16 @@ jQuery(document).ready(function ($) {
                         // 2. Lancer Fabric.js dans le container
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
+                        captureInitialSnapshotFromCanvas();
                         if (!shouldSkipRestore) {
-                                const restorePromise = restoreLastDesignToCanvas();
+                                const restorePromise = restoreLastDesignToCanvas(() => {
+                                        captureInitialSnapshotFromCanvas();
+                                });
                                 if (restorePromise && typeof restorePromise.catch === 'function') {
                                         restorePromise.catch(err => console.error('[Restore] restoreLastDesignToCanvas failed', err));
                                 }
+                        } else {
+                                captureInitialSnapshotFromCanvas();
                         }
                         // La personnalisation est restaurée automatiquement lors d'une ouverture manuelle.
 
@@ -984,18 +1037,7 @@ jQuery(document).ready(function ($) {
 
         async function openProductSidebar() {
                 try {
-                        let data;
-                        if (window.customizerCache?.variants?.[window.currentProductId]) {
-                                data = window.customizerCache.variants[window.currentProductId];
-                        } else {
-                                const res = await fetch(`/wp-json/api/v1/products/${window.currentProductId}`);
-                                data = await res.json();
-                                if (window.customizerCache) {
-                                        window.customizerCache.variants[window.currentProductId] = data;
-                                }
-                        }
-                        sidebarVariants = Array.isArray(data.variants) ? data.variants : [];
-                        renderSidebarOptions(sidebarVariants, selectedVariant);
+                        await preloadSidebarVariants(selectedVariant);
                         productSidebar.addClass('open');
                 } catch (e) {
                         console.error('[Sidebar] Failed to load variants', e);
@@ -1056,6 +1098,40 @@ jQuery(document).ready(function ($) {
         removeImageButton.on('click', function () {
                 CanvasManager.removeImage();
                 updateAddImageButtonVisibility();
+        });
+
+        resetDesignButton.on('click', async function () {
+                if (resetDesignButton.prop('disabled')) {
+                        return;
+                }
+
+                resetDesignButton.prop('disabled', true);
+
+                try {
+                        const layersToRestore = cloneCanvasStateLayers(initialCanvasSnapshot?.canvasState || []);
+                        const hasLayers = Array.isArray(layersToRestore) && layersToRestore.length > 0;
+
+                        if (window.CanvasManager && typeof CanvasManager.clearUserImages === 'function') {
+                                CanvasManager.clearUserImages();
+                        }
+
+                        if (hasLayers && window.CanvasManager && typeof CanvasManager.restoreState === 'function') {
+                                try {
+                                        await CanvasManager.restoreState(layersToRestore, {
+                                                onLayerError: (layer, error) => console.error('[Reset] Layer restore error', layer, error)
+                                        });
+                                } catch (error) {
+                                        console.error('[Reset] Failed to restore canvas state', error);
+                                }
+                        }
+
+                        updateAddImageButtonVisibility();
+                        scheduleDesignAutosave('manual-reset');
+                } catch (error) {
+                        console.error('[Reset] Unexpected error during reset', error);
+                } finally {
+                        resetDesignButton.prop('disabled', false);
+                }
         });
 
         $(document).on('keydown', function (e) {
