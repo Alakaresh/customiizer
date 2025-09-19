@@ -339,11 +339,17 @@ const CanvasManager = {
         const zone = CanvasManager.getClipWindowBBox();
         const iw = img.width, ih = img.height;
         const zw = zone.width, zh = zone.height;
-        const scale = Math.max(zw / iw, zh / ih); // cover
+        const ratioW = Number.isFinite(zw / iw) ? zw / iw : 1;
+        const ratioH = Number.isFinite(zh / ih) ? zh / ih : 1;
+        const scale = Math.max(Math.min(ratioW, ratioH), 0) || 1; // contain, shrink if needed
+        const scaledWidth = iw * scale;
+        const scaledHeight = ih * scale;
+        const left = zone.left + (zw - scaledWidth) / 2;
+        const top = zone.top + (zh - scaledHeight) / 2;
 
         img.set({
-          left: zone.left,
-          top:  zone.top,
+          left,
+          top,
           originX: 'left',
           originY: 'top',
           scaleX: scale,
