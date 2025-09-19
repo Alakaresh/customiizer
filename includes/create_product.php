@@ -39,14 +39,32 @@ function customiizer_generate_product() {
         $placement = $normalize_field($data['placement'] ?? '', 'placement');
         $technique = $normalize_field($data['technique'] ?? '', 'technique');
 
+        customiizer_log(
+                sprintf(
+                        '📩 create_product AJAX : variant_id=%s, placement=%s, technique=%s',
+                        $variant_id ?: '0',
+                        $placement !== '' ? $placement : '(vide)',
+                        $technique !== '' ? $technique : '(vide)'
+                )
+        );
+
         if ($variant_id && (!$placement || !$technique)) {
                 global $wpdb;
+                customiizer_log("🔍 create_product : recherche variant_id={$variant_id} pour compléter placement/technique");
                 $row = $wpdb->get_row(
                         $wpdb->prepare(
                                 'SELECT technique, placement FROM WPC_variant_print WHERE variant_id = %d LIMIT 1',
                                 $variant_id
                         ),
                         ARRAY_A
+                );
+
+                customiizer_log(
+                        sprintf(
+                                '📦 create_product : résultat requête variant_id=%d -> %s',
+                                $variant_id,
+                                $row ? 'valeurs trouvées' : 'aucun résultat'
+                        )
                 );
 
                 if ($row) {
@@ -56,8 +74,25 @@ function customiizer_generate_product() {
                         if (!$technique && !empty($row['technique'])) {
                                 $technique = sanitize_text_field($row['technique']);
                         }
+
+                        customiizer_log(
+                                sprintf(
+                                        '📥 create_product : données récupérées placement=%s, technique=%s',
+                                        !empty($row['placement']) ? sanitize_text_field($row['placement']) : '(vide)',
+                                        !empty($row['technique']) ? sanitize_text_field($row['technique']) : '(vide)'
+                                )
+                        );
                 }
         }
+
+        customiizer_log(
+                sprintf(
+                        '🧾 create_product metas : variant_id=%s, placement=%s, technique=%s',
+                        $variant_id ?: '0',
+                        $placement !== '' ? $placement : '(vide)',
+                        $technique !== '' ? $technique : '(vide)'
+                )
+        );
 
         customiizer_log("➡️ create_product : {$product_name} ({$product_price}€)");
 
