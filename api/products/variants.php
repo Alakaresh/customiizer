@@ -11,8 +11,9 @@ function get_product_variants_full($request) {
 
 	$query = "
 		SELECT
-			v.variant_id,
-			v.color,
+                        v.variant_id,
+                        v.color,
+                        v.hexa,
 			v.size,
 			v.ratio_image,
 			vp.price,
@@ -59,7 +60,8 @@ function get_product_variants_full($request) {
 		if (!isset($grouped[$vid])) {
 			$grouped[$vid] = [
 				'variant_id' => $vid,
-				'color' => $v['color'],
+                                'color' => $v['color'],
+                                'hexa' => $v['hexa'],
 				'size' => $v['size'],
 				'ratio_image' => $v['ratio_image'],
 				'price' => $v['price'] ? floatval($v['price']) : null,

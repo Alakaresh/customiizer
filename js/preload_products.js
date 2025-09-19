@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     variant_id: variantId,
                     variant_size: variant?.size || null,
                     color: typeof variant?.color === 'string' && variant.color.trim() ? variant.color : null,
+                    hexa: typeof variant?.hexa === 'string' && variant.hexa.trim() ? variant.hexa : null,
                     ratio_image: ratio
                 };
 
@@ -185,7 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             variant_id: v.variant_id,
                             size: v.size,
                             ratio_image: v.ratio_image,
-                            color: v.color || null
+                            color: v.color || null,
+                            hexa: v.hexa || null
                         });
                     });
                     window.customizerCache.variantBasics = grouped;

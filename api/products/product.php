@@ -11,8 +11,8 @@ function product($request) {
 	$prefix = 'WPC_';  // Préfixe personnalisé
 
 	$query = $wpdb->prepare("
-    SELECT 
-        v.variant_id, v.color, v.size, v.ratio_image, v.url_3d, v.zone_3d_name,
+    SELECT
+        v.variant_id, v.color, v.hexa, v.size, v.ratio_image, v.url_3d, v.zone_3d_name,
         vp.sale_price, vp.delivery_price, vp.delivery_time,
         st.availability AS stock,
         pr.technique, pr.print_area_width, pr.print_area_height, pr.placement,
@@ -47,7 +47,8 @@ function product($request) {
 		if (!isset($variants[$variant_id])) {
 			$variants[$variant_id] = [
 				'variant_id' => $variant_id,
-				'color' => $row['color'],
+                                'color' => $row['color'],
+                                'hexa' => $row['hexa'],
 				'size' => $row['size'],
 				'ratio_image' => $row['ratio_image'],
 				'url_3d' => $row['url_3d'],

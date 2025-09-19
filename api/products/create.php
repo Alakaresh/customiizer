@@ -175,7 +175,21 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		$vid   = (int) $v['id'];
 		$size_raw = $v['size'] ?? '';
 		$size     = convert_size_to_cm($size_raw);
-		$color = $v['color'];
+                $color = $v['color'];
+                $hexa = null;
+                $rawColorCode = $v['color_code'] ?? null;
+                if (is_string($rawColorCode)) {
+                        $trimmedCode = trim($rawColorCode);
+                        if ($trimmedCode !== '' && preg_match('/^#?[0-9a-f]{3,8}$/i', $trimmedCode)) {
+                                $hexa = '#' . ltrim($trimmedCode, '#');
+                        }
+                }
+
+                if (!$hexa && is_string($color)) {
+                        if (preg_match('/#([0-9a-f]{3,8})/i', $color, $matches)) {
+                                $hexa = '#' . $matches[1];
+                        }
+                }
 
 		// 🧮 Calcul du ratio d’image simplifié
 		$print_width  = (float) ($variant_print_buffer[$vid]['print_area_width'] ?? 0);
@@ -260,14 +274,15 @@ function create_product( WP_REST_Request $req ): WP_REST_Response {
 		/* ------ 1) variant (parent) ---------------------------------- */
 		$wpdb->replace(
 			'WPC_variants',
-			[
-				'variant_id' => $vid,
-				'product_id' => $catalog_id,
-				'color'      => $color,
-				'size'       => $size,
-				'ratio_image' => $ratio_image,
-			],
-			[ '%d','%d','%s','%s','%s' ] // ← ajouté '%s' à la fin
+                        [
+                                'variant_id' => $vid,
+                                'product_id' => $catalog_id,
+                                'color'      => $color,
+                                'hexa'       => $hexa,
+                                'size'       => $size,
+                                'ratio_image' => $ratio_image,
+                        ],
+                        [ '%d','%d','%s','%s','%s','%s' ] // ← inclu "hexa"
 		);
 		db_err( 'WPC_variants '.$vid );
 

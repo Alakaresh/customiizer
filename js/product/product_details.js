@@ -42,6 +42,32 @@ window.CUSTOMIZER_DATA_URL_PLACEHOLDER = DATA_URL_PLACEHOLDER;
         return null;
     }
 
+    function normalizeHexCandidate(value) {
+        if (typeof value !== 'string') {
+            return '';
+        }
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return '';
+        }
+        if (/^#?[0-9a-f]{3,8}$/i.test(trimmed)) {
+            return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+        }
+        return trimmed;
+    }
+
+    function pickFirstValidColor(candidates, fallback = '#333333') {
+        if (!Array.isArray(candidates)) {
+            return fallback;
+        }
+        for (const candidate of candidates) {
+            if (candidate && isValidCssColor(candidate)) {
+                return candidate;
+            }
+        }
+        return fallback;
+    }
+
     function formatLabel(value) {
         if (!value) {
             return 'Couleur';
@@ -49,17 +75,24 @@ window.CUSTOMIZER_DATA_URL_PLACEHOLDER = DATA_URL_PLACEHOLDER;
         return value.charAt(0).toUpperCase() + value.slice(1);
     }
 
-    global.resolveVariantColorAppearance = function resolveVariantColorAppearance(rawColor) {
+    global.resolveVariantColorAppearance = function resolveVariantColorAppearance(rawColor, fallbackHex = null) {
         const original = typeof rawColor === 'string' ? rawColor.trim() : '';
         const normalizedKey = original.toLowerCase();
-        const cssColor =
-            isValidCssColor(original) ? original : extractEmbeddedColor(original) || '#333333';
+        const preferredHex = normalizeHexCandidate(fallbackHex);
+        const embedded = extractEmbeddedColor(original);
+        const cssColor = pickFirstValidColor([
+            preferredHex,
+            original,
+            embedded
+        ]);
 
         return {
             cssColor,
             label: formatLabel(original || 'Couleur'),
             originalValue: rawColor,
-            normalizedKey
+            normalizedKey,
+            providedHex: preferredHex || null,
+            resolvedHex: cssColor
         };
     };
 })(window);
@@ -606,16 +639,27 @@ jQuery(document).ready(function ($) {
                 }
         }
 
-	function updateSelectedVariant() {
-                const selectedColor = $('.color-option.selected').attr('data-color');
+        function updateSelectedVariant() {
+                const selectedColorElement = $('.color-option.selected').first();
+                const selectedColor = selectedColorElement.attr('data-color');
+                const selectedHexRaw = selectedColorElement.attr('data-color-hex');
+                const normalizedSelectedHex = typeof selectedHexRaw === 'string' && selectedHexRaw.trim()
+                        ? selectedHexRaw.trim().toLowerCase()
+                        : null;
                 const sizeSelector = $('.size-selector');
                 const selectedSizeFromSelect = sizeSelector.length ? sizeSelector.val() : null;
                 const selectedSize = $('.size-option.selected').attr('data-size') || selectedSizeFromSelect;
 
-		const newVariant = currentVariants.find(variant =>
-												(!selectedColor || variant.color === selectedColor) &&
-												(!selectedSize || variant.size === selectedSize)
-											   );
+                const newVariant = currentVariants.find(variant => {
+                        const variantHex = typeof variant.hexa === 'string' && variant.hexa.trim()
+                                ? variant.hexa.trim().toLowerCase()
+                                : null;
+                        const matchesColor = (!selectedColor && !normalizedSelectedHex)
+                                || (typeof variant.color === 'string' && variant.color === selectedColor)
+                                || (normalizedSelectedHex && variantHex === normalizedSelectedHex);
+                        const matchesSize = !selectedSize || variant.size === selectedSize;
+                        return matchesColor && matchesSize;
+                });
 
 		if (newVariant) {
                         selectedVariant = newVariant;
@@ -676,15 +720,28 @@ jQuery(document).ready(function ($) {
                         return;
                 }
 
-                if (matchedVariant.color) {
-                        const colorOption = $('.color-option').filter(function () {
-                                return $(this).attr('data-color') === matchedVariant.color;
-                        });
+                const variantHex = typeof matchedVariant.hexa === 'string' && matchedVariant.hexa.trim()
+                        ? matchedVariant.hexa.trim().toLowerCase()
+                        : null;
 
-                        if (colorOption.length) {
-                                $('.color-option').removeClass('selected');
-                                colorOption.addClass('selected');
+                const colorOption = $('.color-option').filter(function () {
+                        const option = $(this);
+                        const optionColor = option.attr('data-color');
+                        if (matchedVariant.color && optionColor === matchedVariant.color) {
+                                return true;
                         }
+
+                        const optionHexRaw = option.attr('data-color-hex');
+                        const optionHex = typeof optionHexRaw === 'string' && optionHexRaw.trim()
+                                ? optionHexRaw.trim().toLowerCase()
+                                : null;
+
+                        return Boolean(variantHex && optionHex && optionHex === variantHex);
+                }).first();
+
+                if (colorOption.length) {
+                        $('.color-option').removeClass('selected');
+                        colorOption.addClass('selected');
                 }
 
                 const sizeSelector = $('.size-selector');
@@ -716,47 +773,53 @@ jQuery(document).ready(function ($) {
         function updateColors(variants) {
                 const colorsContainer = $('.colors-container').empty();
                 const colorSet = new Set();
+                const colorHexMap = new Map();
 
                 variants.forEach(v => {
-			if (v.color) {
-				colorSet.add(v.color);
-			}
-		});
+                        if (v.color) {
+                                colorSet.add(v.color);
+                                if (v.hexa && !colorHexMap.has(v.color)) {
+                                        colorHexMap.set(v.color, v.hexa);
+                                }
+                        }
+                });
 
                 Array.from(colorSet).forEach((color, index) => {
+                        const fallbackHex = colorHexMap.get(color) || null;
                         const appearance = typeof window.resolveVariantColorAppearance === 'function'
-                                ? window.resolveVariantColorAppearance(color)
-                                : { cssColor: color, label: color };
+                                ? window.resolveVariantColorAppearance(color, fallbackHex)
+                                : { cssColor: fallbackHex || color, label: color };
                         const isOutOfStock = !variants.some(v => v.color === color && v.stock !== 'out of stock' && v.stock !== 'discontinued');
 
                         const colorOption = $('<div>')
-                        .addClass('color-option')
-                        .css('background-color', appearance.cssColor)
-                        .attr('data-color', color)
-                        .attr('title', appearance.label)
-                        .attr('aria-label', appearance.label)
-                        .toggleClass('disabled', isOutOfStock)
-                        .on('click', function () {
-                                if ($(this).hasClass('disabled')) return;
-				$('.color-option').removeClass('selected');
-				$(this).addClass('selected');
-				updateSelectedVariant();
-			});
+                                .addClass('color-option')
+                                .css('background-color', appearance.cssColor)
+                                .attr('data-color', color)
+                                .attr('data-color-hex', fallbackHex || '')
+                                .attr('title', appearance.label)
+                                .attr('aria-label', appearance.label)
+                                .toggleClass('disabled', isOutOfStock)
+                                .on('click', function () {
+                                        if ($(this).hasClass('disabled')) return;
+                                        $('.color-option').removeClass('selected');
+                                        $(this).addClass('selected');
+                                        updateSelectedVariant();
+                                });
 
-			colorsContainer.append(colorOption);
+                        colorsContainer.append(colorOption);
 
-			if (index === 0 && !isOutOfStock) {
-				colorOption.addClass('selected');
-			}
-		});
-		// ✅ Affichage conditionnel
-		if (colorSet.size <= 1) {
-			$('.product-colors').hide();
-		} else {
-			$('.product-colors').show();
-		}
+                        if (index === 0 && !isOutOfStock) {
+                                colorOption.addClass('selected');
+                        }
+                });
+                // ✅ Affichage conditionnel
+                if (colorSet.size <= 1) {
+                        $('.product-colors').hide();
+                } else {
+                        $('.product-colors').show();
+                }
 
-	}
+        }
 
 
 
