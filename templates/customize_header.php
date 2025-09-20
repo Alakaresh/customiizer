@@ -15,6 +15,49 @@ $user_logged_in = is_user_logged_in();
 $user_id = $current_user->ID;
 $user_nicename = $current_user->user_nicename;
 $display_name = $current_user->display_name;
+
+$nav_items = [
+        [
+                'slug'  => 'boutique',
+                'label' => __( 'Boutique', 'customiizer' ),
+                'url'   => '/boutique',
+        ],
+        [
+                'slug'  => 'customiize',
+                'label' => __( 'Customiize', 'customiizer' ),
+                'url'   => '/customiize',
+        ],
+        [
+                'slug'  => 'communaute',
+                'label' => __( 'Communauté', 'customiizer' ),
+                'url'   => '/communaute',
+        ],
+];
+
+foreach ( $nav_items as &$nav_item ) {
+        $is_active = false;
+
+        switch ( $nav_item['slug'] ) {
+                case 'boutique':
+                        $is_active = is_page( 'boutique' )
+                                || is_page( 'home' )
+                                || is_front_page()
+                                || ( function_exists( 'is_shop' ) && is_shop() )
+                                || is_post_type_archive( 'product' )
+                                || is_singular( 'product' );
+                        break;
+                case 'customiize':
+                        $is_active = is_page( 'customiize' )
+                                || is_page_template( 'templates/customize.php' );
+                        break;
+                case 'communaute':
+                        $is_active = is_page( 'communaute' );
+                        break;
+        }
+
+        $nav_item['is_active'] = $is_active;
+}
+unset( $nav_item );
 ?>
 
 <!DOCTYPE html>
@@ -41,23 +84,44 @@ $display_name = $current_user->display_name;
 	<body <?php body_class(); ?>>
 		<header id="header">
 			<div class="header-content">
-				<div class="logo-container">
-					<div class="logo">
+                                <div class="logo-container">
+                                        <div class="logo">
                                                 <a href="<?php echo esc_url( home_url( '/home' ) ); ?>">
                                                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/full_logo.png" alt="Logo du site">
                                                 </a>
-					</div>
-				</div>
-				<div class="menu-container">
-                                        <nav class="main-menu">
-                                                <div><a href="/customiize" class="ajax-link">Customiize</a></div>
-                                                <div><a href="/boutique" class="ajax-link">Boutique</a></div>
-                                                <div><a href="/communaute" class="ajax-link">Communauté</a></div>
-						<div>
-							<a href="account?triggerClick=true" class="ajax-link" id="myCreationsLink" data-redirect="account?triggerClick=true">Mes créations</a>
-						</div>
-					</nav>
-				</div>
+                                        </div>
+
+                                        <div class="mobile-menu-toggle" aria-expanded="false" aria-label="<?php esc_attr_e( 'Menu mobile', 'customiizer' ); ?>" aria-controls="customizeMobileMenu">
+                                                <i class="fas fa-bars"></i>
+                                        </div>
+
+                                        <nav class="mobile-menu" id="customizeMobileMenu" aria-label="<?php esc_attr_e( 'Navigation principale', 'customiizer' ); ?>" aria-hidden="true">
+                                                <?php foreach ( $nav_items as $nav_item ) :
+                                                        $mobile_classes = 'mobile-menu__link ajax-link';
+                                                        if ( $nav_item['is_active'] ) {
+                                                                $mobile_classes .= ' is-active';
+                                                        }
+                                                ?>
+                                                        <a class="<?php echo esc_attr( $mobile_classes ); ?>" href="<?php echo esc_url( $nav_item['url'] ); ?>"<?php echo $nav_item['is_active'] ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $nav_item['label'] ); ?></a>
+                                                <?php endforeach; ?>
+                                        </nav>
+                                </div>
+                                <div class="menu-container">
+                                        <nav class="main-menu" aria-label="<?php esc_attr_e( 'Navigation principale', 'customiizer' ); ?>">
+                                                <ul class="main-menu__list">
+                                                        <?php foreach ( $nav_items as $nav_item ) :
+                                                                $link_classes = 'main-menu__link ajax-link';
+                                                                if ( $nav_item['is_active'] ) {
+                                                                        $link_classes .= ' is-active';
+                                                                }
+                                                        ?>
+                                                                <li class="main-menu__item">
+                                                                        <a class="<?php echo esc_attr( $link_classes ); ?>" href="<?php echo esc_url( $nav_item['url'] ); ?>"<?php echo $nav_item['is_active'] ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $nav_item['label'] ); ?></a>
+                                                                </li>
+                                                        <?php endforeach; ?>
+                                                </ul>
+                                        </nav>
+                                </div>
 				<div class="account-icons-container">
 
         <?php if ($user_logged_in): ?>
@@ -124,21 +188,5 @@ $display_name = $current_user->display_name;
                                 display_name: "<?php echo esc_js($display_name); ?>"
                         };
                 </script>
-               <script>
-                       jQuery(document).ready(function($) {
-                               $('#myCreationsLink').on('click', function(event) {
-                                       if (!userIsLoggedIn) {
-                                               event.preventDefault();
-
-                                               // Stocke l’intention dans sessionStorage
-                                               sessionStorage.setItem("redirectAfterLogin", "myCreations");
-
-                                               $('#loginModal').fadeIn(300);
-                                               return false;
-                                       }
-                               });
-                       });
-               </script>
-
         </body>
 </html>

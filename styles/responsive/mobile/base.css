@@ -1,45 +1,46 @@
 @media screen and (max-width: 1024px) {
 
 	/*==========HEADER==========*/
-	.header-content {
-		padding: 0 0;
-	}
+        .header-content {
+                padding: 0 16px;
+                gap: 18px;
+        }
 
-	.mobile-menu-toggle {
-		display: flex !important;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		color: white;
-		font-size: 24px;
-		margin-top: 10px;
-	}
+        .logo-container {
+                width: 100%;
+        }
+
+        .mobile-menu-toggle {
+                display: inline-flex !important;
+                margin-left: auto;
+                margin-top: 0;
+        }
 
        .mobile-menu {
                display: none;
-               top: 55px;
-               position: absolute;
-               flex-direction: column;
-               background-color: #111;
-               padding: 10px 0;
-               border-radius: 6px;
-               gap: 10px;
-               margin-top: 10px;
-               z-index: 1000;
+               right: 0;
+               top: calc(100% + 12px);
+               width: min(85vw, 260px);
                opacity: 0;
-               transform: translateY(-10px);
-               transition: opacity 0.3s ease, transform 0.3s ease;
+               transform: translateY(-12px) scale(0.98);
+               transition: opacity 0.25s ease, transform 0.25s ease;
        }
 
        .mobile-menu.active {
                display: flex !important;
                opacity: 1;
-               transform: translateY(0);
+               transform: translateY(0) scale(1);
        }
 
-	.menu-container {
-		display: none;
-	}
+       .mobile-menu__link {
+               font-size: 0.75rem;
+               letter-spacing: 0.16em;
+               padding: 12px 16px;
+       }
+
+        .menu-container {
+                display: none;
+        }
 
         .cart-container .cart-text,
         .login-register-container .login-text {
@@ -48,34 +49,41 @@
 
         /* Adjust cart badge position on smaller screens */
         .cart-count {
-                top: -8px;
-                right: 8px;
+                top: -10px;
+                right: -6px;
         }
 
-	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
+        /* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
         .image-credits-container {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                border: none;
+                padding: 8px 12px;
+                gap: 6px;
+                box-shadow: none;
+                letter-spacing: 0.12em;
+                font-size: 0.58rem;
         }
 
         .image-credits-label {
                 display: none;
         }
 
-	.image-credits-container i {
-		font-size: 16px;
-		margin: 0;
-		line-height: 1;
+        .image-credits-container i {
+                font-size: 0.85rem;
+                margin: 0;
+                line-height: 1;
+        }
 
-	}
+        .image-credits-container #userCredits {
+                font-size: 0.7rem;
+                line-height: 1;
+                display: inline-block;
+        }
 
-	.image-credits-container #userCredits {
-		font-size: 14px;
-		line-height: 1;
-		display: inline-block;
-	}
+        .early-access-banner {
+                width: calc(100% - 32px);
+                max-width: 320px;
+                padding: 10px 18px;
+                letter-spacing: 0.14em;
+        }
 
 	/*==========FOOTER==========*/
 	.upper-band {

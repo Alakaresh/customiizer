@@ -12,6 +12,49 @@ $user_logged_in = is_user_logged_in();
 $user_id        = $current_user->ID;
 $user_nicename  = $current_user->user_nicename;
 $display_name   = $current_user->display_name;
+
+$nav_items = [
+        [
+                'slug'  => 'boutique',
+                'label' => __( 'Boutique', 'customiizer' ),
+                'url'   => '/boutique',
+        ],
+        [
+                'slug'  => 'customiize',
+                'label' => __( 'Customiize', 'customiizer' ),
+                'url'   => '/customiize',
+        ],
+        [
+                'slug'  => 'communaute',
+                'label' => __( 'Communauté', 'customiizer' ),
+                'url'   => '/communaute',
+        ],
+];
+
+foreach ( $nav_items as &$nav_item ) {
+        $is_active = false;
+
+        switch ( $nav_item['slug'] ) {
+                case 'boutique':
+                        $is_active = is_page( 'boutique' )
+                                || is_page( 'home' )
+                                || is_front_page()
+                                || ( function_exists( 'is_shop' ) && is_shop() )
+                                || is_post_type_archive( 'product' )
+                                || is_singular( 'product' );
+                        break;
+                case 'customiize':
+                        $is_active = is_page( 'customiize' )
+                                || is_page_template( 'templates/customize.php' );
+                        break;
+                case 'communaute':
+                        $is_active = is_page( 'communaute' );
+                        break;
+        }
+
+        $nav_item['is_active'] = $is_active;
+}
+unset( $nav_item );
 ?>
 
 <!DOCTYPE html>
@@ -34,16 +77,20 @@ $display_name   = $current_user->display_name;
                                                 </a>
 					</div>
 
-                                       <div class="mobile-menu-toggle" aria-expanded="false" aria-label="Menu mobile">
+                                       <div class="mobile-menu-toggle" aria-expanded="false" aria-label="<?php esc_attr_e( 'Menu mobile', 'customiizer' ); ?>" aria-controls="primaryMobileMenu">
                                                <i class="fas fa-bars"></i>
                                        </div>
 
-                                       <nav class="mobile-menu">
-						<a href="/customiize">Customiize</a>
-						<a href="/boutique">Boutique</a>
-						<a href="/communaute">Communauté</a>
-						<a href="/compte?triggerClick=true" id="mobileMyCreationsLink">Mes créations</a>
-					</nav>
+                                       <nav class="mobile-menu" id="primaryMobileMenu" aria-label="<?php esc_attr_e( 'Navigation principale', 'customiizer' ); ?>" aria-hidden="true">
+                                                <?php foreach ( $nav_items as $nav_item ) :
+                                                        $mobile_classes = 'mobile-menu__link';
+                                                        if ( $nav_item['is_active'] ) {
+                                                                $mobile_classes .= ' is-active';
+                                                        }
+                                                ?>
+                                                        <a class="<?php echo esc_attr( $mobile_classes ); ?>" href="<?php echo esc_url( $nav_item['url'] ); ?>"<?php echo $nav_item['is_active'] ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $nav_item['label'] ); ?></a>
+                                                <?php endforeach; ?>
+                                        </nav>
 					<!-- 🎯 Bloc Early Access sous le logo -->
 					<?php
 					$pages_autorisees = ['boutique', 'home']; 
@@ -59,15 +106,21 @@ $display_name   = $current_user->display_name;
 
                                 </div>
                                 <div class="menu-container">
-					<nav class="main-menu">
-						<div><a href="/customiize">Customiize</a></div>
-						<div><a href="/boutique">Boutique</a></div>
-						<div><a href="/communaute">Communauté</a></div>
-						<div>
-							<a href="/compte?triggerClick=true" id="myCreationsLink" data-redirect="compte?triggerClick=true">Mes créations</a>
-						</div>
-					</nav>
-				</div>
+                                        <nav class="main-menu" aria-label="<?php esc_attr_e( 'Navigation principale', 'customiizer' ); ?>">
+                                                <ul class="main-menu__list">
+                                                        <?php foreach ( $nav_items as $nav_item ) :
+                                                                $link_classes = 'main-menu__link';
+                                                                if ( $nav_item['is_active'] ) {
+                                                                        $link_classes .= ' is-active';
+                                                                }
+                                                        ?>
+                                                                <li class="main-menu__item">
+                                                                        <a class="<?php echo esc_attr( $link_classes ); ?>" href="<?php echo esc_url( $nav_item['url'] ); ?>"<?php echo $nav_item['is_active'] ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $nav_item['label'] ); ?></a>
+                                                                </li>
+                                                        <?php endforeach; ?>
+                                                </ul>
+                                        </nav>
+                                </div>
 				<div class="account-icons-container">
 
         <?php if ($user_logged_in): ?>

@@ -47,15 +47,28 @@ if ( $user_logged_in ) {
         <?php wp_footer(); ?>
         <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                        const toggle = document.querySelector('.mobile-menu-toggle');
-                        const menu = document.querySelector('.mobile-menu');
-                        if (toggle && menu) {
+                        const toggles = document.querySelectorAll('.mobile-menu-toggle');
+
+                        toggles.forEach((toggle) => {
+                                const scope = toggle.closest('.logo-container') || document;
+                                const menu = scope.querySelector('.mobile-menu');
+
+                                if (!menu) {
+                                        return;
+                                }
+
+                                menu.setAttribute('aria-hidden', 'true');
+
                                 toggle.addEventListener('click', function () {
                                         const expanded = toggle.getAttribute('aria-expanded') === 'true';
-                                        toggle.setAttribute('aria-expanded', (!expanded).toString());
-                                        menu.classList.toggle('active');
+                                        const nextExpanded = !expanded;
+
+                                        toggle.setAttribute('aria-expanded', nextExpanded.toString());
+                                        toggle.classList.toggle('is-active', nextExpanded);
+                                        menu.classList.toggle('active', nextExpanded);
+                                        menu.setAttribute('aria-hidden', (!nextExpanded).toString());
                                 });
-                        }
+                        });
                 });
         </script>
 <?php if ( $user_logged_in ): ?>
