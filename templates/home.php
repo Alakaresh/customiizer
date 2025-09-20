@@ -7,8 +7,8 @@ get_header();
 <main id="site-content" class="site-content home-page">
   <section class="home-section home-section--hero">
     <div class="home-section__inner">
-      <section class="intro-section home-hero surface-card" aria-labelledby="home-hero-title">
-        <div class="intro-content home-hero__content">
+      <section class="home-hero surface-card" aria-labelledby="home-hero-title">
+        <div class="home-hero__content">
           <div class="home-hero__body">
             <span class="home-eyebrow">Studio de personnalisation IA</span>
             <h1 class="first_title home-hero__title" id="home-hero-title">Donne vie à tes idées !</h1>
