@@ -1,10 +1,5 @@
 @media screen and (max-width: 1024px) {
   /* Hero */
-  .intro-image-left,
-  .intro-image-right {
-    display: none !important;
-  }
-
   #site-content.home-page {
     gap: 48px;
     padding: 88px 0 96px;
@@ -19,13 +14,32 @@
     padding: 32px 24px;
   }
 
+  .home-hero.surface-card {
+    padding: 24px 20px;
+  }
+
   .intro-section {
-    grid-template-columns: 1fr;
-    text-align: left;
+    padding: clamp(12px, 6vw, 24px);
   }
 
   .home-hero__content {
     align-items: flex-start;
+    padding: 28px 24px;
+    border-radius: 24px;
+  }
+
+  .home-hero__content::before {
+    width: clamp(220px, 68vw, 320px);
+    height: clamp(220px, 68vw, 320px);
+    top: -32%;
+    right: -28%;
+  }
+
+  .home-hero__content::after {
+    width: clamp(260px, 80vw, 360px);
+    height: clamp(260px, 80vw, 360px);
+    bottom: -38%;
+    left: -32%;
   }
 
   .home-hero__actions {
@@ -41,11 +55,13 @@
     width: 100%;
     flex-direction: column;
     margin-top: 28px;
+    max-width: none;
   }
 
   .home-hero__metrics {
     width: 100%;
     flex-direction: column;
+    max-width: none;
   }
 
   /* Panorama */
