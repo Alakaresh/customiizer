@@ -29,7 +29,7 @@
         border-radius: 22px;
         border: 1px solid transparent;
         background:
-                linear-gradient(180deg, #151719, #151719) padding-box,
+                linear-gradient(180deg, #171717, #020202) padding-box,
                 linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(48, 52, 55, 0.02)) border-box;
         box-shadow:
                 inset 0 0 0 1px rgba(109, 242, 210, 0.02),
