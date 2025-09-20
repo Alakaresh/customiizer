@@ -379,12 +379,25 @@
         position: relative;
         z-index: 5;
         width: 100%;
-        background: rgba(18, 18, 18, 0.92);
+        background: linear-gradient(135deg, rgba(16, 18, 19, 0.94), rgba(8, 10, 11, 0.96));
         color: #e8f7f3;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.58);
+        border-top: 1px solid rgba(109, 242, 210, 0.24);
+        border-bottom: 1px solid rgba(109, 242, 210, 0.16);
+        box-shadow:
+                0 22px 48px rgba(0, 0, 0, 0.58),
+                0 0 0 1px rgba(109, 242, 210, 0.05);
         backdrop-filter: blur(10px);
+        overflow: hidden;
+}
+
+.early-access-banner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(109, 242, 210, 0.08), transparent 65%);
+        opacity: 0.75;
+        pointer-events: none;
+        z-index: 0;
 }
 
 .early-access-banner__inner {
@@ -396,12 +409,26 @@
         max-width: 1200px;
         width: min(100%, 1200px);
         margin: 0 auto;
-        padding: 16px 28px;
+        padding: 18px 32px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(18, 21, 23, 0.7), rgba(10, 12, 13, 0.65));
+        box-shadow:
+                inset 0 0 0 1px rgba(109, 242, 210, 0.12),
+                0 18px 36px rgba(0, 0, 0, 0.55);
+        z-index: 1;
 }
 
 .early-access-banner__icon {
-        font-size: 1.45rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        font-size: 1.35rem;
         line-height: 1;
+        border-radius: 50%;
+        background: radial-gradient(circle at center, rgba(109, 242, 210, 0.28), rgba(109, 242, 210, 0.05));
+        box-shadow: 0 12px 26px rgba(109, 242, 210, 0.18);
         animation: pulseAccess 3s ease-in-out infinite;
 }
 
@@ -412,39 +439,44 @@
 }
 
 .early-access-banner__title {
-        font-size: 0.95rem;
+        font-size: 0.98rem;
         font-weight: 600;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.08em;
         line-height: 1.45;
+        text-transform: uppercase;
 }
 
 .early-access-banner .highlight {
-        color: #ffffff;
+        background: linear-gradient(135deg, #6df2d2, #1abc9c);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
         font-weight: 700;
+        text-shadow: 0 8px 22px rgba(109, 242, 210, 0.35);
 }
 
 @media (max-width: 900px) {
         .early-access-banner__inner {
                 flex-direction: column;
                 text-align: center;
-                gap: 10px;
-                padding: 18px 22px;
+                gap: 12px;
+                padding: 20px 24px;
         }
 
         .early-access-banner__title {
-                font-size: 0.9rem;
-                letter-spacing: 0.02em;
+                font-size: 0.92rem;
+                letter-spacing: 0.06em;
         }
 
 }
 
 @media (max-width: 520px) {
         .early-access-banner__inner {
-                padding: 20px 18px;
+                padding: 22px 20px;
         }
 
         .early-access-banner__icon {
-                font-size: 1.6rem;
+                font-size: 1.5rem;
         }
 }
 
