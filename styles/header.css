@@ -232,7 +232,8 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 16px;
+        gap: 18px;
+        margin-left: auto;
 }
 
 /* Styles pour les icônes de compte utilisateur et panier */
@@ -302,22 +303,34 @@
         font-weight: 700;
         color: #ffffff;
 }
-.loyalty-header-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        margin-left: 20px;
-       color: var(--color-text);
-        font-size: 14px;
-}
-.loyalty-header-points {
+.loyalty-header-wrapper {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 4px;
 }
-.loyalty-header-points img {
-        height: 16px;
-        width: auto;
+
+.loyalty-widget-button {
+        white-space: nowrap;
+}
+
+.loyalty-widget-button .loyalty-widget-balance {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 26px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(109, 242, 210, 0.85), rgba(26, 188, 156, 0.72));
+        color: #032623;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        box-shadow: 0 12px 26px rgba(26, 188, 156, 0.25);
+}
+
+.loyalty-widget-button i {
+        font-size: 1rem;
 }
 
 .cart-container {

@@ -64,7 +64,8 @@ $display_name   = $current_user->display_name;
                                                 <div><a href="/communaute">Communauté</a></div>
                                         </nav>
 				</div>
-				<div class="account-icons-container">
+                                <div class="account-icons-container">
+                                        <?php customiizer_loyalty_widget(); ?>
 
         <?php if ($user_logged_in): ?>
         <?php

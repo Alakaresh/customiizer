@@ -228,9 +228,8 @@ function customiizer_get_referral_link( $user_id = 0 ) {
 }
 
 /**
- * Output the loyalty popup widget.
+ * Output the loyalty widget markup so it can be placed in the header.
  */
-add_action( 'wp_footer', 'customiizer_loyalty_widget' );
 function customiizer_loyalty_widget() {
     $logged_in = is_user_logged_in();
 
@@ -238,12 +237,10 @@ function customiizer_loyalty_widget() {
         $points    = customiizer_get_loyalty_points();
         $referrals = customiizer_get_referral_count();
         $link      = customiizer_get_referral_link();
-        $missions  = customiizer_get_missions();
     } else {
         $points    = 0;
         $referrals = 0;
         $link      = '';
-        $missions  = array();
     }
 
     $template = get_stylesheet_directory() . '/templates/loyalty/widget.php';
