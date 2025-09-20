@@ -3,8 +3,25 @@
                 display: none !important;
         }
 
-        .home-hero__background {
-                opacity: 0.45;
+        .home-hero__inner {
+                border-radius: 32px;
+                margin-inline: 16px;
+        }
+
+        .home-hero__inner::before {
+                left: -36%;
+                width: 78%;
+        }
+
+        .home-hero__inner::after {
+                right: -28%;
+                width: 82%;
+        }
+
+        .home-hero__grid::before,
+        .home-hero__grid::after {
+                inset: clamp(10px, 6vw, 22px);
+                border-radius: 28px;
         }
 
         .home-hero__avatars-images img {

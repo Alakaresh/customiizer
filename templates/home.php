@@ -9,7 +9,6 @@ get_header();
   <section class="home-hero" aria-labelledby="home-hero-title">
     <div class="home-hero__band" aria-hidden="true"></div>
     <div class="home-hero__inner">
-      <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/img/fond_shop.png' ); ?>" alt="" class="home-hero__background" aria-hidden="true">
       <div class="home-hero__grid">
         <div class="home-hero__copy home-card">
           <span class="home-hero__eyebrow"><?php esc_html_e( 'Crée sans limites', 'customiizer' ); ?></span>
