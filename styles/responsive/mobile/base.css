@@ -1,81 +1,33 @@
 @media screen and (max-width: 1024px) {
 
-	/*==========HEADER==========*/
-	.header-content {
-		padding: 0 0;
-	}
-
-	.mobile-menu-toggle {
-		display: flex !important;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		color: white;
-		font-size: 24px;
-		margin-top: 10px;
-	}
-
-       .mobile-menu {
-               display: none;
-               top: 55px;
-               position: absolute;
-               flex-direction: column;
-               background-color: #111;
-               padding: 10px 0;
-               border-radius: 6px;
-               gap: 10px;
-               margin-top: 10px;
-               z-index: 1000;
-               opacity: 0;
-               transform: translateY(-10px);
-               transition: opacity 0.3s ease, transform 0.3s ease;
-       }
-
-       .mobile-menu.active {
-               display: flex !important;
-               opacity: 1;
-               transform: translateY(0);
-       }
-
-	.menu-container {
-		display: none;
-	}
-
-        .cart-container .cart-text,
-        .login-register-container .login-text {
-                display: none !important;
+        /*==========HEADER==========*/
+        .site-header__actions {
+                gap: 10px;
         }
 
-        /* Adjust cart badge position on smaller screens */
-        .cart-count {
-                top: -8px;
-                right: 8px;
+        .site-header__actions .icon-button,
+        .site-header__actions .site-action,
+        .site-header__actions .image-credits-container {
+                padding-inline: 14px;
         }
 
-	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
-        .image-credits-container {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                border: none;
+        .site-header__actions .cart-text,
+        .site-header__actions .login-text {
+                display: none;
         }
 
         .image-credits-label {
                 display: none;
         }
 
-	.image-credits-container i {
-		font-size: 16px;
-		margin: 0;
-		line-height: 1;
+        .image-credits-count {
+                font-size: 0.95rem;
+        }
 
-	}
-
-	.image-credits-container #userCredits {
-		font-size: 14px;
-		line-height: 1;
-		display: inline-block;
-	}
+        .cart-count {
+                top: -6px;
+                right: -6px;
+        }
 
 	/*==========FOOTER==========*/
 	.upper-band {
