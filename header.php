@@ -82,6 +82,7 @@ $show_early_access  = is_page( $early_access_pages ) || is_front_page();
                                                 </a>
                                         </div>
 <?php endif; ?>
+
                                         <div class="profile-container">
                                                 <a id="profileLink" class="icon-button">
                                                         <img src="<?php echo esc_url( $profile_image_url ); ?>" alt="<?php esc_attr_e( 'Photo de profil', 'customiizer' ); ?>" class="user-profile-image">
