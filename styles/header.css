@@ -368,10 +368,6 @@
         position: relative;
 }
 
-.cart-container .icon-button {
-        min-width: 130px;
-}
-
 .cart-container .icon-button i {
         font-size: 1.1rem;
 }
