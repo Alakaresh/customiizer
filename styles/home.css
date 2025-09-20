@@ -13,49 +13,14 @@
   padding: 96px clamp(18px, 5vw, 48px) 120px;
 }
 
-#site-content.home-page::before,
-#site-content.home-page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-}
-
-#site-content.home-page::before {
-  background: radial-gradient(120% 160% at 0% 0%, rgba(26, 188, 156, 0.28) 0%, rgba(9, 37, 46, 0.12) 45%, transparent 80%);
-}
-
-#site-content.home-page::after {
-  background: radial-gradient(110% 140% at 90% 20%, rgba(26, 188, 156, 0.24) 0%, rgba(3, 9, 11, 0.95) 60%, rgba(0, 0, 0, 0.9) 100%);
-}
-
 .surface-card {
   position: relative;
-  background: rgba(5, 14, 18, 0.82);
   border: 1px solid rgba(109, 242, 210, 0.18);
   border-radius: 32px;
   padding: clamp(28px, 5vw, 56px);
   box-shadow: 0 36px 68px rgba(2, 11, 13, 0.6);
   backdrop-filter: blur(18px);
   overflow: hidden;
-}
-
-.surface-card::before {
-  content: "";
-  position: absolute;
-  inset: -20% 30% 55% -40%;
-  background: radial-gradient(60% 60% at 20% 25%, rgba(109, 242, 210, 0.2) 0%, transparent 65%);
-  z-index: -1;
-  filter: blur(0.5px);
-}
-
-.surface-card::after {
-  content: "";
-  position: absolute;
-  inset: 45% -35% -30% 25%;
-  background: radial-gradient(55% 55% at 75% 70%, rgba(26, 188, 156, 0.18) 0%, transparent 70%);
-  z-index: -1;
 }
 
 .first_title {
@@ -286,7 +251,6 @@
 .home-panel {
   position: relative;
   border-radius: 28px;
-  background: rgba(4, 16, 20, 0.62);
   border: 1px solid rgba(109, 242, 210, 0.18);
   box-shadow: 0 36px 68px rgba(2, 10, 13, 0.52);
   padding: clamp(24px, 3.6vw, 36px);
@@ -294,24 +258,6 @@
   flex-direction: column;
   gap: clamp(20px, 3vw, 28px);
   overflow: hidden;
-}
-
-.home-panel::before {
-  content: "";
-  position: absolute;
-  inset: -40% 40% 60% -50%;
-  background: radial-gradient(55% 55% at 35% 40%, rgba(109, 242, 210, 0.22) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.home-panel::after {
-  content: "";
-  position: absolute;
-  inset: 55% -45% -35% 45%;
-  background: radial-gradient(45% 45% at 60% 60%, rgba(26, 188, 156, 0.2) 0%, transparent 75%);
-  pointer-events: none;
-  z-index: -1;
 }
 
 .home-panel--showcase {
