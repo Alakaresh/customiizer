@@ -2,6 +2,18 @@
    Home page styles aligned with the new header art direction
 ---------------------------------------------------------------- */
 
+body.home,
+body.page-template-home,
+body.page-template-template-home,
+body.page-template-home-php {
+  --color-background: #030b0d;
+  background: radial-gradient(130% 160% at 0% 10%, rgba(26, 188, 156, 0.2) 0%, rgba(26, 188, 156, 0) 60%),
+    radial-gradient(140% 180% at 100% 0%, rgba(109, 242, 210, 0.12) 0%, rgba(109, 242, 210, 0) 65%),
+    linear-gradient(180deg, #02090c 0%, #010607 45%, #000304 100%) !important;
+  background-attachment: fixed;
+  color: rgba(232, 247, 243, 0.96);
+}
+
 #site-content.home-page {
   position: relative;
   display: flex;
