@@ -39,20 +39,35 @@
     margin-top: 28px;
   }
 
-  /* Sections */
-  .home-section {
-    gap: 28px;
+  /* Panorama */
+  .home-panorama.surface-card {
+    padding: 32px 24px 40px;
+    border-radius: 32px;
   }
 
-  .home-section__description {
-    margin: 0;
+  .home-panorama__grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
-  .home-section__actions {
+  .home-panel {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .home-panel--showcase {
+    flex-direction: column;
+  }
+
+  .home-panel__media {
+    order: 2;
+  }
+
+  .home-panel__actions {
     width: 100%;
   }
 
-  .home-section__actions .home-button {
+  .home-panel__actions .home-button {
     width: 100%;
   }
 
@@ -86,38 +101,24 @@
   }
 
   /* Steps */
-  .steps-list {
+  .workflow {
+    gap: 20px;
+  }
+
+  .workflow__step {
     grid-template-columns: 1fr;
+    padding: 22px;
   }
 
-  .step-card {
-    padding: 24px;
-    gap: 16px;
-  }
-
-  .step-card__header {
-    align-items: center;
-    gap: 16px;
-  }
-
-  .step-card__number {
-    width: 42px;
-    height: 42px;
+  .workflow__number {
+    width: 44px;
+    height: 44px;
     font-size: 1rem;
-  }
-
-  .step-card__titles {
-    gap: 4px;
-  }
-
-  .step-title {
-    font-size: 0.95rem;
   }
 }
 
 @media screen and (max-width: 640px) {
-  .home-hero__eyebrow,
-  .home-section__eyebrow {
+  .home-eyebrow {
     letter-spacing: 0.18em;
   }
 

@@ -13,7 +13,7 @@ get_header();
       <img class="home-hero__image" src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/hero-6.png" alt="Personnalisation produit">
     </div>
     <div class="intro-content home-hero__content">
-      <span class="home-hero__eyebrow">Studio de personnalisation IA</span>
+      <span class="home-eyebrow">Studio de personnalisation IA</span>
       <h1 class="first_title home-hero__title">Donne vie à tes idées !</h1>
       <p class="text home-hero__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
       <div class="home-hero__actions">
@@ -38,112 +38,116 @@ get_header();
     </div>
   </section>
 
-  <!-- ======= Product Carousel Section ======= -->
-  <section class="home-section home-section--products surface-card">
-    <div class="home-section__header">
-      <span class="home-section__eyebrow">Boutique immersive</span>
-      <h2 class="title home-section__title">Explore notre collection</h2>
-      <p class="text home-section__description">Découvre notre sélection de produits à personnaliser selon tes envies. Grâce à nos outils avancés, chaque objet devient une création unique.</p>
-    </div>
-    <div class="home-section__actions">
-      <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
-        <i class="fas fa-magic"></i>
-        <span>Personnaliser maintenant</span>
-      </a>
-    </div>
-    <div class="carousel" id="productCarousel">
-      <button class="carousel-control-prev" role="button" aria-label="Voir les produits précédents">
-        <span class="fas fa-chevron-left" aria-hidden="true"></span>
-      </button>
-      <div class="carousel-items" aria-live="polite">
-        <!-- Les produits seront ajoutés ici par jQuery -->
-      </div>
-      <button class="carousel-control-next" role="button" aria-label="Voir les produits suivants">
-        <span class="fas fa-chevron-right" aria-hidden="true"></span>
-      </button>
-    </div>
-  </section>
+  <!-- ======= Panorama Section ======= -->
+  <section class="home-panorama surface-card">
+    <header class="home-panorama__header">
+      <span class="home-eyebrow">Expérience Customiizer</span>
+      <h2 class="home-panorama__title">Tout vivre en un seul regard</h2>
+      <p class="home-panorama__description">Retrouve la boutique, la communauté et le parcours de création dans un espace immersif qui valorise chaque étape de ton imagination.</p>
+    </header>
 
-  <!-- ======= Community Carousel Section ======= -->
-  <section class="home-section home-section--community surface-card">
-    <div class="home-section__header">
-      <span class="home-section__eyebrow">Inspiration collective</span>
-      <h2 class="title home-section__title">La Communauté Customiizer</h2>
-      <p class="text home-section__description">Plonge dans l’univers créatif de notre communauté et découvre des réalisations uniques conçues par des passionnés comme toi.</p>
-    </div>
-    <div class="home-section__actions">
-      <a href="<?php echo esc_url( home_url( '/communaute' ) ); ?>" class="home-button home-button--ghost">
-        <i class="fas fa-users"></i>
-        <span>Explorer la galerie</span>
-      </a>
-    </div>
-    <div class="carousel" id="communityCarousel">
-      <button class="carousel-control-prev" role="button" aria-label="Voir les créations précédentes">
-        <span class="fas fa-chevron-left" aria-hidden="true"></span>
-      </button>
-      <div class="carousel-images" aria-live="polite">
-        <!-- Les images seront ajoutées ici par jQuery -->
-      </div>
-      <button class="carousel-control-next" role="button" aria-label="Voir les créations suivantes">
-        <span class="fas fa-chevron-right" aria-hidden="true"></span>
-      </button>
-    </div>
-  </section>
+    <div class="home-panorama__grid">
+      <article class="home-panel home-panel--showcase">
+        <div class="home-panel__intro">
+          <span class="home-eyebrow">Boutique immersive</span>
+          <h3 class="home-panel__title">Explore notre collection</h3>
+          <p class="home-panel__text">Découvre notre sélection de supports à personnaliser et visualise-les en direct grâce à nos technologies IA. Chaque objet devient une création unique.</p>
+          <div class="home-panel__actions">
+            <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
+              <i class="fas fa-store"></i>
+              <span>Explorer la boutique</span>
+            </a>
+          </div>
+        </div>
+        <div class="home-panel__media">
+          <div class="carousel" id="productCarousel">
+            <button class="carousel-control-prev" role="button" aria-label="Voir les produits précédents">
+              <span class="fas fa-chevron-left" aria-hidden="true"></span>
+            </button>
+            <div class="carousel-items" aria-live="polite">
+              <!-- Les produits seront ajoutés ici par jQuery -->
+            </div>
+            <button class="carousel-control-next" role="button" aria-label="Voir les produits suivants">
+              <span class="fas fa-chevron-right" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </article>
 
-  <!-- ======= How It Works Section ======= -->
-  <section class="home-section home-section--how surface-card">
-    <div class="home-section__header">
-      <span class="home-section__eyebrow">Expérience guidée</span>
-      <h2 class="title home-section__title">Comment ça fonctionne</h2>
-      <p class="text home-section__description">Suivre ces étapes suffit pour imaginer, générer et commander ta création personnalisée.</p>
-    </div>
-    <ol class="steps-list" aria-label="Étapes de création">
-      <li class="step-card">
-        <div class="step-card__header">
-          <span class="step-card__number" aria-hidden="true">1</span>
-          <div class="step-card__titles">
-            <span class="step-card__step">Étape 1</span>
-            <h3 class="step-title">Choisis ton support</h3>
+      <article class="home-panel home-panel--community">
+        <div class="home-panel__intro">
+          <span class="home-eyebrow">Inspiration collective</span>
+          <h3 class="home-panel__title">La communauté Customiizer</h3>
+          <p class="home-panel__text">Plonge dans l’univers créatif de nos membres et découvre des réalisations uniques conçues par des passionnés comme toi.</p>
+          <div class="home-panel__actions">
+            <a href="<?php echo esc_url( home_url( '/communaute' ) ); ?>" class="home-button home-button--ghost">
+              <i class="fas fa-users"></i>
+              <span>Explorer la galerie</span>
+            </a>
           </div>
         </div>
-        <p class="step-text">Rends-toi sur la page "Customiize" et sélectionne le format qui t’inspire.</p>
-      </li>
-      <li class="step-card">
-        <div class="step-card__header">
-          <span class="step-card__number" aria-hidden="true">2</span>
-          <div class="step-card__titles">
-            <span class="step-card__step">Étape 2</span>
-            <h3 class="step-title">Génère avec l’IA</h3>
+        <div class="home-panel__media">
+          <div class="carousel" id="communityCarousel">
+            <button class="carousel-control-prev" role="button" aria-label="Voir les créations précédentes">
+              <span class="fas fa-chevron-left" aria-hidden="true"></span>
+            </button>
+            <div class="carousel-images" aria-live="polite">
+              <!-- Les images seront ajoutées ici par jQuery -->
+            </div>
+            <button class="carousel-control-next" role="button" aria-label="Voir les créations suivantes">
+              <span class="fas fa-chevron-right" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
-        <p class="step-text">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
-      </li>
-      <li class="step-card">
-        <div class="step-card__header">
-          <span class="step-card__number" aria-hidden="true">3</span>
-          <div class="step-card__titles">
-            <span class="step-card__step">Étape 3</span>
-            <h3 class="step-title">Personnalise</h3>
-          </div>
+      </article>
+
+      <article class="home-panel home-panel--workflow">
+        <div class="home-panel__intro">
+          <span class="home-eyebrow">Expérience guidée</span>
+          <h3 class="home-panel__title">Comment ça fonctionne</h3>
+          <p class="home-panel__text">Suis un parcours fluide : imagine, génère, personnalise et commande ta création en quelques étapes.</p>
         </div>
-        <p class="step-text">Affines ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
-      </li>
-      <li class="step-card">
-        <div class="step-card__header">
-          <span class="step-card__number" aria-hidden="true">4</span>
-          <div class="step-card__titles">
-            <span class="step-card__step">Étape 4</span>
-            <h3 class="step-title">Commande &amp; reçois</h3>
-          </div>
+        <ol class="workflow" aria-label="Étapes de création">
+          <li class="workflow__step">
+            <span class="workflow__number" aria-hidden="true">1</span>
+            <div class="workflow__content">
+              <span class="workflow__label">Étape 1</span>
+              <h4 class="workflow__title">Choisis ton support</h4>
+              <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
+            </div>
+          </li>
+          <li class="workflow__step">
+            <span class="workflow__number" aria-hidden="true">2</span>
+            <div class="workflow__content">
+              <span class="workflow__label">Étape 2</span>
+              <h4 class="workflow__title">Génère avec l’IA</h4>
+              <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
+            </div>
+          </li>
+          <li class="workflow__step">
+            <span class="workflow__number" aria-hidden="true">3</span>
+            <div class="workflow__content">
+              <span class="workflow__label">Étape 3</span>
+              <h4 class="workflow__title">Personnalise</h4>
+              <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
+            </div>
+          </li>
+          <li class="workflow__step">
+            <span class="workflow__number" aria-hidden="true">4</span>
+            <div class="workflow__content">
+              <span class="workflow__label">Étape 4</span>
+              <h4 class="workflow__title">Commande &amp; reçois</h4>
+              <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
+            </div>
+          </li>
+        </ol>
+        <div class="home-panel__actions">
+          <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
+            <i class="fas fa-magic"></i>
+            <span>Créer maintenant</span>
+          </a>
         </div>
-        <p class="step-text">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
-      </li>
-    </ol>
-    <div class="home-section__actions">
-      <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-        <i class="fas fa-magic"></i>
-        <span>Créer maintenant</span>
-      </a>
+      </article>
     </div>
   </section>
 
