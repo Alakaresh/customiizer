@@ -112,32 +112,32 @@ get_header();
             <span class="workflow__number" aria-hidden="true">1</span>
             <div class="workflow__content">
               <span class="workflow__label">Étape 1</span>
-              <h4 class="workflow__title">Choisis ton support</h4>
-              <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
+              <h4 class="workflow__title">Choisis ton produit</h4>
+              <p class="workflow__description">Rends-toi dans la boutique pour sélectionner le support qui correspond à ton projet.</p>
             </div>
           </li>
           <li class="workflow__step">
             <span class="workflow__number" aria-hidden="true">2</span>
             <div class="workflow__content">
               <span class="workflow__label">Étape 2</span>
-              <h4 class="workflow__title">Génère avec l’IA</h4>
-              <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
+              <h4 class="workflow__title">Lance la personnalisation</h4>
+              <p class="workflow__description">Commence la création : utilise des images de la communauté, importe les tiennes ou génère tes propres visuels.</p>
             </div>
           </li>
           <li class="workflow__step">
             <span class="workflow__number" aria-hidden="true">3</span>
             <div class="workflow__content">
               <span class="workflow__label">Étape 3</span>
-              <h4 class="workflow__title">Personnalise</h4>
-              <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
+              <h4 class="workflow__title">Positionne tes images</h4>
+              <p class="workflow__description">Ajuste librement les visuels sur ton produit pour obtenir le rendu parfait.</p>
             </div>
           </li>
           <li class="workflow__step">
             <span class="workflow__number" aria-hidden="true">4</span>
             <div class="workflow__content">
               <span class="workflow__label">Étape 4</span>
-              <h4 class="workflow__title">Commande &amp; reçois</h4>
-              <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
+              <h4 class="workflow__title">Passe commande</h4>
+              <p class="workflow__description">Valide ton panier et finalise la commande : ta création est en route !</p>
             </div>
           </li>
         </ol>
