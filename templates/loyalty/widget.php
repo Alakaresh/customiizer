@@ -8,22 +8,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div id="loyalty-widget-popup">
     <header id="loyalty-widget-header">
-        <button id="loyalty-widget-back" class="loyalty-back-main" aria-label="Retour" style="display:none;"><i class="fas fa-arrow-left"></i></button>
+        <button id="loyalty-widget-back" class="loyalty-round-button loyalty-back-main" aria-label="<?php echo esc_attr__( 'Retour', 'customiizer' ); ?>" style="display:none;">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        </button>
         <img class="loyalty-widget-logo" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Customiizer" />
         <div class="loyalty-header-info">
-            <span class="loyalty-header-title">Mes avantages</span>
-            <span class="loyalty-header-points">
-                Custompoints: <?php echo intval( $points ); ?>
-                <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" />
+            <span class="loyalty-header-eyebrow"><?php echo esc_html__( 'Programme fidélité', 'customiizer' ); ?></span>
+            <span class="loyalty-header-title"><?php echo esc_html__( 'Mes avantages', 'customiizer' ); ?></span>
+            <span class="loyalty-header-points" role="text">
+                <span class="loyalty-header-points-label"><?php echo esc_html__( 'Custompoints', 'customiizer' ); ?></span>
+                <span class="loyalty-header-points-value"><?php echo intval( $points ); ?></span>
+                <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="<?php echo esc_attr__( 'Custompoints', 'customiizer' ); ?>" />
             </span>
         </div>
-        <button id="loyalty-widget-close" aria-label="Fermer">&times;</button>
+        <button id="loyalty-widget-close" class="loyalty-round-button" aria-label="<?php echo esc_attr__( 'Fermer', 'customiizer' ); ?>">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </header>
 
     <div id="loyalty-widget-content">
         <?php if ( $logged_in ) : ?>
             <div class="loyalty-widget-page loyalty-page-main">
-                <div class="loyalty-widget-card">
+                <div class="loyalty-widget-card loyalty-actions">
+                    <h3 class="loyalty-card-title"><?php echo esc_html__( 'Gérez vos points', 'customiizer' ); ?></h3>
+                    <p class="loyalty-card-text"><?php echo esc_html__( 'Découvrez comment gagner et utiliser vos Custompoints en quelques clics.', 'customiizer' ); ?></p>
                     <button class="loyalty-action loyalty-how-get">
                         <i class="fas fa-coins"></i>
                         <span class="loyalty-action-text"><?php echo esc_html__( 'Comment gagner des points', 'customiizer' ); ?></span>
