@@ -228,10 +228,23 @@ function customiizer_get_referral_link( $user_id = 0 ) {
 }
 
 /**
- * Output the loyalty popup widget.
+ * Output or return the loyalty popup widget markup.
+ *
+ * @param array $args {
+ *     Optional. Arguments to control the output.
+ *
+ *     @type bool $echo Whether to echo the markup. Default true.
+ * }
+ * @return string Widget markup when $echo is false, empty string otherwise.
  */
-add_action( 'wp_footer', 'customiizer_loyalty_widget' );
-function customiizer_loyalty_widget() {
+function customiizer_loyalty_widget( $args = array() ) {
+    $args = wp_parse_args(
+        $args,
+        array(
+            'echo' => true,
+        )
+    );
+
     $logged_in = is_user_logged_in();
 
     if ( $logged_in ) {
@@ -247,8 +260,19 @@ function customiizer_loyalty_widget() {
     }
 
     $template = get_stylesheet_directory() . '/templates/loyalty/widget.php';
-    if ( file_exists( $template ) ) {
-        include $template;
+    if ( ! file_exists( $template ) ) {
+        return '';
     }
+
+    ob_start();
+    include $template;
+    $markup = ob_get_clean();
+
+    if ( $args['echo'] ) {
+        echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        return '';
+    }
+
+    return $markup;
 }
 

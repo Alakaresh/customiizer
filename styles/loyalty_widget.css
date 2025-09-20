@@ -1,50 +1,9 @@
 /* Style du widget fidélité aligné sur la DA de la page produit */
 
-#loyalty-widget-button {
-    position: fixed;
-    bottom: 32px;
-    left: 32px;
-    width: 64px;
-    height: 64px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    border: 1px solid rgba(26, 188, 156, 0.55);
-    background: linear-gradient(135deg, #1abc9c, #0f7f65);
-    color: #f6fffd;
-    font-size: 20px;
-    box-shadow: 0 26px 48px rgba(26, 188, 156, 0.35);
-    cursor: pointer;
-    z-index: 900;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.35s ease;
-}
-
-#loyalty-widget-button:hover,
-#loyalty-widget-button:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 32px 60px rgba(26, 188, 156, 0.45);
-    background: linear-gradient(135deg, #1cd2ae, #109c78);
-    outline: none;
-}
-
-#loyalty-widget-button:focus-visible {
-    outline: 2px solid rgba(26, 188, 156, 0.85);
-    outline-offset: 4px;
-}
-
-#loyalty-widget-button:active {
-    transform: translateY(0);
-}
-
-#loyalty-widget-button i {
-    pointer-events: none;
-}
-
 #loyalty-widget-popup {
-    position: fixed;
-    bottom: 128px;
-    left: 32px;
+    position: absolute;
+    top: calc(100% + 18px);
+    right: 0;
     width: min(360px, calc(100vw - 48px));
     display: none;
     flex-direction: column;
@@ -55,7 +14,21 @@
     box-shadow: 0 40px 82px rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(14px);
     overflow: hidden;
-    z-index: 899;
+    z-index: 950;
+}
+
+#loyalty-widget-popup::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(26, 188, 156, 0.35), rgba(26, 188, 156, 0.08));
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    transform: rotate(45deg);
 }
 
 #loyalty-widget-popup.open {
@@ -221,6 +194,16 @@
     display: none;
     flex-direction: column;
     gap: 18px;
+}
+
+@media (max-width: 640px) {
+    #loyalty-widget-popup {
+        width: min(340px, calc(100vw - 32px));
+    }
+
+    #loyalty-widget-popup::before {
+        right: 12px;
+    }
 }
 
 .loyalty-page-main {
@@ -476,43 +459,6 @@
 
 .loyalty-login-btn:active {
     transform: translateY(0);
-}
-
-@media (max-width: 768px) {
-    #loyalty-widget-button {
-        bottom: 24px;
-        left: 24px;
-    }
-
-    #loyalty-widget-popup {
-        bottom: 104px;
-        left: 24px;
-        width: min(340px, calc(100vw - 40px));
-    }
-}
-
-@media (max-width: 540px) {
-    #loyalty-widget-button {
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    #loyalty-widget-button:hover,
-    #loyalty-widget-button:focus-visible {
-        transform: translate(-50%, -2px);
-    }
-
-    #loyalty-widget-button:active {
-        transform: translate(-50%, 0);
-    }
-
-    #loyalty-widget-popup {
-        bottom: 96px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100vw - 32px);
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
