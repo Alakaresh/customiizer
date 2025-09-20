@@ -1,65 +1,61 @@
 @media screen and (max-width: 1024px) {
-	/*==========HOME==========*/
-	.intro-image-left,
-	.intro-image-right {
-		display: none !important;
-	}
+        .home-hero__band {
+                display: none !important;
+        }
 
-	.intro-section {
-		justify-content: center;
-		padding: 0 15px;
-	}
+        .home-hero__background {
+                opacity: 0.45;
+        }
 
-	.intro-content {
-		max-width: 100%;
-	}
-	.how-it-works-section {
-		width: 90% !important;
-		margin: 20px auto;
-		padding: 15px;
-	}
+        .home-hero__avatars-images img {
+                width: 56px;
+                height: 56px;
+        }
 
-	.steps-list li {
-		padding-left: 30px;
-	}
+        .carousel-control-prev,
+        .carousel-control-next {
+                width: 48px;
+                height: 48px;
+        }
 
-	.steps-list li::before {
-		width: 20px;
-		height: 20px;
-		font-size: 12px;
-	}
+        .product-item {
+                min-width: 190px;
+        }
+}
 
-	.step-text {
-		font-size: 13px;
-	}
-	.carousel-images {
-		padding: 0 10px;
-		gap: 10px;
-	}
+@media screen and (max-width: 640px) {
+        .home-section__inner.home-card {
+                padding: 24px 20px;
+        }
 
-	.carousel-images img {
-		flex: 0 0 calc(50% - 10px);
-		max-width: calc(50% - 10px);
-	}
+        .home-section__description {
+                font-size: 0.95rem;
+        }
 
-	.product-item {
-		width: 48%;
-		margin: 0 1%;
-		height: auto;
-	}
+        .home-hero__preview-media {
+                aspect-ratio: 3 / 4;
+        }
 
-	.product-image-link {
-		height: 150px;
-	}
+        .home-hero__stat {
+                width: 100%;
+                align-items: center;
+                text-align: center;
+        }
+}
 
-	.product-name-link {
-		font-size: 13px;
-		padding: 6px 4px;
-	}
+@media screen and (max-width: 420px) {
+        .home-button {
+                font-size: 0.95rem;
+                padding: 12px 18px;
+        }
 
-	.carousel-control-prev,
-	.carousel-control-next {
-		padding: 5px;
-		top: 40%;
-	}
+        .home-hero__list li {
+                font-size: 0.92rem;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+                width: 42px;
+                height: 42px;
+        }
 }
