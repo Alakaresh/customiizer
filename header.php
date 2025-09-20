@@ -44,19 +44,6 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
                                                 <a href="/customiize">Customiize</a>
                                                 <a href="/communaute">Communauté</a>
                                         </nav>
-					<!-- 🎯 Bloc Early Access sous le logo -->
-					<?php
-					$pages_autorisees = ['boutique', 'home']; 
-
-					if (is_page($pages_autorisees) || is_front_page()):
-					?>
-                                        <div class="early-access-banner">
-                                                🔥 <strong>Early Access</strong> – <span class="highlight">-30%</span> avec le code <strong>CUSTOM30</strong><br>
-                                                <span class="version-info">Version <?php echo esc_html(customiizer_frontend_version()); ?></span>
-
-                                        </div>
-                                        <?php endif; ?>
-
                                 </div>
                                 <div class="menu-container">
                                         <nav class="main-menu">
@@ -139,6 +126,24 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
 				</div>
 			</div>
                </header>
+
+               <?php
+               $pages_autorisees = [ 'boutique', 'home' ];
+
+               if ( is_page( $pages_autorisees ) || is_front_page() ) :
+               ?>
+               <div class="early-access-banner" role="region" aria-label="Offre Early Access">
+                       <div class="early-access-banner__inner">
+                               <span class="early-access-banner__icon" aria-hidden="true">🔥</span>
+                               <div class="early-access-banner__text">
+                                       <span class="early-access-banner__title">
+                                               <strong>Early Access</strong> – <span class="highlight">-30%</span> avec le code <strong>CUSTOM30</strong>
+                                       </span>
+                                       <span class="version-info">Version <?php echo esc_html( customiizer_frontend_version() ); ?></span>
+                               </div>
+                       </div>
+               </div>
+               <?php endif; ?>
 
                <div id="content">
 <?php
