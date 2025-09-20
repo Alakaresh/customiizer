@@ -96,16 +96,37 @@ document.addEventListener('DOMContentLoaded', async function() {
             const imageUrl = product.image || 'default-image-url.jpg';
             const title = product.name || "Nom du produit";
             const minPriceTTC = product.lowest_price !== null ? (parseFloat(product.lowest_price) * 1.20).toFixed(2) : null;
-            const minPrice = minPriceTTC !== null ? `${minPriceTTC} € TTC` : "Prix non disponible";
+            const hasPrice = minPriceTTC !== null;
+            const minPriceValue = hasPrice ? `${minPriceTTC} € TTC` : null;
+            const priceLabel = hasPrice
+                ? `À partir de <span>${minPriceValue}</span>`
+                : '<span class="product-price--placeholder">Prix non disponible</span>';
+            const ariaLabel = hasPrice
+                ? `${title} – À partir de ${minPriceValue}`
+                : `${title} – Prix non disponible`;
 
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+            productCard.setAttribute('role', 'link');
+            productCard.setAttribute('tabindex', '0');
+            productCard.setAttribute('aria-label', ariaLabel);
             productCard.onclick = () => goToProductPage(product);
+            productCard.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    goToProductPage(product);
+                }
+            });
 
             productCard.innerHTML = `
-                <img src="${imageUrl}" alt="${title}">
-                <h2 class="product-title">${title}</h2>
-                <p class="product-price">À partir de ${minPrice}</p>
+                <div class="product-card__media">
+                    <img src="${imageUrl}" alt="${title}">
+                </div>
+                <div class="product-card__body">
+                    <h2 class="product-title">${title}</h2>
+                    <p class="product-price">${priceLabel}</p>
+                    <span class="product-card__cta">Voir le produit <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </div>
             `;
 
             productListContainer.appendChild(productCard);
