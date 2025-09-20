@@ -19,6 +19,15 @@
   --color-feedback-warning: #ffc107;
   --color-feedback-danger: #dc3545;
   --color-background: #242424;
+  --color-accent-turquoise: #1abc9c;
+  --color-accent-turquoise-rgb: 26, 188, 156;
+  --glass-gradient-primary: linear-gradient(135deg, rgba(14, 16, 22, 0.85), rgba(6, 8, 12, 0.92));
+  --glass-gradient-secondary: linear-gradient(135deg, rgba(10, 12, 18, 0.92), rgba(2, 4, 8, 0.94));
+  --glass-accent-glow: rgba(26, 188, 156, 0.18);
+  --glass-border-light: rgba(255, 255, 255, 0.08);
+  --glass-border-strong: rgba(255, 255, 255, 0.16);
+  --glass-shadow-raised: 0 20px 48px rgba(0, 0, 0, 0.45);
+  --glass-shadow-inverse: 0 -20px 48px rgba(0, 0, 0, 0.55);
 }
 
 #site-content {

@@ -8,14 +8,31 @@
 
 /* Styles généraux pour le header */
 #header {
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: space-between;
         height: 80px;
-       background-color: var(--color-header-primary);
-       color: var(--color-text);
-       padding: 0 10px;
-       border-bottom: 1px solid var(--color-ui-border);
+        padding: 0 24px;
+        color: var(--color-text);
+        background: var(--glass-gradient-primary);
+        border-bottom: 1px solid var(--glass-border-light);
+        box-shadow: var(--glass-shadow-raised);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        overflow: hidden;
+        z-index: 20;
+}
+
+#header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+                radial-gradient(circle at 10% 50%, rgba(var(--color-accent-turquoise-rgb), 0.22), transparent 55%),
+                radial-gradient(circle at 90% 50%, rgba(var(--color-accent-turquoise-rgb), 0.16), transparent 60%);
+        pointer-events: none;
+        opacity: 0.85;
 }
 
 .page-id-413 #header {
@@ -27,12 +44,13 @@
 
 /* Contenu général du header, gestion de l'espacement interne */
 .header-content {
-	display: flex;
-	position: relative;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	padding: 0 32px;
+        display: flex;
+        position: relative;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0 16px;
+        z-index: 1;
 }
 
 /* Conteneur pour le logo, centré et occupant 80% du header */
@@ -68,8 +86,48 @@
 }
 
 .main-menu a {
+       position: relative;
+       display: inline-flex;
+       align-items: center;
        font-size: 24px; /* Ajuste cette valeur selon tes besoins pour augmenter la taille de la police */
        color: var(--color-text);
+       text-decoration: none;
+       padding: 6px 0;
+       gap: 6px;
+       transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.main-menu a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -6px;
+        height: 2px;
+        background: linear-gradient(135deg, rgba(var(--color-accent-turquoise-rgb), 0.85), rgba(var(--color-accent-turquoise-rgb), 0.25));
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.3s ease;
+        border-radius: 999px;
+}
+
+.main-menu a:hover,
+.main-menu a:focus-visible {
+        color: rgba(var(--color-accent-turquoise-rgb), 0.9);
+        text-shadow: 0 0 12px rgba(var(--color-accent-turquoise-rgb), 0.45);
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 1px rgba(var(--color-accent-turquoise-rgb), 0.35);
+        outline: none;
+}
+
+.main-menu a:hover::after,
+.main-menu a:focus-visible::after,
+.main-menu a:active::after {
+        transform: scaleX(1);
+}
+
+.main-menu a:active {
+        transform: translateY(0);
 }
 
 .main-menu > div {
@@ -78,14 +136,14 @@
 }
 
 .main-menu > div:not(:last-child)::after {
-	content: "";  /* Crée un pseudo-élément pour la séparation */
-	position: absolute;
-	right: 0;  /* Positionne la séparation à la droite de l'élément */
-	top: 50%;  /* Centrer verticalement la ligne */
-	transform: translate(50%, -50%);  /* Décale le séparateur vers le centre entre deux éléments */
-	height: 70%;  /* Hauteur de la séparation, ajustable selon le design */
-	width: 1px;  /* Largeur de la séparation */
-       background-color: var(--color-ui-border);  /* Couleur de la séparation */
+        content: "";  /* Crée un pseudo-élément pour la séparation */
+        position: absolute;
+        right: 0;  /* Positionne la séparation à la droite de l'élément */
+        top: 50%;  /* Centrer verticalement la ligne */
+        transform: translate(50%, -50%);  /* Décale le séparateur vers le centre entre deux éléments */
+        height: 70%;  /* Hauteur de la séparation, ajustable selon le design */
+        width: 1px;  /* Largeur de la séparation */
+       background-color: var(--glass-border-strong);  /* Couleur de la séparation */
 }
 
 .main-menu > div:last-child {
@@ -100,6 +158,45 @@
        margin-top: 10px; /* Ajoute une marge au-dessus du bouton */
        color: var(--color-text); /* Couleur du texte adaptée à la palette */
        cursor: pointer;
+       gap: 6px;
+       padding: 6px 12px;
+       border-radius: 16px;
+       text-decoration: none;
+       transition: color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, text-shadow 0.3s ease;
+       position: relative;
+       z-index: 0;
+}
+
+.icon-button i,
+.icon-button span,
+.icon-button img {
+        transition: color 0.3s ease, filter 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.icon-button:hover,
+.icon-button:focus-visible {
+        color: rgba(var(--color-accent-turquoise-rgb), 0.92);
+        background: linear-gradient(135deg, rgba(var(--color-accent-turquoise-rgb), 0.18), rgba(var(--color-accent-turquoise-rgb), 0.06));
+        box-shadow: 0 0 0 1px rgba(var(--color-accent-turquoise-rgb), 0.45), 0 16px 36px rgba(var(--color-accent-turquoise-rgb), 0.22);
+        text-shadow: 0 0 12px rgba(var(--color-accent-turquoise-rgb), 0.45);
+        transform: translateY(-2px);
+        outline: none;
+}
+
+.icon-button:hover i,
+.icon-button:hover span,
+.icon-button:hover img,
+.icon-button:focus-visible i,
+.icon-button:focus-visible span,
+.icon-button:focus-visible img {
+        color: rgba(var(--color-accent-turquoise-rgb), 0.92);
+        filter: drop-shadow(0 0 12px rgba(var(--color-accent-turquoise-rgb), 0.45));
+        transform: translateY(0);
+}
+
+.icon-button:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 22px rgba(var(--color-accent-turquoise-rgb), 0.18);
 }
 
 .account-icons-container {
@@ -110,11 +207,13 @@
 
 /* Styles pour les icônes de compte utilisateur et panier */
 .account-icons-container a {
-	display: flex;
-	align-items: center;
-	position: relative;
-	margin-left: 20px;
-	height: 80%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        margin-left: 20px;
+        height: 80%;
+        text-decoration: none;
+        color: inherit;
 }
 
 /* Styles pour l'icône de compte utilisateur */
@@ -135,10 +234,20 @@
        font-size: 16px; /* Or any other appropriate size */
        color: var(--color-text); /* Couleur de texte dynamique */
        vertical-align: middle; /* Ensures alignment with other bar elements */
-       background-color: var(--color-header-secondary); /* Couleur de fond basée sur la palette */
-       padding: 5px 10px; /* Padding around the text */
-       border-radius: 15px; /* Border radius for rounded corners */
-       border: 2px solid var(--color-ui-border); /* Bordure utilisant la palette */
+       background: linear-gradient(135deg, rgba(var(--color-accent-turquoise-rgb), 0.16), rgba(var(--color-accent-turquoise-rgb), 0.05));
+       padding: 6px 14px; /* Padding around the text */
+       border-radius: 16px; /* Border radius for rounded corners */
+       border: 1px solid rgba(var(--color-accent-turquoise-rgb), 0.55); /* Bordure utilisant la palette */
+       box-shadow: 0 12px 28px rgba(var(--color-accent-turquoise-rgb), 0.22);
+       backdrop-filter: blur(12px);
+       -webkit-backdrop-filter: blur(12px);
+       transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.image-credits-container:hover {
+       border-color: rgba(var(--color-accent-turquoise-rgb), 0.78);
+       box-shadow: 0 18px 36px rgba(var(--color-accent-turquoise-rgb), 0.28);
+       transform: translateY(-1px);
 }
 .loyalty-header-container {
         display: flex;
@@ -165,36 +274,40 @@
        position: absolute;
        top: 0px;
        right: 40px;
-       background-color: var(--color-header-secondary);
-       color: var(--color-text);
+       background: linear-gradient(135deg, rgba(var(--color-accent-turquoise-rgb), 0.95), rgba(var(--color-accent-turquoise-rgb), 0.7));
+       color: rgba(4, 16, 14, 0.92);
        font-size: 0.65rem;
        font-weight: bold;
-       min-width: 16px;
-       height: 16px;
-       line-height: 16px;
+       min-width: 18px;
+       height: 18px;
+       line-height: 18px;
        border-radius: 50%;
        text-align: center;
        padding: 0 4px;
-       box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+       border: 1px solid rgba(255, 255, 255, 0.22);
+       box-shadow: 0 0 12px rgba(var(--color-accent-turquoise-rgb), 0.45);
 }
 .early-access-banner {
-	margin-top: 6px;
-	top: 60px;
-	left: 50%;
-	transform: translateX(-50%);
+        margin-top: 6px;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
 
-	text-align: center;
+        text-align: center;
        color: var(--color-text);
-       background: var(--color-header-secondary);
-	border-radius: 6px;
-	padding: 8px 12px;
-	font-size: 0.8rem;
-	font-weight: 500;
-	line-height: 1.4;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-	animation: pulseAccess 3sease-in-out infinite;
-	position: absolute;
-	z-index: 10;
+       background: linear-gradient(135deg, rgba(var(--color-accent-turquoise-rgb), 0.28), rgba(var(--color-accent-turquoise-rgb), 0.08));
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        line-height: 1.4;
+        border: 1px solid rgba(var(--color-accent-turquoise-rgb), 0.55);
+        box-shadow: 0 12px 28px rgba(var(--color-accent-turquoise-rgb), 0.22);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        animation: pulseAccess 3s ease-in-out infinite;
+        position: absolute;
+        z-index: 10;
 }
 .early-access-banner .highlight {
        color: var(--color-action-accent);
