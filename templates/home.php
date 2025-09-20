@@ -8,47 +8,41 @@ get_header();
   <section class="home-section home-section--hero">
     <div class="home-section__inner">
       <section class="intro-section home-hero surface-card" aria-labelledby="home-hero-title">
-        <div class="home-hero__visual intro-image-left">
-          <span class="home-hero__orb home-hero__orb--left" aria-hidden="true"></span>
-          <img class="home-hero__image" src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/hero-6.png" alt="Personnalisation produit">
-        </div>
         <div class="intro-content home-hero__content">
-          <span class="home-eyebrow">Studio de personnalisation IA</span>
-          <h1 class="first_title home-hero__title" id="home-hero-title">Donne vie à tes idées !</h1>
-          <p class="text home-hero__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
-          <div class="home-hero__actions">
-            <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-              <i class="fas fa-magic"></i>
-              <span>Créer maintenant</span>
-            </a>
-            <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
-              <i class="fas fa-store"></i>
-              <span>Explorer la boutique</span>
-            </a>
+          <div class="home-hero__body">
+            <span class="home-eyebrow">Studio de personnalisation IA</span>
+            <h1 class="first_title home-hero__title" id="home-hero-title">Donne vie à tes idées !</h1>
+            <p class="text home-hero__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
+            <div class="home-hero__actions">
+              <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
+                <i class="fas fa-magic"></i>
+                <span>Créer maintenant</span>
+              </a>
+              <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
+                <i class="fas fa-store"></i>
+                <span>Explorer la boutique</span>
+              </a>
+            </div>
+            <ul class="home-hero__highlights" aria-label="Points forts Customiizer">
+              <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
+              <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
+              <li><i class="fas fa-truck" aria-hidden="true"></i><span>Produits livrés rapidement</span></li>
+            </ul>
+            <div class="home-hero__metrics" aria-label="Chiffres clés Customiizer">
+              <div class="home-hero__metric">
+                <span class="home-hero__metric-value">+15k</span>
+                <span class="home-hero__metric-label">Créations IA générées</span>
+              </div>
+              <div class="home-hero__metric">
+                <span class="home-hero__metric-value">120</span>
+                <span class="home-hero__metric-label">Supports personnalisables</span>
+              </div>
+              <div class="home-hero__metric">
+                <span class="home-hero__metric-value">24/7</span>
+                <span class="home-hero__metric-label">Assistance dédiée</span>
+              </div>
+            </div>
           </div>
-          <ul class="home-hero__highlights" aria-label="Points forts Customiizer">
-            <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
-            <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
-            <li><i class="fas fa-truck" aria-hidden="true"></i><span>Produits livrés rapidement</span></li>
-          </ul>
-          <div class="home-hero__metrics" aria-label="Chiffres clés Customiizer">
-            <div class="home-hero__metric">
-              <span class="home-hero__metric-value">+15k</span>
-              <span class="home-hero__metric-label">Créations IA générées</span>
-            </div>
-            <div class="home-hero__metric">
-              <span class="home-hero__metric-value">120</span>
-              <span class="home-hero__metric-label">Supports personnalisables</span>
-            </div>
-            <div class="home-hero__metric">
-              <span class="home-hero__metric-value">24/7</span>
-              <span class="home-hero__metric-label">Assistance dédiée</span>
-            </div>
-          </div>
-        </div>
-        <div class="home-hero__visual intro-image-right">
-          <span class="home-hero__orb home-hero__orb--right" aria-hidden="true"></span>
-          <img class="home-hero__image" src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/hero-4.png" alt="Création artistique">
         </div>
       </section>
     </div>
