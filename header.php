@@ -77,14 +77,7 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
         <?php if ($user_logged_in): ?>
         <?php
         $profile_image_url = customiizer_get_profile_image_url($user_id);
-        global $wpdb;
-        $image_credits = intval($wpdb->get_var($wpdb->prepare("SELECT image_credits FROM WPC_users WHERE user_id = %d", $user_id)));
         ?>
-        <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
-                <i class="fas fa-coins"></i>
-                <span class="image-credits-label">Crédits:</span>
-                <span id="userCredits" class="image-credits-count"><?php echo esc_html($image_credits); ?></span>
-        </div>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
                 <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button" aria-label="<?php echo esc_attr__( 'Panier', 'customiizer' ); ?>">
