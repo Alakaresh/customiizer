@@ -822,9 +822,9 @@ td.tracking-cell, td.invoice-cell {
 }
 
 #mission-categories .mission-category-item.active {
-        background-color: var(--color-secondary);
+        background: var(--color-secondary);
         box-shadow: 0 0 20px rgba(0,0,0,0.6);
-        border-color: var(--color-secondary);
+        border-color: var(--color-secondary-solid);
 }
 
 .missions-list {
