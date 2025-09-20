@@ -68,8 +68,26 @@
 }
 
 .main-menu a {
-       font-size: 24px; /* Ajuste cette valeur selon tes besoins pour augmenter la taille de la police */
-       color: var(--color-text);
+       display: inline-flex;
+       align-items: center;
+       gap: 6px;
+       font-size: clamp(0.85rem, 0.8rem + 0.2vw, 1rem);
+       letter-spacing: 0.14em;
+       text-transform: uppercase;
+       font-weight: 600;
+       color: rgba(255, 255, 255, 0.78);
+       text-decoration: none;
+       transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.main-menu a:hover,
+.main-menu a:focus-visible {
+       color: #ffffff;
+       text-shadow: 0 0 12px rgba(26, 188, 156, 0.45);
+}
+
+.main-menu a:focus-visible {
+       outline: none;
 }
 
 .main-menu > div {
@@ -78,14 +96,14 @@
 }
 
 .main-menu > div:not(:last-child)::after {
-	content: "";  /* Crée un pseudo-élément pour la séparation */
-	position: absolute;
-	right: 0;  /* Positionne la séparation à la droite de l'élément */
-	top: 50%;  /* Centrer verticalement la ligne */
-	transform: translate(50%, -50%);  /* Décale le séparateur vers le centre entre deux éléments */
-	height: 70%;  /* Hauteur de la séparation, ajustable selon le design */
-	width: 1px;  /* Largeur de la séparation */
-       background-color: var(--color-ui-border);  /* Couleur de la séparation */
+        content: "";  /* Crée un pseudo-élément pour la séparation */
+        position: absolute;
+        right: 0;  /* Positionne la séparation à la droite de l'élément */
+        top: 50%;  /* Centrer verticalement la ligne */
+        transform: translate(50%, -50%);  /* Décale le séparateur vers le centre entre deux éléments */
+        height: 60%;  /* Hauteur de la séparation, ajustable selon le design */
+        width: 1px;  /* Largeur de la séparation */
+       background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
 }
 
 .main-menu > div:last-child {

@@ -48,16 +48,13 @@ $display_name = $current_user->display_name;
                                                 </a>
 					</div>
 				</div>
-				<div class="menu-container">
+                                <div class="menu-container">
                                         <nav class="main-menu">
-                                                <div><a href="/customiize" class="ajax-link">Customiize</a></div>
                                                 <div><a href="/boutique" class="ajax-link">Boutique</a></div>
+                                                <div><a href="/customiize" class="ajax-link">Customiize</a></div>
                                                 <div><a href="/communaute" class="ajax-link">Communauté</a></div>
-						<div>
-							<a href="account?triggerClick=true" class="ajax-link" id="myCreationsLink" data-redirect="account?triggerClick=true">Mes créations</a>
-						</div>
-					</nav>
-				</div>
+                                        </nav>
+                                </div>
 				<div class="account-icons-container">
 
         <?php if ($user_logged_in): ?>
@@ -124,21 +121,5 @@ $display_name = $current_user->display_name;
                                 display_name: "<?php echo esc_js($display_name); ?>"
                         };
                 </script>
-               <script>
-                       jQuery(document).ready(function($) {
-                               $('#myCreationsLink').on('click', function(event) {
-                                       if (!userIsLoggedIn) {
-                                               event.preventDefault();
-
-                                               // Stocke l’intention dans sessionStorage
-                                               sessionStorage.setItem("redirectAfterLogin", "myCreations");
-
-                                               $('#loginModal').fadeIn(300);
-                                               return false;
-                                       }
-                               });
-                       });
-               </script>
-
         </body>
 </html>
