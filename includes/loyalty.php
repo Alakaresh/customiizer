@@ -230,8 +230,15 @@ function customiizer_get_referral_link( $user_id = 0 ) {
 /**
  * Output the loyalty popup widget.
  */
-add_action( 'wp_footer', 'customiizer_loyalty_widget' );
 function customiizer_loyalty_widget() {
+    static $rendered = false;
+
+    if ( $rendered ) {
+        return;
+    }
+
+    $rendered = true;
+
     $logged_in = is_user_logged_in();
 
     if ( $logged_in ) {
@@ -251,4 +258,6 @@ function customiizer_loyalty_widget() {
         include $template;
     }
 }
+
+add_action( 'wp_footer', 'customiizer_loyalty_widget' );
 

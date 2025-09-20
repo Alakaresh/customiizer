@@ -12,6 +12,7 @@ $user_logged_in = is_user_logged_in();
 $user_id        = $current_user->ID;
 $user_nicename  = $current_user->user_nicename;
 $display_name   = $current_user->display_name;
+$loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty_points' ) ) ? customiizer_get_loyalty_points( $user_id ) : 0;
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +65,27 @@ $display_name   = $current_user->display_name;
                                                 <div><a href="/communaute">Communauté</a></div>
                                         </nav>
 				</div>
-				<div class="account-icons-container">
+                                <div class="account-icons-container">
+<?php if ( function_exists( 'customiizer_loyalty_widget' ) ) : ?>
+                                        <div class="loyalty-header-container">
+                                                <button type="button" id="loyalty-widget-button" class="loyalty-header-button icon-button" aria-haspopup="dialog" aria-expanded="false">
+                                                        <i class="fas fa-gift" aria-hidden="true"></i>
+                                                        <span class="loyalty-header-label"><?php echo esc_html__( 'Mes avantages', 'customiizer' ); ?></span>
+                                                </button>
+                                                <?php if ( $user_logged_in && function_exists( 'customiizer_get_loyalty_points' ) ) : ?>
+                                                <div class="loyalty-header-points" title="<?php echo esc_attr__( 'Vos CustomPoints disponibles', 'customiizer' ); ?>">
+                                                        <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="" aria-hidden="true">
+                                                        <span class="loyalty-header-points-value"><?php echo esc_html( number_format_i18n( $loyalty_points ) ); ?></span>
+                                                        <span class="loyalty-header-points-label"><?php echo esc_html__( 'pts', 'customiizer' ); ?></span>
+                                                </div>
+                                                <?php else : ?>
+                                                <div class="loyalty-header-points loyalty-header-points--guest">
+                                                        <span class="loyalty-header-points-label"><?php echo esc_html__( 'Découvrir', 'customiizer' ); ?></span>
+                                                </div>
+                                                <?php endif; ?>
+                                                <?php customiizer_loyalty_widget(); ?>
+                                        </div>
+<?php endif; ?>
 
         <?php if ($user_logged_in): ?>
         <?php

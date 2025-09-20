@@ -14,6 +14,7 @@
     justify-content:center;
     cursor:pointer;
     z-index:900;
+    border:none;
 }
 #loyalty-widget-popup{
     position:fixed;
@@ -21,11 +22,12 @@
     left:20px;
     width:300px;
     max-width:90%;
-    background:var(--color-header-primary);
-    border:1px solid var(--color-ui-border);
-    color:var(--font-color);
-    border-radius:4px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    background:rgba(5, 14, 18, 0.96);
+    border:1px solid rgba(109, 242, 210, 0.18);
+    color:rgba(232, 247, 243, 0.9);
+    border-radius:18px;
+    box-shadow:0 32px 78px rgba(0,0,0,0.35);
+    backdrop-filter: blur(18px);
     display:none;
     z-index:899;
 }
@@ -37,11 +39,11 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 10px 15px;
-    background: #3399ff;
-    color: #fff;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #1abc9c 0%, #6df2d2 100%);
+    color: #032623;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
     font-size: 14px;
 }
 
@@ -64,13 +66,13 @@
 }
 
 #loyalty-widget-content {
-    background: var(--color-header-primary);
-    border: 1px solid var(--color-ui-border);
+    background: rgba(6, 18, 22, 0.92);
+    border: 1px solid rgba(26, 188, 156, 0.2);
     border-top: none;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    padding: 15px;
-    color: var(--font-color);
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    padding: 20px;
+    color: rgba(232, 247, 243, 0.9);
     height: 500px;
     overflow-y: auto;
 }
@@ -112,6 +114,43 @@
     width: 14px;   /* réduit par rapport à 18px */
     height: 14px;
     margin-right: 6px;
+}
+
+#loyalty-widget-button:focus {
+    outline: none;
+}
+
+.loyalty-header-container #loyalty-widget-button {
+    position: static;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    height: auto;
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    z-index: auto;
+}
+
+.loyalty-header-container #loyalty-widget-popup {
+    position: absolute;
+    top: calc(100% + 20px);
+    right: 0;
+    left: auto;
+    bottom: auto;
+    width: 360px;
+    max-width: min(90vw, 420px);
+    background: rgba(5, 14, 18, 0.96);
+    border: 1px solid rgba(109, 242, 210, 0.18);
+    border-radius: 18px;
+    box-shadow: 0 32px 78px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(18px);
+    display: none;
+    z-index: 1200;
+}
+
+.loyalty-header-container #loyalty-widget-popup.open {
+    display: block;
 }
 
 #loyalty-widget-points{

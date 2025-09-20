@@ -1,6 +1,28 @@
 jQuery(function($){
-    const $button = $('<div id="loyalty-widget-button"><i class="fas fa-gift"></i></div>');
     const $popup = $('#loyalty-widget-popup');
+    if(!$popup.length){
+        return;
+    }
+
+    let $button = $('#loyalty-widget-button');
+    if(!$button.length){
+        $button = $('<button>', {
+            type: 'button',
+            id: 'loyalty-widget-button',
+            'aria-haspopup': 'dialog',
+            'aria-expanded': 'false',
+            'aria-label': 'Mes avantages'
+        }).append('<i class="fas fa-gift" aria-hidden="true"></i>');
+        $('body').append($button);
+    } else {
+        if(!$button.attr('aria-haspopup')){
+            $button.attr('aria-haspopup', 'dialog');
+        }
+        if(!$button.attr('aria-expanded')){
+            $button.attr('aria-expanded', 'false');
+        }
+    }
+
     const $points = $popup.find('.loyalty-widget-points');
     const $back = $('#loyalty-widget-back');
     const $loginBtn = $popup.find('.loyalty-login-btn');
@@ -15,15 +37,31 @@ jQuery(function($){
             $back.show();
         }
     };
-    $('body').append($button);
+
+    const setExpanded = (expanded) => {
+        $button.attr('aria-expanded', expanded ? 'true' : 'false');
+    };
+
+    const openPopup = () => {
+        $popup.addClass('open');
+        showPage('main');
+        setExpanded(true);
+    };
+
+    const closePopup = () => {
+        $popup.removeClass('open');
+        setExpanded(false);
+    };
+
     $button.on('click', function(){
-        $popup.toggleClass('open');
         if($popup.hasClass('open')){
-            showPage('main');
+            closePopup();
+        } else {
+            openPopup();
         }
     });
     $('#loyalty-widget-close').on('click', function(){
-        $popup.removeClass('open');
+        closePopup();
     });
     $popup.find('.loyalty-how-get').on('click', function(){
         showPage('get');
@@ -39,7 +77,7 @@ jQuery(function($){
         if (typeof window.openLoginModal === 'function') {
             window.openLoginModal();
         }
-        $popup.removeClass('open');
+        closePopup();
     });
 
     const $copyBtn = $popup.find('.loyalty-copy-referral');
@@ -51,5 +89,28 @@ jQuery(function($){
         navigator.clipboard.writeText($copyInput.val()).then(() => {
             $copyConfirm.fadeIn(200).delay(2000).fadeOut(200);
         });
+    });
+
+    $(document).on('click', function(event){
+        if(!$popup.hasClass('open')){
+            return;
+        }
+
+        const $target = $(event.target);
+        if($target.is($popup) || $popup.has($target).length){
+            return;
+        }
+
+        if($target.is($button) || $button.has($target).length){
+            return;
+        }
+
+        closePopup();
+    });
+
+    $(document).on('keydown', function(event){
+        if(event.key === 'Escape' && $popup.hasClass('open')){
+            closePopup();
+        }
     });
 });
