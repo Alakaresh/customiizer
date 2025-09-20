@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html lang="fr">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Boutique</title>
-	</head>
-	<body>
-		<div class="product-list">
-			<!-- Les cartes produits seront générées ici par JavaScript -->
-		</div>
-	</body>
-</html>
+<?php
+/**
+ * Main content for the boutique page.
+ *
+ * @package Customiizer
+ */
+?>
+
+<div class="shop-products" aria-label="Produits disponibles">
+        <div class="shop-products__container">
+                <div class="product-list" role="list" aria-live="polite">
+                        <!-- Les cartes produits sont injectées en JavaScript -->
+                </div>
+        </div>
+</div>
