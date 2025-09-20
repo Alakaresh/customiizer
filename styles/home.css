@@ -1,7 +1,7 @@
 /* Styles globaux pour les titres du site */
 
 .first_title {
-  color: #fff; /* Couleur du texte */
+  color: var(--color-text); /* Couleur du texte */
   font-size: 42px; /* Taille du texte */
   font-weight: bold; /* Graisse du texte */
   margin-bottom: 10px; /* Espace en dessous du titre */
@@ -9,7 +9,7 @@ text-align: center;
 }
 
 .title {
-  color: #fff; /* Couleur du texte */
+  color: var(--color-text); /* Couleur du texte */
   font-size: 24px; /* Taille du texte */
   font-weight: bold; /* Graisse du texte */
   margin-bottom: 10px; /* Espace en dessous du titre */
@@ -18,7 +18,7 @@ text-align: center;
 
 /* Styles globaux pour le texte du site */
 .text {
-	color: #fff; /* Couleur du texte */
+	color: var(--color-text); /* Couleur du texte */
 	font-size: 13px; /* Taille du texte */
 	max-width: 70%;
 	margin: auto; /* Centre le texte horizontalement */
@@ -26,7 +26,7 @@ text-align: center;
 }
 
 .lien {
-    color: #89b9c8; /* Couleur principale */
+    color: var(--color-accent); /* Couleur principale */
     font-size: 16px; /* Taille du texte */
     font-weight: bold; /* Poids du texte */
     text-decoration: none; /* Pas de soulignement */
@@ -45,7 +45,7 @@ text-align: center;
 }
 
 .lien:hover {
-    color: #6D94A0; /* Couleur au survol, assombrir ou changer selon le thème */
+    color: rgba(var(--color-accent-rgb), 0.8); /* Couleur au survol, assombrir ou changer selon le thème */
     text-decoration: underline; /* Ajouter un soulignement au survol pour indiquer l'interactivité */
 }
 
@@ -71,8 +71,8 @@ text-align: center;
 }
 
 .btn-primary {
-    background-color: #89b9c8;
-    color: white;
+    background-color: var(--color-accent);
+    color: var(--color-text);
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 5px;
@@ -111,8 +111,8 @@ text-align: center;
 .product-button {
     opacity: 0;
     transition: opacity 0.5s ease;
-    background-color: #89b9c8; /* Couleur du bouton */
-    color: white;
+    background-color: var(--color-accent); /* Couleur du bouton */
+    color: var(--color-text);
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -140,8 +140,8 @@ text-align: center;
     display: block;
     transition: transform 0.5s ease;
     border-radius: 10px;
-    border: 1px solid #ccc;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0px 4px 6px rgba(var(--color-black-rgb), 0.1);
 }
 
 .carrousel-images img:not(:last-child) {
@@ -154,8 +154,8 @@ text-align: center;
     height: calc(100% - 20px); /* Étendre la hauteur complète du conteneur */
 	margin-top: 10px;
     margin-bottom: 10px;
-    background-color: rgba(0, 123, 255, 0);
-    color: white;
+    background-color: rgba(var(--color-accent-rgb), 0);
+    color: var(--color-text);
     border: none;
     padding: 10px;
     cursor: pointer;
@@ -166,7 +166,7 @@ text-align: center;
 }
 
 .carousel-control-prev:hover, .carousel-control-next:hover {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(var(--color-white-rgb), 0.4);
 }
 .carousel-control-prev {
     left: 0px; /* Ajustez cette valeur pour positionner hors des images si nécessaire */
@@ -183,7 +183,7 @@ text-align: center;
 .how-it-works-section {
     width: 50%; /* Largeur fixe à 50% */
     margin: 40px auto; /* Marges verticales de 40px et horizontales automatiques pour centrer */
-    border: 2px solid #ccc; /* Style de bordure */
+    border: 2px solid var(--color-border-subtle); /* Style de bordure */
     padding: 20px; /* Padding interne */
     border-radius: 8px; /* Coins arrondis */
     display: flex; /* Utilisation de Flexbox */
@@ -211,18 +211,18 @@ text-align: center;
     left: 0; /* Aligné à gauche dans le li */
     width: 25px; /* Largeur pour le cercle */
     height: 25px; /* Hauteur pour le cercle */
-    background: #f2f2f2; /* Fond gris pour le cercle */
+    background: rgba(var(--color-white-rgb), 0.95); /* Fond gris pour le cercle */
     border-radius: 50%; /* Rend le fond parfaitement rond */
     display: flex;
     align-items: center;
     justify-content: center; /* Centre le numéro dans le cercle */
-    color: #333; /* Couleur du numéro */
+    color: var(--color-text-inverse); /* Couleur du numéro */
 	font-size: 14px;
     font-weight: bold; /* Rend le numéro gras */
 }
 
 .step-text {
-	color: #fff; /* Couleur du texte */
+	color: var(--color-text); /* Couleur du texte */
 	font-size: 13px; /* Taille du texte */
 }
 
@@ -270,8 +270,8 @@ text-align: center;
 
 .product-name-link {
     display: block;
-    background-color: #89b9c8; /* Couleur de fond */
-    color: #0D1117; /* Couleur du texte */
+    background-color: var(--color-accent); /* Couleur de fond */
+    color: var(--color-text-inverse); /* Couleur du texte */
     text-decoration: none; /* Enlever le soulignement */
     text-align: center; /* Centrer le texte */
     padding: 5px 0; /* Réduction des marges verticales */
@@ -282,7 +282,7 @@ text-align: center;
 }
 
 .product-name-link:hover {
-    background-color: #6D94A0; /* Couleur au survol */
+    background-color: rgba(var(--color-accent-rgb), 0.8); /* Couleur au survol */
 }
 
 .product-name {

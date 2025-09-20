@@ -1,24 +1,79 @@
 :root {
-  --color-bg: #242424;
-  --color-primary: #5a90a0;
-  --color-secondary: #007bff;
-  --color-text: #ffffff;
-  --color-text-muted: #6c757d;
-  --color-text-inverse: #000000;
-  --color-header-primary: #1a1a1a;
-  --color-header-secondary: #4f5254;
-  --color-action-primary: #007bff;
-  --color-action-secondary: #6c757d;
-  --color-action-accent: #ffc107;
-  --color-on-primary: #ffffff;
-  --color-on-secondary: #ffffff;
-  --color-on-accent: #000000;
-  --color-ui-border: #ced4da;
-  --color-ui-focus: #80bdff;
-  --color-feedback-success: #28a745;
+  /* Base color references */
+  --color-white-rgb: 255, 255, 255;
+  --color-black-rgb: 0, 0, 0;
+
+  /* Brand palette */
+  --color-accent-rgb: 26, 188, 156;
+  --color-accent: rgb(var(--color-accent-rgb));
+
+  /* Dark surfaces */
+  --surface-carbon-rgb: 40, 40, 40;
+  --surface-elevated-rgb: 32, 32, 32;
+  --surface-intense-rgb: 26, 26, 26;
+  --surface-bold-rgb: 25, 25, 25;
+  --surface-ember-rgb: 24, 24, 24;
+  --surface-strong-rgb: 22, 22, 22;
+  --surface-deep-rgb: 20, 20, 20;
+  --surface-glass-rgb: 18, 18, 18;
+  --surface-velvet-rgb: 16, 16, 16;
+  --surface-abyss-rgb: 14, 14, 14;
+  --surface-cavern-rgb: 12, 12, 12;
+  --surface-night-rgb: 10, 10, 10;
+  --surface-fog-rgb: 8, 8, 8;
+  --surface-shadow-rgb: 6, 6, 6;
+  --surface-void-rgb: 4, 4, 4;
+
+  /* Text and border colors */
+  --color-text: rgb(var(--color-white-rgb));
+  --color-text-muted: rgba(var(--color-white-rgb), 0.55);
+  --color-text-secondary: rgba(var(--color-white-rgb), 0.75);
+  --color-text-inverse: rgb(var(--color-black-rgb));
+
+  --color-background: rgb(var(--surface-deep-rgb));
+  --color-background-alt: rgb(var(--surface-glass-rgb));
+  --color-surface: rgb(var(--surface-strong-rgb));
+
+  --color-border-subtle: rgba(var(--color-white-rgb), 0.08);
+  --color-border-strong: rgba(var(--color-white-rgb), 0.18);
+  --color-border-heavy: rgba(var(--color-white-rgb), 0.25);
+
+  /* Accent transparencies */
+  --color-accent-soft: rgba(var(--color-accent-rgb), 0.25);
+  --color-accent-faint: rgba(var(--color-accent-rgb), 0.1);
+  --color-accent-strong: rgba(var(--color-accent-rgb), 0.75);
+  --color-accent-glow: rgba(var(--color-accent-rgb), 0.85);
+
+  /* Shared gradients */
+  --gradient-surface-strong: linear-gradient(135deg, rgba(var(--surface-velvet-rgb), 0.92), rgba(var(--surface-void-rgb), 0.94));
+  --gradient-surface-soft: linear-gradient(135deg, rgba(var(--surface-glass-rgb), 0.9), rgba(var(--surface-shadow-rgb), 0.94));
+  --gradient-surface-lifted: linear-gradient(135deg, rgba(var(--surface-elevated-rgb), 0.86), rgba(var(--surface-abyss-rgb), 0.94));
+  --gradient-surface-subtle: linear-gradient(135deg, rgba(var(--surface-intense-rgb), 0.9), rgba(var(--surface-shadow-rgb), 0.88));
+  --gradient-highlight: linear-gradient(135deg, rgba(var(--color-white-rgb), 0.14), rgba(var(--color-white-rgb), 0.04));
+  --gradient-highlight-strong: linear-gradient(135deg, rgba(var(--color-white-rgb), 0.22), rgba(var(--color-white-rgb), 0.08));
+  --gradient-highlight-solid: linear-gradient(135deg, rgba(var(--color-white-rgb), 0.32), rgba(var(--color-white-rgb), 0));
+  --gradient-accent-soft: linear-gradient(135deg, rgba(var(--color-accent-rgb), 0.28), rgba(var(--color-accent-rgb), 0.1));
+  --gradient-accent-strong: linear-gradient(135deg, rgba(var(--color-accent-rgb), 0.42), rgba(var(--color-accent-rgb), 0.18));
+  --gradient-accent-solid: linear-gradient(135deg, rgba(var(--color-accent-rgb), 0.85), rgba(var(--color-accent-rgb), 0.58));
+  --gradient-accent-intense: linear-gradient(135deg, rgba(var(--color-accent-rgb), 0.95), rgba(var(--color-accent-rgb), 0.72));
+
+  /* Legacy aliases */
+  --color-bg: var(--color-background);
+  --color-primary: var(--color-accent);
+  --color-secondary: var(--color-accent);
+  --color-header-primary: rgb(var(--surface-intense-rgb));
+  --color-header-secondary: rgba(var(--surface-velvet-rgb), 0.72);
+  --color-action-primary: var(--color-accent);
+  --color-action-secondary: var(--color-accent-strong);
+  --color-action-accent: var(--color-accent-glow);
+  --color-on-primary: rgb(var(--color-white-rgb));
+  --color-on-secondary: rgb(var(--color-white-rgb));
+  --color-on-accent: rgb(var(--color-black-rgb));
+  --color-ui-border: var(--color-border-subtle);
+  --color-ui-focus: rgba(var(--color-accent-rgb), 0.65);
+  --color-feedback-success: #2ecc71;
   --color-feedback-warning: #ffc107;
   --color-feedback-danger: #dc3545;
-  --color-background: #242424;
 }
 
 #site-content {
@@ -54,18 +109,18 @@ h2.title {
 	}
 
 a {
-  color: var(--color-primary);
+  color: var(--color-accent);
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--color-secondary);
+  color: var(--color-accent-glow);
   text-decoration: none;
 }
 
 button,
 .button {
-  background-color: var(--color-primary);
+  background-color: var(--color-accent);
   color: var(--color-text);
   border: none;
   cursor: pointer;
@@ -73,7 +128,7 @@ button,
 
 button:hover,
 .button:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--color-accent-glow);
 }
 
 /* Surcharge des styles de WooCommerce pour les images dans le panier */
@@ -88,10 +143,10 @@ button:hover,
     background-color: var(--color-background);
     color: var(--color-text);
     padding: 10px 15px;
-    border: 2px solid var(--color-primary);
+    border: 2px solid var(--color-accent);
     border-radius: 20px;
     font-family: 'Cinzel', serif;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(var(--color-black-rgb), 0.3);
     display: none;
     z-index: 1000;
     align-items: center;
