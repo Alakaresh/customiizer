@@ -103,9 +103,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             productCard.onclick = () => goToProductPage(product);
 
             productCard.innerHTML = `
-                <img src="${imageUrl}" alt="${title}">
+                <div class="product-card__visual" aria-hidden="true">
+                    <img src="${imageUrl}" alt="${title}">
+                </div>
                 <h2 class="product-title">${title}</h2>
-                <p class="product-price">À partir de ${minPrice}</p>
+                <p class="product-price">
+                    <span class="product-price__from">À partir de</span>
+                    <span class="product-price__value">${minPrice}</span>
+                </p>
             `;
 
             productListContainer.appendChild(productCard);
