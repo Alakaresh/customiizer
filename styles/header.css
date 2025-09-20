@@ -12,9 +12,9 @@
         width: 44px;
         height: 44px;
         border-radius: 14px;
-        border: 1px solid rgba(26, 188, 156, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.14);
         background: rgba(255, 255, 255, 0.05);
-        color: rgba(232, 247, 243, 0.92);
+        color: rgba(240, 240, 240, 0.92);
         font-size: 1.2rem;
         cursor: pointer;
         transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
@@ -23,20 +23,20 @@
 
 .mobile-menu-toggle:hover,
 .mobile-menu-toggle:focus-visible {
-        background: rgba(26, 188, 156, 0.22);
+        background: rgba(255, 255, 255, 0.12);
         transform: translateY(-1px);
-        box-shadow: 0 12px 28px rgba(26, 188, 156, 0.28);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
 }
 
 .mobile-menu {
         align-items: flex-start;
         justify-content: center;
-        border: 1px solid rgba(26, 188, 156, 0.28);
-        background: rgba(5, 14, 18, 0.96);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(15, 15, 15, 0.96);
         border-radius: 18px;
         padding: 16px 22px;
         gap: 14px;
-        box-shadow: 0 26px 52px rgba(3, 10, 12, 0.75);
+        box-shadow: 0 26px 52px rgba(0, 0, 0, 0.65);
         backdrop-filter: blur(12px);
 }
 
@@ -50,7 +50,7 @@
 
 .mobile-menu a:hover,
 .mobile-menu a:focus-visible {
-        color: #6df2d2;
+        color: #ffffff;
 }
 
 /* Styles généraux pour le header */
@@ -64,28 +64,9 @@
         color: var(--color-text);
         overflow: visible;
         background: linear-gradient(150deg, rgba(24, 24, 24, 0.92), rgba(10, 10, 10, 0.94));
-        border-bottom: 1px solid rgba(26, 188, 156, 0.24);
-        box-shadow: 0 22px 48px rgba(2, 8, 10, 0.72);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(14px);
-}
-
-#header::before,
-#header::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        z-index: 0;
-}
-
-#header::before {
-        background: radial-gradient(120% 160% at 0% 0%, rgba(26, 188, 156, 0.32) 0%, rgba(26, 188, 156, 0.12) 42%, transparent 70%);
-        opacity: 0.7;
-}
-
-#header::after {
-        background: radial-gradient(120% 140% at 90% -20%, rgba(26, 188, 156, 0.28) 0%, transparent 55%);
-        opacity: 0.85;
 }
 
 .page-id-413 #header {
@@ -172,7 +153,7 @@
         width: 100%;
         height: 3px;
         border-radius: 999px;
-        background: linear-gradient(90deg, rgba(26, 188, 156, 0.8), rgba(26, 188, 156, 0.15));
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
         transform: scaleX(0);
         transform-origin: left;
         transition: transform 0.3s ease;
@@ -180,7 +161,7 @@
 
 .main-menu a:hover,
 .main-menu a:focus-visible {
-        color: #6df2d2;
+        color: #ffffff;
         transform: translateY(-1px);
 }
 
@@ -196,7 +177,7 @@
        gap: 10px;
        padding: 10px 16px;
        border-radius: 999px;
-       border: 1px solid rgba(26, 188, 156, 0.24);
+       border: 1px solid rgba(255, 255, 255, 0.16);
        background: rgba(255, 255, 255, 0.04);
        color: var(--color-text);
        letter-spacing: 0.08em;
@@ -208,22 +189,22 @@
 }
 
 .icon-button i {
-        color: #1abc9c;
+        color: rgba(255, 255, 255, 0.85);
         transition: color 0.3s ease;
         font-size: 1rem;
 }
 
 .icon-button:hover,
 .icon-button:focus-visible {
-        background: rgba(26, 188, 156, 0.2);
-        color: #041013;
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 12px 30px rgba(26, 188, 156, 0.24);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
 .icon-button:hover i,
 .icon-button:focus-visible i {
-        color: #041013;
+        color: #ffffff;
 }
 
 .account-icons-container {
@@ -246,26 +227,26 @@
         height: 44px !important;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid rgba(109, 242, 210, 0.55);
-        box-shadow: 0 12px 28px rgba(26, 188, 156, 0.25);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .profile-container .icon-button {
         padding: 4px;
         background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(26, 188, 156, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .profile-container .icon-button:hover,
 .profile-container .icon-button:focus-visible {
-        background: rgba(26, 188, 156, 0.22);
+        background: rgba(255, 255, 255, 0.12);
 }
 
 .profile-container .icon-button:hover .user-profile-image,
 .profile-container .icon-button:focus-visible .user-profile-image {
         transform: scale(1.02);
-        box-shadow: 0 16px 34px rgba(26, 188, 156, 0.35);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.45);
 }
 
 .image-credits-container {
@@ -274,18 +255,18 @@
        gap: 8px;
        margin-left: 0;
        font-size: 0.85rem;
-       color: #e8f7f3;
+       color: rgba(240, 240, 240, 0.85);
        vertical-align: middle;
-       background: linear-gradient(135deg, rgba(26, 188, 156, 0.24), rgba(6, 26, 28, 0.88));
+       background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(28, 28, 28, 0.88));
        padding: 10px 18px;
        border-radius: 999px;
-       border: 1px solid rgba(109, 242, 210, 0.35);
-       box-shadow: 0 14px 36px rgba(2, 12, 13, 0.55);
+       border: 1px solid rgba(255, 255, 255, 0.16);
+       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
 }
 
 .image-credits-container i {
         font-size: 1rem;
-        color: #6df2d2;
+        color: #ffffff;
 }
 
 .image-credits-label {
@@ -320,7 +301,7 @@
 
 .loyalty-header-button i {
         font-size: 1rem;
-        color: #6df2d2;
+        color: rgba(255, 255, 255, 0.85);
 }
 
 .loyalty-header-label {
@@ -329,9 +310,9 @@
 
 .loyalty-header-button:hover,
 .loyalty-header-button:focus-visible {
-        background: rgba(109, 242, 210, 0.18);
-        box-shadow: 0 16px 36px rgba(26, 188, 156, 0.28);
-        color: #6df2d2;
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+        color: #ffffff;
 }
 
 .loyalty-header-points {
@@ -340,11 +321,11 @@
         gap: 6px;
         padding: 6px 12px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(26, 188, 156, 0.26);
-        box-shadow: 0 10px 28px rgba(4, 18, 19, 0.45);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
         font-size: 0.8rem;
-        color: rgba(232, 247, 243, 0.82);
+        color: rgba(240, 240, 240, 0.82);
 }
 
 .loyalty-header-points img {
@@ -359,9 +340,9 @@
 }
 
 .loyalty-header-points--guest {
-        background: rgba(109, 242, 210, 0.12);
-        border: 1px solid rgba(109, 242, 210, 0.28);
-        color: #6df2d2;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #ffffff;
 }
 
 .cart-container {
@@ -380,8 +361,8 @@
        position: absolute;
        top: -8px;
        right: -6px;
-       background: linear-gradient(135deg, #6df2d2, #1abc9c);
-       color: #032623;
+       background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(160, 160, 160, 0.85));
+       color: #111111;
        font-size: 0.7rem;
        font-weight: 700;
        min-width: 20px;
@@ -390,30 +371,20 @@
        border-radius: 999px;
        text-align: center;
        padding: 0 5px;
-       border: 2px solid rgba(3, 17, 19, 0.45);
-       box-shadow: 0 12px 26px rgba(26, 188, 156, 0.45);
+       border: 2px solid rgba(0, 0, 0, 0.45);
+       box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
 }
 
 .early-access-banner {
         position: relative;
         z-index: 5;
         width: 100%;
-        background: rgba(5, 14, 18, 0.92);
+        background: rgba(18, 18, 18, 0.92);
         color: #e8f7f3;
-        border-top: 1px solid rgba(109, 242, 210, 0.22);
-        border-bottom: 1px solid rgba(109, 242, 210, 0.22);
-        box-shadow: 0 22px 48px rgba(3, 10, 12, 0.58);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.58);
         backdrop-filter: blur(10px);
-}
-
-.early-access-banner::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(160% 120% at 10% 10%, rgba(109, 242, 210, 0.2) 0%, transparent 55%),
-                    radial-gradient(160% 120% at 90% 90%, rgba(26, 188, 156, 0.18) 0%, transparent 60%);
-        opacity: 0.7;
-        pointer-events: none;
 }
 
 .early-access-banner__inner {
@@ -448,7 +419,7 @@
 }
 
 .early-access-banner .highlight {
-        color: #6df2d2;
+        color: #ffffff;
         font-weight: 700;
 }
 
