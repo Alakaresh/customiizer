@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
-	var visibleItems = 5; // Nombre d'éléments visibles dans le carrousel
-	var itemWidth; // Initialisation de la variable pour la largeur des éléments
+        var visibleItems = 4; // Nombre d'éléments visibles par défaut dans le carrousel
+        var itemWidth; // Initialisation de la variable pour la largeur des éléments
 
 	var products = [
 		{
@@ -68,17 +68,45 @@ jQuery(document).ready(function($) {
 	jQuery('.carousel-items').append($carousel);
 
 
-       function initCarousel() {
-               var mq = window.matchMedia('(max-width: 1024px)');
-               visibleItems = mq.matches ? 2 : 5;
+        function getVisibleItems() {
+                if (window.matchMedia('(max-width: 640px)').matches) {
+                        return 1;
+                }
 
-               var containerWidth = jQuery('.carousel-inner').width();
-               itemWidth = containerWidth / visibleItems - (10 * 2);
-		jQuery('.product-item').css('width', itemWidth + 'px');
+                if (window.matchMedia('(max-width: 1024px)').matches) {
+                        return 2;
+                }
 
+                if (window.matchMedia('(max-width: 1440px)').matches) {
+                        return 3;
+                }
 
-		jQuery('.product-item').css('width', itemWidth + 'px'); // Appliquer la largeur calculée à chaque élément
-	}
+                return 4;
+        }
+
+        function initCarousel() {
+                var $container = jQuery('.carousel-items');
+                var $inner = jQuery('.carousel-inner');
+
+                if ($container.length === 0 || $inner.length === 0) {
+                        return;
+                }
+
+                visibleItems = getVisibleItems();
+
+                var containerWidth = $container.width();
+                var computedStyles = window.getComputedStyle($inner.get(0));
+                var gapValue = parseFloat(computedStyles.columnGap || computedStyles.gap || 0) || 0;
+                var totalGap = gapValue * Math.max(visibleItems - 1, 0);
+                var availableWidth = containerWidth - totalGap;
+
+                if (availableWidth <= 0) {
+                        availableWidth = containerWidth;
+                }
+
+                itemWidth = Math.max(availableWidth / visibleItems, 0);
+                jQuery('.product-item').css('width', itemWidth + 'px');
+        }
 
 	function rotateCarousel(direction) {
 		var $items = jQuery('.carousel-inner .product-item');
