@@ -390,34 +390,47 @@
 .steps-list {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: clamp(18px, 3vw, 28px);
   padding: 0;
   margin: 0;
-  counter-reset: step-counter;
   width: 100%;
 }
 
-.steps-list li {
+.step-card {
   position: relative;
-  counter-increment: step-counter;
-  padding: 28px 24px 32px;
+  padding: clamp(26px, 3vw, 32px);
   border-radius: 24px;
   background: rgba(4, 16, 20, 0.75);
   border: 1px solid rgba(109, 242, 210, 0.18);
   text-align: left;
   box-shadow: 0 26px 48px rgba(2, 12, 15, 0.55);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.steps-list li::before {
-  content: counter(step-counter);
+.step-card::after {
+  content: "";
   position: absolute;
-  top: 18px;
-  left: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(109, 242, 210, 0.06), transparent 55%);
+  pointer-events: none;
+}
+
+.step-card__header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  z-index: 1;
+}
+
+.step-card__number {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
   background: linear-gradient(135deg, rgba(26, 188, 156, 0.9), rgba(109, 242, 210, 0.5));
   color: #021416;
   font-weight: 700;
@@ -426,32 +439,38 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 12px 26px rgba(26, 188, 156, 0.35);
+  flex-shrink: 0;
 }
 
-.steps-list li::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(109, 242, 210, 0.06), transparent 55%);
-  pointer-events: none;
+.step-card__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-card__step {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: rgba(109, 242, 210, 0.72);
 }
 
 .step-title {
-  display: block;
-  margin-left: 64px;
+  margin: 0;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(232, 247, 243, 0.9);
-  margin-bottom: 14px;
+  color: rgba(232, 247, 243, 0.92);
 }
 
 .step-text {
   margin: 0;
-  margin-left: 64px;
+  position: relative;
+  z-index: 1;
   color: rgba(194, 222, 217, 0.85);
   font-size: 0.98rem;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 /* Legacy link style (kept for compatibility) */

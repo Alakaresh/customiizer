@@ -90,20 +90,28 @@
     grid-template-columns: 1fr;
   }
 
-  .steps-list li {
+  .step-card {
     padding: 24px;
+    gap: 16px;
   }
 
-  .steps-list li::before {
-    position: relative;
-    top: 0;
-    left: 0;
-    margin-bottom: 16px;
+  .step-card__header {
+    align-items: center;
+    gap: 16px;
   }
 
-  .step-title,
-  .step-text {
-    margin-left: 0;
+  .step-card__number {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+  }
+
+  .step-card__titles {
+    gap: 4px;
+  }
+
+  .step-title {
+    font-size: 0.95rem;
   }
 }
 

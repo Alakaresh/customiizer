@@ -98,20 +98,44 @@ get_header();
       <p class="text home-section__description">Suivre ces étapes suffit pour imaginer, générer et commander ta création personnalisée.</p>
     </div>
     <ol class="steps-list" aria-label="Étapes de création">
-      <li>
-        <span class="step-title">Choisis ton support</span>
+      <li class="step-card">
+        <div class="step-card__header">
+          <span class="step-card__number" aria-hidden="true">1</span>
+          <div class="step-card__titles">
+            <span class="step-card__step">Étape 1</span>
+            <h3 class="step-title">Choisis ton support</h3>
+          </div>
+        </div>
         <p class="step-text">Rends-toi sur la page "Customiize" et sélectionne le format qui t’inspire.</p>
       </li>
-      <li>
-        <span class="step-title">Génère avec l’IA</span>
+      <li class="step-card">
+        <div class="step-card__header">
+          <span class="step-card__number" aria-hidden="true">2</span>
+          <div class="step-card__titles">
+            <span class="step-card__step">Étape 2</span>
+            <h3 class="step-title">Génère avec l’IA</h3>
+          </div>
+        </div>
         <p class="step-text">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
       </li>
-      <li>
-        <span class="step-title">Personnalise</span>
+      <li class="step-card">
+        <div class="step-card__header">
+          <span class="step-card__number" aria-hidden="true">3</span>
+          <div class="step-card__titles">
+            <span class="step-card__step">Étape 3</span>
+            <h3 class="step-title">Personnalise</h3>
+          </div>
+        </div>
         <p class="step-text">Affines ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
       </li>
-      <li>
-        <span class="step-title">Commande &amp; reçois</span>
+      <li class="step-card">
+        <div class="step-card__header">
+          <span class="step-card__number" aria-hidden="true">4</span>
+          <div class="step-card__titles">
+            <span class="step-card__step">Étape 4</span>
+            <h3 class="step-title">Commande &amp; reçois</h3>
+          </div>
+        </div>
         <p class="step-text">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
       </li>
     </ol>
