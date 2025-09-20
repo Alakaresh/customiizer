@@ -87,9 +87,8 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
         </div>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
-                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button">
+                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button" aria-label="<?php echo esc_attr__( 'Panier', 'customiizer' ); ?>">
                         <i class="fas fa-shopping-bag"></i>
-                        <span class="cart-text">Panier</span>
                         <?php $count = WC()->cart->get_cart_contents_count(); ?>
                         <?php if ($count > 0): ?>
                         <span class="cart-count"><?php echo esc_html($count); ?></span>
@@ -105,9 +104,8 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
         <?php else: ?>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
-                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button">
+                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button" aria-label="<?php echo esc_attr__( 'Panier', 'customiizer' ); ?>">
                         <i class="fas fa-shopping-bag"></i>
-                        <span class="cart-text">Panier</span>
                         <?php $count = WC()->cart->get_cart_contents_count(); ?>
                         <?php if ($count > 0): ?>
                         <span class="cart-count"><?php echo esc_html($count); ?></span>
