@@ -39,11 +39,10 @@ $display_name   = $current_user->display_name;
                                        </div>
 
                                        <nav class="mobile-menu">
-						<a href="/customiize">Customiize</a>
-						<a href="/boutique">Boutique</a>
-						<a href="/communaute">Communauté</a>
-						<a href="/compte?triggerClick=true" id="mobileMyCreationsLink">Mes créations</a>
-					</nav>
+                                                <a href="/boutique">Boutique</a>
+                                                <a href="/customiize">Customiize</a>
+                                                <a href="/communaute">Communauté</a>
+                                        </nav>
 					<!-- 🎯 Bloc Early Access sous le logo -->
 					<?php
 					$pages_autorisees = ['boutique', 'home']; 
@@ -59,14 +58,11 @@ $display_name   = $current_user->display_name;
 
                                 </div>
                                 <div class="menu-container">
-					<nav class="main-menu">
-						<div><a href="/customiize">Customiize</a></div>
-						<div><a href="/boutique">Boutique</a></div>
-						<div><a href="/communaute">Communauté</a></div>
-						<div>
-							<a href="/compte?triggerClick=true" id="myCreationsLink" data-redirect="compte?triggerClick=true">Mes créations</a>
-						</div>
-					</nav>
+                                        <nav class="main-menu">
+                                                <div><a href="/boutique">Boutique</a></div>
+                                                <div><a href="/customiize">Customiize</a></div>
+                                                <div><a href="/communaute">Communauté</a></div>
+                                        </nav>
 				</div>
 				<div class="account-icons-container">
 

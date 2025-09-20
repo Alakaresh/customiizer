@@ -6,139 +6,301 @@
     display: none;
 }
 
+.mobile-menu-toggle {
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        border: 1px solid rgba(26, 188, 156, 0.28);
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(232, 247, 243, 0.92);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 2;
+}
+
+.mobile-menu-toggle:hover,
+.mobile-menu-toggle:focus-visible {
+        background: rgba(26, 188, 156, 0.22);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 28px rgba(26, 188, 156, 0.28);
+}
+
+.mobile-menu {
+        align-items: flex-start;
+        justify-content: center;
+        border: 1px solid rgba(26, 188, 156, 0.28);
+        background: rgba(5, 14, 18, 0.96);
+        border-radius: 18px;
+        padding: 16px 22px;
+        gap: 14px;
+        box-shadow: 0 26px 52px rgba(3, 10, 12, 0.75);
+        backdrop-filter: blur(12px);
+}
+
+.mobile-menu a {
+        color: rgba(232, 247, 243, 0.9);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-size: 0.78rem;
+}
+
+.mobile-menu a:hover,
+.mobile-menu a:focus-visible {
+        color: #6df2d2;
+}
+
 /* Styles généraux pour le header */
 #header {
+        position: relative;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        height: 80px;
-       background-color: var(--color-header-primary);
-       color: var(--color-text);
-       padding: 0 10px;
-       border-bottom: 1px solid var(--color-ui-border);
+        justify-content: center;
+        height: 88px;
+        padding: 0 10px;
+        color: var(--color-text);
+        overflow: visible;
+        background: linear-gradient(135deg, rgba(8, 22, 27, 0.94) 0%, rgba(5, 14, 18, 0.96) 60%);
+        border-bottom: 1px solid rgba(26, 188, 156, 0.32);
+        box-shadow: 0 18px 42px rgba(4, 12, 14, 0.65);
+        backdrop-filter: blur(14px);
+}
+
+#header::before,
+#header::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+}
+
+#header::before {
+        background: radial-gradient(120% 160% at 0% 0%, rgba(26, 188, 156, 0.32) 0%, rgba(26, 188, 156, 0.12) 42%, transparent 70%);
+        opacity: 0.7;
+}
+
+#header::after {
+        background: radial-gradient(120% 140% at 90% -20%, rgba(26, 188, 156, 0.28) 0%, transparent 55%);
+        opacity: 0.85;
 }
 
 .page-id-413 #header {
-	position: sticky;
-	top: 0;
-	z-index: 999;
+        position: sticky;
+        top: 0;
+        z-index: 999;
 }
-
 
 /* Contenu général du header, gestion de l'espacement interne */
 .header-content {
-	display: flex;
-	position: relative;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	padding: 0 32px;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        width: 100%;
+        max-width: 1320px;
+        padding: 0 40px;
 }
 
-/* Conteneur pour le logo, centré et occupant 80% du header */
+/* Conteneur pour le logo */
 .logo-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 18px;
 }
 
-/* Style pour le logo, assure que le logo est centré et proportionné */
+/* Style pour le logo */
 .logo img {
-        height: 100%;  /* Utilise toute la hauteur du container tout en restant proportionnel */
-        max-height: 70px; /* Limite la taille du logo pour éviter le surdimensionnement */
+        height: 54px;
+        max-height: 70px;
+        filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.45));
 }
 
 .menu-container {
-	position: absolute; /* Permet le positionnement précis dans le parent */
-	left: 50%; /* Centre horizontalement par rapport à l'élément parent */
-	transform: translateX(-50%); /* Décale le menu de 50% de sa propre largeur vers la gauche */
-	display: flex;
-	justify-content: center;
-	align-items: center;
+        position: relative;
+        left: auto;
+        transform: none;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 }
-
 
 /* Style pour les menus de navigation */
 .main-menu {
-	display: flex;
-	padding: 0;
-	margin: 0;
-	list-style: none;
-	align-items: center;  /* Assure que tous les éléments sont alignés verticalement */
-}
-
-.main-menu a {
-       font-size: 24px; /* Ajuste cette valeur selon tes besoins pour augmenter la taille de la police */
-       color: var(--color-text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
 }
 
 .main-menu > div {
-	padding: 0 20px;  /* Espacement autour de chaque élément de menu */
-	position: relative;  /* Nécessaire pour le positionnement des pseudo-éléments */
+        position: relative;
+        padding: 0;
 }
 
 .main-menu > div:not(:last-child)::after {
-	content: "";  /* Crée un pseudo-élément pour la séparation */
-	position: absolute;
-	right: 0;  /* Positionne la séparation à la droite de l'élément */
-	top: 50%;  /* Centrer verticalement la ligne */
-	transform: translate(50%, -50%);  /* Décale le séparateur vers le centre entre deux éléments */
-	height: 70%;  /* Hauteur de la séparation, ajustable selon le design */
-	width: 1px;  /* Largeur de la séparation */
-       background-color: var(--color-ui-border);  /* Couleur de la séparation */
+        display: none;
 }
 
-.main-menu > div:last-child {
-	padding-right: 20px;  /* Assure une symétrie avec l'espacement interne */
+.main-menu a {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: rgba(232, 247, 243, 0.88);
+        padding: 10px 0;
+        transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.main-menu a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -8px;
+        width: 100%;
+        height: 3px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(26, 188, 156, 0.8), rgba(26, 188, 156, 0.15));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+}
+
+.main-menu a:hover,
+.main-menu a:focus-visible {
+        color: #6df2d2;
+        transform: translateY(-1px);
+}
+
+.main-menu a:hover::after,
+.main-menu a:focus-visible::after {
+        transform: scaleX(1);
 }
 
 .icon-button {
-       display: flex;
-       flex-direction: column; /* Les éléments sont empilés verticalement */
-       align-items: center; /* Centrer les éléments horizontalement */
-       text-align: center;
-       margin-top: 10px; /* Ajoute une marge au-dessus du bouton */
-       color: var(--color-text); /* Couleur du texte adaptée à la palette */
+       display: inline-flex;
+       align-items: center;
+       justify-content: center;
+       gap: 10px;
+       padding: 10px 16px;
+       border-radius: 999px;
+       border: 1px solid rgba(26, 188, 156, 0.24);
+       background: rgba(255, 255, 255, 0.04);
+       color: var(--color-text);
+       letter-spacing: 0.08em;
+       text-transform: uppercase;
+       font-size: 0.75rem;
+       font-weight: 600;
        cursor: pointer;
+       transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+
+.icon-button i {
+        color: #1abc9c;
+        transition: color 0.3s ease;
+        font-size: 1rem;
+}
+
+.icon-button:hover,
+.icon-button:focus-visible {
+        background: rgba(26, 188, 156, 0.2);
+        color: #041013;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 30px rgba(26, 188, 156, 0.24);
+}
+
+.icon-button:hover i,
+.icon-button:focus-visible i {
+        color: #041013;
 }
 
 .account-icons-container {
-	display: flex;
-	align-items: center;
-	height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 16px;
 }
 
 /* Styles pour les icônes de compte utilisateur et panier */
 .account-icons-container a {
-	display: flex;
-	align-items: center;
-	position: relative;
-	margin-left: 20px;
-	height: 80%;
+        margin-left: 0;
+        position: relative;
+        height: auto;
 }
 
 /* Styles pour l'icône de compte utilisateur */
 .user-profile-image {
-	width: auto; /* Assurez-vous que la largeur s'ajuste automatiquement pour conserver les proportions */
-	height: 40px !important; /* Définissez la hauteur sur 80% de la hauteur de la barre de navigation */
-	max-height: 80% !important; /* Limitez la hauteur à 80% de la hauteur de la barre de navigation */
-	border-radius: 50%; /* Gardez le bord arrondi */
-	object-fit: contain; /* Assurez-vous que l'image s'adapte tout en conservant les proportions */
-	margin-top: -10px;
+        width: 44px;
+        height: 44px !important;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(109, 242, 210, 0.55);
+        box-shadow: 0 12px 28px rgba(26, 188, 156, 0.25);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-container .icon-button {
+        padding: 4px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(26, 188, 156, 0.3);
+}
+
+.profile-container .icon-button:hover,
+.profile-container .icon-button:focus-visible {
+        background: rgba(26, 188, 156, 0.22);
+}
+
+.profile-container .icon-button:hover .user-profile-image,
+.profile-container .icon-button:focus-visible .user-profile-image {
+        transform: scale(1.02);
+        box-shadow: 0 16px 34px rgba(26, 188, 156, 0.35);
 }
 
 .image-credits-container {
        display: inline-flex;
        align-items: center;
-       gap: 4px;
-       margin-left: 20px; /* Adjust this value as needed */
-       font-size: 16px; /* Or any other appropriate size */
-       color: var(--color-text); /* Couleur de texte dynamique */
-       vertical-align: middle; /* Ensures alignment with other bar elements */
-       background-color: var(--color-header-secondary); /* Couleur de fond basée sur la palette */
-       padding: 5px 10px; /* Padding around the text */
-       border-radius: 15px; /* Border radius for rounded corners */
-       border: 2px solid var(--color-ui-border); /* Bordure utilisant la palette */
+       gap: 8px;
+       margin-left: 0;
+       font-size: 0.85rem;
+       color: #e8f7f3;
+       vertical-align: middle;
+       background: linear-gradient(135deg, rgba(26, 188, 156, 0.24), rgba(6, 26, 28, 0.88));
+       padding: 10px 18px;
+       border-radius: 999px;
+       border: 1px solid rgba(109, 242, 210, 0.35);
+       box-shadow: 0 14px 36px rgba(2, 12, 13, 0.55);
+}
+
+.image-credits-container i {
+        font-size: 1rem;
+        color: #6df2d2;
+}
+
+.image-credits-label {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.65rem;
+        color: rgba(232, 247, 243, 0.7);
+}
+
+.image-credits-count {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ffffff;
 }
 .loyalty-header-container {
         display: flex;
@@ -157,56 +319,73 @@
         height: 16px;
         width: auto;
 }
+
 .cart-container {
-	position: relative;
+        position: relative;
+}
+
+.cart-container .icon-button {
+        min-width: 130px;
+}
+
+.cart-container .icon-button i {
+        font-size: 1.1rem;
+}
+
+.cart-text {
+        letter-spacing: 0.14em;
 }
 
 .cart-count {
        position: absolute;
-       top: 0px;
-       right: 40px;
-       background-color: var(--color-header-secondary);
-       color: var(--color-text);
-       font-size: 0.65rem;
-       font-weight: bold;
-       min-width: 16px;
-       height: 16px;
-       line-height: 16px;
-       border-radius: 50%;
+       top: -8px;
+       right: -6px;
+       background: linear-gradient(135deg, #6df2d2, #1abc9c);
+       color: #032623;
+       font-size: 0.7rem;
+       font-weight: 700;
+       min-width: 20px;
+       height: 20px;
+       line-height: 18px;
+       border-radius: 999px;
        text-align: center;
-       padding: 0 4px;
-       box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+       padding: 0 5px;
+       border: 2px solid rgba(3, 17, 19, 0.45);
+       box-shadow: 0 12px 26px rgba(26, 188, 156, 0.45);
 }
-.early-access-banner {
-	margin-top: 6px;
-	top: 60px;
-	left: 50%;
-	transform: translateX(-50%);
 
-	text-align: center;
-       color: var(--color-text);
-       background: var(--color-header-secondary);
-	border-radius: 6px;
-	padding: 8px 12px;
-	font-size: 0.8rem;
-	font-weight: 500;
-	line-height: 1.4;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-	animation: pulseAccess 3sease-in-out infinite;
-	position: absolute;
-	z-index: 10;
+.early-access-banner {
+        position: absolute;
+        top: calc(100% - 12px);
+        left: 50%;
+        transform: translate(-50%, 0);
+        display: inline-flex;
+        flex-direction: column;
+        gap: 4px;
+        color: #e8f7f3;
+        background: rgba(5, 14, 18, 0.92);
+        border-radius: 16px;
+        padding: 12px 18px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        line-height: 1.5;
+        border: 1px solid rgba(109, 242, 210, 0.32);
+        box-shadow: 0 22px 48px rgba(3, 10, 12, 0.65);
+        animation: pulseAccess 3s ease-in-out infinite;
+        backdrop-filter: blur(12px);
+        z-index: 10;
+        text-align: left;
 }
 .early-access-banner .highlight {
-       color: var(--color-action-accent);
-       font-weight: bold;
+       color: #6df2d2;
+       font-weight: 700;
 }
 
 .early-access-banner .version-info {
         display: block;
-        font-size: 0.7rem;
-       color: var(--color-text);
-       opacity: 0.85;
-        margin-top: 3px;
+        font-size: 0.68rem;
+        color: rgba(232, 247, 243, 0.75);
+        margin-top: 2px;
 }
 
 .ast-separate-container .error-404,
