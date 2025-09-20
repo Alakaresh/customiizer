@@ -452,14 +452,6 @@
         font-weight: 700;
 }
 
-.early-access-banner .version-info {
-        display: block;
-        font-size: 0.72rem;
-        color: rgba(232, 247, 243, 0.78);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-}
-
 @media (max-width: 900px) {
         .early-access-banner__inner {
                 flex-direction: column;
@@ -473,9 +465,6 @@
                 letter-spacing: 0.02em;
         }
 
-        .early-access-banner .version-info {
-                font-size: 0.68rem;
-        }
 }
 
 @media (max-width: 520px) {

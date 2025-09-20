@@ -137,7 +137,6 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
                                        <span class="early-access-banner__title">
                                                <strong>Early Access</strong> – <span class="highlight">-30%</span> avec le code <strong>CUSTOM30</strong>
                                        </span>
-                                       <span class="version-info">Version <?php echo esc_html( customiizer_frontend_version() ); ?></span>
                                </div>
                        </div>
                </div>
