@@ -1,29 +1,40 @@
 @media screen and (max-width: 1024px) {
 
-	/*==========HEADER==========*/
-	.header-content {
-		padding: 0 0;
-	}
+        /*==========HEADER==========*/
+        #header {
+                height: 76px;
+                padding: 0 18px;
+        }
 
-	.mobile-menu-toggle {
-		display: flex !important;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		color: white;
-		font-size: 24px;
-		margin-top: 10px;
-	}
+        #header::after {
+                left: 18px;
+                right: 18px;
+        }
+
+        .header-content {
+                padding: 0 0;
+                gap: 18px;
+        }
+
+        .mobile-menu-toggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: var(--color-text);
+                font-size: 24px;
+                margin-top: 0;
+        }
 
        .mobile-menu {
                display: none;
                top: 55px;
                position: absolute;
                flex-direction: column;
-               background-color: #111;
-               padding: 10px 0;
-               border-radius: 6px;
-               gap: 10px;
+               background: linear-gradient(135deg, rgba(12, 12, 12, 0.96), rgba(4, 4, 4, 0.9));
+               padding: 18px;
+               border-radius: 16px;
+               gap: 12px;
                margin-top: 10px;
                z-index: 1000;
                opacity: 0;
@@ -46,36 +57,46 @@
                 display: none !important;
         }
 
-        /* Adjust cart badge position on smaller screens */
-        .cart-count {
-                top: -8px;
-                right: 8px;
+        .account-icons-container {
+                gap: 12px;
         }
 
-	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
+        .icon-button {
+                padding: 10px 14px;
+                letter-spacing: 0.08em;
+        }
+
+        /* Adjust cart badge position on smaller screens */
+        .cart-count {
+                top: -6px;
+                right: 4px;
+        }
+
+        /* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
         .image-credits-container {
                 display: flex;
                 align-items: center;
-                gap: 4px;
-                border: none;
+                gap: 6px;
+                padding: 8px 12px;
+                border: 1px solid rgba(26, 188, 156, 0.35);
         }
 
         .image-credits-label {
                 display: none;
         }
 
-	.image-credits-container i {
-		font-size: 16px;
-		margin: 0;
-		line-height: 1;
+        .image-credits-container i {
+                font-size: 15px;
+                margin: 0;
+                line-height: 1;
 
-	}
+        }
 
-	.image-credits-container #userCredits {
-		font-size: 14px;
-		line-height: 1;
-		display: inline-block;
-	}
+        .image-credits-container #userCredits {
+                font-size: 13px;
+                line-height: 1;
+                display: inline-block;
+        }
 
 	/*==========FOOTER==========*/
 	.upper-band {
