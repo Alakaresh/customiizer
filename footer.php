@@ -18,6 +18,9 @@ if ( $user_logged_in ) {
 }
 ?>
         </div>
+        <button type="button" id="scrollToTopButton" class="scroll-to-top-button" aria-label="Revenir en haut de la page">
+                <i class="fas fa-arrow-up" aria-hidden="true"></i>
+        </button>
         <footer>
                 <!-- Blue Band with Centered Links and Right-Aligned Social Icons -->
                 <div class="upper-band">
@@ -56,6 +59,29 @@ if ( $user_logged_in ) {
                                         menu.classList.toggle('active');
                                 });
                         }
+                });
+        </script>
+        <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                        const scrollButton = document.getElementById('scrollToTopButton');
+                        if (!scrollButton) {
+                                return;
+                        }
+
+                        const toggleButtonVisibility = function () {
+                                if (window.scrollY > 300) {
+                                        scrollButton.classList.add('is-visible');
+                                } else {
+                                        scrollButton.classList.remove('is-visible');
+                                }
+                        };
+
+                        window.addEventListener('scroll', toggleButtonVisibility, { passive: true });
+                        toggleButtonVisibility();
+
+                        scrollButton.addEventListener('click', function () {
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                        });
                 });
         </script>
 <?php if ( $user_logged_in ): ?>
