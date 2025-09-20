@@ -8,9 +8,13 @@
   flex-direction: column;
   gap: 72px;
   width: 100%;
-  max-width: 1180px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   padding: 96px clamp(18px, 5vw, 48px) 120px;
+}
+
+.site-content.home-page {
+  max-width: none;
 }
 
 .surface-card {

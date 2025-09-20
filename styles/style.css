@@ -51,7 +51,7 @@ body,
 
 body.home,
 body.home .ast-separate-container {
-  background-color: transparent !important;
+  background: linear-gradient(155deg, rgba(6, 20, 24, 0.92) 0%, rgba(2, 9, 12, 0.78) 55%, rgba(4, 14, 18, 0.7) 100%) !important;
 }
 
 h2.title {
