@@ -122,7 +122,6 @@ get_header();
               <li class="workflow__step">
                 <span class="workflow__number" aria-hidden="true">1</span>
                 <div class="workflow__content">
-                  <span class="workflow__label">Étape 1</span>
                   <h4 class="workflow__title">Choisis ton support</h4>
                   <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
                 </div>
@@ -130,7 +129,6 @@ get_header();
               <li class="workflow__step">
                 <span class="workflow__number" aria-hidden="true">2</span>
                 <div class="workflow__content">
-                  <span class="workflow__label">Étape 2</span>
                   <h4 class="workflow__title">Génère avec l’IA</h4>
                   <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
                 </div>
@@ -138,7 +136,6 @@ get_header();
               <li class="workflow__step">
                 <span class="workflow__number" aria-hidden="true">3</span>
                 <div class="workflow__content">
-                  <span class="workflow__label">Étape 3</span>
                   <h4 class="workflow__title">Personnalise</h4>
                   <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
                 </div>
@@ -146,7 +143,6 @@ get_header();
               <li class="workflow__step">
                 <span class="workflow__number" aria-hidden="true">4</span>
                 <div class="workflow__content">
-                  <span class="workflow__label">Étape 4</span>
                   <h4 class="workflow__title">Commande &amp; reçois</h4>
                   <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
                 </div>
