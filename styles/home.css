@@ -380,15 +380,16 @@
 
 .product-image-link {
   display: block;
+  width: 50%;
+  margin: 0 auto;
   aspect-ratio: 4 / 5;
   background-size: cover;
   background-position: center;
-  transition: transform 0.3s ease;
 }
 
 .product-item:hover .product-image-link,
 .product-item:focus-within .product-image-link {
-  transform: scale(1.05);
+  transform: none;
 }
 
 .product-name-link {
