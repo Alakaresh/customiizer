@@ -1,12 +1,40 @@
 @media screen and (max-width: 1024px) {
 
 	/*==========HEADER==========*/
-	.header-content {
-		padding: 0 0;
-	}
+        :root {
+                --header-height: 72px;
+        }
 
-	.mobile-menu-toggle {
-		display: flex !important;
+        #header {
+                height: 72px;
+                padding: 0 18px;
+        }
+
+        .header-content {
+                padding: 0;
+                gap: 12px;
+        }
+
+        .logo img {
+                max-height: 40px;
+        }
+
+        .icon-button {
+                font-size: 12px;
+        }
+
+        .header-pill {
+                gap: 12px;
+                padding: 10px 18px;
+                box-shadow: none;
+        }
+
+        .header-pill:hover {
+                transform: none;
+        }
+
+        .mobile-menu-toggle {
+                display: flex !important;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
@@ -41,6 +69,10 @@
 		display: none;
 	}
 
+        .account-icons-container {
+                gap: 12px;
+        }
+
         .cart-container .cart-text,
         .login-register-container .login-text {
                 display: none !important;
@@ -48,34 +80,46 @@
 
         /* Adjust cart badge position on smaller screens */
         .cart-count {
-                top: -8px;
-                right: 8px;
+                top: -6px;
+                right: 12px;
         }
 
-	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
+        /* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
         .image-credits-container {
                 display: flex;
                 align-items: center;
-                gap: 4px;
+                gap: 6px;
                 border: none;
+                padding: 10px 14px;
         }
 
         .image-credits-label {
                 display: none;
         }
 
-	.image-credits-container i {
-		font-size: 16px;
-		margin: 0;
-		line-height: 1;
+        .image-credits-container i {
+                font-size: 16px;
+                margin: 0;
+                line-height: 1;
 
-	}
+        }
 
-	.image-credits-container #userCredits {
-		font-size: 14px;
-		line-height: 1;
-		display: inline-block;
-	}
+        .image-credits-container #userCredits {
+                font-size: 14px;
+                line-height: 1;
+                display: inline-block;
+        }
+
+        .cart-pill,
+        .login-pill {
+                padding: 10px 16px;
+        }
+
+        .profile-pill {
+                width: 48px;
+                height: 48px;
+                padding: 4px;
+        }
 
 	/*==========FOOTER==========*/
 	.upper-band {

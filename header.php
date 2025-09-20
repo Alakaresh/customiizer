@@ -59,15 +59,17 @@ $display_name   = $current_user->display_name;
 
                                 </div>
                                 <div class="menu-container">
-					<nav class="main-menu">
-						<div><a href="/customiize">Customiize</a></div>
-						<div><a href="/boutique">Boutique</a></div>
-						<div><a href="/communaute">Communauté</a></div>
-						<div>
-							<a href="/compte?triggerClick=true" id="myCreationsLink" data-redirect="compte?triggerClick=true">Mes créations</a>
-						</div>
-					</nav>
-				</div>
+                                        <div class="nav-pill header-pill">
+                                                <nav class="main-menu">
+                                                        <div><a href="/customiize">Customiize</a></div>
+                                                        <div><a href="/boutique">Boutique</a></div>
+                                                        <div><a href="/communaute">Communauté</a></div>
+                                                        <div>
+                                                                <a href="/compte?triggerClick=true" id="myCreationsLink" data-redirect="compte?triggerClick=true">Mes créations</a>
+                                                        </div>
+                                                </nav>
+                                        </div>
+                                </div>
 				<div class="account-icons-container">
 
         <?php if ($user_logged_in): ?>
@@ -76,14 +78,14 @@ $display_name   = $current_user->display_name;
         global $wpdb;
         $image_credits = intval($wpdb->get_var($wpdb->prepare("SELECT image_credits FROM WPC_users WHERE user_id = %d", $user_id)));
         ?>
-        <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
+        <div class="image-credits-container header-pill" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
                 <i class="fas fa-coins"></i>
                 <span class="image-credits-label">Crédits:</span>
                 <span id="userCredits" class="image-credits-count"><?php echo esc_html($image_credits); ?></span>
         </div>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
-                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button">
+                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button header-pill cart-pill">
                         <i class="fas fa-shopping-bag"></i>
                         <span class="cart-text">Panier</span>
                         <?php $count = WC()->cart->get_cart_contents_count(); ?>
@@ -94,14 +96,14 @@ $display_name   = $current_user->display_name;
         </div>
         <?php endif; ?>
         <div class="profile-container">
-                <a id="profileLink" class="icon-button">
+                <a id="profileLink" class="icon-button profile-pill">
                         <img src="<?php echo esc_url($profile_image_url); ?>" alt="Profile Image" class="user-profile-image">
                 </a>
         </div>
         <?php else: ?>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
-                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button">
+                <a href="<?php echo esc_url( wc_get_cart_url() ); ?>" id="cartButton" class="icon-button header-pill cart-pill">
                         <i class="fas fa-shopping-bag"></i>
                         <span class="cart-text">Panier</span>
                         <?php $count = WC()->cart->get_cart_contents_count(); ?>
@@ -112,7 +114,7 @@ $display_name   = $current_user->display_name;
         </div>
         <?php endif; ?>
         <div class="login-register-container">
-                <a id="loginRegisterButton" class="icon-button">
+                <a id="loginRegisterButton" class="icon-button header-pill login-pill">
                         <i class="fas fa-user"></i>
                         <span class="login-text">Se connecter</span>
                 </a>
