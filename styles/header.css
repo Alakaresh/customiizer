@@ -215,6 +215,12 @@
         gap: 16px;
 }
 
+.profile-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+}
+
 /* Styles pour les icônes de compte utilisateur et panier */
 .account-icons-container a {
         margin-left: 0;

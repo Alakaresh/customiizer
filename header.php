@@ -90,7 +90,7 @@ $loyalty_points = ( $user_logged_in && function_exists( 'customiizer_get_loyalty
         </div>
         <?php endif; ?>
         <div class="profile-container">
-                <a id="profileLink" class="icon-button">
+                <a id="profileLink" class="icon-button" aria-haspopup="menu" aria-expanded="false">
                         <img src="<?php echo esc_url($profile_image_url); ?>" alt="Profile Image" class="user-profile-image">
                 </a>
         </div>
