@@ -16,7 +16,6 @@
 
                 <div class="account-sidebar__body">
                         <nav class="navigation-menu" aria-label="<?php esc_attr_e( 'Sections du compte', 'customiizer' ); ?>">
-                                <span class="navigation-menu__title"><?php esc_html_e( 'Navigation', 'customiizer' ); ?></span>
                                 <a href="javascript:void(0);" id="dashboardLink" class="ajax-link" data-target="dashboard">
                                         <i class="fas fa-chart-pie" aria-hidden="true"></i>
                                         <span><?php esc_html_e( 'Tableau de bord', 'customiizer' ); ?></span>
