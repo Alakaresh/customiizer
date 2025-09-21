@@ -8,6 +8,37 @@
         --shop-card-text-muted: #8d96a0;
 }
 
+body.shop-flex-layout {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+}
+
+body.shop-flex-layout > #content {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+}
+
+body.shop-flex-layout #site-content {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+}
+
+body.shop-flex-layout #customize-main {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+}
+
+body.shop-flex-layout #customize-main > #content {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+}
+
 .product-list {
         display: flex;
         flex-wrap: wrap;

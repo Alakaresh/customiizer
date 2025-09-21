@@ -9,6 +9,17 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
+
+add_filter(
+        'body_class',
+        function ( $classes ) {
+                if ( is_page( 'boutique' ) ) {
+                        $classes[] = 'shop-flex-layout';
+                }
+
+                return $classes;
+        }
+);
 add_filter('woocommerce_order_actions', function($actions) {
     $actions['test_action'] = '🚀 Test bouton';
     return $actions;
