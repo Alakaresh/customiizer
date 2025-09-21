@@ -1,90 +1,80 @@
 @media screen and (max-width: 1024px) {
-	/*==========CUSTOMIIZE==========*/
+  .customiize-page {
+    padding: clamp(48px, 12vw, 72px) clamp(16px, 6vw, 32px);
+    gap: clamp(20px, 6vw, 32px);
+  }
 
-	#customize-main {
-		flex-direction: column;
-		max-width: 100vw;
-		overflow-x: hidden;
-	}
+  .customiize-shell {
+    gap: clamp(18px, 5vw, 28px);
+  }
 
-	#left-sidebar,
-	#right-sidebar,
-	#content,
-	#sidebar-header,
-	#sidebar-footer {
-		width: 100%;
-		max-width: 100vw;
-		overflow-x: hidden;
-		box-sizing: border-box;
-	}
+  .customiize-layout {
+    flex-direction: column;
+    gap: clamp(18px, 5vw, 28px);
+  }
 
-	#left-sidebar {
-		max-height: none;
-		height: auto;
-	}
+  .customiize-panel,
+  .customiize-panel--left,
+  .customiize-panel--right,
+  .customiize-panel--content {
+    flex: 1 1 auto;
+    width: 100%;
+    max-height: none;
+  }
 
-	#content {
-		order: 1;
-		padding: 10px 10px 0 10px;
-		margin-bottom: 0;
-		overflow: auto;
-	}
+  .customiize-panel__header {
+    padding: clamp(16px, 5vw, 24px);
+  }
 
-        #right-sidebar {
-                order: 2;
-                margin-top: 0;
-                padding: 0 0 5px 0;
-                background-color: var(--color-header-primary);
-                border-top: 1px solid #2a2a2a;
-                max-height: 25dvh;
-        }
+  .customiize-panel__inner,
+  .customiize-panel__inner--flush {
+    padding: clamp(18px, 5vw, 28px);
+  }
 
-	#right-sidebar h2 {
-		margin: 0;
-		padding: 5px;
-		font-size: 16px;
-		text-align: center;
-	}
+  #content {
+    order: 1;
+  }
 
-	#user_images {
-		display: flex;
-		flex-wrap: nowrap;
-		overflow-x: auto;
-		gap: 6px;
-		padding: 5px 10px;
-		margin: 0;
-		align-items: center;
-		box-sizing: border-box;
-	}
+  #right-sidebar {
+    order: 3;
+  }
 
-	#user_images img {
-		width: 65px;
-		height: 65px;
-		object-fit: cover;
-		border-radius: 8px;
-		flex-shrink: 0;
-	}
+  #left-sidebar {
+    order: 2;
+  }
 
-	#sidebar-header,
-	#sidebar-footer {
-		text-align: center;
-		padding: 10px;
-		box-sizing: border-box;
-	}
+  #left-sidebar #content-container {
+    max-height: none;
+    padding: clamp(16px, 4vw, 24px);
+  }
 
-       #sidebar-content {
-               padding: 10px;
-               margin-bottom: 10px;
-               box-sizing: border-box;
-       }
+  #sidebar-content {
+    gap: clamp(14px, 4vw, 22px);
+  }
 
-       /* Adjust generate grid spacing */
-       .image-container {
-               height: auto;
-       }
+  #user_images {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
 
-       .centered-image {
-               height: auto;
-               width: 100%;
-       }
+  #user_images img {
+    width: 72px;
+    height: 72px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+  }
+
+  .image-container {
+    height: auto;
+  }
+
+  .centered-image {
+    height: auto;
+    width: 100%;
+  }
 }

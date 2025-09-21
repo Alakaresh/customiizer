@@ -1,83 +1,271 @@
-#customize-main {
-    display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
-    color: white;
-        flex-grow: 1;
+/* -----------------------------------------------------------------
+   Customiize page layout
+------------------------------------------------------------------ */
+
+.customiize-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vw, 48px);
+  width: 100%;
+  max-width: min(1400px, 96vw);
+  margin: 0 auto;
+  padding: clamp(72px, 9vw, 120px) clamp(20px, 6vw, 64px);
+  box-sizing: border-box;
+  z-index: 1;
 }
 
-.sidebar {
-        flex: 0 0 auto;
-    background-color: var(--color-header-primary);
-    color: white;
-    height: calc(100dvh - 65px);
-    display: flex;
-    flex-direction: column; /* Organise les enfants (header, content, footer) verticalement */
+.customiize-shell {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 40px);
+  width: 100%;
 }
 
-#sidebar-main {
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Assurez-vous que cela prend toute la hauteur de la sidebar */
+.customiize-intro {
+  position: relative;
+  padding: clamp(28px, 4vw, 56px);
+  border-radius: 32px;
+  border: 1px solid rgba(109, 242, 210, 0.18);
+  background:
+    linear-gradient(160deg, rgba(5, 18, 22, 0.88) 0%, rgba(2, 10, 13, 0.82) 55%, rgba(1, 7, 9, 0.78) 100%);
+  box-shadow: 0 36px 68px rgba(2, 11, 13, 0.6);
+  overflow: hidden;
+  backdrop-filter: blur(18px);
 }
 
+.customiize-intro::before,
+.customiize-intro::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(0.4px);
+  pointer-events: none;
+  opacity: 0.65;
+  z-index: 0;
+}
+
+.customiize-intro::before {
+  width: clamp(260px, 45vw, 420px);
+  height: clamp(260px, 45vw, 420px);
+  top: -22%;
+  right: -14%;
+  background: radial-gradient(circle at 30% 30%, rgba(109, 242, 210, 0.32), rgba(4, 15, 17, 0));
+}
+
+.customiize-intro::after {
+  width: clamp(320px, 55vw, 520px);
+  height: clamp(320px, 55vw, 520px);
+  bottom: -30%;
+  left: -18%;
+  background: radial-gradient(circle at 65% 65%, rgba(26, 188, 156, 0.24), rgba(1, 7, 9, 0));
+}
+
+.customiize-layout {
+  display: flex;
+  gap: clamp(22px, 3vw, 36px);
+  align-items: stretch;
+  width: 100%;
+}
+
+.customiize-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  box-sizing: border-box;
+  color: rgba(232, 247, 243, 0.95);
+  background:
+    linear-gradient(165deg, rgba(6, 20, 24, 0.94) 0%, rgba(3, 12, 16, 0.88) 48%, rgba(1, 7, 9, 0.85) 100%);
+  border-radius: 28px;
+  border: 1px solid rgba(109, 242, 210, 0.18);
+  box-shadow: 0 32px 64px rgba(2, 10, 13, 0.55);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  min-height: 0;
+}
+
+.customiize-panel::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 27px;
+  background:
+    radial-gradient(130% 95% at 50% 0%, rgba(109, 242, 210, 0.16), transparent 65%),
+    radial-gradient(135% 100% at 50% 100%, rgba(26, 188, 156, 0.12), transparent 70%);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.customiize-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.customiize-panel--left {
+  flex: 0 0 clamp(300px, 26vw, 360px);
+  max-height: calc(100dvh - 140px);
+}
+
+.customiize-panel--content {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.customiize-panel--right {
+  flex: 0 0 clamp(240px, 22vw, 280px);
+  max-height: calc(100dvh - 140px);
+}
+
+.customiize-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(16px, 2.2vw, 24px);
+  border-bottom: 1px solid rgba(109, 242, 210, 0.12);
+  background: linear-gradient(180deg, rgba(9, 27, 32, 0.38), rgba(6, 18, 22, 0));
+}
+
+.customiize-panel__inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.3vw, 28px);
+  padding: clamp(20px, 2.6vw, 32px);
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.customiize-panel__inner--flush {
+  padding: clamp(18px, 2.2vw, 28px);
+  gap: clamp(16px, 1.8vw, 24px);
+}
+
+.customiize-panel__inner--scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(109, 242, 210, 0.45) rgba(5, 18, 22, 0.6);
+}
+
+.customiize-panel__inner--scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customiize-panel__inner--scroll::-webkit-scrollbar-thumb {
+  background: rgba(109, 242, 210, 0.45);
+  border-radius: 999px;
+}
+
+.customiize-panel__inner--scroll::-webkit-scrollbar-track {
+  background: rgba(5, 18, 22, 0.6);
+}
 
 #left-sidebar {
-        height: 100%;
-        display: flex; /* Assurer que les enfants peuvent utiliser flexbox */
-    flex-direction: column; /* Aligner les enfants en colonne */
-    width: 360px;
-        background-color: var(--color-header-primary);
-    flex: none; /* Empêche la sidebar de s'ajuster ou de se redimensionner */
-        max-height: calc(100dvh - 65px);
+  color: inherit;
+}
+
+#left-sidebar #header-container {
+  padding: clamp(16px, 2vw, 24px);
+  border-radius: 20px;
+  background: rgba(8, 26, 32, 0.62);
+  border: 1px solid rgba(109, 242, 210, 0.14);
+  box-shadow: 0 18px 38px rgba(2, 12, 15, 0.45);
+  box-sizing: border-box;
+}
+
+#left-sidebar #content-container {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vw, 22px);
+  padding: clamp(18px, 2.1vw, 26px);
+  border-radius: 24px;
+  background: rgba(3, 15, 18, 0.68);
+  border: 1px solid rgba(109, 242, 210, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(109, 242, 210, 0.05);
+  box-sizing: border-box;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(109, 242, 210, 0.35) rgba(5, 18, 22, 0.4);
+}
+
+#left-sidebar #content-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#left-sidebar #content-container::-webkit-scrollbar-thumb {
+  background: rgba(109, 242, 210, 0.35);
+  border-radius: 999px;
+}
+
+#left-sidebar #content-container::-webkit-scrollbar-track {
+  background: rgba(5, 18, 22, 0.4);
 }
 
 #right-sidebar {
-    width: 250px;
-}
-
-#content {
-    flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
-    background-color: var(--color-bg);
-    /*padding: 20px;*/
-        /* max-height: calc(100dvh - 65px); */
-}
-
-#sidebar-header, #sidebar-footer {
-        background-color: var(--color-header-primary);
-    color: white;
-
-}
-
-#sidebar-header {
-    padding: 10px;
+  color: inherit;
 }
 
 #sidebar-content {
-	display: flex;
-    flex-direction: column; /* Organisation verticale des éléments */
-    padding: 10px;
-    flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
-    overflow-y: auto; /* Ajoute un scroll si le contenu dépasse la hauteur calculée */
-	margin-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 24px);
 }
 
-
-#sidebar-footer {
-    padding: 10px;
-    align-items: center; /* Centre verticalement */
-    text-align: center;
-}
 #user_images {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between; /* Pour aligner les images sur les côtés */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
 #user_images img {
-    width: calc(50% - 5px); /* Pour afficher deux images par ligne avec une marge de 10px */
-    margin-bottom: 5px; /* Marge inférieure entre les lignes */
-    border-radius: 10px; /* Coins arrondis */
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  object-fit: cover;
 }
 
 .hidden {
-    display: none;
+  display: none !important;
+}
+
+/* -----------------------------------------------------------------
+   Responsive adjustments
+------------------------------------------------------------------ */
+
+@media screen and (max-width: 1280px) {
+  .customiize-page {
+    max-width: 100%;
+    padding: clamp(60px, 9vw, 96px) clamp(18px, 5vw, 48px);
+  }
+
+  .customiize-panel--left,
+  .customiize-panel--right {
+    max-height: calc(100dvh - 120px);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .customiize-layout {
+    flex-direction: column;
+  }
+
+  .customiize-panel,
+  .customiize-panel--left,
+  .customiize-panel--right {
+    flex: 1 1 auto;
+    max-height: none;
+  }
+
+  .customiize-panel__inner,
+  .customiize-panel__inner--flush {
+    padding: clamp(18px, 5vw, 28px);
+  }
+
+  #left-sidebar #content-container {
+    max-height: none;
+  }
 }
