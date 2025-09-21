@@ -34,11 +34,6 @@
     flex-direction: column;
 }
 
-.full-content {
-    /* Adjust for pages without footer */
-    min-height: calc(100dvh - 65px);
-}
-
 body {
   font-family: 'Arial', sans-serif;
   color: var(--color-text);
