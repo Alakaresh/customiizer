@@ -10,9 +10,7 @@
                                 <img id="profileImage" src="" alt="<?php esc_attr_e( 'Photo de profil', 'customiizer' ); ?>" style="display: none;" />
                         </div>
                         <div class="user-info">
-                                <span class="user-info__eyebrow"><?php esc_html_e( 'Profil Customiizer', 'customiizer' ); ?></span>
                                 <p class="user-info__name"><span id="nickname"></span></p>
-                                <p class="user-info__status"><?php esc_html_e( 'Personnalise ton espace et retrouve toutes tes activités.', 'customiizer' ); ?></p>
                         </div>
                 </div>
 
@@ -44,11 +42,6 @@
                                         <span><?php esc_html_e( 'Missions', 'customiizer' ); ?></span>
                                 </a>
                         </nav>
-
-                        <div class="account-sidebar__callout" aria-live="polite">
-                                <i class="fas fa-lightbulb" aria-hidden="true"></i>
-                                <p><?php esc_html_e( 'Astuce : complète ton profil pour débloquer davantage de missions et d’avantages.', 'customiizer' ); ?></p>
-                        </div>
                 </div>
 
                 <div class="account-sidebar__footer">
