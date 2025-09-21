@@ -27,14 +27,33 @@ $(document).ready(function() {
                 e.preventDefault();
                 var targetFile = $(this).data('target');
 
-		if (!targetFile) {
-			console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
-			return;
-		}
+                if (!targetFile) {
+                        console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
+                        return;
+                }
 
-		loadContent(targetFile);
-		updateActiveLink(this);
-	});
+                loadContent(targetFile);
+                updateActiveLink(this);
+        });
+
+        // Navigation rapide depuis le hero
+        $(document).on('click', '.account-hero__action', function(e) {
+                e.preventDefault();
+                var targetFile = $(this).data('target');
+
+                if (!targetFile) {
+                        return;
+                }
+
+                var correspondingLink = $('#' + targetFile + 'Link');
+
+                if (correspondingLink.length) {
+                        correspondingLink.trigger('click');
+                        updateActiveLink(correspondingLink.get(0));
+                } else {
+                        loadContent(targetFile);
+                }
+        });
 
 
 	function getUrlParameter(sParam) {
