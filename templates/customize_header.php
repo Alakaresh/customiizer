@@ -74,7 +74,7 @@ $display_name = $current_user->display_name;
         </div>
         <?php endif; ?>
         <div class="profile-container">
-                <a id="profileLink" class="icon-button">
+                <a id="profileLink" class="icon-button" aria-haspopup="menu" aria-expanded="false">
                         <img src="<?php echo esc_url($profile_image_url); ?>" alt="Profile Image" class="user-profile-image">
                 </a>
         </div>
