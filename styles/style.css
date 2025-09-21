@@ -45,14 +45,9 @@ body,
   background-color: var(--color-background) !important;
 }
 
-body.home,
-body.home .ast-separate-container {
-  background-color: transparent !important;
-}
-
 h2.title {
-	font-size: 24px;
-	}
+        font-size: 24px;
+        }
 
 a {
   color: var(--color-primary);
