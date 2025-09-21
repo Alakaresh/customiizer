@@ -27,17 +27,16 @@ $(document).ready(function() {
                 e.preventDefault();
                 var targetFile = $(this).data('target');
 
-		if (!targetFile) {
-			console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
-			return;
-		}
+                if (!targetFile) {
+                        console.warn("⚠️ Le lien cliqué n'a pas de `data-target`. Ignoré.");
+                        return;
+                }
 
-		loadContent(targetFile);
-		updateActiveLink(this);
-	});
+                loadContent(targetFile);
+                updateActiveLink(this);
+        });
 
-
-	function getUrlParameter(sParam) {
+        function getUrlParameter(sParam) {
 		var sPageURL = window.location.search.substring(1),
 			sURLVariables = sPageURL.split('&'),
 			sParameterName,
