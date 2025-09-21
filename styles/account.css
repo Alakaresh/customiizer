@@ -10,7 +10,7 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: clamp(20px, 12vw, 160px) 0 clamp(140px, 14vw, 200px);
+  padding: 40px;
   overflow: hidden;
   isolation: isolate;
   color: rgba(246, 250, 249, 0.94);
