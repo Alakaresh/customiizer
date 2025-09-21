@@ -1,36 +1,57 @@
 @media screen and (max-width: 1024px) {
-	/*==========ACCOUNT==========*/
-.profile {
-		flex-direction: column !important;
-		align-items: stretch !important;
-	}
+  .site-content.account-page {
+    padding: clamp(96px, 14vw, 120px) 0 clamp(110px, 18vw, 160px);
+    gap: clamp(36px, 8vw, 48px);
+  }
 
-	.sidebar {
-		width: 100% !important;
-		order: -1;
-		margin-bottom: 20px;
-		border-radius: 0 0 15px 15px;
-	}
+  .account-page__container {
+    padding-inline: clamp(16px, 6vw, 48px);
+  }
 
-	.main-container {
-		width: 100% !important;
-		padding: 0 10px;
-		box-sizing: border-box;
-	}
+  .profile {
+    flex-direction: column;
+  }
 
-       .dashboard-container {
-               align-items: stretch;
-       }
+  .sidebar {
+    position: static;
+    width: 100%;
+    max-height: none;
+    padding: clamp(24px, 6vw, 36px);
+  }
 
-       .dashboard-container .content-container {
-               flex: 0 0 100% !important;
-               max-width: 100% !important;
-               width: 100% !important;
-               margin: 10px 0;
-       }
+  .main-container.account-surface {
+    width: 100%;
+    padding: clamp(26px, 6vw, 40px);
+  }
 
-        /* Orders table requires horizontal scroll on small screens */
-        #purchases-container table {
-                min-width: 650px;
-        }
+  .dashboard-container {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .form-container {
+    max-width: none;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .account-page__container {
+    padding-inline: clamp(14px, 8vw, 28px);
+  }
+
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+
+  .top-buttons {
+    flex-direction: column;
+  }
+
+  .top-buttons button {
+    max-width: none;
+    width: 100%;
+  }
+
+  .bottom-button button {
+    width: 100%;
+  }
 }
