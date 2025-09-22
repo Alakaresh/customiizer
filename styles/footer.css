@@ -1,85 +1,154 @@
-/* Upper band styles */
+/* =========================================
+   Footer inspired by the global header DA
+   ========================================= */
+
+.site-footer {
+    color: rgba(232, 247, 243, 0.82);
+    background: #040404;
+    font-family: inherit;
+}
+
 .upper-band {
-    background-color: #1A1A1A;
-    position: relative; /* This allows absolute positioning inside */
-    height: 100px;
+    position: relative;
+    display: block;
+    padding: 32px 32px 30px;
+    background: linear-gradient(150deg, rgba(24, 24, 24, 0.96), rgba(10, 10, 10, 0.94));
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    box-shadow: 0 -26px 54px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(14px);
+    overflow: hidden;
+}
+
+.upper-band::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(120% 160% at 12% 0%, rgba(109, 242, 210, 0.12), transparent 55%),
+        radial-gradient(140% 140% at 90% 100%, rgba(120, 163, 255, 0.1), transparent 58%);
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.upper-band__inner {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    width: min(1120px, 100%);
     display: flex;
     align-items: center;
-    justify-content: center; /* Center the links container */
-    padding: 0 20px;
+    justify-content: space-between;
+    gap: 32px;
 }
 
-/* Container for the footer links to manage overall positioning */
 .footer-links-container {
+    flex: 1;
     display: flex;
-    justify-content: center; /* This centers the links container in the parent */
-    flex-grow: 1; /* Takes up the available space, pushing social icons to the right */
+    justify-content: center;
 }
 
-/* Footer links styling */
 .footer-links {
     display: flex;
-    justify-content: center; /* This centers the actual links in their container */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 32px;
 }
 
 .footer-link {
-    color: white;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    color: rgba(232, 247, 243, 0.78);
     text-decoration: none;
-    padding: 0 15px; /* Adjust spacing between links as needed */
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    font-weight: 600;
     transition: color 0.3s ease;
 }
 
-.footer-link:hover {
-    color: #00f; /* Blue color on hover */
+.footer-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 100%;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
 }
 
-/* Social icons styling */
+.footer-link:hover,
+.footer-link:focus-visible {
+    color: #ffffff;
+}
+
+.footer-link:hover::after,
+.footer-link:focus-visible::after {
+    transform: scaleX(1);
+}
+
 .social-icons {
-    position: absolute;
-    right: 10%; /* Position from the right edge of the upper-band */
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+    gap: 18px;
 }
 
-/* Social icon styles */
 .social-icon {
-	display: none;
-    padding: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(240, 240, 240, 0.92);
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.42);
 }
 
-.social-icon .fa-youtube {
-    color: #FF0000; /* YouTube Red */
+.social-icon i {
+    font-size: 1rem;
 }
 
-.social-icon .fa-facebook-f {
-    color: #1877F2; /* Facebook Blue */
+.social-icon:hover,
+.social-icon:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.32);
+    transform: translateY(-2px);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    outline: none;
 }
 
-.social-icon .fa-instagram {
-    background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-    -webkit-background-clip: text;
-    color: transparent; /* Assurez-vous que le texte est transparent */
-}
-.social-icon .fa-tiktok {
-    color: #000000; /* TikTok Black */
+.social-icon:focus-visible {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), 0 22px 48px rgba(0, 0, 0, 0.5);
 }
 
-.social-icon:hover i {
-    opacity: 0.8; /* Slightly reduce opacity on hover for effect */
-}
-
-
-/* Lower band styles */
 .lower-band {
-    background-color: #000000;
-    text-align: center;
-    padding: 10px 20px;
-    border-top: 1px solid white;
-	height: 50px;
+    background: linear-gradient(160deg, rgba(8, 8, 8, 0.96), rgba(3, 3, 3, 0.94));
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Copyright text styling */
+.lower-band__inner {
+    margin: 0 auto;
+    width: min(1120px, 100%);
+    padding: 20px 32px 26px;
+    text-align: center;
+}
+
 .lower-band p {
     margin: 0;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(232, 247, 243, 0.64);
 }
