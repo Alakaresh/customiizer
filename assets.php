@@ -39,17 +39,31 @@ function customiizer_enqueue_customize_assets() {
         wp_enqueue_script('jquery-migrate');
 
         $current_user = wp_get_current_user();
-        $inline_js    = sprintf(
+        $advantages    = array(
+                'points'         => 0,
+                'mission_points' => 0,
+                'referrals'      => 0,
+                'referral_link'  => '',
+        );
+
+        if ( is_user_logged_in() && function_exists( 'customiizer_get_user_advantages_summary' ) ) {
+                $advantages = customiizer_get_user_advantages_summary( $current_user->ID );
+        }
+
+        $inline_js = sprintf(
                 "var baseUrl = %s;\n" .
                 "var ajaxurl = baseUrl + '/wp-admin/admin-ajax.php';\n" .
                 "var userIsLoggedIn = %s;\n" .
-                "var currentUser = {ID: %d, user_nicename: %s, display_name: %s};",
+                "var currentUser = {ID: %d, user_nicename: %s, display_name: %s};\n",
                 json_encode(get_site_url()),
                 is_user_logged_in() ? 'true' : 'false',
                 $current_user->ID,
                 json_encode($current_user->user_nicename),
                 json_encode($current_user->display_name)
         );
+
+        $inline_js .= 'var userAdvantages = ' . wp_json_encode( $advantages ) . ";\n";
+        $inline_js .= "if (typeof currentUser === 'object') { currentUser.advantages = userAdvantages; }\n";
 
         wp_add_inline_script('jquery', $inline_js, 'before');
 

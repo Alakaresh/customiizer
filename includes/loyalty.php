@@ -252,3 +252,44 @@ function customiizer_loyalty_widget() {
     }
 }
 
+/**
+ * Return a summary of the loyalty advantages available to a user.
+ *
+ * @param int $user_id Optional user ID.
+ * @return array {
+ *     @type int    $points         Current loyalty balance.
+ *     @type int    $mission_points Total points earned thanks to missions.
+ *     @type int    $referrals      Number of validated referrals.
+ *     @type string $referral_link  Personal referral link.
+ * }
+ */
+function customiizer_get_user_advantages_summary( $user_id = 0 ) {
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
+
+    if ( $user_id <= 0 ) {
+        return array(
+            'points'         => 0,
+            'mission_points' => 0,
+            'referrals'      => 0,
+            'referral_link'  => '',
+        );
+    }
+
+    $summary = array(
+        'points'         => customiizer_get_loyalty_points( $user_id ),
+        'mission_points' => function_exists( 'customiizer_get_total_mission_points' )
+            ? customiizer_get_total_mission_points( $user_id )
+            : 0,
+        'referrals'      => customiizer_get_referral_count( $user_id ),
+        'referral_link'  => customiizer_get_referral_link( $user_id ),
+    );
+
+    /**
+     * Filter the loyalty advantages summary displayed in the header and exposed to JS.
+     *
+     * @param array $summary Current summary data.
+     * @param int   $user_id User identifier.
+     */
+    return apply_filters( 'customiizer_user_advantages_summary', $summary, $user_id );
+}
+
