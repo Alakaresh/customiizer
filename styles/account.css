@@ -5,8 +5,8 @@
         margin-top: 5%;
         display: flex;
         align-items: flex-start;
-        background-color: #0D1117;
-        color: #F1F5F9;
+        background-color: var(--color-bg-deep);
+        color: var(--color-text-strong);
 }
 
 .sidebar {
@@ -16,8 +16,8 @@
 	width: 20%;
 	padding: 10px;
 	box-sizing: border-box;
-        background-color: #161B22;
-        border: 1px solid #334155;
+        background-color: var(--color-bg);
+        border: 1px solid var(--color-border);
         border-radius: 20px;
         overflow: auto;
 }
@@ -40,11 +40,11 @@
        overflow: hidden;
        /*width: 100%;   calc(33.33% - 20px);*/
        margin: 10px;
-       background-color: #161B22;
-       color: #F1F5F9;
+       background-color: var(--color-bg);
+       color: var(--color-text-strong);
        padding: 10px;
        margin-bottom: 10px;
-       border: 1px solid #334155;
+       border: 1px solid var(--color-border);
        border-radius: 10px;
 }
 .dashboard-container .content-container {
@@ -54,17 +54,17 @@
 }
 
 .content-container h2 {
-        color: #F1F5F9;
+        color: var(--color-text-strong);
 	text-align: center;
 	font-size: 24px;
-	font-family: 'Roboto', sans-serif; 
+	font-family: var(--font-body); 
 	font-weight: 500;
 	margin-bottom: 1em; 
 }
 .content-container.new-item::before {
 	content: 'New';
-	color: #FF0000;
-	background-color: #000000;
+	color: var(--color-danger);
+	background-color: var(--color-text-inverse-strong);
 	font-size: 0.75em;
 	font-weight: bold;
 	position: absolute;
@@ -91,8 +91,8 @@
 	text-align: center; /* Centre le texte */
 	margin-bottom: 20px; /* Espacement sous le titre */
 	padding: 10px; /* Espacement interne */
-        background-color: #161B22; /* Couleur d'arrière-plan pour le titre */
-        color: #F1F5F9; /* Couleur du texte */
+        background-color: var(--color-bg); /* Couleur d'arrière-plan pour le titre */
+        color: var(--color-text-strong); /* Couleur du texte */
         border-radius: 5px; /* Bords arrondis pour le titre */
 }
 #details-container{
@@ -110,7 +110,7 @@
 
 .user-info p {
         margin: 0;
-        color: #F1F5F9;
+        color: var(--color-text-strong);
         font-weight: bold;
         text-align: center;
 }
@@ -123,27 +123,27 @@
 
 .navigation-menu a {
         text-decoration: none;
-        color: #F1F5F9;
+        color: var(--color-text-strong);
         padding: 10px;
         display: block;
         border-radius: 4px;
 }
 
 .navigation-menu a:hover {
-        background-color: #3B4D63;
-        color: #F1F5F9;
+        background-color: var(--color-border-strong);
+        color: var(--color-text-strong);
 }
 
 .navigation-menu a.active {
-        background-color: #3B4D63;
-        color: #000000;
+        background-color: var(--color-border-strong);
+        color: var(--color-text-inverse-strong);
 }
 
 .logout-button {
         margin-top: 20px;
         display: block;
         background-color: transparent;
-        color: #ff4d4d;
+        color: var(--color-critical);
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
@@ -153,8 +153,8 @@
 }
 
 .logout-button:hover {
-        background-color: #ff4d4d;
-        color: white;
+        background-color: var(--color-critical);
+        color: var(--color-text-strong);
 }
 
 .profile-picture {
@@ -173,12 +173,12 @@
 	width: 100px;
 	height: 100px;
 	border-radius: 50%;
-        border: 2px solid #3B4D63;
-        background-color: #161B22;
+        border: 2px solid var(--color-border-strong);
+        background-color: var(--color-bg);
 }
 
 .plus-vertical, .plus-horizontal {
-        background-color: #3B4D63;
+        background-color: var(--color-border-strong);
 	position: absolute;
 	border-radius: 2px;
 }
@@ -216,26 +216,26 @@
 	justify-content: center;
 	align-items: center;
 	position: relative;
-        background: conic-gradient(#3B4D63 var(--percentage-value, 0%), #334155 var(--percentage-value, 0%));
+        background: conic-gradient(var(--color-border-strong) var(--percentage-value, 0%), var(--color-border) var(--percentage-value, 0%));
 }
 
 .progress-ring .percentage {
 	position: absolute;
 	width: 90px;
 	height: 90px;
-        background: #0D1117;
+        background: var(--color-bg-deep);
         border-radius: 50%;
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 1em;
-        color: #F1F5F9;
+        color: var(--color-text-strong);
         z-index: 1;
 }
 .content-button {
         display: inline-block;
-        background-color: #89b9c8;
-        color: #0D1117;
+        background-color: var(--color-info-soft);
+        color: var(--color-bg-deep);
         padding: 10px 20px;
         margin-top: 10px;
         border: none;
@@ -245,7 +245,7 @@
 }
 
 .content-button:hover {
-        background-color: #556480; /* Couleur de fond au survol */
+        background-color: var(--neutral-600); /* Couleur de fond au survol */
 }
 
 .centered-content {
@@ -290,7 +290,7 @@
 	height: 0;
 	background-color: rgba(0, 0, 0, 0.7);
 	transition: height 0.3s ease;
-	color: #fff;
+	color: var(--color-text-strong);
 	text-align: center;
 	line-height: 30px;
 }
@@ -302,45 +302,45 @@
 .pagination-container button {
         padding: 8px 12px;
         margin: 0 4px;
-        border: 1px solid #334155; /* Bordure pour contraste */
-        background-color: #161B22; /* Fond sombre */
-        color: #F1F5F9; /* Texte clair pour contraste */
+        border: 1px solid var(--color-border); /* Bordure pour contraste */
+        background-color: var(--color-bg); /* Fond sombre */
+        color: var(--color-text-strong); /* Texte clair pour contraste */
         cursor: pointer;
         transition: background-color 0.3s, color 0.3s; /* Effet de transition doux */
 }
 
 /* Survol des boutons de pagination */
 .pagination-container button:hover {
-        background-color: #1E293B; /* Légèrement plus clair au survol pour un effet visuel */
-        border-color: #334155;
+        background-color: var(--color-border); /* Légèrement plus clair au survol pour un effet visuel */
+        border-color: var(--color-border);
 }
 
 /* Style pour le bouton de la page active */
 .pagination-container button.active {
-        background-color: #3B4D63; /* Accent pour la page active */
-        color: #0D1117; /* Texte sombre pour le contraste */
-        border-color: #C85C0B; /* Bordure un peu plus foncée que le fond */
+        background-color: var(--color-border-strong); /* Accent pour la page active */
+        color: var(--color-bg-deep); /* Texte sombre pour le contraste */
+        border-color: var(--color-amber-600); /* Bordure un peu plus foncée que le fond */
 }
 .order-id {
-        color: #3B4D63; /* Accent */
+        color: var(--color-border-strong); /* Accent */
         cursor: pointer;
         text-decoration: underline;
         transition: color 0.2s ease-in-out; /* Transition douce pour le changement de couleur */
 }
 
 .order-id:hover {
-        color: #556480; /* Teinte plus claire au survol */
+        color: var(--neutral-600); /* Teinte plus claire au survol */
 }
 .product-image {
 	max-height: 50px !important; /* ou toute autre taille appropriée */
 	height: auto; /* pour maintenir le ratio aspect */
 }
 .tracking-link {
-        color: #3B4D63;
+        color: var(--color-border-strong);
         text-decoration: underline !important; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
 }
 .tracking-link:hover {
-        color: #556480;
+        color: var(--neutral-600);
 }
 /* Utilise les mêmes styles pour les deux formulaires */
 .form-container {
@@ -375,22 +375,22 @@
 
 .form-group input {
 	padding: 10px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--neutral-300);
 	border-radius: 4px;
 	width: 100%; /* Assure que l'input prend toute la largeur du form-group */
 }
 
 button {
         padding: 10px 20px;
-        background-color: #3B4D63;
-        color: #0D1117;
+        background-color: var(--color-border-strong);
+        color: var(--color-bg-deep);
         border: none;
         border-radius: 4px;
         cursor: pointer;
 }
 
 button:hover {
-        background-color: #556480;
+        background-color: var(--neutral-600);
 }
 /* Style pour le Modal */
 .add-payment-modal {
@@ -403,15 +403,15 @@ button:hover {
 }
 
 .modal-content {
-	background-color: #fefefe;
-	width: 100%; /* Adjust width as needed */
-	height: 100%;
-	position: relative; /* Needed for positioning the close button absolutely */
-	background-color: #ffffff; /* Black w/ opacity for the background */
+        background-color: var(--color-surface-200);
+        width: 100%; /* Adjust width as needed */
+        height: 100%;
+        position: relative; /* Needed for positioning the close button absolutely */
+        color: var(--color-text-primary);
 }
 
 .close-button {
-	color: #aaa;
+	color: var(--neutral-400);
 	float: right;
 	font-size: 28px;
 	font-weight: bold;
@@ -422,27 +422,27 @@ button:hover {
 
 .close-button:hover,
 .close-button:focus {
-	color: black;
+	color: var(--color-text-inverse-strong);
 	text-decoration: none;
 	cursor: pointer;
 }
 
 /* Styles du modal */
 .modal {
-	position: fixed;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
-	width: 420px;
-	background-color: #0B1F3B; /* ✅ même ton que la page */
-	padding: 20px;
-	border-radius: 12px;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-	z-index: 1050;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	color: #ffffff; /* ✅ texte clair */
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 420px;
+        background-color: var(--color-surface-300); /* ✅ même ton que la page */
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+        z-index: 1050;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: var(--color-text-strong); /* ✅ texte clair */
 }
 
 
@@ -450,7 +450,7 @@ button:hover {
 .image-placeholder {
 	width: 100%;
 	min-height: 180px;
-	background-color: #1A2A48; /* ✅ bleu foncé/gris */
+	background-color: var(--color-surface-300); /* ✅ bleu foncé/gris */
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -464,10 +464,10 @@ button:hover {
 }
 
 .modal-header h2 {
-	color: #ffffff;
-	font-size: 22px;
-	font-weight: 500;
-	margin: 0;
+        color: var(--color-text-strong);
+        font-size: 22px;
+        font-weight: 500;
+        margin: 0;
 }
 
 
@@ -489,8 +489,8 @@ button:hover {
 .modal-footer button {
         padding: 10px 20px;      /* Padding confortable pour les boutons */
         margin: 0 10px;          /* Espacement horizontal entre les boutons */
-        background-color: #3B4D63;   /* Couleur de fond des boutons */
-        color: #0D1117;            /* Couleur du texte */
+        background-color: var(--color-border-strong);   /* Couleur de fond des boutons */
+        color: var(--color-text-strong);            /* Couleur du texte */
         border: none;            /* Pas de bordure */
         border-radius: 5px;      /* Bordures arrondies */
         cursor: pointer;         /* Curseur pointer pour indiquer l'interactivité */
@@ -498,7 +498,7 @@ button:hover {
 }
 
 .modal-footer button:hover {
-        background-color: #556480; /* Couleur au survol */
+        background-color: var(--color-mint-700); /* Couleur au survol */
 }
 .top-buttons {
 	display: flex;
@@ -535,7 +535,7 @@ button:hover {
 }
 
 #header {
-        background-color: #1A1A1A !important; /* Gris très foncé */
+        background-color: var(--color-surface-200) !important; /* Gris très foncé */
 }
 td:last-child {
 	text-align: center;         /* centrer horizontalement */
@@ -545,14 +545,14 @@ td:last-child {
 .invoice-icon {
 	display: inline-block;
 	font-size: 1.3em;
-	color: #ffffff;
+        color: var(--color-text-strong);
 	text-decoration: none;
 	line-height: 1;
 	padding: 4px;
 }
 
 .invoice-icon:hover {
-	color: #ffcc00;
+	color: var(--color-warning);
 	cursor: pointer;
 }
 td.tracking-cell, td.invoice-cell {
@@ -564,7 +564,7 @@ td.tracking-cell, td.invoice-cell {
 .no-tracking-icon {
         font-size: 1.2em;
         line-height: 1;
-        color: #ccc;
+        color: var(--neutral-300);
 }
 
 /* ===== Orders Table ===== */
@@ -581,18 +581,18 @@ td.tracking-cell, td.invoice-cell {
 #purchases-container th,
 #purchases-container td {
         padding: 8px;
-        border: 1px solid #ddd;
+        border: 1px solid var(--neutral-200);
         white-space: nowrap;
 }
 
 #purchases-container th {
-        background-color: #161B22;
-        color: #F1F5F9;
+        background-color: var(--color-bg);
+        color: var(--color-text-strong);
 }
 
 #toast-notification, #password-toast-notification {
-        background-color: #3B4D63; /* Couleur d'accent */
-        color: #0D1117;
+        background-color: var(--color-border-strong); /* Couleur d'accent */
+        color: var(--color-bg-deep);
         padding: 10px 15px;
         margin-top: 10px;
         border-radius: 4px;
@@ -611,23 +611,23 @@ td.tracking-cell, td.invoice-cell {
 	font-weight: bold;
 	height: 20px;
 	line-height: 20px;
-	color: white;
+	color: var(--color-text-strong);
 	padding: 0 10px;
 	border-radius: 4px;
 	transition: background-color 0.3s ease;
 }
 
 .strength-weak {
-	background-color: #dc3545; /* Rouge */
+	background-color: var(--color-danger); /* Rouge */
 }
 
 .strength-medium {
-	background-color: #ffc107; /* Jaune */
-	color: #212529;
+	background-color: var(--color-warning); /* Jaune */
+	color: var(--color-bg);
 }
 
 .strength-strong {
-        background-color: #3B4D63; /* Accent */
+        background-color: var(--color-border-strong); /* Accent */
 }
 .password-rules {
 	list-style: none;
@@ -642,12 +642,12 @@ td.tracking-cell, td.invoice-cell {
 
 .password-rules li.valid::before {
         content: "✅ ";
-        color: #3B4D63;
+        color: var(--color-border-strong);
 }
 
 .password-rules li.invalid::before {
         content: "❌ ";
-        color: #dc3545;
+        color: var(--color-danger);
 }
 
 .customiizer-loyalty-balance {
@@ -682,7 +682,7 @@ td.tracking-cell, td.invoice-cell {
         font-size: 1.1em;
         font-weight: 600;
         color: var(--color-primary);
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
 }
 
 /* ===== Missions ===== */
@@ -700,7 +700,7 @@ td.tracking-cell, td.invoice-cell {
         width: 100%;
         color: var(--color-text);
         box-shadow: 0 0 10px rgba(0,0,0,0.6);
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
 }
 
 .mission-header {
@@ -713,7 +713,7 @@ td.tracking-cell, td.invoice-cell {
 .mission-header h4 {
         margin: 0;
         font-size: 1rem;
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
 }
 
 .mission-header .points {
@@ -770,7 +770,7 @@ td.tracking-cell, td.invoice-cell {
         margin-left: 4px;
         font-size: 0.8rem;
         color: var(--color-text);
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
 }
 
 .mission-completed {
@@ -778,7 +778,7 @@ td.tracking-cell, td.invoice-cell {
         text-align: center;
         color: var(--color-primary);
         font-size: 0.8rem;
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
 }
 
 .mission-category-group {
@@ -790,7 +790,7 @@ td.tracking-cell, td.invoice-cell {
         text-align: center;
         font-size: 1.3rem;
         color: var(--color-primary);
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
 }
 
 #missions-container .missions-wrapper {
@@ -809,7 +809,7 @@ td.tracking-cell, td.invoice-cell {
         border: 2px solid var(--color-primary);
         border-radius: 10px;
         color: var(--color-text);
-        font-family: 'Cinzel', serif;
+        font-family: var(--font-accent-serif);
         padding: 10px;
         margin-bottom: 10px;
         text-align: center;
@@ -840,7 +840,7 @@ td.tracking-cell, td.invoice-cell {
        padding: 10px 15px;
        border: 2px solid var(--color-primary);
        border-radius: 20px;
-       font-family: 'Cinzel', serif;
+       font-family: var(--font-accent-serif);
        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
        display: none;
        z-index: 1000;

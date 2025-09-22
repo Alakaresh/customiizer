@@ -16,7 +16,7 @@
 .loginModal-content {
 	position: relative;
     display: flex;
-    background-color: #333;
+    background-color: var(--neutral-800);
     border-radius: 8px;
     overflow: hidden; /* Masque les débordements */
 }
@@ -46,7 +46,7 @@
     position: relative;
     border: none;
     height: 1px;
-    background-color: #ccc;
+    background-color: var(--neutral-300);
     margin: 30px 0; /* Espace vertical autour de la ligne */
     overflow: visible; /* Permet aux enfants de se positionner correctement */
 }
@@ -59,7 +59,7 @@
     right: 0;
     width: 100%;
     height: 1px;
-    background-color: #ccc;
+    background-color: var(--neutral-300);
     z-index: 1;
 }
 
@@ -69,8 +69,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* Centrage parfait */
-    background-color: #333; /* Couleur de fond pour cacher la ligne derrière le texte */
-    color: #fff; /* Couleur du texte */
+    background-color: var(--neutral-800); /* Couleur de fond pour cacher la ligne derrière le texte */
+    color: var(--color-text-strong); /* Couleur du texte */
     font-size: 12px; /* Taille de la police pour le texte */
     padding: 0 10px; /* Espacement horizontal autour du texte */
     z-index: 2;
@@ -81,13 +81,13 @@
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--neutral-300);
     border-radius: 4px;
 }
 
 .signup-button {
-    background-color: #007BFF; /* Bleu vif pour attirer l'attention */
-    color: white; /* Texte blanc pour le contraste */
+    background-color: var(--color-brand-500); /* Bleu vif pour attirer l'attention */
+    color: var(--color-text-strong); /* Texte blanc pour le contraste */
     border: none; /* Aucune bordure pour un look moderne */
     border-radius: 4px; /* Coins arrondis */
     padding: 10px 20px; /* Espacement interne pour le confort de clic */
@@ -100,7 +100,7 @@
 }
 
 .signup-button:hover {
-    background-color: #0056b3; /* Assombrit le bouton lors du survol */
+    background-color: var(--color-brand-600); /* Assombrit le bouton lors du survol */
 }
 
 .remember-forget-box {
@@ -114,8 +114,8 @@
 .signin-button {
     width: 100%;
     padding: 12px;
-    background-color: #007BFF;
-    color: white;
+    background-color: var(--color-brand-500);
+    color: var(--color-text-strong);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -123,14 +123,14 @@
 }
 
 .signin-button:hover {
-    background-color: #0056b3;
+    background-color: var(--color-brand-600);
 }
 
 .login-background {
 	display: flex;
 	position: relative;
     width: 500px; /* Ajustez selon vos besoins */
-	color: #fff;
+	color: var(--color-text-strong);
     background-size: cover;
     background-position: center;
 	align-items: center;
@@ -159,16 +159,16 @@ h2.title_login {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
-    color: #fff;
+    color: var(--color-text-strong);
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
 }
 
-.facebook { background-color: #3b5998; }
-.google { background-color: #dd4b39; }
-.apple { background-color: #000; }
+.facebook { background-color: var(--color-social-facebook); }
+.google { background-color: var(--color-social-google); }
+.apple { background-color: var(--color-text-inverse-strong); }
 
 .close {
     position: absolute; /* Position absolue pour un meilleur contrôle */
@@ -176,12 +176,12 @@ h2.title_login {
     right: 15px; /* Ajustement horizontal depuis le côté droit du contenu du modal */
     cursor: pointer;
     font-size: 25px;
-    color: #fff; /* Assurez-vous que la couleur blanche est appliquée */
+    color: var(--color-text-strong); /* Assurez-vous que la couleur blanche est appliquée */
     z-index: 1050; /* S'assurer qu'elle est au-dessus de tous les autres éléments du modal */
 }
 
 .close:hover,
 .close:focus {
-    color: red; /* Changement de couleur lors du survol ou du focus */
+    color: var(--color-danger); /* Changement de couleur lors du survol ou du focus */
     text-decoration: none;
 }

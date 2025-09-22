@@ -70,9 +70,15 @@ function customiizer_enqueue_customize_assets() {
 	// ===============================
 	// STYLES GLOBAUX
 	// ===============================
+        wp_enqueue_style(
+                'customiizer-fonts',
+                'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Sora:wght@500;600;700&display=swap',
+                [],
+                null
+        );
         wp_enqueue_style('parent-style', get_template_directory_uri().'/style.css', [], $ver);
         wp_enqueue_style('child-style', get_stylesheet_directory_uri().'/style.css', ['parent-style'], $ver);
-        wp_enqueue_style('customiizer-style', get_stylesheet_directory_uri() . '/styles/style.css', [], $ver);
+        wp_enqueue_style('customiizer-style', get_stylesheet_directory_uri() . '/styles/style.css', ['customiizer-fonts'], $ver);
         wp_enqueue_style('preview-image-style', get_stylesheet_directory_uri() . '/styles/preview_image.css', [], $ver);
        wp_enqueue_style('customize-style', get_stylesheet_directory_uri() . '/styles/customize.css', [], $ver);
        wp_enqueue_style('header-style', get_stylesheet_directory_uri() . '/styles/header.css', [], $ver);

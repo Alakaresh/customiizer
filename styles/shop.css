@@ -7,21 +7,22 @@
 }
 
 .product-card {
-        background: linear-gradient(135deg, #333333, #555555, #777777, #999999);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(81, 54, 255, 0.12) 55%, rgba(28, 229, 177, 0.16) 100%);
         width: 250px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
         text-align: center;
-        padding: 15px;
+        padding: var(--space-md);
         cursor: pointer;
         text-decoration: none;
-        color: inherit;
-        transition: transform 0.2s, box-shadow 0.2s;
+        color: var(--color-text-primary);
+        transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .product-card:hover {
-	transform: scale(1.05);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
 }
 
 .product-card img {
@@ -35,17 +36,17 @@
 }
 
 .product-title {
-	font-size: 20px;
-	font-weight: bold;
-	color: #ffffff;
-	margin-bottom: 5px;
-	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-text-strong);
+        margin-bottom: var(--space-xs);
+        text-shadow: 0 10px 30px rgba(15, 23, 42, 0.45);
 }
 
 .product-price {
         font-size: 18px;
         font-weight: 600;
-        color: #B8B8B8;
+        color: var(--neutral-400);
         margin-bottom: 10px;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }

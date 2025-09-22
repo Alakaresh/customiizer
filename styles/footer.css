@@ -1,6 +1,6 @@
 /* Upper band styles */
 .upper-band {
-    background-color: #1A1A1A;
+    background-color: var(--color-surface-100);
     position: relative; /* This allows absolute positioning inside */
     height: 100px;
     display: flex;
@@ -23,14 +23,14 @@
 }
 
 .footer-link {
-    color: white;
+    color: var(--color-text-primary);
     text-decoration: none;
     padding: 0 15px; /* Adjust spacing between links as needed */
     transition: color 0.3s ease;
 }
 
 .footer-link:hover {
-    color: #00f; /* Blue color on hover */
+    color: var(--color-brand-400);
 }
 
 /* Social icons styling */
@@ -48,20 +48,20 @@
 }
 
 .social-icon .fa-youtube {
-    color: #FF0000; /* YouTube Red */
+    color: var(--color-social-youtube); /* YouTube Red */
 }
 
 .social-icon .fa-facebook-f {
-    color: #1877F2; /* Facebook Blue */
+    color: var(--color-social-facebook); /* Facebook Blue */
 }
 
 .social-icon .fa-instagram {
-    background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+    background: var(--gradient-instagram);
     -webkit-background-clip: text;
     color: transparent; /* Assurez-vous que le texte est transparent */
 }
 .social-icon .fa-tiktok {
-    color: #000000; /* TikTok Black */
+    color: var(--color-text-inverse-strong); /* TikTok Black */
 }
 
 .social-icon:hover i {
@@ -71,11 +71,11 @@
 
 /* Lower band styles */
 .lower-band {
-    background-color: #000000;
+    background-color: var(--color-bg-deep);
     text-align: center;
     padding: 10px 20px;
-    border-top: 1px solid white;
-	height: 50px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+        height: 50px;
 }
 
 /* Copyright text styling */

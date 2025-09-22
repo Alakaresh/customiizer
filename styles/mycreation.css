@@ -16,7 +16,7 @@
 
 /* Style pour chaque conteneur individuel d'image */
 .imageContainer {
-    background: #fff; /* Arrière-plan blanc pour chaque conteneur d'image */
+    background: var(--color-surface-inverse); /* Arrière-plan blanc pour chaque conteneur d'image */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Ombre légère pour un effet de profondeur */
     border-radius: 8px; /* Bordures arrondies */
     overflow: hidden; /* Empêche le contenu de déborder */

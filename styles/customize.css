@@ -1,13 +1,13 @@
 #customize-main {
     display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
-    color: white;
+    color: var(--color-text-strong);
         flex-grow: 1;
 }
 
 .sidebar {
         flex: 0 0 auto;
     background-color: var(--color-header-primary);
-    color: white;
+    color: var(--color-text-strong);
     height: calc(100dvh - 65px);
     display: flex;
     flex-direction: column; /* Organise les enfants (header, content, footer) verticalement */
@@ -43,7 +43,7 @@
 
 #sidebar-header, #sidebar-footer {
         background-color: var(--color-header-primary);
-    color: white;
+    color: var(--color-text-strong);
 
 }
 

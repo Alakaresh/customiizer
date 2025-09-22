@@ -16,7 +16,7 @@
 .preview-main-container {
     display: flex;
     align-items: center;
-    background-color: #222; /* Couleur plus sombre */
+    background-color: var(--neutral-850); /* Couleur plus sombre */
     box-sizing: border-box;
     padding: 20px;
     max-width: 80%; /* Pour éviter que le conteneur dépasse de l'écran */
@@ -31,7 +31,7 @@
     justify-content: center; /* Centrer le contenu verticalement */
     height: 70dvh; /* La hauteur est 70% de la hauteur de la fenêtre */
     width: 70dvh; /* La largeur est égale à la hauteur pour obtenir un carré */
-    background-color: #333;
+    background-color: var(--neutral-800);
     margin-right: 20px; /* Marge autour du conteneur d'image */
     box-sizing: border-box;
     padding: 20px; /* Padding autour de l'image */
@@ -49,7 +49,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start; /* Aligner en haut */
-    color: white;
+    color: var(--color-text-strong);
     box-sizing: border-box;
     height: 70dvh; /* La hauteur du conteneur d'informations est égale à celle du conteneur d'image */
     width: 300px; /* Largeur définie explicitement en pixels */
@@ -72,22 +72,22 @@
     justify-content: center;
     font-size: 24px;
     font-weight: bold;
-    color: white;
-    background-color: #4a4a4a;
+    color: var(--color-text-strong);
+    background-color: var(--neutral-650);
     text-transform: uppercase;
 }
 
 
 /* Styles pour le lien utilisateur */
 .user-login-link {
-    color: white;
+    color: var(--color-text-strong);
     text-decoration: none;
     padding: 5px;
 }
 
 .user-login-link:hover {
-    background-color: #ccc; /* Fond gris clair au survol */
-    color: black;
+    background-color: var(--neutral-300); /* Fond gris clair au survol */
+    color: var(--color-text-inverse-strong);
     border-radius: 5px; /* Optionnel : arrondir les coins */
 }
 
@@ -109,18 +109,18 @@
 }
 
 .prompt-text, .format-text {
-    background-color: #333;
+    background-color: var(--neutral-800);
     padding: 10px;
     border-radius: 5px;
     margin-top: 10px;
-    color: white;
+    color: var(--color-text-strong);
     word-wrap: break-word;
 }
 
 .format-ratio-label {
     font-weight: 600;
     margin-bottom: 8px;
-    color: #f1f1f1;
+    color: var(--neutral-100);
 }
 
 .format-product-list {
@@ -130,7 +130,7 @@
 }
 
 .format-product-item {
-    background-color: #2a2a2a;
+    background-color: var(--color-surface-200);
     border-radius: 6px;
     padding: 10px;
 }
@@ -143,7 +143,7 @@
 .format-variant-list {
     margin: 0;
     padding-left: 18px;
-    color: #dcdcdc;
+    color: var(--neutral-300);
 }
 
 .format-variant-item {
@@ -165,7 +165,7 @@
 .copy-button {
     background: none;
     border: none;
-    color: white;
+    color: var(--color-text-strong);
     cursor: pointer;
     font-size: 16px;
     padding: 5px 10px; /* Padding horizontal et vertical */
@@ -175,8 +175,8 @@
 }
 
 .copy-button:hover {
-    background-color: #ccc; /* Gris clair au survol */
-    color: black;
+    background-color: var(--neutral-300); /* Gris clair au survol */
+    color: var(--color-text-inverse-strong);
 }
 
 .copy-button i {
@@ -191,8 +191,8 @@
     bottom: 100%; /* Positionner au-dessus du bouton */
     left: 50%;
     transform: translateX(-50%);
-    background-color: #444;
-    color: white;
+    background-color: var(--neutral-750);
+    color: var(--color-text-strong);
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 14px;
@@ -206,7 +206,7 @@
     right: 10px;
     background: none;
     border: none;
-    color: white;
+    color: var(--color-text-strong);
     cursor: pointer;
     font-size: 16px;
     padding: 5px; /* Carré */
@@ -219,8 +219,8 @@
 }
 
 .close-button:hover {
-    background-color: #ccc; /* Gris clair au survol */
-    color: black;
+    background-color: var(--neutral-300); /* Gris clair au survol */
+    color: var(--color-text-inverse-strong);
 }
 
 .close-button i {
@@ -237,8 +237,8 @@
 }
 
 .use-button {
-    background-color: #444;
-    color: white;
+    background-color: var(--neutral-750);
+    color: var(--color-text-strong);
     border: none;
     padding: 10px;
     cursor: pointer;
@@ -248,7 +248,7 @@
 }
 
 .use-button:hover {
-    background-color: #666;
+    background-color: var(--neutral-600);
 }
 
 .preview-enlarge {
@@ -279,7 +279,7 @@
         padding: 28px;
         max-width: 460px;
         width: min(100%, 460px);
-        color: #f5f5f5;
+        color: var(--neutral-100);
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -322,7 +322,7 @@
         font-size: 1.05rem;
         font-weight: 600;
         letter-spacing: 0.01em;
-        color: #ffffff;
+        color: var(--color-text-strong);
 }
 
 .product-choice-group-count {
@@ -349,7 +349,7 @@
         width: 100%;
         padding: 16px 18px;
         background: linear-gradient(145deg, rgba(72, 72, 72, 0.55), rgba(46, 46, 46, 0.6));
-        color: #f5f5f5;
+        color: var(--neutral-100);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 12px;
         cursor: pointer;
@@ -380,7 +380,7 @@
         font-size: 0.95rem;
         font-weight: 600;
         letter-spacing: 0.01em;
-        color: #ffffff;
+        color: var(--color-text-strong);
 }
 
 .product-choice-description {
@@ -405,19 +405,19 @@
         text-transform: uppercase;
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #dcdcdc;
+        color: var(--neutral-300);
 }
 
 .product-choice-badge--color {
         background: rgba(88, 144, 255, 0.12);
         border-color: rgba(88, 144, 255, 0.35);
-        color: #b9d2ff;
+        color: var(--color-lavender-bright);
 }
 
 .product-choice-badge--ratio {
         background: rgba(167, 127, 255, 0.14);
         border-color: rgba(167, 127, 255, 0.4);
-        color: #e0d0ff;
+        color: var(--color-lavender-soft);
 }
 
 .close-choice-button {
@@ -425,7 +425,7 @@
         padding: 8px 22px;
         font-size: 0.85rem;
         background: transparent;
-        color: #d0d0d0;
+        color: var(--neutral-300);
         border: 1px solid rgba(255, 255, 255, 0.18);
         border-radius: 999px;
         cursor: pointer;
@@ -436,7 +436,7 @@
 .close-choice-button:focus-visible {
         background: rgba(255, 255, 255, 0.08);
         border-color: rgba(255, 255, 255, 0.35);
-        color: #ffffff;
+        color: var(--color-text-strong);
         transform: translateY(-1px);
         outline: none;
 }

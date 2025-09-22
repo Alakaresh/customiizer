@@ -5,24 +5,24 @@
 		padding: 0 0;
 	}
 
-	.mobile-menu-toggle {
-		display: flex !important;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		color: white;
-		font-size: 24px;
-		margin-top: 10px;
-	}
+        .mobile-menu-toggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: var(--color-text-strong);
+                font-size: 24px;
+                margin-top: 10px;
+        }
 
        .mobile-menu {
                display: none;
                top: 55px;
                position: absolute;
                flex-direction: column;
-               background-color: #111;
+               background-color: var(--color-surface-200);
                padding: 10px 0;
-               border-radius: 6px;
+               border-radius: var(--radius-md);
                gap: 10px;
                margin-top: 10px;
                z-index: 1000;
@@ -116,7 +116,7 @@
 		font-size: 14px;
 		line-height: 1.4;
 		padding: 8px;
-		background-color: #333;
+		background-color: var(--neutral-800);
 		border-radius: 5px;
 	}
 	.prompt-text::-webkit-scrollbar {

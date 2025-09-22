@@ -63,13 +63,13 @@
     .ratio-filter,
     .favorite-filter {
         padding: 6px 36px 6px 12px;
-        border: 1px solid #666;
+        border: 1px solid var(--neutral-600);
         border-radius: 20px;
-        background-color: #333;
-        color: #000;
+        background-color: var(--neutral-800);
+        color: var(--color-text-inverse-strong);
         font-size: 14px;
-        background-image: linear-gradient(45deg, transparent 50%, #000 50%),
-            linear-gradient(135deg, #000 50%, transparent 50%);
+        background-image: linear-gradient(45deg, transparent 50%, var(--color-text-inverse-strong) 50%),
+            linear-gradient(135deg, var(--color-text-inverse-strong) 50%, transparent 50%);
         background-position: right 12px center, right 6px center;
         background-size: 6px 6px, 6px 6px;
         background-repeat: no-repeat;

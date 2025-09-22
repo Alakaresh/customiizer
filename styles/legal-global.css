@@ -1,8 +1,8 @@
 .legal-content {
     padding: 80px 20px;
     background-color: var(--color-background); /* Harmonise le fond avec le thème */
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    color: #f0f0f0; /* Texte clair */
+    font-family: var(--font-body);
+    color: var(--color-text-primary); /* Texte clair */
     line-height: 1.8;
 }
 
@@ -18,13 +18,13 @@
     font-size: 2.8em;
     margin-bottom: 10px;
     text-align: center;
-    color: #ffffff;
+    color: var(--color-text-strong);
 }
 
 .legal-content h2 {
     font-size: 1.5em;
     margin-bottom: 10px;
-    color: #dddddd;
+    color: var(--neutral-200);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding-bottom: 5px;
 }
@@ -33,14 +33,14 @@
     font-size: 1.05em;
     margin: 0;
     padding-bottom: 20px;
-    color: #e0e0e0;
+    color: var(--neutral-300);
 }
 
 .legal-content a {
-    color: #66bfff;
+    color: var(--color-info);
     text-decoration: underline;
 }
 
 .legal-content a:hover {
-    color: #99d3ff;
+    color: var(--color-info);
 }

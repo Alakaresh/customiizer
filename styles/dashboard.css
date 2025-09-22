@@ -11,7 +11,7 @@
     width: 20%;
     padding: 10px;
     box-sizing: border-box;
-    background-color: #031927;
+    background-color: var(--color-bg-deep);
     border-radius: 20px;
     overflow: auto;
 }
@@ -24,27 +24,27 @@
 
 .navigation-menu a {
   text-decoration: none;
-  color: #fff;
+  color: var(--color-text-strong);
   padding: 10px;
   display: block;
   border-radius: 4px; 
 }
 
 .navigation-menu a:hover {
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--color-brand-500);
+  color: var(--color-text-strong);
 }
 
 .navigation-menu a.active {
-  background-color: #007bff;
-  color: #000;
+  background-color: var(--color-brand-500);
+  color: var(--color-text-inverse-strong);
 }
 
 .logout-button {
     margin-top: 20px;
     display: block;
     background-color: transparent;
-    color: #ff4d4d;
+    color: var(--color-critical);
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -54,8 +54,8 @@
 }
 
 .logout-button:hover {
-    background-color: #ff4d4d;
-    color: white;
+    background-color: var(--color-critical);
+    color: var(--color-text-strong);
 }
 
 .profile-picture {
@@ -74,12 +74,12 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  border: 2px solid #007bff;
-  background-color: #fff;
+  border: 2px solid var(--color-brand-500);
+  background-color: var(--color-text-strong);
 }
 
 .plus-vertical, .plus-horizontal {
-  background-color: #007bff;
+  background-color: var(--color-brand-500);
   position: absolute;
   border-radius: 2px;
 }
@@ -108,8 +108,8 @@
 }
 
 .active-link {
-    color: #fff; /* Couleur du texte pour l'onglet actif */
-    background-color: #89b9c8; /* Couleur de fond pour l'onglet actif */
+    color: var(--color-text-strong); /* Couleur du texte pour l'onglet actif */
+    background-color: var(--color-info-soft); /* Couleur de fond pour l'onglet actif */
 }
 .close-btn {
     float: right;        /* Positionne le bouton à droite */
@@ -117,7 +117,7 @@
     font-weight: bold;   /* Rend le symbole plus épais */
     cursor: pointer;     /* Change le curseur en main lors du survol */
     padding: 0 15px;     /* Ajoute de l'espace autour du texte pour faciliter le clic */
-    color: #000;         /* Couleur du texte, ajustez selon votre design */
+    color: var(--color-text-inverse-strong);         /* Couleur du texte, ajustez selon votre design */
 }
 
 .modal-header {

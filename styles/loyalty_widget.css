@@ -4,8 +4,8 @@
     position: fixed;
     bottom: 20px;
     left: 20px;
-    background:#007bff;
-    color:#fff;
+    background:var(--color-brand-500);
+    color:var(--color-text-strong);
     width:50px;
     height:50px;
     border-radius:50%;
@@ -23,7 +23,7 @@
     max-width:90%;
     background:var(--color-header-primary);
     border:1px solid var(--color-ui-border);
-    color:var(--font-color);
+    color:var(--color-text-primary);
     border-radius:4px;
     box-shadow:0 2px 8px rgba(0,0,0,0.2);
     display:none;
@@ -38,8 +38,8 @@
     align-items: center;
     justify-content: flex-start;
     padding: 10px 15px;
-    background: #3399ff;
-    color: #fff;
+    background: var(--color-brand-500);
+    color: var(--color-text-strong);
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     font-size: 14px;
@@ -70,7 +70,7 @@
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     padding: 15px;
-    color: var(--font-color);
+    color: var(--color-text-primary);
     height: 500px;
     overflow-y: auto;
 }
@@ -137,14 +137,14 @@
     background:none;
     border:none;
     font-size:16px;
-    color:var(--font-color);
+    color:var(--color-text-primary);
     cursor:pointer;
 }
 #loyalty-widget-popup .loyalty-widget-page .button{
     width:100%;
     margin:5px 0;
-    background-color:#007bff;
-    color:#fff;
+    background-color:var(--color-brand-500);
+    color:var(--color-text-strong);
     border:none;
     border-radius:4px;
     padding:8px 0;
@@ -164,7 +164,7 @@
     justify-content: space-between;
     width: 100%;
     background: var(--color-header-secondary);
-    color: var(--font-color);
+    color: var(--color-text-primary);
     border: 1px solid var(--color-ui-border);
     border-radius: 4px;
     padding: 8px 10px;
@@ -193,7 +193,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #007bff;
+    color: var(--color-brand-500);
     cursor: pointer;
     padding: 0;
 }
@@ -203,8 +203,8 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #444;
-    color: #fff;
+    background-color: var(--neutral-750);
+    color: var(--color-text-strong);
     padding: 3px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -222,17 +222,17 @@
     list-style: none;
     padding-left: 0;
     margin: 0;
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-accent-serif);
 }
 
 .loyalty-missions-list li {
     font-size: 13px;
     margin-bottom: 6px;
-    background: linear-gradient(#3b2d1f, #27190b);
-    border: 1px solid #c29a5b;
+    background: linear-gradient(var(--color-gold-deep), var(--color-gold-shadow));
+    border: 1px solid var(--color-gold);
     border-radius: 6px;
     padding: 4px;
-    color: #f3e2c7;
+    color: var(--color-gold-soft);
 }
 
 .loyalty-missions-list progress {
@@ -241,16 +241,16 @@
     vertical-align: middle;
     margin: 2px 0;
     appearance: none;
-    border: 1px solid #c29a5b;
+    border: 1px solid var(--color-gold);
     border-radius: 4px;
-    background-color: #1b1207;
+    background-color: var(--color-gold-overlay);
 }
 .loyalty-missions-list progress::-webkit-progress-value {
-    background-color: #c29a5b;
+    background-color: var(--color-gold);
     border-radius: 4px;
 }
 .loyalty-missions-list progress::-moz-progress-bar {
-    background-color: #c29a5b;
+    background-color: var(--color-gold);
     border-radius: 4px;
 }
 
@@ -262,8 +262,8 @@
 .loyalty-login-btn {
     display: block;
     width: 100%;
-    background-color: #007bff;
-    color: #fff;
+    background-color: var(--color-brand-500);
+    color: var(--color-text-strong);
     border: none;
     border-radius: 4px;
     padding: 8px 0;
@@ -277,8 +277,8 @@
 .loyalty-missions-link {
     display: inline-block;
     padding: 6px 10px;
-    background-color: #007bff;
-    color: #fff;
+    background-color: var(--color-brand-500);
+    color: var(--color-text-strong);
     border-radius: 4px;
     text-decoration: none;
 }

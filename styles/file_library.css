@@ -1,14 +1,14 @@
-/* Palette sombre */
+/* Palette sombre spécifique à la médiathèque */
 :root {
-    --bg-color: #2b2b2b;
-    --border-color: #555555;
-    --text-color: #f0f0f0;
-    --accent-color: #777777;
+    --file-library-bg: var(--color-surface-200);
+    --file-library-border: var(--color-border);
+    --file-library-text: var(--color-text-primary);
+    --file-library-accent: var(--color-brand-500);
 }
 
 /* Conteneur général de la modal */
 #imageSourceModal .modal-content {
-    background: var(--bg-color);
+    background: var(--file-library-bg);
     padding: 20px;
     border-radius: 40px;
     position: absolute;
@@ -33,22 +33,22 @@
     display: flex;
     flex-direction: column;
     width: 180px;
-    border-right: 1px solid var(--border-color);
+    border-right: 1px solid var(--file-library-border);
     padding-right: 10px;
     margin-right: 20px;
     height: 100%;
 }
 .file-library-sidebar .sidebar-title {
-    color: var(--text-color);
+    color: var(--file-library-text);
     text-align: center;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--file-library-border);
     padding-bottom: 8px;
     margin-bottom: 15px;
 }
 .file-library-sidebar button {
-    background: var(--bg-color);
+    background: var(--file-library-bg);
     border: none;
-    color: var(--text-color);
+    color: var(--file-library-text);
     margin-bottom: 6px;
     cursor: pointer;
     display: flex;
@@ -70,8 +70,8 @@
 
 /* Zone de dépôt pour l'import de fichiers */
 .file-drop-zone {
-    border: 2px dashed var(--border-color);
-    color: var(--text-color);
+    border: 2px dashed var(--file-library-border);
+    color: var(--file-library-text);
     padding: 10px;
     text-align: center;
     margin-top: auto;
@@ -167,7 +167,7 @@
     padding: 6px;
     border: 1px solid var(--border-color);
     background: var(--bg-color);
-    color: var(--text-color);
+    color: var(--file-library-text);
 }
 
 .filter-sort {
@@ -196,7 +196,7 @@
 
 .filter-group h4 {
     margin: 0;
-    color: var(--text-color);
+    color: var(--file-library-text);
     font-size: 14px;
     font-weight: normal;
 }
@@ -211,7 +211,7 @@
 .filter-buttons button {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
-    color: var(--text-color);
+    color: var(--file-library-text);
     padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
@@ -301,7 +301,7 @@
     gap: 12px;
     text-align: center;
     padding: 40px 20px;
-    color: var(--text-color);
+    color: var(--file-library-text);
 }
 
 .file-library-empty-title {
@@ -340,23 +340,23 @@
 }
 
 .file-library-empty-primary {
-    background: #ffffff;
-    color: #1f1f1f;
+    background: var(--color-brand-500);
+    color: var(--color-text-strong);
     border: none;
 }
 
 .file-library-empty-primary:hover {
-    background: #e6e6e6;
+    background: var(--color-brand-400);
 }
 
 .file-library-empty-secondary {
     background: transparent;
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
+    color: var(--file-library-text);
+    border: 1px solid var(--file-library-border);
 }
 
 .file-library-empty-secondary:hover {
-    border-color: var(--text-color);
+    border-color: var(--color-brand-500);
 }
 
 /* Style d’un élément de fichier */
@@ -388,7 +388,7 @@
     transform: translate(-50%, -50%);
     display: none;
     background: var(--accent-color);
-    color: var(--text-color);
+    color: var(--file-library-text);
     border: none;
     padding: 6px 12px;
     border-radius: 4px;
@@ -403,7 +403,7 @@
     position: absolute;
     top: 5px;
     right: 5px;
-    color: var(--text-color);
+    color: var(--file-library-text);
     background: rgba(0, 0, 0, 0.5);
     border-radius: 4px;
     padding: 2px;
@@ -423,7 +423,7 @@
     left: 5px;
     background: rgba(0, 0, 0, 0.5);
     border: none;
-    color: var(--text-color);
+    color: var(--file-library-text);
     padding: 2px 4px;
     cursor: pointer;
     border-radius: 4px;
@@ -451,7 +451,7 @@
 .file-item .file-menu-dropdown button {
     background: none;
     border: none;
-    color: var(--text-color);
+    color: var(--file-library-text);
     padding: 6px 12px;
     text-align: left;
     cursor: pointer;
@@ -485,7 +485,7 @@
 .pagination-controls button {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
-    color: var(--text-color);
+    color: var(--file-library-text);
     padding: 6px 12px;
     cursor: pointer;
 }
@@ -499,7 +499,7 @@
     padding: 0 6px;
     border: 1px solid var(--border-color);
     background: var(--bg-color) !important;
-    color: var(--text-color);
+    color: var(--file-library-text);
     text-align: center;
     border-radius: 4px;
     appearance: textfield;
@@ -511,5 +511,5 @@
     margin: 0;
 }
 .pagination-controls .page-total {
-    color: var(--text-color);
+    color: var(--file-library-text);
 }
