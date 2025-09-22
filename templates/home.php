@@ -5,40 +5,40 @@ Template Name: Home
 get_header();
 ?>
 <main id="site-content" class="site-content home-page">
-  <section class="home-panel home-panel--hero" aria-labelledby="home-experience-title">
-    <div class="home-panel__content">
-      <div class="home-panel__body">
-        <span class="home-eyebrow">Studio de personnalisation IA</span>
-        <h1 class="first_title home-panel__headline" id="home-experience-title">Donne vie à tes idées !</h1>
-        <p class="text home-panel__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
-        <div class="home-panel__actions">
-          <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-            <i class="fas fa-magic"></i>
-            <span>Créer maintenant</span>
-          </a>
-          <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
-            <i class="fas fa-store"></i>
-            <span>Explorer la boutique</span>
-          </a>
+  <section class="home-panel home-panel--hero" aria-labelledby="home-hero-title">
+    <div class="home-panel__intro">
+      <span class="home-eyebrow">Studio de personnalisation IA</span>
+      <h1 class="first_title home-panel__headline" id="home-hero-title">Donne vie à tes idées !</h1>
+      <p class="text home-panel__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
+      <div class="home-panel__actions">
+        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
+          <i class="fas fa-magic"></i>
+          <span>Créer maintenant</span>
+        </a>
+        <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
+          <i class="fas fa-store"></i>
+          <span>Explorer la boutique</span>
+        </a>
+      </div>
+    </div>
+    <div class="home-panel__media">
+      <ul class="home-panel__highlights" aria-label="Points forts Customiizer">
+        <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
+        <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
+        <li><i class="fas fa-truck" aria-hidden="true"></i><span>Produits livrés rapidement</span></li>
+      </ul>
+      <div class="home-panel__metrics" aria-label="Chiffres clés Customiizer">
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">+15k</span>
+          <span class="home-panel__metric-label">Créations IA générées</span>
         </div>
-        <ul class="home-panel__highlights" aria-label="Points forts Customiizer">
-          <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
-          <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
-          <li><i class="fas fa-truck" aria-hidden="true"></i><span>Produits livrés rapidement</span></li>
-        </ul>
-        <div class="home-panel__metrics" aria-label="Chiffres clés Customiizer">
-          <div class="home-panel__metric">
-            <span class="home-panel__metric-value">+15k</span>
-            <span class="home-panel__metric-label">Créations IA générées</span>
-          </div>
-          <div class="home-panel__metric">
-            <span class="home-panel__metric-value">120</span>
-            <span class="home-panel__metric-label">Supports personnalisables</span>
-          </div>
-          <div class="home-panel__metric">
-            <span class="home-panel__metric-value">24/7</span>
-            <span class="home-panel__metric-label">Assistance dédiée</span>
-          </div>
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">120</span>
+          <span class="home-panel__metric-label">Supports personnalisables</span>
+        </div>
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">24/7</span>
+          <span class="home-panel__metric-label">Assistance dédiée</span>
         </div>
       </div>
     </div>
@@ -109,41 +109,43 @@ get_header();
       <h2 class="home-panel__title" id="home-workflow-title">Comment ça fonctionne</h2>
       <p class="home-panel__text">Suis un parcours fluide : imagine, génère, personnalise et commande ta création en quelques étapes.</p>
     </div>
-    <ol class="workflow" aria-label="Étapes de création">
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">1</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Choisis ton support</h3>
-          <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
-        </div>
-      </li>
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">2</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Génère avec l’IA</h3>
-          <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
-        </div>
-      </li>
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">3</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Personnalise</h3>
-          <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
-        </div>
-      </li>
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">4</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Commande &amp; reçois</h3>
-          <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
-        </div>
-      </li>
-    </ol>
-    <div class="home-panel__actions">
-      <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-        <i class="fas fa-magic"></i>
-        <span>Créer maintenant</span>
-      </a>
+    <div class="home-panel__media">
+      <ol class="workflow" aria-label="Étapes de création">
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">1</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Choisis ton support</h3>
+            <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
+          </div>
+        </li>
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">2</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Génère avec l’IA</h3>
+            <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
+          </div>
+        </li>
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">3</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Personnalise</h3>
+            <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
+          </div>
+        </li>
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">4</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Commande &amp; reçois</h3>
+            <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
+          </div>
+        </li>
+      </ol>
+      <div class="home-panel__actions">
+        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
+          <i class="fas fa-magic"></i>
+          <span>Créer maintenant</span>
+        </a>
+      </div>
     </div>
   </section>
 
