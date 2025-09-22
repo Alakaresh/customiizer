@@ -190,48 +190,6 @@ get_header();
     </div>
   </section>
 
-  <section class="home-cta surface-card" aria-labelledby="home-cta-title">
-    <div class="home-cta__content">
-      <span class="home-eyebrow">Prêt à créer ?</span>
-      <h2 class="home-cta__title" id="home-cta-title">Lance ton atelier de personnalisation dès aujourd’hui</h2>
-      <p class="home-cta__description">Imagine une collection, partage-la avec ta communauté et laisse Customiizer s’occuper du reste : impression, logistique et missions fidélité.</p>
-      <div class="home-cta__actions">
-        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-          <i class="fas fa-rocket"></i>
-          <span>Démarrer un projet</span>
-        </a>
-        <a href="<?php echo esc_url( home_url( '/contact' ) ); ?>" class="home-button home-button--ghost">
-          <i class="fas fa-comment-dots"></i>
-          <span>Parler à un expert</span>
-        </a>
-      </div>
-      <dl class="home-cta__stats">
-        <div class="home-cta__stat">
-          <dt>+150</dt>
-          <dd>Modèles prêts à personnaliser</dd>
-        </div>
-        <div class="home-cta__stat">
-          <dt>48h</dt>
-          <dd>pour recevoir tes premiers mockups</dd>
-        </div>
-        <div class="home-cta__stat">
-          <dt>4,9/5</dt>
-          <dd>Note moyenne de la communauté</dd>
-        </div>
-      </dl>
-    </div>
-    <div class="home-cta__media" aria-hidden="true">
-      <span class="home-cta__orb home-cta__orb--primary"></span>
-      <span class="home-cta__orb home-cta__orb--secondary"></span>
-      <div class="home-cta__mockup">
-        <span class="home-cta__mockup-label">Mockup IA</span>
-        <div class="home-cta__mockup-visual">
-          <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/hero-4.png" alt="">
-        </div>
-        <p class="home-cta__mockup-caption">Visualise instantanément tes designs sur les supports que tu préfères.</p>
-      </div>
-    </div>
-  </section>
   <button class="scroll-to-top" type="button" aria-label="Revenir en haut">
     <i class="fas fa-arrow-up" aria-hidden="true"></i>
   </button>
