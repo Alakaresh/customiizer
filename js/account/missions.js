@@ -18,11 +18,16 @@ function updateMissionTotal(list) {
 }
 
 function refreshMissionCache() {
-    const container = document.getElementById('main-container');
-    if (container) {
-        const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
-        localStorage.setItem('account-section-' + uid + '-missions', container.innerHTML);
+    const missionsContainer = document.getElementById('missions-container');
+    if (!missionsContainer) {
+        return;
     }
+
+    const uid = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+    localStorage.setItem(
+        'account-section-' + uid + '-missions',
+        missionsContainer.outerHTML
+    );
 }
 
 async function fetchMissions(options = {}) {
