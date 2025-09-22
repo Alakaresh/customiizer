@@ -56,14 +56,13 @@
     max-width: none;
   }
 
+  /* Experience */
   .home-experience {
-    gap: 32px;
+    padding: 32px 24px 40px;
   }
 
-  /* Experience */
-  .home-experience.surface-card {
-    padding: 32px 24px 40px;
-    border-radius: 32px;
+  .home-experience > * + * {
+    margin-top: 32px;
   }
 
   .home-experience__grid {

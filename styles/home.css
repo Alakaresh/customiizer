@@ -161,9 +161,12 @@
 
 /* Hero */
 .home-experience {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(36px, 4vw, 56px);
+  display: block;
+  padding: clamp(36px, 5vw, 64px);
+}
+
+.home-experience > * + * {
+  margin-top: clamp(36px, 4vw, 56px);
 }
 
 .home-hero__content {
@@ -300,14 +303,6 @@
 }
 
 /* Immersive experience */
-.home-experience.surface-card {
-  padding: clamp(36px, 5vw, 64px);
-  border-radius: 40px;
-  background: var(--home-surface-background);
-  border-color: var(--home-surface-border);
-  box-shadow: var(--home-surface-shadow);
-}
-
 .home-experience__panorama {
   display: flex;
   flex-direction: column;
