@@ -43,7 +43,6 @@ get_header();
       </div>
     </div>
     <div class="home-experience__intro">
-      <span class="home-eyebrow">Expérience Customiizer</span>
       <h2 class="home-experience__title" id="home-experience-overview">Tout vivre en un seul regard</h2>
       <p class="home-experience__description">Retrouve la boutique, la communauté et le parcours de création dans un espace immersif qui valorise chaque étape de ton imagination.</p>
     </div>
