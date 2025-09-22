@@ -79,10 +79,10 @@ if ( $user_logged_in ) {
                         }
 
                         sessionStorage.setItem("USER_ESSENTIALS", JSON.stringify(essentials));
-                        document.addEventListener("DOMContentLoaded", function(){
-                                const creditsEl = document.getElementById("userCredits");
-                                if (creditsEl) creditsEl.textContent = essentials.image_credits;
-                        });
+                        if (window.currentUser && currentUser.ID === essentials.user_id) {
+                                currentUser.image_credits = essentials.image_credits;
+                                currentUser.display_name = essentials.display_name;
+                        }
                 })();
         </script>
 <?php endif; ?>
@@ -95,50 +95,50 @@ if ( $user_logged_in ) {
 
                         const userId = currentUser.ID;
 
-                        // Références DOM
-                        const creditsEl = document.getElementById('userCredits');
-                        const nameEl = document.getElementById('userDisplayName');
-                        const logoEl = document.getElementById('userLogo');
-
-                        // Vérifie si les éléments existent avant de continuer
-                        if (!creditsEl) {
-                                console.warn("⚠️ Élément #userCredits introuvable.");
-                        } else {
+                        let shouldFetch = true;
+                        try {
                                 const cached = sessionStorage.getItem('USER_ESSENTIALS');
-                                let fromCache = false;
                                 if (cached) {
                                         const data = JSON.parse(cached);
-                                        if (data.user_id === userId) {
-                                                creditsEl.textContent = data.image_credits;
-                                                if (nameEl) nameEl.textContent = data.display_name;
-                                                if (logoEl && data.user_logo) logoEl.src = data.user_logo;
-                                                fromCache = true;
+                                        if (data.user_id === userId && typeof data.image_credits !== 'undefined') {
+                                                shouldFetch = false;
+                                                if (window.currentUser && currentUser.ID === userId) {
+                                                        currentUser.image_credits = data.image_credits;
+                                                        currentUser.display_name = data.display_name;
+                                                }
                                         }
                                 }
-
-                                if (!fromCache) {
-                                        // Récupère depuis l’API si pas trouvé dans le cache
-                                        fetch(`/wp-json/api/v1/user/load?user_id=${userId}&include=display_name,image_credits,user_logo`, {
-                                                credentials: 'include'
-                                        })
-                                                .then(res => res.json())
-                                                .then(data => {
-                                                if (data.success && data.data) {
-                                                        const essentials = {
-                                                                user_id: userId,
-                                                                display_name: data.data.display_name,
-                                                                image_credits: data.data.image_credits,
-                                                                user_logo: data.data.user_logo
-                                                        };
-                                                        sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(essentials));
-
-                                                        if (creditsEl) creditsEl.textContent = data.data.image_credits;
-                                                        if (nameEl) nameEl.textContent = data.data.display_name;
-                                                        if (logoEl && data.data.user_logo) logoEl.src = data.data.user_logo;
-                                                }
-                                        });
-                                }
+                        } catch (error) {
+                                console.warn('⚠️ Impossible de lire USER_ESSENTIALS.', error);
                         }
+
+                        if (!shouldFetch) {
+                                return;
+                        }
+
+                        fetch(`/wp-json/api/v1/user/load?user_id=${userId}&include=display_name,image_credits,user_logo`, {
+                                credentials: 'include'
+                        })
+                                .then(res => res.json())
+                                .then(data => {
+                                if (data.success && data.data) {
+                                        const essentials = {
+                                                user_id: userId,
+                                                display_name: data.data.display_name,
+                                                image_credits: data.data.image_credits,
+                                                user_logo: data.data.user_logo
+                                        };
+                                        sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(essentials));
+
+                                        if (window.currentUser && currentUser.ID === userId) {
+                                                currentUser.display_name = data.data.display_name;
+                                                currentUser.image_credits = data.data.image_credits;
+                                        }
+                                }
+                        })
+                                .catch(error => {
+                                console.error('❌ Erreur lors de la récupération des informations utilisateur :', error);
+                        });
                 });
         </script>
         </body>
