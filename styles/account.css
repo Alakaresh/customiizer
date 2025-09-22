@@ -375,8 +375,8 @@
 
 .form-group input {
         padding: 10px;
-        border: 1px solid var(--color-border-light);
-        border-radius: 4px;
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 12px;
         width: 100%; /* Assure que l'input prend toute la largeur du form-group */
 }
 
@@ -403,10 +403,13 @@ button:hover {
 }
 
 .modal-content {
-        background-color: var(--color-text-primary);
+        background: linear-gradient(135deg, var(--color-surface-card), color-mix(in srgb, var(--color-surface-card-alt) 60%, transparent));
         width: 100%; /* Adjust width as needed */
         height: 100%;
         position: relative; /* Needed for positioning the close button absolutely */
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 24px;
+        box-shadow: 0 28px 52px rgba(8, 15, 35, 0.45);
 }
 
 .close-button {

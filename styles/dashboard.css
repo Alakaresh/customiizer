@@ -9,11 +9,13 @@
     height: auto;
     max-height: 100dvh;
     width: 20%;
-    padding: 10px;
+    padding: 16px;
     box-sizing: border-box;
-    background-color: color-mix(in srgb, var(--color-surface-canvas) 85%, var(--color-action-primary) 15%);
-    border-radius: 20px;
+    background: linear-gradient(140deg, var(--color-surface-card), color-mix(in srgb, var(--color-action-primary) 25%, var(--color-surface-card-alt) 75%));
+    border-radius: 24px;
+    border: 1px solid var(--color-border-subtle);
     overflow: auto;
+    box-shadow: 0 28px 52px rgba(8, 15, 35, 0.45);
 }
 
 .navigation-menu {
@@ -32,12 +34,12 @@
 
 .navigation-menu a:hover {
   background-color: var(--color-action-primary);
-  color: var(--color-text-primary);
+  color: var(--color-on-primary);
 }
 
 .navigation-menu a.active {
   background-color: var(--color-action-primary);
-  color: var(--color-text-contrast);
+  color: var(--color-on-primary);
 }
 
 .logout-button {
@@ -54,8 +56,8 @@
 }
 
 .logout-button:hover {
-    background-color: var(--color-action-destructive);
-    color: white;
+    background: linear-gradient(135deg, var(--color-action-destructive), color-mix(in srgb, var(--color-action-destructive) 65%, var(--color-background) 35%));
+    color: var(--color-on-primary);
 }
 
 .profile-picture {
@@ -75,7 +77,7 @@
   height: 100px;
   border-radius: 50%;
   border: 2px solid var(--color-action-primary);
-  background-color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-surface-card) 80%, transparent);
 }
 
 .plus-vertical, .plus-horizontal {
@@ -117,7 +119,7 @@
     font-weight: bold;   /* Rend le symbole plus épais */
     cursor: pointer;     /* Change le curseur en main lors du survol */
     padding: 0 15px;     /* Ajoute de l'espace autour du texte pour faciliter le clic */
-    color: var(--color-text-contrast);         /* Couleur du texte, ajustez selon votre design */
+    color: var(--color-text-primary);         /* Couleur du texte, ajustez selon votre design */
 }
 
 .modal-header {

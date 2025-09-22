@@ -10,13 +10,15 @@
 }
 
 .content {
-    background-color: var(--color-neutral-600);
-    padding: 10px;
+    background: color-mix(in srgb, var(--color-surface-overlay) 85%, transparent);
+    padding: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-grow: 1;
     overflow: auto; /* gestion de débordement */
+    border-radius: 20px;
+    box-shadow: 0 24px 48px rgba(8, 15, 35, 0.45);
 }
 
 #sidebar-footer {
@@ -80,24 +82,24 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    border: 1px solid var(--color-border-light); /* Ajoute une bordure pour la délimitation */
-	border-radius: 5px;
-    background-color: var(--color-text-primary); /* Fond blanc */
+    border: 1px solid var(--color-border-subtle); /* Ajoute une bordure pour la délimitation */
+    border-radius: 12px;
+    background-color: var(--color-surface-overlay);
     font-size: 16px; /* Taille de police réduite */
-	padding: 5px; /* Ajoute une marge de 5px à gauche du texte */
-	color: var(--color-text-contrast); /* Texte noir */
-	line-height: 1; /* Réduit l'espace entre les lignes */
+    padding: 10px;
+    color: var(--color-text-primary);
+    line-height: 1.2;
 }
 
 #resizer {
-	border-radius: 2.5px;
+        border-radius: 2.5px;
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 20px;
     height: 5px;
-    background-color: var(--color-border-light);
+    background-color: var(--color-border-medium);
     cursor: ns-resize;
 }
 
@@ -122,16 +124,16 @@
 
 .info-icon {
     margin-left: 5px;
-	font-size: 14px; /* Réduit la taille de la police */
+        font-size: 14px; /* Réduit la taille de la police */
     cursor: pointer;
     border-radius: 50%; /* Met le point d'interrogation dans un cercle */
-    background-color: var(--color-border-light); /* Couleur de fond pour le cercle */
+    background: color-mix(in srgb, var(--color-action-primary) 25%, var(--color-surface-overlay) 75%);
     width: 15px; /* Réduit la taille du cercle */
     height: 15px; /* Réduit la taille du cercle */
     display: flex;
     align-items: center;
     justify-content: center;
-	color: black;
+        color: var(--color-text-primary);
 }
 
 #product-groups-container {
@@ -219,10 +221,11 @@
 }
 
 #selected-info {
-    padding: 10px 20px;
-    border: none;
-    background-color: var(--color-border-medium);
-    color: var(--color-neutral-800);
+    padding: 12px 20px;
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-surface-card) 85%, transparent);
+    color: var(--color-text-primary);
+    border-radius: 16px;
 }
 
 /* Style supplémentaire pour les images pour assurer l'uniformité */
@@ -244,9 +247,13 @@
 }
 
 .modal-content {
-  background-color: var(--color-neutral-800);
+  background: linear-gradient(135deg, var(--color-surface-card), color-mix(in srgb, var(--color-surface-card-alt) 60%, transparent));
   color: var(--color-text-primary);
- text-align: left; 
+ text-align: left;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 20px;
+  box-shadow: 0 24px 48px rgba(8, 15, 35, 0.45);
+  padding: 24px;
 }
 
 .modal-title {
@@ -267,17 +274,18 @@
 
 .ok-button {
     background-color: var(--color-action-primary);
-    border: none;
-    color: white;
-    padding: 8px 12px; /* Réduire la marge interne du bouton */
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-on-primary);
+    padding: 8px 16px; /* Réduire la marge interne du bouton */
     font-size: 12px;
-    transition-duration: 0.4s;
+    transition-duration: 0.3s;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 999px;
+    box-shadow: 0 16px 28px rgba(13, 110, 139, 0.3);
 }
 
 .ok-button:hover {
-  background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-text-contrast) 30%);
+  background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-background) 30%);
 }
 
 .content-images {
@@ -305,7 +313,7 @@
 .loading-bar-border {
     width: 100%; 
     height: 30px;
-    border: 3px solid color-mix(in srgb, var(--color-action-primary) 80%, var(--color-surface-contrast) 20%);
+    border: 3px solid color-mix(in srgb, var(--color-action-primary) 80%, var(--color-background) 20%);
     background-color: var(--color-surface-card-alt);
     box-sizing: border-box;
     padding: 2px;
@@ -317,7 +325,7 @@
 .loading-bar {
     width: 0%; 
     height: 100%;
-    background-color: color-mix(in srgb, var(--color-action-primary) 80%, var(--color-surface-contrast) 20%);
+    background-color: color-mix(in srgb, var(--color-action-primary) 80%, var(--color-background) 20%);
     transition: width 0.5s ease-in-out;
     display: flex;
     align-items: center;
@@ -326,7 +334,7 @@
 
 .loading-text {
     font-size: 12px;
-    color: white;
+    color: var(--color-text-primary);
     text-align: center;
     position: absolute; /* Permet de centrer par rapport à la barre */
     width: 100%; /* Occupe toute la largeur pour un centrage horizontal */
@@ -343,9 +351,9 @@
 }
 
 .format-button {
-    background-color: var(--color-neutral-700); /* Gris moyen pour le fond du bouton */
-    color: color-mix(in srgb, var(--color-neutral-200) 70%, transparent); /* Gris très clair pour le texte, pour un contraste suffisant */
-    border: 1px solid color-mix(in srgb, var(--color-neutral-600) 85%, var(--color-neutral-800) 15%); /* Bordure légèrement plus claire que le fond du bouton */
+    background: color-mix(in srgb, var(--color-surface-overlay) 75%, transparent); /* Fond harmonisé avec le thème sombre */
+    color: var(--color-text-primary); /* Texte clair */
+    border: 1px solid var(--color-border-subtle); /* Bordure douce */
     padding: 10px 20px; /* Espacement interne un peu plus grand pour rendre le bouton plus large */
     font-size: 16px; /* Taille de la police */
     border-radius: 30px; /* Coins très arrondis pour un design moderne */
@@ -357,8 +365,8 @@
 
 /* Effet de survol et focus */
 .format-button:hover, .format-button:focus {
-    background-color: var(--color-neutral-600); /* Gris légèrement plus clair pour le survol */
-    color: var(--color-text-primary); /* Texte blanc pour améliorer le contraste au survol */
+    background-color: color-mix(in srgb, var(--color-action-primary) 35%, var(--color-surface-overlay) 65%);
+    color: var(--color-on-primary);
     transform: scale(1.05); /* Légère augmentation de taille pour un feedback visuel */
 }
 
@@ -392,9 +400,9 @@
     border-color: transparent !important;
 }
 #infoButton {
-    background-color: white; /* Fond blanc */
-    color: black; /* Icône noire */
-    border: none;
+    background: color-mix(in srgb, var(--color-action-primary) 15%, var(--color-surface-overlay) 85%);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-subtle);
     padding: 0.5em; /* Padding basé sur la taille de la police */
     width: 1.5em; /* Largeur du bouton basée sur la taille de la police */
     height: 1.5em; /* Hauteur du bouton basée sur la taille de la police */
@@ -404,13 +412,13 @@
     border-radius: 50%; /* Rond */
     font-size: 12px; /* Taille initiale de la police, ajustable */
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Ombre pour le relief */
+    box-shadow: 0 12px 24px rgba(8, 15, 35, 0.35); /* Ombre pour le relief */
     transition: background-color 0.3s, color 0.3s; /* Transition pour le survol */
 }
 
 #infoButton:hover {
-    background-color: color-mix(in srgb, var(--color-neutral-200) 80%, transparent); /* Changement de couleur au survol */
-    color: var(--color-neutral-800); /* Changement de la couleur de l'icône au survol */
+    background-color: color-mix(in srgb, var(--color-action-primary) 60%, var(--color-background) 40%); /* Changement de couleur au survol */
+    color: var(--color-on-primary); /* Changement de la couleur de l'icône au survol */
 }
 
 .intro {
@@ -429,15 +437,17 @@
 }
 
 .intro-content {
-    background: var(--color-neutral-800);
-    padding: 30px;
-    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-surface-card), color-mix(in srgb, var(--color-surface-card-alt) 55%, transparent));
+    padding: 32px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 28px 48px rgba(8, 15, 35, 0.45);
 }
 
 h1 {
     font-size: 28px;
     margin-bottom: 20px;
-	color: fff;
+        color: var(--color-text-primary);
 }
 
 p {
@@ -452,15 +462,16 @@ p {
 
 /* Style commun pour les boutons Ratio et Generate */
 button {
-    background-color: var(--color-neutral-700); /* Couleur de fond gris */
-    color: white; /* Texte blanc */
-    padding: 10px 20px; /* Ajout de padding pour agrandir les boutons */
-    border: none; /* Pas de bordure */
-    border-radius: 30px; /* Boutons arrondis */
+    background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
+    color: var(--color-text-primary);
+    padding: 10px 24px; /* Ajout de padding pour agrandir les boutons */
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 999px; /* Boutons arrondis */
     font-size: 16px; /* Taille de la police */
     cursor: pointer; /* Curseur de pointeur au survol */
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Transition douce */
+    transition: background 0.3s ease, transform 0.3s ease, color 0.3s ease; /* Transition douce */
     text-align: center; /* Centre le texte dans le bouton */
+    box-shadow: 0 14px 28px rgba(8, 15, 35, 0.35);
 }
 
 /* Alignement des boutons dans un conteneur centré */
@@ -473,14 +484,15 @@ button {
 
 /* Effet de survol pour les boutons */
 button:hover {
-    background-color: var(--color-neutral-600); /* Couleur plus claire au survol */
-    transform: scale(1.05); /* Légère augmentation de taille pour le feedback visuel */
+    background: color-mix(in srgb, var(--color-action-primary) 35%, var(--color-surface-overlay) 65%);
+    color: var(--color-on-primary);
+    transform: translateY(-2px);
 }
 
 /* Style pour la flèche du bouton Ratio */
 #arrow-icon {
     display: inline-block;
-    border: solid white;
+    border: solid var(--color-text-primary);
     border-width: 0 2px 2px 0;
     padding: 5px;
     margin-left: 10px;
@@ -508,27 +520,27 @@ button:hover {
 /* Style du bouton "Generate" */
 #validate-button {
     background-color: var(--color-action-primary); /* Couleur bleue */
-    color: white; /* Texte blanc */
-    padding: 10px 20px; /* Espace intérieur */
-    border: none; /* Pas de bordure */
-    border-radius: 30px; /* Coins arrondis */
+    color: var(--color-on-primary); /* Texte contrasté */
+    padding: 12px 26px; /* Espace intérieur */
+    border: 1px solid var(--color-border-strong); /* Bordure harmonisée */
+    border-radius: 999px; /* Coins arrondis */
     font-size: 16px; /* Taille de la police */
     cursor: pointer; /* Curseur de pointeur */
     transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Transitions fluides */
     min-width: 150px; /* Largeur minimale du bouton */
     text-align: center; /* Centrer le texte */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre pour donner du volume */
+    box-shadow: 0 18px 32px rgba(13, 110, 139, 0.35); /* Ombre pour donner du volume */
 }
 
 /* Effet de survol et de clic */
 #validate-button:hover {
-    background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-text-contrast) 30%); /* Couleur bleue plus foncée au survol */
+    background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-background) 30%); /* Couleur bleue plus foncée au survol */
     transform: translateY(-2px); /* Légère remontée pour l'effet de volume */
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Ombre plus forte au survol */
 }
 
 #validate-button:active {
-    background-color: color-mix(in srgb, var(--color-action-primary) 60%, var(--color-text-contrast) 40%); /* Couleur encore plus foncée lors du clic */
+    background-color: color-mix(in srgb, var(--color-action-primary) 60%, var(--color-background) 40%); /* Couleur encore plus foncée lors du clic */
     transform: translateY(0); /* Revenir à la position initiale au clic */
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Diminuer l'ombre lors du clic */
 }

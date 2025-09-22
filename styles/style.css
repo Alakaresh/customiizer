@@ -29,12 +29,12 @@
   --color-surface-elevated: #161b22;
   --color-surface-overlay: #1f252f;
   --color-surface-muted: #1b2430;
-  --color-surface-soft: #f6f6f6;
-  --color-surface-contrast: #ffffff;
+  --color-surface-soft: #1e2733;
+  --color-surface-contrast: #f8fafc;
   --color-surface-highlight: #ecfffa;
-  --color-surface-card: #1f1f1f;
-  --color-surface-card-alt: #2a2a2a;
-  --color-surface-dialog: #0b1f3b;
+  --color-surface-card: #141a24;
+  --color-surface-card-alt: #1b2432;
+  --color-surface-dialog: #13283f;
   --color-surface-placeholder: #1a2a48;
 
   /* Text tokens */
@@ -45,12 +45,12 @@
   --color-text-accent: var(--color-brand-500);
 
   /* Border tokens */
-  --color-border-subtle: var(--color-neutral-700);
-  --color-border-strong: var(--color-brand-700);
-  --color-border-contrast: rgba(255, 255, 255, 0.24);
-  --color-border-light: #d4d4d8;
-  --color-border-medium: #cfcfd4;
-  --color-border-muted-alt: #1e293b;
+  --color-border-subtle: rgba(148, 163, 184, 0.35);
+  --color-border-strong: color-mix(in srgb, var(--color-brand-500) 65%, transparent);
+  --color-border-contrast: rgba(255, 255, 255, 0.28);
+  --color-border-light: rgba(148, 163, 184, 0.24);
+  --color-border-medium: rgba(148, 163, 184, 0.38);
+  --color-border-muted-alt: rgba(15, 23, 42, 0.45);
 
   /* Action tokens */
   --color-action-primary: var(--color-brand-500);
@@ -123,6 +123,12 @@
 body {
   font-family: 'Arial', sans-serif;
   color: var(--color-text);
+  background-color: var(--color-background);
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(90, 144, 160, 0.18), transparent 55%),
+    radial-gradient(circle at 80% -5%, rgba(32, 40, 54, 0.32), transparent 60%),
+    radial-gradient(circle at 50% 110%, rgba(59, 77, 99, 0.22), transparent 65%);
+  min-height: 100vh;
 }
 
 /* Ensure body and Astra container share the same background */
@@ -132,8 +138,68 @@ body,
 }
 
 h2.title {
-	font-size: 24px;
-	}
+        font-size: 24px;
+        }
+
+main,
+section,
+.site-content,
+.full-content,
+.wp-block-group {
+  background-color: transparent;
+  color: inherit;
+}
+
+.surface-card,
+.card-surface,
+.panel-surface,
+.wp-block-group.is-style-custom-surface {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 20px;
+  box-shadow: 0 24px 48px rgba(8, 15, 35, 0.45);
+  color: var(--color-text-primary);
+}
+
+.surface-card-alt {
+  background: var(--color-surface-card-alt);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 18px;
+  box-shadow: 0 18px 36px rgba(8, 15, 35, 0.35);
+  color: var(--color-text-primary);
+}
+
+input,
+textarea,
+select {
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  color: var(--color-text-primary);
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-action-primary);
+  box-shadow: 0 0 0 3px var(--color-ui-focus);
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: color-mix(in srgb, var(--color-surface-overlay) 70%, var(--color-border-muted-alt) 30%);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
 
 a {
   color: var(--color-primary);
@@ -147,15 +213,37 @@ a:hover {
 
 button,
 .button {
-  background-color: var(--color-primary);
-  color: var(--color-text);
-  border: none;
+  background: linear-gradient(135deg, var(--color-action-primary), color-mix(in srgb, var(--color-action-primary) 75%, var(--color-background) 25%));
+  color: var(--color-on-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
   cursor: pointer;
+  padding: 10px 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 24px rgba(13, 110, 139, 0.35);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover,
 .button:hover {
-  background-color: var(--color-secondary);
+  background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(13, 110, 139, 0.4);
+}
+
+button:active,
+.button:active {
+  transform: translateY(0);
+  background: linear-gradient(135deg, var(--color-action-primary-active), color-mix(in srgb, var(--color-action-primary-active) 60%, var(--color-background) 40%));
+  box-shadow: 0 8px 16px rgba(13, 110, 139, 0.32);
+}
+
+button:disabled,
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 /* Surcharge des styles de WooCommerce pour les images dans le panier */
@@ -167,17 +255,17 @@ button:hover,
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: var(--color-background);
-    color: var(--color-text);
-    padding: 10px 15px;
-    border: 2px solid var(--color-primary);
+    background: linear-gradient(135deg, var(--color-surface-overlay), color-mix(in srgb, var(--color-surface-card) 65%, transparent));
+    color: var(--color-text-primary);
+    padding: 12px 18px;
+    border: 1px solid var(--color-border-strong);
     border-radius: 20px;
     font-family: 'Cinzel', serif;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 18px 36px rgba(8, 15, 35, 0.45);
     display: none;
     z-index: 1000;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 #mission-achievement.show {
     display: flex;
