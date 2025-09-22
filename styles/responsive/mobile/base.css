@@ -1,55 +1,17 @@
 @media screen and (max-width: 1024px) {
 
 	/*==========HEADER==========*/
-	.header-content {
-		padding: 0 0;
-	}
-
-	.mobile-menu-toggle {
-		display: flex !important;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		color: white;
-		font-size: 24px;
-		margin-top: 10px;
-	}
-
-       .mobile-menu {
-               display: none;
-               top: 55px;
-               position: absolute;
-               flex-direction: column;
-               background-color: var(--color-surface-muted);
-               padding: 10px 0;
-               border-radius: 6px;
-               gap: 10px;
-               margin-top: 10px;
-               z-index: 1000;
-               opacity: 0;
-               transform: translateY(-10px);
-               transition: opacity 0.3s ease, transform 0.3s ease;
-       }
-
-       .mobile-menu.active {
-               display: flex !important;
-               opacity: 1;
-               transform: translateY(0);
-       }
-
-	.menu-container {
-		display: none;
-	}
-
-        .cart-container .cart-text,
-        .login-register-container .login-text {
-                display: none !important;
+        .mobile-menu-toggle {
+                display: inline-flex !important;
         }
 
-        /* Adjust cart badge position on smaller screens */
+        .mobile-menu {
+                display: flex;
+        }
+
         .cart-count {
-                top: -8px;
-                right: 8px;
+                top: -4px;
+                right: -4px;
         }
 
 	/*==========FOOTER==========*/

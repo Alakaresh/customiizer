@@ -50,10 +50,24 @@ if ( $user_logged_in ) {
                         const toggle = document.querySelector('.mobile-menu-toggle');
                         const menu = document.querySelector('.mobile-menu');
                         if (toggle && menu) {
+                                const setMenuState = (isOpen) => {
+                                        toggle.setAttribute('aria-expanded', isOpen.toString());
+                                        toggle.classList.toggle('is-open', isOpen);
+                                        menu.classList.toggle('is-open', isOpen);
+                                        menu.setAttribute('aria-hidden', (!isOpen).toString());
+                                };
+
+                                setMenuState(false);
+
                                 toggle.addEventListener('click', function () {
                                         const expanded = toggle.getAttribute('aria-expanded') === 'true';
-                                        toggle.setAttribute('aria-expanded', (!expanded).toString());
-                                        menu.classList.toggle('active');
+                                        setMenuState(!expanded);
+                                });
+
+                                menu.addEventListener('click', function (event) {
+                                        if (event.target.closest('a')) {
+                                                setMenuState(false);
+                                        }
                                 });
                         }
                 });
