@@ -9,8 +9,8 @@
 </div>
 -->
 
-<div class="content-images" id="content-images">
-	<div class="loading-container hide">
+<div class="content-images studio-panel studio-panel--preview" id="content-images" aria-live="polite">
+        <div class="loading-container hide">
     <div class="loading-bar-border">
         <div class="loading-bar" id="loading-bar">
             <!-- Ajout du texte de pourcentage à l'intérieur de la barre -->
@@ -20,10 +20,10 @@
 </div>
 
 
-	<div id="image-grid" class="image-grid">
-		<img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0">
-		<img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1">
-		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 2">
-		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 3">
-	</div>
+        <div id="image-grid" class="image-grid" role="list">
+                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image générée 1" role="listitem">
+                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image générée 2" role="listitem">
+                <img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image générée 3" role="listitem">
+                <img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image générée 4" role="listitem">
+        </div>
 </div>
