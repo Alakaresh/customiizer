@@ -44,20 +44,12 @@
   color: var(--home-body-text);
 }
 
-.home-section {
+#site-content.home-page > section {
   position: relative;
   width: 100%;
-  z-index: 1;
-}
-
-.home-section__inner {
-  width: 100%;
   padding-inline: clamp(18px, 6vw, 120px);
-}
-
-.home-section__inner > .surface-card,
-.home-section__inner > section.surface-card {
-  width: 100%;
+  box-sizing: border-box;
+  z-index: 1;
 }
 
 .surface-card {
@@ -160,13 +152,11 @@
 }
 
 /* Hero */
-.home-experience {
-  display: block;
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 4vw, 56px);
   padding: clamp(36px, 5vw, 64px);
-}
-
-.home-experience > * + * {
-  margin-top: clamp(36px, 4vw, 56px);
 }
 
 .home-hero__content {
@@ -303,13 +293,7 @@
 }
 
 /* Immersive experience */
-.home-experience__panorama {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(32px, 5vw, 52px);
-}
-
-.home-experience__header {
+.home-experience__intro {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -332,12 +316,6 @@
   color: var(--home-muted-text);
   font-size: 1.05rem;
   line-height: 1.7;
-}
-
-.home-experience__grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: clamp(20px, 3.5vw, 32px);
 }
 
 .home-panel {

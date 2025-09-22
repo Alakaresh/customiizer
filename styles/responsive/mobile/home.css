@@ -5,7 +5,7 @@
     padding: 88px 0 96px;
   }
 
-  .home-section__inner {
+  #site-content.home-page > section {
     padding-inline: clamp(18px, 8vw, 32px);
   }
 
@@ -57,17 +57,9 @@
   }
 
   /* Experience */
-  .home-experience {
+  .home-hero {
     padding: 32px 24px 40px;
-  }
-
-  .home-experience > * + * {
-    margin-top: 32px;
-  }
-
-  .home-experience__grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 32px;
   }
 
   .home-panel {
