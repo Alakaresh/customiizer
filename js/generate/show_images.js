@@ -95,9 +95,9 @@ function shuffleArray(array) {
 function displayImagesForCurrentUser() {
 	var mainContent = jQuery('#user_images');
 	mainContent.empty(); // Nettoyer le contenu précédent
-	var currentUserImages = allImages.filter(function(image) {
-		return image.user_id == currentUser.ID; // ✅ correction ici
-	});
+        var currentUserImages = allImages.filter(function(image) {
+                return image.user_id == currentUser.ID; // ✅ correction ici
+        });
 
 
 	if (currentUserImages.length === 0) {
@@ -113,16 +113,20 @@ function displayImagesForCurrentUser() {
                             : (image.prompt || '');
 
                         var imgElement = jQuery('<img>')
-                        .attr('src', image.image_url)
-                        .attr('alt', 'Image ' + image.image_number)
-                        .attr('data-display_name', image.display_name || '')
-                        .attr('data-user-logo', image.user_logo || '')
-                        .attr('data-user-id', image.user_id || '')
-                        .attr('data-format-image', image.format || '')
-                        .attr('data-prompt', promptText)
-                        .addClass('preview-enlarge');
+                                .attr('src', image.image_url)
+                                .attr('alt', 'Image ' + image.image_number)
+                                .attr('data-display_name', image.display_name || '')
+                                .attr('data-user-logo', image.user_logo || '')
+                                .attr('data-user-id', image.user_id || '')
+                                .attr('data-format-image', image.format || '')
+                                .attr('data-prompt', promptText)
+                                .addClass('preview-enlarge');
 
-			mainContent.append(imgElement);
-		});
-	}
+                        var wrapper = jQuery('<div>')
+                                .addClass('user-image-wrapper')
+                                .append(imgElement);
+
+                        mainContent.append(wrapper);
+                });
+        }
 }

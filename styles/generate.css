@@ -47,8 +47,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    aspect-ratio: 1 / 1; /* Garantit un conteneur carré */
+    width: min(100%, calc((100dvh - 90px - 30px) / 2));
+    aspect-ratio: 1 / 1;
     overflow: hidden; /* Cache les parties de l'image qui débordent */
     background: linear-gradient(180deg, rgba(26, 26, 26, 0.92) 0%, rgba(17, 17, 17, 0.94) 100%);
     border-radius: 24px;
@@ -57,9 +57,11 @@
     padding: 16px;
     box-sizing: border-box;
     position: relative;
+    margin: 0 auto;
 }
 
 .centered-image {
+
     width: min(100%, 520px);
     aspect-ratio: 1 / 1;
     height: auto;
@@ -70,6 +72,7 @@
     box-shadow: 0 28px 44px rgba(0, 0, 0, 0.55);
     padding: 16px;
     box-sizing: border-box;
+
 }
 
 .image-grid img {
