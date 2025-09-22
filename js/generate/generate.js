@@ -230,23 +230,29 @@ jQuery(function($) {
                                         const $newImage = $('<img>')
                                         .attr('src', displayedUrl)
                                         .attr('alt', 'Image générée')
-					.attr('data-display_name', currentUser.display_name || '')
-					.attr('data-user-logo', currentUser.user_logo || '')
-					.attr('data-user-id', currentUser.ID || '')
-					.attr('data-format-image', selectedRatio || '')
-					.attr('data-prompt', promptText)
-					.addClass('centered-image preview-enlarge');
+                                        .attr('data-display_name', currentUser.display_name || '')
+                                        .attr('data-user-logo', currentUser.user_logo || '')
+                                        .attr('data-user-id', currentUser.ID || '')
+                                        .attr('data-format-image', selectedRatio || '')
+                                        .attr('data-prompt', promptText)
+                                        .addClass('centered-image preview-enlarge');
 
-					$container.append($newImage);
-					$('#image-grid').hide();
-					console.log(`${LOG_PREFIX} Image intermédiaire affichée`, { displayedUrl });
-				} else {
-					$container.append(`
-					<img src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png"
-					        alt="En cours..."
-					        class="centered-image">`);
-					$('#image-grid').hide();
-				}
+                                        $container.append($newImage);
+                                        if (typeof adjustImageHeight === 'function') {
+                                                adjustImageHeight();
+                                        }
+                                        $('#image-grid').hide();
+                                        console.log(`${LOG_PREFIX} Image intermédiaire affichée`, { displayedUrl });
+                                } else {
+                                        $container.append(`
+                                        <img src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png"
+                                                alt="En cours..."
+                                                class="centered-image">`);
+                                        if (typeof adjustImageHeight === 'function') {
+                                                adjustImageHeight();
+                                        }
+                                        $('#image-grid').hide();
+                                }
 
 // 💡 Mise à jour de la barre de chargement
 				if (statusData.progress > 0) {

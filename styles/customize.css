@@ -1,6 +1,8 @@
 #customize-main {
     display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
     flex-grow: 1;
+    height: calc(100dvh - var(--header-height, 88px));
+    min-height: calc(100dvh - var(--header-height, 88px));
     color: #f5f7f4;
     font-family: 'Inter', 'Arial', sans-serif;
     background: linear-gradient(160deg, #111111 0%, #131313 50%, #1a1a1a 100%);
@@ -8,7 +10,7 @@
 
 .sidebar {
     flex: 0 0 auto;
-    height: calc(100dvh - 65px);
+    height: calc(100dvh - var(--header-height, 88px));
     display: flex;
     flex-direction: column; /* Organise les enfants (header, content, footer) verticalement */
     background: #141414;
@@ -31,7 +33,7 @@
     width: 360px;
     background: #151515;
     flex: none; /* Empêche la sidebar de s'ajuster ou de se redimensionner */
-    max-height: calc(100dvh - 65px);
+    max-height: calc(100dvh - var(--header-height, 88px));
     border-right: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 28px 0 0 28px;
 }
@@ -51,6 +53,10 @@
     align-items: stretch;
     justify-content: center;
     overflow-y: auto;
+}
+
+#customize-main > #content {
+    height: 100%;
 }
 
 #sidebar-header,

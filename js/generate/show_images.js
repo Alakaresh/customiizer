@@ -31,44 +31,58 @@ function loadImages() {
 }
 
 function displayImages() {
-	var container = jQuery('#content-images .image-grid');
-	container.empty(); // Nettoyer la grille avant d'ajouter de nouvelles images
+        var container = jQuery('#content-images .image-grid');
+        container.empty(); // Nettoyer la grille avant d'ajouter de nouvelles images
 
-	var filteredImages = allImages.filter(function(image) {
-		return image.format === selectedRatio; // Filtrer les images selon le ratio global
-	});
-	if (filteredImages.length === 0) {		for (var i = 0; i < 4; i++) {
-			var imgElement = jQuery('<img>')
-			.attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
-			.attr('alt', 'Image d\'attente ' + i)
-			.addClass(i < 2 ? 'top' : 'bottom');
-			var imgContainer = jQuery('<div>').addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
-			.append(imgElement);
-			container.append(imgContainer);
-		}
-	} else {		shuffleArray(filteredImages);
+        var filteredImages = allImages.filter(function(image) {
+                return image.format === selectedRatio; // Filtrer les images selon le ratio global
+        });
 
-		filteredImages.slice(0, 4).forEach(function(image, index) {                        const promptText = typeof image.prompt === 'object'
-                            ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
-                            : (image.prompt || '');
+        if (filteredImages.length === 0) {
+                for (var i = 0; i < 4; i++) {
+                        var imgElement = jQuery('<img>')
+                                .attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
+                                .attr('alt', 'Image d\'attente ' + i)
+                                .addClass(i < 2 ? 'top' : 'bottom');
+
+                        var imgContainer = jQuery('<div>')
+                                .addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
+                                .append(imgElement);
+
+                        container.append(imgContainer);
+                }
+        } else {
+                shuffleArray(filteredImages);
+
+                filteredImages.slice(0, 4).forEach(function(image, index) {
+                        const promptText = typeof image.prompt === 'object'
+                                ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+                                : (image.prompt || '');
 
                         var imgElement = jQuery('<img>')
-                        .attr('src', image.image_url)
-                        .attr('alt', 'Image ' + image.image_number)
-                        .attr('data-display_name', image.display_name || '')
-                        .attr('data-user-logo', image.user_logo || '')
-                        .attr('data-user-id', image.user_id || '')
-                        .attr('data-format-image', image.format || '')
-                        .attr('data-prompt', promptText)
-                        .addClass('preview-enlarge')
-                        .addClass(index < 2 ? 'top' : 'bottom');
+                                .attr('src', image.image_url)
+                                .attr('alt', 'Image ' + image.image_number)
+                                .attr('data-display_name', image.display_name || '')
+                                .attr('data-user-logo', image.user_logo || '')
+                                .attr('data-user-id', image.user_id || '')
+                                .attr('data-format-image', image.format || '')
+                                .attr('data-prompt', promptText)
+                                .addClass('preview-enlarge')
+                                .addClass(index < 2 ? 'top' : 'bottom');
 
-			var imgContainer = jQuery('<div>').addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
-			.append(imgElement);
-			container.append(imgContainer);
-		});
-	}
+                        var imgContainer = jQuery('<div>')
+                                .addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
+                                .append(imgElement);
+
+                        container.append(imgContainer);
+                });
+        }
+
+        if (typeof adjustImageHeight === 'function') {
+                adjustImageHeight();
+        }
 }
+
 
 
 function shuffleArray(array) {
