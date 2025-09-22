@@ -233,19 +233,37 @@
         z-index: 1;
 }
 .content-button {
-        display: inline-block;
-        background-color: var(--color-brand-300);
-        color: var(--color-text-contrast);
-        padding: 10px 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--color-action-primary), color-mix(in srgb, var(--color-action-primary) 75%, var(--color-background) 25%));
+        color: var(--color-on-primary);
+        padding: 10px 24px;
         margin-top: 10px;
-        border: none;
-        border-radius: 5px;
+        border: 1px solid var(--color-border-strong);
+        border-radius: 999px;
         cursor: pointer;
         font-size: 1em;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        box-shadow: 0 18px 32px rgba(47, 143, 99, 0.35);
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        text-decoration: none;
 }
 
-.content-button:hover {
-        background-color: var(--color-action-secondary-hover); /* Couleur de fond au survol */
+.content-button:hover,
+.content-button:focus-visible {
+        background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
+        color: var(--color-on-primary);
+        transform: translateY(-1px);
+        box-shadow: 0 22px 40px rgba(32, 112, 76, 0.38);
+        outline: none;
+}
+
+.content-button:active {
+        transform: translateY(0);
+        background: linear-gradient(135deg, var(--color-action-primary-active), color-mix(in srgb, var(--color-action-primary-active) 60%, var(--color-background) 40%));
+        box-shadow: 0 12px 24px rgba(32, 112, 76, 0.32);
 }
 
 .centered-content {
@@ -298,28 +316,47 @@
 .imageContainer:hover .overlay {
 	height: 30px;
 }
-/* Styles pour les boutons de pagination */
-.pagination-container button {
-        padding: 8px 12px;
-        margin: 0 4px;
-        border: 1px solid var(--color-border-subtle); /* Bordure pour contraste */
-        background-color: var(--color-surface-elevated); /* Fond sombre */
-        color: var(--color-text-primary); /* Texte clair pour contraste */
+#pagination-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+}
+
+#pagination-container button {
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: 1px solid var(--color-border-subtle);
+        background: linear-gradient(135deg, var(--color-surface-overlay), color-mix(in srgb, var(--color-surface-card-alt) 65%, transparent));
+        color: var(--color-text-primary);
         cursor: pointer;
-        transition: background-color 0.3s, color 0.3s; /* Effet de transition doux */
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        box-shadow: 0 14px 28px rgba(10, 24, 20, 0.35);
 }
 
-/* Survol des boutons de pagination */
-.pagination-container button:hover {
-        background-color: var(--color-border-muted-alt); /* Légèrement plus clair au survol pour un effet visuel */
-        border-color: var(--color-border-subtle);
+#pagination-container button:hover,
+#pagination-container button:focus-visible {
+        background: linear-gradient(135deg, var(--color-action-secondary-hover), color-mix(in srgb, var(--color-action-secondary-hover) 65%, var(--color-background) 35%));
+        color: var(--color-on-primary);
+        border-color: var(--color-border-strong);
+        transform: translateY(-1px);
+        box-shadow: 0 20px 36px rgba(32, 112, 76, 0.35);
+        outline: none;
 }
 
-/* Style pour le bouton de la page active */
-.pagination-container button.active {
-        background-color: var(--color-action-secondary); /* Accent pour la page active */
-        color: var(--color-surface-canvas); /* Texte sombre pour le contraste */
-        border-color: var(--color-feedback-warning); /* Bordure un peu plus foncée que le fond */
+#pagination-container button.active {
+        background: linear-gradient(135deg, var(--color-action-secondary), color-mix(in srgb, var(--color-action-secondary) 65%, var(--color-background) 35%));
+        color: var(--color-on-primary);
+        border-color: var(--color-border-strong);
+        box-shadow: 0 22px 42px rgba(32, 112, 76, 0.4);
+}
+
+#pagination-container button:active {
+        transform: translateY(0);
+        box-shadow: 0 12px 24px rgba(16, 32, 24, 0.32);
 }
 .order-id {
         color: var(--color-action-secondary); /* Accent */
@@ -337,10 +374,18 @@
 }
 .tracking-link {
         color: var(--color-action-secondary);
-        text-decoration: underline !important; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
+        text-decoration: underline; /* Soulignez pour indiquer qu'il s'agit d'un lien cliquable */
 }
+
 .tracking-link:hover {
         color: var(--color-action-secondary-hover);
+}
+
+.tracking-number {
+        font-weight: 600;
+        color: inherit;
+        text-decoration: underline;
+        cursor: pointer;
 }
 /* Utilise les mêmes styles pour les deux formulaires */
 .form-container {
@@ -380,17 +425,31 @@
         width: 100%; /* Assure que l'input prend toute la largeur du form-group */
 }
 
-button {
-        padding: 10px 20px;
-        background-color: var(--color-action-secondary);
-        color: var(--color-on-secondary);
-        border: none;
-        border-radius: 4px;
+.form-container button {
+        padding: 12px 26px;
+        background: linear-gradient(135deg, var(--color-action-primary), color-mix(in srgb, var(--color-action-primary) 75%, var(--color-background) 25%));
+        color: var(--color-on-primary);
+        border: 1px solid var(--color-border-strong);
+        border-radius: 999px;
         cursor: pointer;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 18px 32px rgba(47, 143, 99, 0.35);
 }
 
-button:hover {
-        background-color: var(--color-action-secondary-hover);
+.form-container button:hover,
+.form-container button:focus-visible {
+        background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
+        transform: translateY(-1px);
+        box-shadow: 0 22px 40px rgba(32, 112, 76, 0.38);
+        outline: none;
+}
+
+.form-container button:active {
+        transform: translateY(0);
+        background: linear-gradient(135deg, var(--color-action-primary-active), color-mix(in srgb, var(--color-action-primary-active) 60%, var(--color-background) 40%));
+        box-shadow: 0 12px 24px rgba(32, 112, 76, 0.32);
 }
 /* Style pour le Modal */
 .add-payment-modal {
@@ -804,29 +863,45 @@ td.tracking-cell, td.invoice-cell {
         display: flex;
         flex-direction: column;
         margin-right: 20px;
+        gap: 12px;
 }
 
 #mission-categories .mission-category-item {
-        background-color: var(--color-background);
-        border: 2px solid var(--color-primary);
-        border-radius: 10px;
-        color: var(--color-text);
+        background: linear-gradient(135deg, color-mix(in srgb, var(--color-surface-overlay) 80%, transparent), color-mix(in srgb, var(--color-surface-card-alt) 70%, transparent));
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 16px;
+        color: var(--color-text-primary);
         font-family: 'Cinzel', serif;
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 12px;
         text-align: center;
         cursor: pointer;
-        box-shadow: 0 0 10px rgba(0,0,0,0.6);
+        box-shadow: 0 18px 32px rgba(10, 24, 20, 0.45);
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 #mission-categories .mission-category-item:hover {
-        background-color: var(--color-primary);
+        background: linear-gradient(135deg, var(--color-action-primary), color-mix(in srgb, var(--color-action-primary) 70%, var(--color-background) 30%));
+        color: var(--color-on-primary);
+        border-color: var(--color-border-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 22px 40px rgba(32, 112, 76, 0.38);
+}
+
+#mission-categories .mission-category-item:focus-visible {
+        outline: none;
+        background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
+        color: var(--color-on-primary);
+        border-color: var(--color-border-strong);
+        transform: translateY(-2px);
+        box-shadow: 0 0 0 2px var(--color-ui-focus), 0 24px 44px rgba(32, 112, 76, 0.4);
 }
 
 #mission-categories .mission-category-item.active {
-        background-color: var(--color-secondary);
-        box-shadow: 0 0 20px rgba(0,0,0,0.6);
-        border-color: var(--color-secondary);
+        background: linear-gradient(135deg, var(--color-action-secondary), color-mix(in srgb, var(--color-action-secondary) 70%, var(--color-background) 30%));
+        border-color: var(--color-border-strong);
+        color: var(--color-on-primary);
+        box-shadow: 0 26px 48px rgba(32, 112, 76, 0.42);
+        transform: translateY(-2px);
 }
 
 .missions-list {
