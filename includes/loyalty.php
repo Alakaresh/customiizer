@@ -228,27 +228,43 @@ function customiizer_get_referral_link( $user_id = 0 ) {
 }
 
 /**
- * Output the loyalty popup widget.
+ * Return a summary of the loyalty advantages available to a user.
+ *
+ * @param int $user_id Optional user ID.
+ * @return array {
+ *     @type int    $points         Current loyalty balance.
+ *     @type int    $mission_points Total points earned thanks to missions.
+ *     @type int    $referrals      Number of validated referrals.
+ *     @type string $referral_link  Personal referral link.
+ * }
  */
-add_action( 'wp_footer', 'customiizer_loyalty_widget' );
-function customiizer_loyalty_widget() {
-    $logged_in = is_user_logged_in();
+function customiizer_get_user_advantages_summary( $user_id = 0 ) {
+    $user_id = $user_id ? intval( $user_id ) : get_current_user_id();
 
-    if ( $logged_in ) {
-        $points    = customiizer_get_loyalty_points();
-        $referrals = customiizer_get_referral_count();
-        $link      = customiizer_get_referral_link();
-        $missions  = customiizer_get_missions();
-    } else {
-        $points    = 0;
-        $referrals = 0;
-        $link      = '';
-        $missions  = array();
+    if ( $user_id <= 0 ) {
+        return array(
+            'points'         => 0,
+            'mission_points' => 0,
+            'referrals'      => 0,
+            'referral_link'  => '',
+        );
     }
 
-    $template = get_stylesheet_directory() . '/templates/loyalty/widget.php';
-    if ( file_exists( $template ) ) {
-        include $template;
-    }
+    $summary = array(
+        'points'         => customiizer_get_loyalty_points( $user_id ),
+        'mission_points' => function_exists( 'customiizer_get_total_mission_points' )
+            ? customiizer_get_total_mission_points( $user_id )
+            : 0,
+        'referrals'      => customiizer_get_referral_count( $user_id ),
+        'referral_link'  => customiizer_get_referral_link( $user_id ),
+    );
+
+    /**
+     * Filter the loyalty advantages summary displayed in the header and exposed to JS.
+     *
+     * @param array $summary Current summary data.
+     * @param int   $user_id User identifier.
+     */
+    return apply_filters( 'customiizer_user_advantages_summary', $summary, $user_id );
 }
 

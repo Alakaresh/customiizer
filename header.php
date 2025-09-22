@@ -12,6 +12,47 @@ $user_logged_in = is_user_logged_in();
 $user_id        = $current_user->ID;
 $user_nicename  = $current_user->user_nicename;
 $display_name   = $current_user->display_name;
+$advantages     = array(
+        'points'         => 0,
+        'mission_points' => 0,
+        'referrals'      => 0,
+        'referral_link'  => '',
+);
+
+if ( $user_logged_in && function_exists( 'customiizer_get_user_advantages_summary' ) ) {
+        $advantages = customiizer_get_user_advantages_summary( $user_id );
+}
+
+$advantages_json = wp_json_encode( $advantages );
+if ( false === $advantages_json ) {
+        $advantages_json = '{}';
+}
+
+$loyalty_title_parts = array(
+        sprintf(
+                /* translators: %s: formatted number of loyalty points */
+                esc_html__( 'Custompoints : %s', 'customiizer' ),
+                number_format_i18n( intval( $advantages['points'] ) )
+        ),
+);
+
+if ( ! empty( $advantages['mission_points'] ) ) {
+        $loyalty_title_parts[] = sprintf(
+                /* translators: %s: formatted number of points earned via missions */
+                esc_html__( 'Points missions : %s', 'customiizer' ),
+                number_format_i18n( intval( $advantages['mission_points'] ) )
+        );
+}
+
+if ( ! empty( $advantages['referrals'] ) ) {
+        $loyalty_title_parts[] = sprintf(
+                /* translators: %s: formatted number of referrals */
+                esc_html__( 'Parrainages validés : %s', 'customiizer' ),
+                number_format_i18n( intval( $advantages['referrals'] ) )
+        );
+}
+
+$loyalty_title = implode( ' • ', array_filter( $loyalty_title_parts ) );
 ?>
 
 <!DOCTYPE html>
@@ -82,6 +123,33 @@ $display_name   = $current_user->display_name;
                 </a>
         </div>
         <?php endif; ?>
+        <a class="loyalty-header-container" href="<?php echo esc_url( home_url( '/compte?tab=loyalty' ) ); ?>" data-advantages="<?php echo esc_attr( $advantages_json ); ?>" title="<?php echo esc_attr( $loyalty_title ); ?>">
+                <span class="loyalty-header-label"><?php echo esc_html__( 'Mes avantages', 'customiizer' ); ?></span>
+                <span class="loyalty-header-points">
+                        <span class="loyalty-header-balance"><?php echo esc_html( number_format_i18n( intval( $advantages['points'] ) ) ); ?></span>
+                        <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="<?php echo esc_attr__( 'Custompoints', 'customiizer' ); ?>">
+                </span>
+                <?php if ( ! empty( $advantages['mission_points'] ) ) : ?>
+                        <?php
+                        $mission_text = sprintf(
+                                /* translators: %s: number of mission points */
+                                esc_html__( '%s pts missions', 'customiizer' ),
+                                number_format_i18n( intval( $advantages['mission_points'] ) )
+                        );
+                        ?>
+                        <span class="loyalty-header-meta"><?php echo esc_html( $mission_text ); ?></span>
+                <?php endif; ?>
+                <?php if ( ! empty( $advantages['referrals'] ) ) : ?>
+                        <?php
+                        $referral_text = sprintf(
+                                /* translators: 1: number of referrals */
+                                _n( '%s parrainage validé', '%s parrainages validés', intval( $advantages['referrals'] ), 'customiizer' ),
+                                number_format_i18n( intval( $advantages['referrals'] ) )
+                        );
+                        ?>
+                        <span class="loyalty-header-meta"><?php echo esc_html( $referral_text ); ?></span>
+                <?php endif; ?>
+        </a>
         <div class="profile-container">
                 <a id="profileLink" class="icon-button">
                         <img src="<?php echo esc_url($profile_image_url); ?>" alt="Profile Image" class="user-profile-image">
