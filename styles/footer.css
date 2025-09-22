@@ -30,7 +30,7 @@
 }
 
 .footer-link:hover {
-    color: var(--color-action-primary); /* Blue color on hover */
+    color: var(--color-action-primary); /* Accent survol */
 }
 
 /* Social icons styling */
@@ -52,7 +52,7 @@
 }
 
 .social-icon .fa-facebook-f {
-    color: var(--color-social-facebook); /* Facebook Blue */
+    color: var(--color-social-facebook); /* Couleur officielle Facebook */
 }
 
 .social-icon .fa-instagram {

@@ -59,13 +59,13 @@
     border-radius: 999px;
     cursor: pointer;
     font-size: 16px;
-    box-shadow: 0 16px 32px rgba(13, 110, 139, 0.35);
+    box-shadow: 0 16px 32px color-mix(in srgb, var(--color-action-primary) 35%, transparent);
     transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .action-button:hover {
     background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
-    box-shadow: 0 20px 38px rgba(13, 110, 139, 0.4);
+    box-shadow: 0 20px 38px color-mix(in srgb, var(--color-action-primary) 40%, transparent);
     transform: translateY(-2px);
 }
 

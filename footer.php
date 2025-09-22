@@ -19,7 +19,7 @@ if ( $user_logged_in ) {
 ?>
         </div>
         <footer>
-                <!-- Blue Band with Centered Links and Right-Aligned Social Icons -->
+                <!-- Bande accentuée avec liens centrés et icônes sociales alignées à droite -->
                 <div class="upper-band">
                         <!-- Centered Links -->
                         <div class="footer-links-container">

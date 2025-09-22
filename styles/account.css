@@ -452,11 +452,11 @@ button:hover {
 .image-placeholder {
         width: 100%;
         min-height: 180px;
-        background-color: var(--color-surface-placeholder); /* ✅ bleu foncé/gris */
+        background-color: var(--color-surface-placeholder); /* ✅ vert/gris profond */
         display: flex;
         justify-content: center;
         align-items: center;
-	border-radius: 10px;
+        border-radius: 10px;
 }
 
 
