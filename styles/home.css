@@ -160,16 +160,10 @@
 }
 
 /* Hero */
-.intro-section {
-  position: relative;
+.home-experience {
   display: flex;
-  justify-content: center;
-  padding: clamp(12px, 3vw, 28px);
-  isolation: isolate;
-}
-
-.home-hero.surface-card {
-  padding: clamp(24px, 4vw, 52px);
+  flex-direction: column;
+  gap: clamp(36px, 4vw, 56px);
 }
 
 .home-hero__content {
@@ -305,8 +299,8 @@
   color: rgba(26, 188, 156, 0.7);
 }
 
-/* Immersive panorama */
-.home-panorama.surface-card {
+/* Immersive experience */
+.home-experience.surface-card {
   padding: clamp(36px, 5vw, 64px);
   border-radius: 40px;
   background: var(--home-surface-background);
@@ -314,13 +308,13 @@
   box-shadow: var(--home-surface-shadow);
 }
 
-.home-panorama {
+.home-experience__panorama {
   display: flex;
   flex-direction: column;
   gap: clamp(32px, 5vw, 52px);
 }
 
-.home-panorama__header {
+.home-experience__header {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -330,7 +324,7 @@
   margin: 0 auto;
 }
 
-.home-panorama__title {
+.home-experience__title {
   margin: 0;
   color: var(--home-heading-text);
   font-size: clamp(2rem, 4vw, 2.8rem);
@@ -338,14 +332,14 @@
   letter-spacing: 0.02em;
 }
 
-.home-panorama__description {
+.home-experience__description {
   margin: 0;
   color: var(--home-muted-text);
   font-size: 1.05rem;
   line-height: 1.7;
 }
 
-.home-panorama__grid {
+.home-experience__grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: clamp(20px, 3.5vw, 32px);
