@@ -167,6 +167,49 @@ function customiizer_get_missions( $user_id = 0 ) {
     );
     $rows = $wpdb->get_results( $sql, ARRAY_A );
 
+    if ( empty( $rows ) ) {
+        return array();
+    }
+
+    $deduped = array();
+    foreach ( $rows as $row ) {
+        $mission_id = intval( $row['mission_id'] ?? 0 );
+        if ( $mission_id <= 0 ) {
+            continue;
+        }
+
+        if ( ! isset( $deduped[ $mission_id ] ) ) {
+            $deduped[ $mission_id ] = $row;
+            continue;
+        }
+
+        $existing           = $deduped[ $mission_id ];
+        $existing_progress  = isset( $existing['user_progress'] ) ? intval( $existing['user_progress'] ) : 0;
+        $row_progress       = isset( $row['user_progress'] ) ? intval( $row['user_progress'] ) : 0;
+        $existing_total     = isset( $existing['action_total'] ) ? intval( $existing['action_total'] ) : 0;
+        $row_total          = isset( $row['action_total'] ) ? intval( $row['action_total'] ) : 0;
+        $existing_completed = $existing['completed_at'] ?? '';
+        $row_completed      = $row['completed_at'] ?? '';
+
+        if ( $row_progress > $existing_progress ) {
+            $existing['user_progress'] = $row['user_progress'];
+        }
+
+        if ( $row_total > $existing_total ) {
+            $existing['action_total'] = $row['action_total'];
+        }
+
+        if ( empty( $existing_completed ) && ! empty( $row_completed ) ) {
+            $existing['completed_at'] = $row_completed;
+        } elseif ( ! empty( $row_completed ) && ! empty( $existing_completed ) && strtotime( $row_completed ) < strtotime( $existing_completed ) ) {
+            $existing['completed_at'] = $row_completed;
+        }
+
+        $deduped[ $mission_id ] = $existing;
+    }
+
+    $rows = array_values( $deduped );
+
     foreach ( $rows as &$r ) {
         $progress = isset( $r['user_progress'] ) ? intval( $r['user_progress'] ) : 0;
         if ( 0 === $progress && isset( $r['action_total'] ) ) {
@@ -178,6 +221,8 @@ function customiizer_get_missions( $user_id = 0 ) {
         $r['progress'] = $progress;
         unset( $r['user_progress'], $r['action_total'] );
     }
+
+    unset( $r );
 
     return $rows;
 }
