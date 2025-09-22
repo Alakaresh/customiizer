@@ -39,8 +39,6 @@ $dropdown_aria_labelledby = $is_user_logged_in ? ' aria-labelledby="profileLink"
                                         <img src="<?php echo esc_url( $profile_image_url ); ?>" alt="" class="user-dropdown__avatar-image">
                                 <?php elseif ( ! empty( $name_initial ) ) : ?>
                                         <span class="user-dropdown__avatar-initial"><?php echo esc_html( $name_initial ); ?></span>
-                                <?php else : ?>
-                                        <i class="fas fa-user"></i>
                                 <?php endif; ?>
                         </div>
                         <div class="user-dropdown__identity">
