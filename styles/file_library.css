@@ -1,9 +1,9 @@
 /* Palette sombre */
 :root {
-    --bg-color: #2b2b2b;
-    --border-color: #555555;
-    --text-color: #f0f0f0;
-    --accent-color: #777777;
+    --bg-color: var(--color-surface-card-alt);
+    --border-color: var(--color-neutral-600);
+    --text-color: color-mix(in srgb, var(--color-neutral-200) 70%, transparent);
+    --accent-color: var(--color-neutral-500);
 }
 
 /* Conteneur général de la modal */
@@ -340,13 +340,13 @@
 }
 
 .file-library-empty-primary {
-    background: #ffffff;
-    color: #1f1f1f;
+    background: var(--color-surface-contrast);
+    color: var(--color-surface-card);
     border: none;
 }
 
 .file-library-empty-primary:hover {
-    background: #e6e6e6;
+    background: color-mix(in srgb, var(--color-neutral-200) 80%, transparent);
 }
 
 .file-library-empty-secondary {

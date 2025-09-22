@@ -20,7 +20,7 @@
                top: 55px;
                position: absolute;
                flex-direction: column;
-               background-color: #111;
+               background-color: var(--color-surface-muted);
                padding: 10px 0;
                border-radius: 6px;
                gap: 10px;
@@ -116,7 +116,7 @@
 		font-size: 14px;
 		line-height: 1.4;
 		padding: 8px;
-		background-color: #333;
+		background-color: var(--color-neutral-800);
 		border-radius: 5px;
 	}
 	.prompt-text::-webkit-scrollbar {

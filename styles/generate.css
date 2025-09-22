@@ -10,7 +10,7 @@
 }
 
 .content {
-    background-color: #666;
+    background-color: var(--color-neutral-600);
     padding: 10px;
     display: flex;
     align-items: center;
@@ -25,9 +25,9 @@
 
 #additional-options {
     flex-grow: 1;
-	width: 100%;
-	background: #222222;
-	overflow: auto;
+        width: 100%;
+        background: var(--color-surface-card-alt);
+        overflow: auto;
 }
 
 .options-container {
@@ -80,12 +80,12 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    border: 1px solid #ccc; /* Ajoute une bordure pour la délimitation */
+    border: 1px solid var(--color-border-light); /* Ajoute une bordure pour la délimitation */
 	border-radius: 5px;
-    background-color: #fff; /* Fond blanc */
+    background-color: var(--color-text-primary); /* Fond blanc */
     font-size: 16px; /* Taille de police réduite */
 	padding: 5px; /* Ajoute une marge de 5px à gauche du texte */
-	color: #000; /* Texte noir */
+	color: var(--color-text-contrast); /* Texte noir */
 	line-height: 1; /* Réduit l'espace entre les lignes */
 }
 
@@ -97,7 +97,7 @@
     transform: translateX(-50%);
     width: 20px;
     height: 5px;
-    background-color: #ccc;
+    background-color: var(--color-border-light);
     cursor: ns-resize;
 }
 
@@ -105,7 +105,7 @@
     position: absolute;
 	left: 5px; /* Ajoute une marge de 5px à gauche du texte */
 	font-size: 16px; /* Taille de police réduite */
-    color: #888; /* Couleur du texte de l'indication */
+    color: var(--color-neutral-500); /* Couleur du texte de l'indication */
     pointer-events: none; /* Ignorer les événements de souris sur le texte d'indication */
 }
 
@@ -116,7 +116,7 @@
     font-family: 'Poppins', sans-serif; /* Utilisation d'une police proche */
     font-size: 12px; /* Taille plus petite */
     font-weight: bold; /* Mettre en gras */
-    color: #e0e0e0; /* Couleur gris clair */
+    color: var(--color-neutral-200); /* Couleur gris clair */
 }
 
 
@@ -125,7 +125,7 @@
 	font-size: 14px; /* Réduit la taille de la police */
     cursor: pointer;
     border-radius: 50%; /* Met le point d'interrogation dans un cercle */
-    background-color: #ccc; /* Couleur de fond pour le cercle */
+    background-color: var(--color-border-light); /* Couleur de fond pour le cercle */
     width: 15px; /* Réduit la taille du cercle */
     height: 15px; /* Réduit la taille du cercle */
     display: flex;
@@ -165,7 +165,7 @@
 }
 
 .product-item.selected {
-	border: 2px solid #888;
+	border: 2px solid var(--color-neutral-500);
 	border-radius: 4px;
 	background-color: rgba(255, 255, 255, 0.05);
 	box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
@@ -179,7 +179,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-	border: 1px solid #ccc; /* Bordure autour de chaque produit */
+	border: 1px solid var(--color-border-light); /* Bordure autour de chaque produit */
 	border-radius: 10px;
 }
 
@@ -221,8 +221,8 @@
 #selected-info {
     padding: 10px 20px;
     border: none;
-    background-color: #ddd;
-    color: #333;
+    background-color: var(--color-border-medium);
+    color: var(--color-neutral-800);
 }
 
 /* Style supplémentaire pour les images pour assurer l'uniformité */
@@ -244,8 +244,8 @@
 }
 
 .modal-content {
-  background-color: #333;
-  color: #fff;
+  background-color: var(--color-neutral-800);
+  color: var(--color-text-primary);
  text-align: left; 
 }
 
@@ -258,7 +258,7 @@
     margin-bottom: 15px; /* Réduire l'écart entre les paragraphes */
     font-size: 16px; /* Réduire la taille de la police du paragraphe */
     line-height: 1.2; /* Ajuster l'écart entre les lignes */
-	color: #fff;
+	color: var(--color-text-primary);
 }
 
 .modal-footer {
@@ -266,7 +266,7 @@
 }
 
 .ok-button {
-    background-color: #007BFF;
+    background-color: var(--color-action-primary);
     border: none;
     color: white;
     padding: 8px 12px; /* Réduire la marge interne du bouton */
@@ -277,7 +277,7 @@
 }
 
 .ok-button:hover {
-  background-color: #0056b3;
+  background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-text-contrast) 30%);
 }
 
 .content-images {
@@ -305,8 +305,8 @@
 .loading-bar-border {
     width: 100%; 
     height: 30px;
-    border: 3px solid #3498db;
-    background-color: #222;
+    border: 3px solid color-mix(in srgb, var(--color-action-primary) 80%, var(--color-surface-contrast) 20%);
+    background-color: var(--color-surface-card-alt);
     box-sizing: border-box;
     padding: 2px;
     display: flex;
@@ -317,7 +317,7 @@
 .loading-bar {
     width: 0%; 
     height: 100%;
-    background-color: #3498db;
+    background-color: color-mix(in srgb, var(--color-action-primary) 80%, var(--color-surface-contrast) 20%);
     transition: width 0.5s ease-in-out;
     display: flex;
     align-items: center;
@@ -336,16 +336,16 @@
 
 .section-title .title {
     font-size: 24px; /* Taille de police appropriée */
-    color: #e0e0e0; /* Gris clair pour une bonne visibilité sur le fond sombre */
+    color: var(--color-neutral-200); /* Gris clair pour une bonne visibilité sur le fond sombre */
     font-weight: bold; /* Police en gras pour accentuer le titre */
     text-align: center; /* Centre le texte */
     margin: 20px 0; /* Espacement vertical pour une bonne structuration */
 }
 
 .format-button {
-    background-color: #505050; /* Gris moyen pour le fond du bouton */
-    color: #f0f0f0; /* Gris très clair pour le texte, pour un contraste suffisant */
-    border: 1px solid #686868; /* Bordure légèrement plus claire que le fond du bouton */
+    background-color: var(--color-neutral-700); /* Gris moyen pour le fond du bouton */
+    color: color-mix(in srgb, var(--color-neutral-200) 70%, transparent); /* Gris très clair pour le texte, pour un contraste suffisant */
+    border: 1px solid color-mix(in srgb, var(--color-neutral-600) 85%, var(--color-neutral-800) 15%); /* Bordure légèrement plus claire que le fond du bouton */
     padding: 10px 20px; /* Espacement interne un peu plus grand pour rendre le bouton plus large */
     font-size: 16px; /* Taille de la police */
     border-radius: 30px; /* Coins très arrondis pour un design moderne */
@@ -357,8 +357,8 @@
 
 /* Effet de survol et focus */
 .format-button:hover, .format-button:focus {
-    background-color: #707070; /* Gris légèrement plus clair pour le survol */
-    color: #ffffff; /* Texte blanc pour améliorer le contraste au survol */
+    background-color: var(--color-neutral-600); /* Gris légèrement plus clair pour le survol */
+    color: var(--color-text-primary); /* Texte blanc pour améliorer le contraste au survol */
     transform: scale(1.05); /* Légère augmentation de taille pour un feedback visuel */
 }
 
@@ -374,17 +374,17 @@
 }
 /* Couleur de fond du popover */
 .driver-popover {
-    background-color: #333 !important; /* Fond blanc */
+    background-color: var(--color-neutral-800) !important; /* Fond blanc */
 }
 
 /* Couleur du texte dans le popover */
 .driver-popover-title, .driver-popover-description {
-    color: #fff !important; /* Texte noir */
+    color: var(--color-surface-contrast) !important; /* Texte noir */
 }
 /* Cibler la flèche à droite avec alignement au début */
 .driver-popover-arrow.driver-popover-arrow-side-right.driver-popover-arrow-align-start::before {
     border-color: transparent !important; /* Assure-toi de rendre transparents tous les autres côtés de la bordure qui ne sont pas nécessaires */
-    border-right-color: #333 !important; /* Modifie cette couleur à #333 pour la flèche à droite */
+    border-right-color: var(--color-neutral-800) !important; /* Modifie cette couleur à var(--color-neutral-800) pour la flèche à droite */
 }
 
 .driver-popover-arrow.driver-popover-arrow-side-right.driver-popover-arrow-align-start::after {
@@ -409,8 +409,8 @@
 }
 
 #infoButton:hover {
-    background-color: #e8e8e8; /* Changement de couleur au survol */
-    color: #333; /* Changement de la couleur de l'icône au survol */
+    background-color: color-mix(in srgb, var(--color-neutral-200) 80%, transparent); /* Changement de couleur au survol */
+    color: var(--color-neutral-800); /* Changement de la couleur de l'icône au survol */
 }
 
 .intro {
@@ -429,7 +429,7 @@
 }
 
 .intro-content {
-    background: #333;
+    background: var(--color-neutral-800);
     padding: 30px;
     border-radius: 10px;
 }
@@ -452,7 +452,7 @@ p {
 
 /* Style commun pour les boutons Ratio et Generate */
 button {
-    background-color: #505050; /* Couleur de fond gris */
+    background-color: var(--color-neutral-700); /* Couleur de fond gris */
     color: white; /* Texte blanc */
     padding: 10px 20px; /* Ajout de padding pour agrandir les boutons */
     border: none; /* Pas de bordure */
@@ -473,7 +473,7 @@ button {
 
 /* Effet de survol pour les boutons */
 button:hover {
-    background-color: #707070; /* Couleur plus claire au survol */
+    background-color: var(--color-neutral-600); /* Couleur plus claire au survol */
     transform: scale(1.05); /* Légère augmentation de taille pour le feedback visuel */
 }
 
@@ -496,7 +496,7 @@ button:hover {
 /* Maintenir le style du bouton même lorsqu'il est focus (après clic) */
 #ratioButton:focus {
     outline: none; /* Retirer la bordure bleue par défaut du focus */
-    background-color: #505050; /* Conserver la couleur d'origine */
+    background-color: var(--color-neutral-700); /* Conserver la couleur d'origine */
 }
 
 .ratio-selection {
@@ -507,7 +507,7 @@ button:hover {
 
 /* Style du bouton "Generate" */
 #validate-button {
-    background-color: #007BFF; /* Couleur bleue */
+    background-color: var(--color-action-primary); /* Couleur bleue */
     color: white; /* Texte blanc */
     padding: 10px 20px; /* Espace intérieur */
     border: none; /* Pas de bordure */
@@ -522,13 +522,13 @@ button:hover {
 
 /* Effet de survol et de clic */
 #validate-button:hover {
-    background-color: #0056b3; /* Couleur bleue plus foncée au survol */
+    background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-text-contrast) 30%); /* Couleur bleue plus foncée au survol */
     transform: translateY(-2px); /* Légère remontée pour l'effet de volume */
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Ombre plus forte au survol */
 }
 
 #validate-button:active {
-    background-color: #004080; /* Couleur encore plus foncée lors du clic */
+    background-color: color-mix(in srgb, var(--color-action-primary) 60%, var(--color-text-contrast) 40%); /* Couleur encore plus foncée lors du clic */
     transform: translateY(0); /* Revenir à la position initiale au clic */
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Diminuer l'ombre lors du clic */
 }

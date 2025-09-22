@@ -42,8 +42,8 @@
     align-items: center;
     justify-content: flex-start;
     padding: 10px 15px;
-    background: #3399ff;
-    color: #fff;
+    background: var(--color-loyalty-primary);
+    color: var(--color-text-primary);
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     font-size: 14px;
@@ -147,8 +147,8 @@
 #loyalty-widget-popup .loyalty-widget-page .button{
     width:100%;
     margin:5px 0;
-    background-color:#007bff;
-    color:#fff;
+    background-color:var(--color-loyalty-primary);
+    color:var(--color-surface-contrast);
     border:none;
     border-radius:4px;
     padding:8px 0;
@@ -197,7 +197,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #007bff;
+    color: var(--color-loyalty-primary);
     cursor: pointer;
     padding: 0;
 }
@@ -207,8 +207,8 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #444;
-    color: #fff;
+    background-color: var(--color-neutral-600);
+    color: var(--color-text-primary);
     padding: 3px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -236,11 +236,11 @@
 .loyalty-missions-list li {
     font-size: 13px;
     margin-bottom: 6px;
-    background: linear-gradient(#3b2d1f, #27190b);
-    border: 1px solid #c29a5b;
+    background: linear-gradient(var(--color-loyalty-gold-deep), var(--color-loyalty-gold-shadow));
+    border: 1px solid var(--color-loyalty-gold);
     border-radius: 6px;
     padding: 4px;
-    color: #f3e2c7;
+    color: var(--color-loyalty-gold-soft);
 }
 
 .loyalty-missions-list progress {
@@ -249,16 +249,16 @@
     vertical-align: middle;
     margin: 2px 0;
     appearance: none;
-    border: 1px solid #c29a5b;
+    border: 1px solid var(--color-loyalty-gold);
     border-radius: 4px;
-    background-color: #1b1207;
+    background-color: var(--color-loyalty-gold-shadow);
 }
 .loyalty-missions-list progress::-webkit-progress-value {
-    background-color: #c29a5b;
+    background-color: var(--color-loyalty-gold);
     border-radius: 4px;
 }
 .loyalty-missions-list progress::-moz-progress-bar {
-    background-color: #c29a5b;
+    background-color: var(--color-loyalty-gold);
     border-radius: 4px;
 }
 
@@ -270,8 +270,8 @@
 .loyalty-login-btn {
     display: block;
     width: 100%;
-    background-color: #007bff;
-    color: #fff;
+    background-color: var(--color-loyalty-primary);
+    color: var(--color-text-primary);
     border: none;
     border-radius: 4px;
     padding: 8px 0;
@@ -285,8 +285,8 @@
 .loyalty-missions-link {
     display: inline-block;
     padding: 6px 10px;
-    background-color: #007bff;
-    color: #fff;
+    background-color: var(--color-loyalty-primary);
+    color: var(--color-text-primary);
     border-radius: 4px;
     text-decoration: none;
 }
