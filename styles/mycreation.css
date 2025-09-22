@@ -22,12 +22,17 @@
     overflow: hidden; /* Empêche le contenu de déborder */
     margin-bottom: 20px; /* Espacement entre les conteneurs d'image */
     transition: transform 0.3s ease-in-out; /* Transition pour l'effet de survol */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
 }
 
 /* Style pour les images à l'intérieur des conteneurs */
 .dynamic-image {
     width: 100%; /* Largeur complète pour s'adapter au conteneur parent */
-    height: auto; /* Hauteur automatique pour maintenir l'aspect ratio */
+    height: 100%;
+    object-fit: contain; /* Maintient le ratio dans le carré */
     display: block; /* Évite les problèmes de marges inattendues */
 }
 
