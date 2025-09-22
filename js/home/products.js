@@ -43,7 +43,8 @@ jQuery(document).ready(function($) {
 
         var $carousel = jQuery('<div class="carousel-inner"></div>');
 
-        products.forEach(function(product) {
+        var maxProducts = 5;
+        products.slice(0, maxProducts).forEach(function(product) {
                 const formattedName = product.name.toLowerCase()
                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
