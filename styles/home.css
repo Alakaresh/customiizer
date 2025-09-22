@@ -161,9 +161,11 @@
 
 /* Hero */
 .home-experience {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(36px, 4vw, 56px);
+  display: block;
+}
+
+.home-experience > * + * {
+  margin-top: clamp(36px, 4vw, 56px);
 }
 
 .home-hero__content {

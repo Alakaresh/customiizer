@@ -56,8 +56,8 @@
     max-width: none;
   }
 
-  .home-experience {
-    gap: 32px;
+  .home-experience > * + * {
+    margin-top: 32px;
   }
 
   /* Experience */
