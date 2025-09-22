@@ -1,7 +1,7 @@
 .user-menu-toggle {
   cursor: pointer;
   font-size: 28px;
-  color: #f0f0f0;
+  color: color-mix(in srgb, var(--color-neutral-200) 70%, transparent);
   margin-left: 16px;
 }
 
@@ -10,7 +10,7 @@
   right: 20px;
   top: 60px;
   width: 200px;
-  background: #1a1a1a;
+  background: var(--color-surface-card);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 10px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.35);
@@ -21,11 +21,11 @@
 
 .user-dropdown .user-header {
   padding: 12px;
-  background: #222;
+  background: var(--color-surface-card-alt);
   font-weight: 600;
   text-align: center;
   border-bottom: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
+  color: var(--color-text-primary);
 }
 
 .user-dropdown .user-links {
@@ -39,7 +39,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  color: #eee;
+  color: color-mix(in srgb, var(--color-neutral-200) 85%, transparent);
   text-decoration: none;
   transition: background 0.2s;
 }
@@ -49,5 +49,5 @@
 }
 
 .user-dropdown .user-links li.logout a {
-  color: #ff6b6b;
+  color: var(--color-action-destructive-hover);
 }
