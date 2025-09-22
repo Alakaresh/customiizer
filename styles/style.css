@@ -101,6 +101,14 @@
   --color-text-inverse: var(--color-text-contrast);
   --color-text-muted-legacy: var(--color-text-muted);
   --color-action-accent: var(--color-brand-100);
+
+  /* Bootstrap palette overrides */
+  --bs-primary: var(--color-action-primary);
+  --bs-primary-rgb: 47, 143, 99;
+  --bs-link-color: var(--color-action-primary);
+  --bs-link-hover-color: var(--color-action-secondary);
+  --bs-body-color: var(--color-text-primary);
+  --bs-body-bg: var(--color-background);
 }
 
 #site-content {
@@ -244,6 +252,192 @@ button:disabled,
   cursor: not-allowed;
   opacity: 0.6;
   box-shadow: none;
+}
+
+/* Harmonise Bootstrap defaults with the brand palette */
+.btn,
+.btn:focus {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:visited,
+.btn-primary:disabled,
+.btn-primary.disabled,
+.btn-check:focus + .btn-primary,
+.btn-check:checked + .btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--color-action-primary),
+    color-mix(in srgb, var(--color-action-primary) 75%, var(--color-background) 25%)
+  );
+  border-color: color-mix(in srgb, var(--color-action-primary) 75%, transparent);
+  color: var(--color-on-primary);
+  box-shadow: 0 10px 24px rgba(47, 143, 99, 0.35);
+}
+
+.btn-primary:hover,
+.btn-check:focus + .btn-primary:hover,
+.btn-check:checked + .btn-primary:hover,
+.btn-primary:focus:hover {
+  background: linear-gradient(
+    135deg,
+    var(--color-action-primary-hover),
+    color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%)
+  );
+  border-color: color-mix(in srgb, var(--color-action-primary-hover) 80%, transparent);
+  color: var(--color-on-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(47, 143, 99, 0.4);
+}
+
+.btn-primary:active,
+.btn-check:checked + .btn-primary:active,
+.btn-check:focus + .btn-primary:active {
+  background: linear-gradient(
+    135deg,
+    var(--color-action-primary-active),
+    color-mix(in srgb, var(--color-action-primary-active) 60%, var(--color-background) 40%)
+  );
+  border-color: color-mix(in srgb, var(--color-action-primary-active) 85%, transparent);
+  box-shadow: 0 8px 16px rgba(47, 143, 99, 0.32);
+  transform: translateY(0);
+}
+
+.btn-primary:focus,
+.btn-primary:focus-visible,
+.btn-check:focus + .btn-primary {
+  box-shadow: 0 0 0 0.25rem var(--color-ui-focus);
+  outline: none;
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled,
+fieldset:disabled .btn-primary {
+  background: color-mix(in srgb, var(--color-action-primary) 45%, var(--color-background) 55%);
+  border-color: color-mix(in srgb, var(--color-action-primary) 60%, transparent);
+  box-shadow: none;
+  opacity: 0.65;
+  transform: none;
+}
+
+.btn-outline-primary,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary:visited {
+  color: var(--color-action-primary);
+  border-color: color-mix(in srgb, var(--color-action-primary) 70%, transparent);
+  background: transparent;
+  box-shadow: none;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus:hover,
+.btn-outline-primary:active:hover {
+  color: var(--color-on-primary);
+  background: linear-gradient(
+    135deg,
+    var(--color-action-primary),
+    color-mix(in srgb, var(--color-action-primary) 72%, var(--color-background) 28%)
+  );
+  border-color: color-mix(in srgb, var(--color-action-primary) 80%, transparent);
+  box-shadow: 0 8px 18px rgba(47, 143, 99, 0.28);
+}
+
+.btn-outline-primary:focus,
+.btn-outline-primary:focus-visible,
+.btn-check:focus + .btn-outline-primary {
+  box-shadow: 0 0 0 0.25rem var(--color-ui-focus);
+  outline: none;
+}
+
+.btn-outline-primary:disabled,
+.btn-outline-primary.disabled,
+fieldset:disabled .btn-outline-primary {
+  color: color-mix(in srgb, var(--color-action-primary) 45%, var(--color-text-muted) 55%);
+  border-color: color-mix(in srgb, var(--color-action-primary) 25%, var(--color-border-subtle) 75%);
+  opacity: 0.6;
+}
+
+.btn-link,
+.link-primary,
+.link-primary:visited {
+  color: var(--color-action-primary);
+}
+
+.btn-link:hover,
+.btn-link:focus,
+.link-primary:hover,
+.link-primary:focus {
+  color: var(--color-action-secondary);
+}
+
+.text-primary {
+  color: var(--color-action-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--color-action-primary) !important;
+  color: var(--color-on-primary);
+}
+
+.border-primary {
+  border-color: color-mix(in srgb, var(--color-action-primary) 85%, transparent) !important;
+}
+
+.page-link {
+  color: var(--color-action-primary);
+  background: var(--color-surface-overlay);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.page-link:hover,
+.page-link:focus {
+  color: var(--color-on-primary);
+  background: color-mix(in srgb, var(--color-action-primary) 24%, var(--color-surface-overlay) 76%);
+  border-color: color-mix(in srgb, var(--color-action-primary) 45%, var(--color-border-subtle) 55%);
+  box-shadow: 0 0 0 0.2rem var(--color-ui-focus);
+}
+
+.page-item.active .page-link,
+.page-item.active .page-link:hover,
+.page-item.active .page-link:focus {
+  color: var(--color-on-primary);
+  background: var(--color-action-primary);
+  border-color: color-mix(in srgb, var(--color-action-primary) 80%, transparent);
+  box-shadow: 0 0 0 0.2rem var(--color-ui-focus);
+}
+
+.page-item.disabled .page-link,
+.page-link.disabled,
+.page-link:disabled {
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-surface-overlay) 80%, var(--color-border-muted-alt) 20%);
+  border-color: var(--color-border-subtle);
+  box-shadow: none;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background: var(--color-action-primary);
+  color: var(--color-on-primary);
+}
+
+.nav-pills .nav-link {
+  color: var(--color-action-primary);
+}
+
+.nav-pills .nav-link:hover {
+  color: var(--color-action-secondary);
 }
 
 /* Surcharge des styles de WooCommerce pour les images dans le panier */

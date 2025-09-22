@@ -116,17 +116,14 @@ function displayOrders(orders, maxNumPages) {
 			const trackingUrl = order.tracking_info;
 			const trackingNumberFromUrl = trackingUrl.split('tracknumbers=')[1] || "Lien de suivi";
 
-			trackingText.textContent = trackingNumberFromUrl;
-			trackingText.className = "tracking-number";
-			trackingText.style.color = "#004488"; // ✅ Couleur appliquée ici
-			trackingText.style.fontWeight = "bold";
-			trackingText.style.textDecoration = "underline";
-			trackingText.style.cursor = "pointer";
+                        trackingText.textContent = trackingNumberFromUrl;
+                        trackingText.className = "tracking-number";
 
-			const trackingLink = document.createElement('a');
-			trackingLink.href = trackingUrl;
-			trackingLink.target = "_blank";
-			trackingLink.appendChild(trackingText);
+                        const trackingLink = document.createElement('a');
+                        trackingLink.href = trackingUrl;
+                        trackingLink.target = "_blank";
+                        trackingLink.classList.add('tracking-link');
+                        trackingLink.appendChild(trackingText);
 
 			trackingInfoCell.appendChild(trackingLink);
 		} else {
