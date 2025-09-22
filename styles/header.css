@@ -134,11 +134,35 @@
         margin-left: 20px;
        color: var(--color-text);
         font-size: 14px;
+        gap: 4px;
+        text-decoration: none;
+}
+.loyalty-header-container:hover {
+        text-decoration: none;
+        color: var(--color-text);
 }
 .loyalty-header-points {
         display: flex;
         align-items: center;
         gap: 4px;
+}
+.loyalty-header-container span {
+        line-height: 1.2;
+}
+.loyalty-header-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        opacity: 0.85;
+}
+.loyalty-header-balance {
+        font-size: 1rem;
+        font-weight: 600;
+}
+.loyalty-header-meta {
+        font-size: 0.75rem;
+        opacity: 0.85;
 }
 .loyalty-header-points img {
         height: 16px;
