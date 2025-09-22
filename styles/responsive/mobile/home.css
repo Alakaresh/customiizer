@@ -5,7 +5,7 @@
     padding: 88px 0 96px;
   }
 
-  .home-section__inner {
+  #site-content.home-page > section {
     padding-inline: clamp(18px, 8vw, 32px);
   }
 

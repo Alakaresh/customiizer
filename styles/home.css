@@ -44,20 +44,12 @@
   color: var(--home-body-text);
 }
 
-.home-section {
+#site-content.home-page > section {
   position: relative;
   width: 100%;
-  z-index: 1;
-}
-
-.home-section__inner {
-  width: 100%;
   padding-inline: clamp(18px, 6vw, 120px);
-}
-
-.home-section__inner > .surface-card,
-.home-section__inner > section.surface-card {
-  width: 100%;
+  box-sizing: border-box;
+  z-index: 1;
 }
 
 .surface-card {
