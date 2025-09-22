@@ -14,24 +14,33 @@
     padding: 32px 24px;
   }
 
-  .home-panel--hero .home-panel__content {
-    align-items: flex-start;
-    padding: 28px 24px;
-    border-radius: 24px;
+  .home-panel.home-panel--hero {
+    padding: 28px 24px 36px;
+    gap: 28px;
   }
 
-  .home-panel--hero .home-panel__content::before {
+  .home-panel--hero::before {
     width: clamp(220px, 68vw, 320px);
     height: clamp(220px, 68vw, 320px);
     top: -32%;
     right: -28%;
   }
 
-  .home-panel--hero .home-panel__content::after {
+  .home-panel--hero::after {
     width: clamp(260px, 80vw, 360px);
     height: clamp(260px, 80vw, 360px);
     bottom: -38%;
     left: -32%;
+  }
+
+  .home-panel--hero .home-panel__intro {
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .home-panel--hero .home-panel__media {
+    gap: 24px;
+    align-items: flex-start;
   }
 
   .home-panel--hero .home-panel__actions {
@@ -56,24 +65,18 @@
     max-width: none;
   }
 
-  /* Experience */
-  .home-panel.home-panel--hero {
-    padding: 32px 24px 40px;
-    gap: 32px;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-    overflow: visible;
-  }
-
   .home-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
     padding: 24px;
     border-radius: 24px;
   }
 
-  .home-panel--showcase {
-    flex-direction: column;
+  .home-panel--showcase,
+  .home-panel--community,
+  .home-panel--workflow {
+    grid-template-columns: none;
   }
 
   .home-panel__media {

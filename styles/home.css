@@ -153,38 +153,15 @@
 
 /* Hero */
 .home-panel.home-panel--hero {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(36px, 4vw, 56px);
-  padding: clamp(36px, 5vw, 64px);
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  background: transparent;
-  overflow: visible;
-}
-
-.home-panel--hero .home-panel__content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  text-align: left;
-  max-width: 940px;
-  width: 100%;
-  margin: 0 auto;
-  padding: clamp(32px, 4.5vw, 64px);
-  border-radius: 32px;
+  padding: clamp(32px, 4.5vw, 48px);
+  gap: clamp(28px, 4vw, 40px);
   background: var(--home-hero-background);
-  border: 1px solid var(--home-panel-border);
-  box-shadow: var(--home-panel-shadow);
-  overflow: hidden;
   isolation: isolate;
   backdrop-filter: blur(18px);
 }
 
-.home-panel--hero .home-panel__content::before,
-.home-panel--hero .home-panel__content::after {
+.home-panel--hero::before,
+.home-panel--hero::after {
   content: "";
   position: absolute;
   border-radius: 50%;
@@ -194,7 +171,7 @@
   z-index: 0;
 }
 
-.home-panel--hero .home-panel__content::before {
+.home-panel--hero::before {
   width: clamp(260px, 45vw, 420px);
   height: clamp(260px, 45vw, 420px);
   top: -22%;
@@ -202,7 +179,7 @@
   background: radial-gradient(circle at 30% 30%, rgba(26, 188, 156, 0.22), rgba(18, 18, 18, 0));
 }
 
-.home-panel--hero .home-panel__content::after {
+.home-panel--hero::after {
   width: clamp(320px, 55vw, 520px);
   height: clamp(320px, 55vw, 520px);
   bottom: -30%;
@@ -210,16 +187,19 @@
   background: radial-gradient(circle at 65% 65%, rgba(26, 188, 156, 0.18), rgba(16, 16, 16, 0));
 }
 
-.home-panel--hero .home-panel__body {
+.home-panel--hero > * {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
+}
+
+.home-panel--hero .home-panel__intro {
+  gap: clamp(18px, 3vw, 24px);
+  align-self: center;
   align-items: flex-start;
 }
 
-.home-panel--hero .home-panel__content .home-eyebrow {
-  margin-bottom: 18px;
+.home-panel--hero .home-panel__intro .home-eyebrow {
+  margin-bottom: 0;
 }
 
 .home-panel--hero .home-panel__headline {
@@ -236,11 +216,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 
 .home-panel--hero .home-panel__actions .home-button {
   flex: 0 1 auto;
+}
+
+.home-panel--hero .home-panel__media {
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: clamp(24px, 4vw, 32px);
 }
 
 .home-panel--hero .home-panel__highlights {
@@ -248,10 +234,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px 20px;
-  margin: 34px 0 0;
+  margin: 12px 0 0;
   padding: 0;
   width: 100%;
-  max-width: 720px;
 }
 
 .home-panel--hero .home-panel__highlights li {
@@ -275,9 +260,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 18px 28px;
-  margin-top: 36px;
+  margin: 8px 0 0;
   width: 100%;
-  max-width: 720px;
 }
 
 .home-panel--hero .home-panel__metric {
@@ -303,6 +287,11 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(26, 188, 156, 0.7);
+}
+
+.home-panel--hero .home-experience__intro {
+  grid-column: 1 / -1;
+  margin-top: clamp(24px, 4vw, 40px);
 }
 
 /* Immersive experience */
@@ -338,31 +327,33 @@
   box-shadow: var(--home-panel-shadow);
   background: var(--home-panel-background);
   padding: clamp(24px, 3.6vw, 36px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(20px, 3vw, 28px);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+  align-items: stretch;
+  gap: clamp(24px, 4vw, 40px);
   overflow: hidden;
 }
 
-.home-panel--showcase {
-  grid-column: 1 / -1;
-  flex-direction: row;
-  align-items: stretch;
-}
-
-.home-panel--community {
-  grid-column: 1 / -1;
-}
-
+.home-panel--showcase,
+.home-panel--community,
 .home-panel--workflow {
   grid-column: 1 / -1;
 }
 
-.home-panel__intro {
+.home-panel__intro,
+.home-panel__media {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  flex: 1 1 280px;
+}
+
+.home-panel__media {
+  justify-content: center;
+  gap: clamp(20px, 3vw, 28px);
+}
+
+.home-panel--workflow .home-panel__media {
+  justify-content: flex-start;
 }
 
 .home-panel__intro .home-eyebrow {
@@ -395,12 +386,7 @@
   flex: 0 1 auto;
 }
 
-.home-panel__media {
-  flex: 1 1 320px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+
 
 /* Spotlights */
 .home-spotlights.surface-card {
