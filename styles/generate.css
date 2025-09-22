@@ -10,13 +10,14 @@
 }
 
 .content {
-    background-color: #666;
-    padding: 10px;
+    background: transparent;
+    padding: 0;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     flex-grow: 1;
-    overflow: auto; /* gestion de débordement */
+    overflow: visible;
+    position: relative;
 }
 
 #sidebar-footer {
@@ -37,7 +38,8 @@
 .image-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Deux colonnes */
-    grid-gap: 10px; /* Espacement entre les images */
+    gap: 24px; /* Espacement entre les images */
+    width: 100%;
 }
 
 
@@ -47,17 +49,30 @@
     align-items: center;
     height: calc((100dvh - 90px - 30px) / 2); /* Hauteur disponible pour chaque image */
     overflow: hidden; /* Cache les parties de l'image qui débordent */
+    background: linear-gradient(180deg, rgba(26, 26, 26, 0.92) 0%, rgba(17, 17, 17, 0.94) 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 28px 44px rgba(0, 0, 0, 0.55);
+    padding: 16px;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .centered-image {
-	max-width: 100%;
-        height: calc(100dvh - 90px - 30px);
+    max-width: 100%;
+    height: calc(100dvh - 90px - 30px);
 }
 
 .image-grid img {
-    width: auto; /* Adaptation automatique de la largeur */
-    height: 100%; /* Hauteur complète du conteneur */
+    width: 100%;
+    height: 100%;
     object-fit: contain; /* Maintient le ratio sans découper l'image */
+    border-radius: 16px;
+    transition: transform 0.3s ease;
+}
+
+.image-container:hover img {
+    transform: scale(1.01);
 }
 
 .bottom {
@@ -67,10 +82,21 @@
 .top {
   object-position: bottom;
 }
+#header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: linear-gradient(160deg, rgba(29, 29, 29, 0.95) 0%, rgba(16, 16, 16, 0.95) 100%);
+    border-radius: 26px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+}
+
 #container {
     position: relative;
-	margin: 10px;
-    height: 100px; /* Hauteur fixe pour la zone mobile */
+    margin: 0;
+    min-height: 150px; /* Hauteur confortable pour la zone de prompt */
 }
 
 #custom-text {
@@ -80,113 +106,143 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    border: 1px solid #ccc; /* Ajoute une bordure pour la délimitation */
-	border-radius: 5px;
-    background-color: #fff; /* Fond blanc */
-    font-size: 16px; /* Taille de police réduite */
-	padding: 5px; /* Ajoute une marge de 5px à gauche du texte */
-	color: #000; /* Texte noir */
-	line-height: 1; /* Réduit l'espace entre les lignes */
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    background: rgba(21, 21, 21, 0.95);
+    font-size: 1rem;
+    padding: 18px 22px 38px 22px;
+    color: #f4f6f4;
+    line-height: 1.5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#custom-text:focus {
+    outline: none;
+    border-color: rgba(43, 216, 121, 0.6);
+    box-shadow: 0 0 0 1px rgba(31, 184, 108, 0.6);
 }
 
 #resizer {
-	border-radius: 2.5px;
+    border-radius: 9999px;
     position: absolute;
-    bottom: 0;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 20px;
-    height: 5px;
-    background-color: #ccc;
+    width: 64px;
+    height: 6px;
+    background: linear-gradient(90deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
     cursor: ns-resize;
 }
 
 #placeholder {
     position: absolute;
-	left: 5px; /* Ajoute une marge de 5px à gauche du texte */
-	font-size: 16px; /* Taille de police réduite */
-    color: #888; /* Couleur du texte de l'indication */
+    top: 18px;
+    left: 24px;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.38);
     pointer-events: none; /* Ignorer les événements de souris sur le texte d'indication */
+    line-height: 1.5;
 }
 
 /* Style pour le conteneur du texte */
 #aspect-ratio-info {
     text-align: left; /* Aligner le texte à gauche */
-    margin-top: 10px; /* Ajout d'une marge au-dessus */
-    font-family: 'Poppins', sans-serif; /* Utilisation d'une police proche */
-    font-size: 12px; /* Taille plus petite */
-    font-weight: bold; /* Mettre en gras */
-    color: #e0e0e0; /* Couleur gris clair */
+    margin-top: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
 }
 
+#aspect-ratio-info .info-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
 
 .info-icon {
-    margin-left: 5px;
-	font-size: 14px; /* Réduit la taille de la police */
+    font-size: 0.75rem;
     cursor: pointer;
     border-radius: 50%; /* Met le point d'interrogation dans un cercle */
-    background-color: #ccc; /* Couleur de fond pour le cercle */
-    width: 15px; /* Réduit la taille du cercle */
-    height: 15px; /* Réduit la taille du cercle */
+    background: rgba(255, 255, 255, 0.1);
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-	color: black;
+    color: rgba(255, 255, 255, 0.8);
+    transition: background 0.2s ease;
+}
+
+.info-icon:hover {
+    background: linear-gradient(135deg, var(--color-brand-600, #148556), var(--color-brand-400, #2bd879));
+    color: #0f1914;
 }
 
 #product-groups-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 16px;
     width: 100%; /* Assurez-vous que cela correspond à la largeur désirée ou est limité par un parent */
     max-width: 100%; /* Empêche le conteneur de déborder */
 }
 
 .product-group {
-    flex: 1 1 auto; /* Maintient la flexibilité, mais ajustez en fonction du besoin */
+    flex: 1 1 100%;
     max-width: 100%;
     display: flex;
     flex-direction: row; /* Alignement horizontal des produits à l'intérieur du groupe */
     flex-wrap: wrap;
+    gap: 12px;
 }
 
 .product-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 25%;
-	min-height: 100px;
-	margin: 3px 3px 0px;
-	flex: 0 0 auto;
-	text-align: center;
-	box-sizing: border-box;
-	transition: all 0.2s ease-in-out; /* met ici pour éviter le duplicate */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: 14px 12px;
+    flex: 1 1 calc(50% - 12px);
+    text-align: center;
+    box-sizing: border-box;
+    background: rgba(20, 20, 20, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    color: rgba(255, 255, 255, 0.85);
+    gap: 10px;
+}
+
+.product-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(43, 216, 121, 0.5);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.4);
 }
 
 .product-item.selected {
-	border: 2px solid #888;
-	border-radius: 4px;
-	background-color: rgba(255, 255, 255, 0.05);
-	box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    border-color: var(--color-brand-500, #1fb86c);
+    box-shadow: 0 20px 38px rgba(43, 216, 121, 0.18);
 }
 
 
 .product-container {
-    width: 100px;
-    height: 100px; /* Taille de l'image carrée */
+    width: 92px;
+    height: 92px; /* Taille de l'image carrée */
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-	border: 1px solid #ccc; /* Bordure autour de chaque produit */
-	border-radius: 10px;
+    border-radius: 14px;
+    background: rgba(15, 15, 15, 0.85);
 }
 
 .product-item img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: cover; /* Assure que l'image couvre toute la zone */
+    object-fit: contain; /* Assure que l'image couvre toute la zone */
 }
 
 .hidden {
@@ -195,34 +251,65 @@
 
 .product-item p {
     text-align: center;
-	margin: 0; /* ✅ Supprime la marge par défaut */
+    margin: 0; /* ✅ Supprime la marge par défaut */
     padding: 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#ratio-menu {
+    background: rgba(20, 20, 20, 0.96);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 22px 40px rgba(0, 0, 0, 0.55);
+    padding: 22px 24px 26px;
+    display: none;
+}
+
+#ratio-menu > * + * {
+    margin-top: 18px;
 }
 
 #ratio-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
 }
 
 /* styles.css */
 #product-container {
     display: flex; /* Active Flexbox pour aligner les enfants horizontalement */
     flex-wrap: wrap; /* Permet aux boutons de passer à la ligne suivante si l'espace horizontal est insuffisant */
-    justify-content: space-around; /* Distribue l'espace autour des éléments pour une meilleure apparence */
+    justify-content: flex-start;
     align-items: center; /* Centre les éléments verticalement */
-    margin-bottom: 20px; /* Espace en dessous du conteneur pour la clarté */
+    margin-bottom: 16px; /* Espace en dessous du conteneur pour la clarté */
+    gap: 10px;
 }
 #selected-display {
-    margin-top: 10px;
-    text-align: center;
+    margin-top: 6px;
+    text-align: left;
 }
 
 #selected-info {
-    padding: 10px 20px;
-    border: none;
-    background-color: #ddd;
-    color: #333;
+    padding: 6px 14px;
+    border: 1px solid rgba(31, 184, 108, 0.5);
+    background: rgba(31, 184, 108, 0.12);
+    color: var(--color-brand-400, #2bd879);
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+#alert-box {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 99, 132, 0.4);
+    background: rgba(255, 99, 132, 0.12);
+    color: #ff8ba1;
+    font-size: 0.92rem;
+    font-weight: 500;
 }
 
 /* Style supplémentaire pour les images pour assurer l'uniformité */
@@ -285,51 +372,56 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 300px; /* Assurez-vous que la hauteur est suffisante pour la visibilité */
+    min-height: 320px; /* Assurez-vous que la hauteur est suffisante pour la visibilité */
+    width: 100%;
 }
 
 .loading-container {
     position: absolute;
-    width: 400px;
+    width: clamp(260px, 32vw, 420px);
     height: auto;
-    z-index: 10; 
+    z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    gap: 12px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    background: rgba(14, 14, 14, 0.95);
+    padding: 24px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 26px 44px rgba(0, 0, 0, 0.55);
 }
 
 .loading-bar-border {
-    width: 100%; 
-    height: 30px;
-    border: 3px solid #3498db;
-    background-color: #222;
+    width: 100%;
+    height: 12px;
+    background-color: rgba(32, 32, 32, 0.92);
+    border-radius: 999px;
     box-sizing: border-box;
-    padding: 2px;
+    padding: 3px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    border: 1px solid rgba(43, 216, 121, 0.4);
 }
 
 .loading-bar {
-    width: 0%; 
+    width: 0%;
     height: 100%;
-    background-color: #3498db;
+    background: linear-gradient(135deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
     transition: width 0.5s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 999px;
 }
 
 .loading-text {
-    font-size: 12px;
-    color: white;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
     text-align: center;
-    position: absolute; /* Permet de centrer par rapport à la barre */
-    width: 100%; /* Occupe toute la largeur pour un centrage horizontal */
+    width: 100%;
 }
 
 
@@ -343,23 +435,33 @@
 }
 
 .format-button {
-    background-color: #505050; /* Gris moyen pour le fond du bouton */
-    color: #f0f0f0; /* Gris très clair pour le texte, pour un contraste suffisant */
-    border: 1px solid #686868; /* Bordure légèrement plus claire que le fond du bouton */
-    padding: 10px 20px; /* Espacement interne un peu plus grand pour rendre le bouton plus large */
-    font-size: 16px; /* Taille de la police */
-    border-radius: 30px; /* Coins très arrondis pour un design moderne */
-    cursor: pointer; /* Indique que le bouton est cliquable */
-    transition: background-color 0.3s, transform 0.2s; /* Douce transition pour survol */
-    margin: 5px; /* Marge externe pour espacer les boutons */
-	min-width: 150px;
+    background: rgba(24, 24, 24, 0.92);
+    color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.65rem 1.2rem;
+    font-size: 0.95rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    margin: 4px;
+    min-width: 0;
+    font-weight: 500;
 }
 
 /* Effet de survol et focus */
-.format-button:hover, .format-button:focus {
-    background-color: #707070; /* Gris légèrement plus clair pour le survol */
-    color: #ffffff; /* Texte blanc pour améliorer le contraste au survol */
-    transform: scale(1.05); /* Légère augmentation de taille pour un feedback visuel */
+.format-button:hover,
+.format-button:focus {
+    background: rgba(28, 28, 28, 0.98);
+    color: #f5fff9;
+    border-color: rgba(43, 216, 121, 0.55);
+    box-shadow: 0 18px 28px rgba(43, 216, 121, 0.2);
+    outline: none;
+}
+
+.format-button.active,
+.format-button.selected {
+    border-color: var(--color-brand-500, #1fb86c);
+    color: var(--color-brand-400, #2bd879);
 }
 
 
@@ -447,40 +549,76 @@ p {
 
 .button-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
-/* Style commun pour les boutons Ratio et Generate */
-button {
-    background-color: #505050; /* Couleur de fond gris */
-    color: white; /* Texte blanc */
-    padding: 10px 20px; /* Ajout de padding pour agrandir les boutons */
-    border: none; /* Pas de bordure */
-    border-radius: 30px; /* Boutons arrondis */
-    font-size: 16px; /* Taille de la police */
-    cursor: pointer; /* Curseur de pointeur au survol */
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Transition douce */
-    text-align: center; /* Centre le texte dans le bouton */
-}
-
-/* Alignement des boutons dans un conteneur centré */
 #buttons-container {
     display: flex;
-    justify-content: center; /* Centre les boutons horizontalement */
-    gap: 20px; /* Espacement entre les boutons */
-    margin-top: 20px; /* Espacement par rapport aux autres éléments */
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
 }
 
-/* Effet de survol pour les boutons */
-button:hover {
-    background-color: #707070; /* Couleur plus claire au survol */
-    transform: scale(1.05); /* Légère augmentation de taille pour le feedback visuel */
+#aspect-ratio-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#buttons-container button {
+    background: linear-gradient(135deg, rgba(19, 86, 63, 0.95) 0%, rgba(24, 120, 79, 0.95) 50%, rgba(43, 216, 121, 0.95) 100%);
+    color: #f8fffc;
+    padding: 0.85rem 1.65rem;
+    border: 1px solid rgba(43, 216, 121, 0.35);
+    border-radius: 999px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, background-position 0.3s ease;
+    background-size: 160%;
+    background-position: 0% 50%;
+    box-shadow: 0 20px 34px rgba(31, 184, 108, 0.28);
+}
+
+#buttons-container button:hover,
+#buttons-container button:focus-visible {
+    transform: translateY(-2px);
+    background-position: 100% 50%;
+    box-shadow: 0 26px 40px rgba(43, 216, 121, 0.32);
+}
+
+#buttons-container button:focus-visible {
+    outline: none;
+}
+
+#ratioButton {
+    background: linear-gradient(135deg, rgba(15, 49, 38, 0.95) 0%, rgba(22, 80, 58, 0.95) 100%);
+    border: 1px solid rgba(31, 184, 108, 0.25);
+    box-shadow: 0 16px 28px rgba(15, 68, 49, 0.35);
+}
+
+#ratioButton:hover,
+#ratioButton:focus-visible {
+    box-shadow: 0 20px 34px rgba(25, 116, 81, 0.4);
+}
+
+#validate-button {
+    background: linear-gradient(135deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#validate-button:active {
+    transform: translateY(0);
+    box-shadow: 0 16px 28px rgba(31, 184, 108, 0.24);
 }
 
 /* Style pour la flèche du bouton Ratio */
 #arrow-icon {
     display: inline-block;
-    border: solid white;
+    border: solid var(--color-brand-400, #2bd879);
     border-width: 0 2px 2px 0;
     padding: 5px;
     margin-left: 10px;
@@ -493,42 +631,9 @@ button:hover {
     transform: rotate(-135deg); /* Flèche vers le haut */
 }
 
-/* Maintenir le style du bouton même lorsqu'il est focus (après clic) */
-#ratioButton:focus {
-    outline: none; /* Retirer la bordure bleue par défaut du focus */
-    background-color: #505050; /* Conserver la couleur d'origine */
-}
-
 .ratio-selection {
     display: flex; /* Activer le mode Flexbox */
     flex-wrap: wrap; /* Permettre aux éléments de se répartir sur plusieurs lignes si nécessaire */
-    justify-content: space-around; /* Espacer les boutons de manière égale autour du conteneur */
-}
-
-/* Style du bouton "Generate" */
-#validate-button {
-    background-color: #007BFF; /* Couleur bleue */
-    color: white; /* Texte blanc */
-    padding: 10px 20px; /* Espace intérieur */
-    border: none; /* Pas de bordure */
-    border-radius: 30px; /* Coins arrondis */
-    font-size: 16px; /* Taille de la police */
-    cursor: pointer; /* Curseur de pointeur */
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Transitions fluides */
-    min-width: 150px; /* Largeur minimale du bouton */
-    text-align: center; /* Centrer le texte */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre pour donner du volume */
-}
-
-/* Effet de survol et de clic */
-#validate-button:hover {
-    background-color: #0056b3; /* Couleur bleue plus foncée au survol */
-    transform: translateY(-2px); /* Légère remontée pour l'effet de volume */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Ombre plus forte au survol */
-}
-
-#validate-button:active {
-    background-color: #004080; /* Couleur encore plus foncée lors du clic */
-    transform: translateY(0); /* Revenir à la position initiale au clic */
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Diminuer l'ombre lors du clic */
+    justify-content: flex-start;
+    gap: 12px;
 }

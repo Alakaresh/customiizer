@@ -20,6 +20,9 @@
   --color-feedback-warning: #ffc107;
   --color-feedback-danger: #dc3545;
   --color-background: #242424;
+  --color-brand-400: #2bd879;
+  --color-brand-500: #1fb86c;
+  --color-brand-600: #148556;
 }
 
 #site-content {
