@@ -199,8 +199,9 @@
 
 .home-panel--hero .home-panel__intro {
   gap: clamp(18px, 3vw, 24px);
-  align-self: center;
+  align-self: flex-start;
   align-items: flex-start;
+  width: 100%;
 }
 
 .home-panel--hero .home-panel__intro .home-eyebrow {
