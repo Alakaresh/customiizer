@@ -1,33 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
 #loyalty-widget-button{
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background:#007bff;
-    color:#fff;
-    width:50px;
-    height:50px;
-    border-radius:50%;
     display:flex;
     align-items:center;
-    justify-content:center;
+    gap:8px;
+    background:none;
+    border:none;
+    color:inherit;
     cursor:pointer;
-    z-index:900;
+    font:inherit;
+    padding:0;
+    margin:0;
 }
+
+#loyalty-widget-button i{
+    font-size:18px;
+}
+
 #loyalty-widget-popup{
     position:fixed;
-    bottom:80px;
-    left:20px;
-    width:300px;
-    max-width:90%;
+    top:110px;
+    right:20px;
+    left:auto;
+    bottom:auto;
+    width:320px;
+    max-width:calc(100% - 40px);
     background:var(--color-header-primary);
     border:1px solid var(--color-ui-border);
     color:var(--font-color);
     border-radius:4px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
     display:none;
-    z-index:899;
+    z-index:999;
 }
 #loyalty-widget-popup.open{
     display:block;
@@ -214,7 +218,11 @@
 
 @media(max-width:480px){
     #loyalty-widget-popup{
-        width:260px;
+        top:96px;
+        right:16px;
+        left:16px;
+        width:auto;
+        max-width:none;
     }
 }
 

@@ -131,18 +131,47 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        justify-content: center;
         margin-left: 20px;
-       color: var(--color-text);
+        color: var(--color-text);
         font-size: 14px;
+        gap: 4px;
+}
+.loyalty-widget-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        font: inherit;
+        text-decoration: none;
+}
+.loyalty-widget-button:focus-visible {
+        outline: 2px solid var(--color-action-accent);
+        outline-offset: 2px;
+}
+.loyalty-button-text {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
 }
 .loyalty-header-points {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
+        font-size: 0.8rem;
 }
 .loyalty-header-points img {
         height: 16px;
         width: auto;
+}
+.loyalty-header-hint {
+        font-size: 0.75rem;
+        opacity: 0.75;
 }
 .cart-container {
 	position: relative;

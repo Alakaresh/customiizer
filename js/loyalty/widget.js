@@ -1,9 +1,12 @@
 jQuery(function($){
-    const $button = $('<div id="loyalty-widget-button"><i class="fas fa-gift"></i></div>');
+    const $button = $('#loyalty-widget-button');
     const $popup = $('#loyalty-widget-popup');
     const $points = $popup.find('.loyalty-widget-points');
     const $back = $('#loyalty-widget-back');
     const $loginBtn = $popup.find('.loyalty-login-btn');
+    if(!$button.length || !$popup.length){
+        return;
+    }
     const showPage = (slug) => {
         $popup.find('.loyalty-widget-page').hide();
         $popup.find('.loyalty-page-' + slug).show();
@@ -15,8 +18,8 @@ jQuery(function($){
             $back.show();
         }
     };
-    $('body').append($button);
-    $button.on('click', function(){
+    $button.on('click', function(event){
+        event.preventDefault();
         $popup.toggleClass('open');
         if($popup.hasClass('open')){
             showPage('main');
