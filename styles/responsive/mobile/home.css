@@ -14,27 +14,27 @@
     padding: 32px 24px;
   }
 
-  .home-hero__content {
+  .home-panel--hero .home-panel__content {
     align-items: flex-start;
     padding: 28px 24px;
     border-radius: 24px;
   }
 
-  .home-hero__content::before {
+  .home-panel--hero .home-panel__content::before {
     width: clamp(220px, 68vw, 320px);
     height: clamp(220px, 68vw, 320px);
     top: -32%;
     right: -28%;
   }
 
-  .home-hero__content::after {
+  .home-panel--hero .home-panel__content::after {
     width: clamp(260px, 80vw, 360px);
     height: clamp(260px, 80vw, 360px);
     bottom: -38%;
     left: -32%;
   }
 
-  .home-hero__actions {
+  .home-panel--hero .home-panel__actions {
     width: 100%;
   }
 
@@ -43,23 +43,28 @@
     justify-content: center;
   }
 
-  .home-hero__highlights {
+  .home-panel--hero .home-panel__highlights {
     width: 100%;
     flex-direction: column;
     margin-top: 28px;
     max-width: none;
   }
 
-  .home-hero__metrics {
+  .home-panel--hero .home-panel__metrics {
     width: 100%;
     flex-direction: column;
     max-width: none;
   }
 
   /* Experience */
-  .home-hero {
+  .home-panel.home-panel--hero {
     padding: 32px 24px 40px;
     gap: 32px;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    overflow: visible;
   }
 
   .home-panel {
@@ -174,12 +179,12 @@
     letter-spacing: 0.18em;
   }
 
-  .home-hero__highlights li {
+  .home-panel--hero .home-panel__highlights li {
     flex-direction: row;
     align-items: center;
   }
 
-  .home-hero__metric {
+  .home-panel--hero .home-panel__metric {
     align-items: center;
     text-align: center;
   }
