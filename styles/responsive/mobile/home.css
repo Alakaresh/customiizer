@@ -14,14 +14,6 @@
     padding: 32px 24px;
   }
 
-  .home-hero.surface-card {
-    padding: 24px 20px;
-  }
-
-  .intro-section {
-    padding: clamp(12px, 6vw, 24px);
-  }
-
   .home-hero__content {
     align-items: flex-start;
     padding: 28px 24px;
@@ -64,13 +56,17 @@
     max-width: none;
   }
 
-  /* Panorama */
-  .home-panorama.surface-card {
+  .home-experience {
+    gap: 32px;
+  }
+
+  /* Experience */
+  .home-experience.surface-card {
     padding: 32px 24px 40px;
     border-radius: 32px;
   }
 
-  .home-panorama__grid {
+  .home-experience__grid {
     grid-template-columns: 1fr;
     gap: 24px;
   }
