@@ -170,6 +170,10 @@
 
 .home-hero.surface-card {
   padding: clamp(24px, 4vw, 52px);
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .home-hero__content {
