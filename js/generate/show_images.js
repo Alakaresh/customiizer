@@ -1,4 +1,26 @@
 var allImages = [];
+function normaliseRatioValue(value) {
+        if (!value) {
+                return '';
+        }
+
+        const normalised = String(value)
+                .replace(/[xX×]/g, ':')
+                .replace(/\s+/g, '')
+                .trim();
+
+        const parts = normalised.split(':').map(Number);
+        if (parts.length !== 2) {
+                return '';
+        }
+
+        const [width, height] = parts;
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+                return '';
+        }
+
+        return `${width}:${height}`;
+}
 
 jQuery(document).ready(function() {
 	// Requête AJAX pour récupérer les images
@@ -43,10 +65,12 @@ function displayImages() {
                         var imgElement = jQuery('<img>')
                                 .attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
                                 .attr('alt', 'Image d\'attente ' + i)
+                                .attr('data-format-image', '1:1')
                                 .addClass(i < 2 ? 'top' : 'bottom');
 
                         var imgContainer = jQuery('<div>')
                                 .addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
+                                .attr('data-format-image', '1:1')
                                 .append(imgElement);
 
                         container.append(imgContainer);
@@ -55,6 +79,8 @@ function displayImages() {
                 shuffleArray(filteredImages);
 
                 filteredImages.slice(0, 4).forEach(function(image, index) {
+                        const ratioValue = normaliseRatioValue(image.format || selectedRatio || '');
+
                         const promptText = typeof image.prompt === 'object'
                                 ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
                                 : (image.prompt || '');
@@ -65,13 +91,14 @@ function displayImages() {
                                 .attr('data-display_name', image.display_name || '')
                                 .attr('data-user-logo', image.user_logo || '')
                                 .attr('data-user-id', image.user_id || '')
-                                .attr('data-format-image', image.format || '')
+                                .attr('data-format-image', ratioValue || '')
                                 .attr('data-prompt', promptText)
                                 .addClass('preview-enlarge')
                                 .addClass(index < 2 ? 'top' : 'bottom');
 
                         var imgContainer = jQuery('<div>')
                                 .addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
+                                .attr('data-format-image', ratioValue || '')
                                 .append(imgElement);
 
                         container.append(imgContainer);
@@ -108,6 +135,8 @@ function displayImagesForCurrentUser() {
 	} else {
 		// Ajouter les images directement à mainContent
                 currentUserImages.forEach(function(image) {
+                        const ratioValue = normaliseRatioValue(image.format || '');
+
                         const promptText = typeof image.prompt === 'object'
                             ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
                             : (image.prompt || '');
@@ -118,12 +147,13 @@ function displayImagesForCurrentUser() {
                                 .attr('data-display_name', image.display_name || '')
                                 .attr('data-user-logo', image.user_logo || '')
                                 .attr('data-user-id', image.user_id || '')
-                                .attr('data-format-image', image.format || '')
+                                .attr('data-format-image', ratioValue || '')
                                 .attr('data-prompt', promptText)
                                 .addClass('preview-enlarge');
 
                         var wrapper = jQuery('<div>')
                                 .addClass('user-image-wrapper')
+                                .attr('data-format-image', ratioValue || '')
                                 .append(imgElement);
 
                         mainContent.append(wrapper);

@@ -63,7 +63,7 @@
 .centered-image {
 
     width: min(100%, 520px);
-    aspect-ratio: 1 / 1;
+    aspect-ratio: auto;
     height: auto;
     object-fit: contain;
     background: rgba(0, 0, 0, 0.4);
@@ -77,7 +77,7 @@
 
 .image-grid img {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: auto;
     height: auto;
     object-fit: contain; /* Maintient le ratio sans découper l'image */
     background: rgba(0, 0, 0, 0.4); /* Applique un fond pour les bandes lorsque le ratio diffère */

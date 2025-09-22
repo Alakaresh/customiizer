@@ -65,6 +65,57 @@ function enableInfoModal() {
 	infoTitle.textContent = infoText.textContent;
 }
 
+function normaliseRatioString(value) {
+        if (!value) {
+                return '';
+        }
+
+        return String(value)
+                .replace(/[xX×]/g, ':')
+                .replace(/\s+/g, '')
+                .trim();
+}
+
+function parseRatio(value) {
+        const normalised = normaliseRatioString(value);
+        if (!normalised || !normalised.includes(':')) {
+                return null;
+        }
+
+        const parts = normalised.split(':').map(Number);
+        if (parts.length !== 2) {
+                return null;
+        }
+
+        const [width, height] = parts;
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+                return null;
+        }
+
+        return { width, height };
+}
+
+function ratioFromImage(img) {
+        const dataRatio = parseRatio(img.getAttribute('data-format-image'));
+        if (dataRatio) {
+                return dataRatio;
+        }
+
+        const container = img.closest('.image-container');
+        if (container) {
+                const containerRatio = parseRatio(container.getAttribute('data-format-image'));
+                if (containerRatio) {
+                        return containerRatio;
+                }
+        }
+
+        if (img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+                return { width: img.naturalWidth, height: img.naturalHeight };
+        }
+
+        return null;
+}
+
 // Fonction d'ajustement de la hauteur des images
 function adjustImageHeight() {
         const images = document.querySelectorAll('.image-grid img, #content-images > img.centered-image');
@@ -75,15 +126,30 @@ function adjustImageHeight() {
         let needsRetry = false;
 
         images.forEach(img => {
-                img.style.height = '';
+                const ratio = ratioFromImage(img);
+                const container = img.closest('.image-container');
 
-                // Utilise la largeur calculée par le layout CSS pour garantir un conteneur carré
-                const width = img.clientWidth;
-                if (width > 0) {
-                        img.style.height = `${width}px`;
-                } else if (img.offsetParent !== null) {
+                if (!ratio) {
+                        img.style.removeProperty('height');
+                        img.style.removeProperty('aspect-ratio');
+                        if (container) {
+                                container.style.removeProperty('aspect-ratio');
+                        }
                         needsRetry = true;
+                        return;
                 }
+
+                if (container) {
+                        container.style.aspectRatio = `${ratio.width} / ${ratio.height}`;
+                }
+
+                if (img.matches('#content-images > img.centered-image')) {
+                        img.style.aspectRatio = `${ratio.width} / ${ratio.height}`;
+                } else {
+                        img.style.removeProperty('aspect-ratio');
+                }
+
+                img.style.removeProperty('height');
         });
 
         if (needsRetry) {

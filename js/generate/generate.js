@@ -7,6 +7,29 @@ console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 const customTextInput = document.getElementById('custom-text');
 const validateButton = document.getElementById('validate-button');
 let loadingToggled = false;
+function normaliseRatioValue(value) {
+        if (!value) {
+                return '';
+        }
+
+        const normalised = String(value)
+                .replace(/[xX×]/g, ':')
+                .replace(/\s+/g, '')
+                .trim();
+
+        const parts = normalised.split(':').map(Number);
+        if (parts.length !== 2) {
+                return '';
+        }
+
+        const [width, height] = parts;
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+                return '';
+        }
+
+        return `${width}:${height}`;
+}
+
 let upscaledImageUrls = [];
 let id_image;
 let prompt = "";
@@ -227,13 +250,15 @@ jQuery(function($) {
 						? (prompt.text || prompt.prompt || JSON.stringify(prompt))
 						: (prompt || '');
 
+                                        const ratioValue = normaliseRatioValue(selectedRatio || '');
+
                                         const $newImage = $('<img>')
                                         .attr('src', displayedUrl)
                                         .attr('alt', 'Image générée')
                                         .attr('data-display_name', currentUser.display_name || '')
                                         .attr('data-user-logo', currentUser.user_logo || '')
                                         .attr('data-user-id', currentUser.ID || '')
-                                        .attr('data-format-image', selectedRatio || '')
+                                        .attr('data-format-image', ratioValue || '')
                                         .attr('data-prompt', promptText)
                                         .addClass('centered-image preview-enlarge');
 
@@ -492,18 +517,20 @@ jQuery(function($) {
 		const imageContainers = grid.querySelectorAll('.image-container');
 		if (imageContainers && imageContainers.length > index) {
 			const imgElement = imageContainers[index].querySelector('img');
-			if (imgElement) {
-				imgElement.src = imageUrl;
+                        if (imgElement) {
+                                const ratioValue = normaliseRatioValue(selectedRatio || '');
+                                imgElement.src = imageUrl;
 
-				// ✅ Ajout des bons data-* pour prévisualisation correcte
-				imgElement.setAttribute('data-display_name', currentUser.display_name || '');
-				imgElement.setAttribute('data-user-logo', currentUser.user_logo || '');
-				imgElement.setAttribute('data-user-id', currentUser.ID || '');
-                                imgElement.setAttribute('data-format-image', selectedRatio || '');
+                                // ✅ Ajout des bons data-* pour prévisualisation correcte
+                                imgElement.setAttribute('data-display_name', currentUser.display_name || '');
+                                imgElement.setAttribute('data-user-logo', currentUser.user_logo || '');
+                                imgElement.setAttribute('data-user-id', currentUser.ID || '');
+                                imgElement.setAttribute('data-format-image', ratioValue || '');
                                 const promptTextUpdate = typeof prompt === 'object'
                                     ? (prompt.text || prompt.prompt || JSON.stringify(prompt))
                                     : (prompt || '');
                                 imgElement.setAttribute('data-prompt', promptTextUpdate);
+                                imageContainers[index].setAttribute('data-format-image', ratioValue || '');
                                 console.log(`${LOG_PREFIX} Image de la grille mise à jour`, {
                                         index,
                                         imageUrl,
