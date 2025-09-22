@@ -149,7 +149,7 @@ function customiizer_get_missions( $user_id = 0 ) {
     $join_totals   = '';
 
     if ( ! empty( $tables ) ) {
-        $select_totals = 'ut.total AS action_total';
+        $select_totals = 'MAX(ut.total) AS action_total';
         $join_totals   = $wpdb->prepare(
             " LEFT JOIN WPC_user_action_totals ut ON ut.user_id = %d AND ut.action = m.trigger_action",
             $user_id
@@ -158,11 +158,12 @@ function customiizer_get_missions( $user_id = 0 ) {
 
     $sql = $wpdb->prepare(
         "SELECT m.mission_id, m.title, m.description, m.goal, m.reward_amount, m.reward_type, m.category, m.trigger_action,
-                um.progress AS user_progress, {$select_totals}, um.completed_at
+                COALESCE(MAX(um.progress), 0) AS user_progress, {$select_totals}, MAX(um.completed_at) AS completed_at
          FROM WPC_missions m
          LEFT JOIN WPC_user_missions um ON m.mission_id = um.mission_id AND um.user_id = %d" .
          $join_totals .
-         " WHERE m.is_active = 1",
+         " WHERE m.is_active = 1
+         GROUP BY m.mission_id",
         $user_id
     );
     $rows = $wpdb->get_results( $sql, ARRAY_A );
