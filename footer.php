@@ -18,30 +18,29 @@ if ( $user_logged_in ) {
 }
 ?>
         </div>
-        <footer>
-                <!-- Blue Band with Centered Links and Right-Aligned Social Icons -->
+        <footer id="site-footer" class="site-footer">
                 <div class="upper-band">
-                        <!-- Centered Links -->
-                        <div class="footer-links-container">
-                                <div class="footer-links">
-                                        <a href="/mentions-legales" class="footer-link">Mentions légales</a>
-                                        <a href="/conditions" class="footer-link">Conditions générales</a>
-                                        <a href="/confidentialite" class="footer-link">Politique de confidentialité</a>
-                                        <a href="/retours" class="footer-link">Politique de retour</a>
-                                        <a href="/cookies" class="footer-link">Gestion des cookies</a>
-                                        <a href="/contact" class="footer-link">Contact</a>
+                        <div class="upper-band__inner">
+                                <div class="footer-links-container">
+                                        <div class="footer-links">
+                                                <a href="/mentions-legales" class="footer-link">Mentions légales</a>
+                                                <a href="/conditions" class="footer-link">Conditions générales</a>
+                                                <a href="/confidentialite" class="footer-link">Politique de confidentialité</a>
+                                                <a href="/retours" class="footer-link">Politique de retour</a>
+                                                <a href="/cookies" class="footer-link">Gestion des cookies</a>
+                                                <a href="/contact" class="footer-link">Contact</a>
+                                        </div>
+                                </div>
+                                <div class="social-icons" aria-label="Réseaux sociaux">
+                                        <a href="https://instagram.com/customiizer" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                                        <a href="https://tiktok.com/customiizer" target="_blank" class="social-icon" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
                                 </div>
                         </div>
-
-                        <!-- Right-Aligned Social Icons -->
-                        <div class="social-icons">
-                                <a href="https://instagram.com/customiizer" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                                <a href="https://tiktok.com/customiizer" target="_blank" class="social-icon" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-                        </div>
                 </div>
-                <!-- Lower Black Band for Copyright -->
                 <div class="lower-band">
-                        <p>© 2025 Customiizer | Développé par Customiizer</p>
+                        <div class="lower-band__inner">
+                                <p>© 2025 Customiizer | Développé par Customiizer</p>
+                        </div>
                 </div>
         </footer>
         <?php wp_footer(); ?>
