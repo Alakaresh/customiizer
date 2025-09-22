@@ -52,6 +52,11 @@
   z-index: 1;
 }
 
+#site-content.home-page > section.home-panel {
+  max-width: 80%;
+  margin-inline: auto;
+}
+
 .surface-card {
   position: relative;
   border: 1px solid var(--home-surface-border);
