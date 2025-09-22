@@ -267,12 +267,12 @@
   border-radius: 999px;
   border: 1px solid var(--color-border-strong);
   font-size: 16px;
-  box-shadow: 0 18px 36px rgba(13, 110, 139, 0.35);
+  box-shadow: 0 18px 36px color-mix(in srgb, var(--color-action-primary) 35%, transparent);
   transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .checkout-button:hover {
   background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
   transform: translateY(-1px);
-  box-shadow: 0 22px 42px rgba(13, 110, 139, 0.4);
+  box-shadow: 0 22px 42px color-mix(in srgb, var(--color-action-primary) 40%, transparent);
 }

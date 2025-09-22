@@ -86,7 +86,7 @@
 }
 
 .signup-button {
-    background-color: var(--color-action-primary); /* Bleu vif pour attirer l'attention */
+    background-color: var(--color-action-primary); /* Vert accentué pour attirer l'attention */
     color: white; /* Texte blanc pour le contraste */
     border: none; /* Aucune bordure pour un look moderne */
     border-radius: 4px; /* Coins arrondis */

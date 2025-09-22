@@ -281,7 +281,7 @@
     transition-duration: 0.3s;
     cursor: pointer;
     border-radius: 999px;
-    box-shadow: 0 16px 28px rgba(13, 110, 139, 0.3);
+    box-shadow: 0 16px 28px color-mix(in srgb, var(--color-action-primary) 30%, transparent);
 }
 
 .ok-button:hover {
@@ -507,7 +507,7 @@ button:hover {
 
 /* Maintenir le style du bouton même lorsqu'il est focus (après clic) */
 #ratioButton:focus {
-    outline: none; /* Retirer la bordure bleue par défaut du focus */
+    outline: none; /* Retirer la bordure de focus par défaut */
     background-color: var(--color-neutral-700); /* Conserver la couleur d'origine */
 }
 
@@ -519,7 +519,7 @@ button:hover {
 
 /* Style du bouton "Generate" */
 #validate-button {
-    background-color: var(--color-action-primary); /* Couleur bleue */
+    background-color: var(--color-action-primary); /* Accent principal */
     color: var(--color-on-primary); /* Texte contrasté */
     padding: 12px 26px; /* Espace intérieur */
     border: 1px solid var(--color-border-strong); /* Bordure harmonisée */
@@ -529,18 +529,18 @@ button:hover {
     transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease; /* Transitions fluides */
     min-width: 150px; /* Largeur minimale du bouton */
     text-align: center; /* Centrer le texte */
-    box-shadow: 0 18px 32px rgba(13, 110, 139, 0.35); /* Ombre pour donner du volume */
+    box-shadow: 0 18px 32px color-mix(in srgb, var(--color-action-primary) 35%, transparent); /* Ombre pour donner du volume */
 }
 
 /* Effet de survol et de clic */
 #validate-button:hover {
-    background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-background) 30%); /* Couleur bleue plus foncée au survol */
+    background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-background) 30%); /* Accent plus profond au survol */
     transform: translateY(-2px); /* Légère remontée pour l'effet de volume */
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Ombre plus forte au survol */
 }
 
 #validate-button:active {
-    background-color: color-mix(in srgb, var(--color-action-primary) 60%, var(--color-background) 40%); /* Couleur encore plus foncée lors du clic */
+    background-color: color-mix(in srgb, var(--color-action-primary) 60%, var(--color-background) 40%); /* Accent renforcé lors du clic */
     transform: translateY(0); /* Revenir à la position initiale au clic */
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Diminuer l'ombre lors du clic */
 }

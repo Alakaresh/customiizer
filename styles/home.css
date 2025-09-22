@@ -154,7 +154,7 @@ text-align: center;
     height: calc(100% - 20px); /* Étendre la hauteur complète du conteneur */
 	margin-top: 10px;
     margin-bottom: 10px;
-    background-color: rgba(0, 123, 255, 0);
+    background-color: transparent;
     color: var(--color-on-secondary);
     border: none;
     padding: 10px;
