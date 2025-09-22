@@ -68,12 +68,17 @@
   }
 
   .home-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
     padding: 24px;
     border-radius: 24px;
   }
 
-  .home-panel--showcase {
-    flex-direction: column;
+  .home-panel--showcase,
+  .home-panel--community,
+  .home-panel--workflow {
+    grid-template-columns: none;
   }
 
   .home-panel__media {

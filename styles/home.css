@@ -338,31 +338,33 @@
   box-shadow: var(--home-panel-shadow);
   background: var(--home-panel-background);
   padding: clamp(24px, 3.6vw, 36px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(20px, 3vw, 28px);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+  align-items: stretch;
+  gap: clamp(24px, 4vw, 40px);
   overflow: hidden;
 }
 
-.home-panel--showcase {
-  grid-column: 1 / -1;
-  flex-direction: row;
-  align-items: stretch;
-}
-
-.home-panel--community {
-  grid-column: 1 / -1;
-}
-
+.home-panel--showcase,
+.home-panel--community,
 .home-panel--workflow {
   grid-column: 1 / -1;
 }
 
-.home-panel__intro {
+.home-panel__intro,
+.home-panel__media {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  flex: 1 1 280px;
+}
+
+.home-panel__media {
+  justify-content: center;
+  gap: clamp(20px, 3vw, 28px);
+}
+
+.home-panel--workflow .home-panel__media {
+  justify-content: flex-start;
 }
 
 .home-panel__intro .home-eyebrow {
@@ -395,12 +397,7 @@
   flex: 0 1 auto;
 }
 
-.home-panel__media {
-  flex: 1 1 320px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+
 
 /* Spotlights */
 .home-spotlights.surface-card {

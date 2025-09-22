@@ -109,41 +109,43 @@ get_header();
       <h2 class="home-panel__title" id="home-workflow-title">Comment ça fonctionne</h2>
       <p class="home-panel__text">Suis un parcours fluide : imagine, génère, personnalise et commande ta création en quelques étapes.</p>
     </div>
-    <ol class="workflow" aria-label="Étapes de création">
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">1</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Choisis ton support</h3>
-          <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
-        </div>
-      </li>
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">2</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Génère avec l’IA</h3>
-          <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
-        </div>
-      </li>
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">3</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Personnalise</h3>
-          <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
-        </div>
-      </li>
-      <li class="workflow__step">
-        <span class="workflow__number" aria-hidden="true">4</span>
-        <div class="workflow__content">
-          <h3 class="workflow__title">Commande &amp; reçois</h3>
-          <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
-        </div>
-      </li>
-    </ol>
-    <div class="home-panel__actions">
-      <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-        <i class="fas fa-magic"></i>
-        <span>Créer maintenant</span>
-      </a>
+    <div class="home-panel__media">
+      <ol class="workflow" aria-label="Étapes de création">
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">1</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Choisis ton support</h3>
+            <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
+          </div>
+        </li>
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">2</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Génère avec l’IA</h3>
+            <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
+          </div>
+        </li>
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">3</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Personnalise</h3>
+            <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
+          </div>
+        </li>
+        <li class="workflow__step">
+          <span class="workflow__number" aria-hidden="true">4</span>
+          <div class="workflow__content">
+            <h3 class="workflow__title">Commande &amp; reçois</h3>
+            <p class="workflow__description">Ajoute au panier, confirme ta commande… il ne reste plus qu’à attendre la livraison !</p>
+          </div>
+        </li>
+      </ol>
+      <div class="home-panel__actions">
+        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
+          <i class="fas fa-magic"></i>
+          <span>Créer maintenant</span>
+        </a>
+      </div>
     </div>
   </section>
 
