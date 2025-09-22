@@ -16,12 +16,13 @@
 
 /* Style pour chaque conteneur individuel d'image */
 .imageContainer {
+    position: relative;
     background: #fff; /* Arrière-plan blanc pour chaque conteneur d'image */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Ombre légère pour un effet de profondeur */
     border-radius: 8px; /* Bordures arrondies */
     overflow: hidden; /* Empêche le contenu de déborder */
     margin-bottom: 20px; /* Espacement entre les conteneurs d'image */
-    transition: transform 0.3s ease-in-out; /* Transition pour l'effet de survol */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Transition pour l'effet de survol */
 }
 
 /* Style pour les images à l'intérieur des conteneurs */
@@ -35,4 +36,34 @@
 .imageContainer:hover {
     transform: translateY(-5px); /* Déplace légèrement le conteneur vers le haut au survol */
     box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Ombre plus prononcée pour un effet de soulèvement */
+}
+
+.image-delete-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.image-delete-button:hover,
+.image-delete-button:focus {
+    background: rgba(220, 53, 69, 0.9);
+    transform: translateY(-1px);
+}
+
+.image-delete-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.imageContainer.is-deleting {
+    opacity: 0.6;
 }

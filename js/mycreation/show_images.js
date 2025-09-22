@@ -2,7 +2,53 @@ if (typeof baseUrl === 'undefined') {
     var baseUrl = window.location.origin;
 }
 
+if (typeof userId === 'undefined') {
+    var userId = window.currentUser && currentUser.ID ? currentUser.ID : 0;
+}
+
 jQuery(document).ready(function($) {
+    function deleteImage(imageDiv, imageNumber) {
+        var requestSucceeded = false;
+
+        imageDiv.addClass('is-deleting');
+
+        var button = imageDiv.find('.image-delete-button');
+        button.prop('disabled', true).text(button.data('loading-label'));
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'delete_user_generated_image',
+                image_number: imageNumber
+            }
+        })
+            .done(function(response) {
+                if (response && response.success) {
+                    requestSucceeded = true;
+                    imageDiv.fadeOut(200, function() {
+                        $(this).remove();
+                    });
+                    return;
+                }
+
+                var message = response && response.data && response.data.message
+                    ? response.data.message
+                    : 'Une erreur est survenue lors de la suppression.';
+                alert(message);
+            })
+            .fail(function() {
+                alert('Impossible de supprimer cette image pour le moment.');
+            })
+            .always(function() {
+                imageDiv.removeClass('is-deleting');
+                if (!requestSucceeded) {
+                    button.prop('disabled', false).text(button.data('default-label'));
+                }
+            });
+    }
+
     function initializeColumns(numColumns) {
         var columns = [];
         for (var i = 0; i < numColumns; i++) {
@@ -30,6 +76,28 @@ jQuery(document).ready(function($) {
             });
             imageDiv.append(imgElement);
 
+            var deleteButton = $('<button/>', {
+                type: 'button',
+                class: 'image-delete-button',
+                text: 'Supprimer'
+            });
+
+            deleteButton.data('default-label', 'Supprimer');
+            deleteButton.data('loading-label', 'Suppression...');
+
+            deleteButton.on('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (!confirm('Voulez-vous vraiment supprimer cette image ?')) {
+                    return;
+                }
+
+                deleteImage(imageDiv, image.image_number);
+            });
+
+            imageDiv.append(deleteButton);
+
             columns[columnIndex].append(imageDiv);
             columnIndex = (columnIndex + 1) % columns.length; // Passe à la colonne suivante
         });
@@ -43,23 +111,33 @@ jQuery(document).ready(function($) {
     }
 
     $.ajax({
-    url: ajaxurl,
-    type: 'POST',
-    data: { action: 'get_all_generated_images' },
-    success: function(response) { // Ajoutez ceci pour inspecter la réponse
-        try {
-            // Assurez-vous que la réponse n'est pas déjà un objet JavaScript
-            var filteredImages = response.filter(function(image) {
-                return image.user_id === userId.toString(); // Assurez-vous que les IDs sont comparés comme des chaînes
-            });
-            displayImages(filteredImages);
-        } catch (e) {
-            console.error("Erreur lors du traitement des données : ", e);
-        }
-    },
-    error: function(xhr, status, error) {
-        console.error("Erreur lors de la récupération des images : ", status, error);
-    }
-});
+        url: ajaxurl,
+        type: 'POST',
+        dataType: 'json',
+        data: { action: 'get_all_generated_images' }
+    })
+        .done(function(response) {
+            try {
+                if (!Array.isArray(response)) {
+                    if (response && response.data && response.data.message) {
+                        console.warn('Aucune image récupérée :', response.data.message);
+                    }
+                    return;
+                }
+
+                var currentUserId = String(userId || '');
+
+                var filteredImages = response.filter(function(image) {
+                    return String(image.user_id) === currentUserId;
+                });
+
+                displayImages(filteredImages);
+            } catch (e) {
+                console.error('Erreur lors du traitement des données : ', e);
+            }
+        })
+        .fail(function(xhr, status, error) {
+            console.error('Erreur lors de la récupération des images : ', status, error);
+        });
 
 });
