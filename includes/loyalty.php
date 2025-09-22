@@ -232,6 +232,13 @@ function customiizer_get_referral_link( $user_id = 0 ) {
  */
 add_action( 'wp_footer', 'customiizer_loyalty_widget' );
 function customiizer_loyalty_widget() {
+    static $rendered = false;
+
+    if ( $rendered ) {
+        return;
+    }
+
+    $rendered = true;
     $logged_in = is_user_logged_in();
 
     if ( $logged_in ) {

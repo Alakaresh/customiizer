@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <img class="loyalty-widget-logo" src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Customiizer" />
         <div class="loyalty-header-info">
             <span class="loyalty-header-title">Mes avantages</span>
-            <span class="loyalty-header-points">
+            <span class="loyalty-header-points loyalty-widget-points">
                 Custompoints: <?php echo intval( $points ); ?>
                 <img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/images/customiizerSiteImages/customPoint.png' ); ?>" alt="Custompoints" />
             </span>
