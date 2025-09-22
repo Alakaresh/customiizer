@@ -48,29 +48,19 @@ $display_name = $current_user->display_name;
                                                 </a>
 					</div>
 				</div>
-				<div class="menu-container">
+                                <div class="menu-container">
                                         <nav class="main-menu">
                                                 <div><a href="/customiize" class="ajax-link">Customiize</a></div>
                                                 <div><a href="/boutique" class="ajax-link">Boutique</a></div>
                                                 <div><a href="/communaute" class="ajax-link">Communauté</a></div>
-						<div>
-							<a href="account?triggerClick=true" class="ajax-link" id="myCreationsLink" data-redirect="account?triggerClick=true">Mes créations</a>
-						</div>
-					</nav>
-				</div>
+                                        </nav>
+                                </div>
 				<div class="account-icons-container">
 
         <?php if ($user_logged_in): ?>
         <?php
         $profile_image_url = customiizer_get_profile_image_url($user_id);
-        global $wpdb;
-        $image_credits = intval($wpdb->get_var($wpdb->prepare("SELECT image_credits FROM WPC_users WHERE user_id = %d", $user_id)));
         ?>
-        <div class="image-credits-container" title="Ces crédits servent à générer des images IA (1 crédit = 1 image)">
-                <i class="fas fa-coins"></i>
-                <span class="image-credits-label">Crédits:</span>
-                <span id="userCredits" class="image-credits-count"><?php echo esc_html($image_credits); ?></span>
-        </div>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
                 <a href="<?php echo wc_get_cart_url(); ?>" class="icon-button">
@@ -124,21 +114,5 @@ $display_name = $current_user->display_name;
                                 display_name: "<?php echo esc_js($display_name); ?>"
                         };
                 </script>
-               <script>
-                       jQuery(document).ready(function($) {
-                               $('#myCreationsLink').on('click', function(event) {
-                                       if (!userIsLoggedIn) {
-                                               event.preventDefault();
-
-                                               // Stocke l’intention dans sessionStorage
-                                               sessionStorage.setItem("redirectAfterLogin", "myCreations");
-
-                                               $('#loginModal').fadeIn(300);
-                                               return false;
-                                       }
-                               });
-                       });
-               </script>
-
         </body>
 </html>

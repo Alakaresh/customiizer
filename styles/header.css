@@ -127,19 +127,6 @@
 	margin-top: -10px;
 }
 
-.image-credits-container {
-       display: inline-flex;
-       align-items: center;
-       gap: 4px;
-       margin-left: 20px; /* Adjust this value as needed */
-       font-size: 16px; /* Or any other appropriate size */
-       color: var(--color-text); /* Couleur de texte dynamique */
-       vertical-align: middle; /* Ensures alignment with other bar elements */
-       background-color: var(--color-header-secondary); /* Couleur de fond basée sur la palette */
-       padding: 5px 10px; /* Padding around the text */
-       border-radius: 15px; /* Border radius for rounded corners */
-       border: 2px solid var(--color-ui-border); /* Bordure utilisant la palette */
-}
 .loyalty-header-container {
         display: flex;
         flex-direction: column;

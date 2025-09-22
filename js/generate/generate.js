@@ -15,11 +15,69 @@ let imageHashes = {};
 let imagesSaved = false;
 let humorIntervalId;
 jQuery(function($) {
-	function resetGenerationState() {
-		console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
-		resetLoadingState();
-		id_image = "";
-		prompt = "";
+        function getUserCredits() {
+                const creditsEl = document.getElementById('userCredits');
+                if (creditsEl) {
+                        const fromDom = parseInt(creditsEl.textContent || '0', 10);
+                        if (!isNaN(fromDom)) {
+                                return fromDom;
+                        }
+                }
+
+                try {
+                        const cached = sessionStorage.getItem('USER_ESSENTIALS');
+                        if (cached) {
+                                const data = JSON.parse(cached);
+                                if (data && data.user_id === (window.currentUser ? currentUser.ID : null)) {
+                                        const fromCache = parseInt(data.image_credits, 10);
+                                        if (!isNaN(fromCache)) {
+                                                return fromCache;
+                                        }
+                                }
+                        }
+                } catch (error) {
+                        console.warn(`${LOG_PREFIX} Lecture du cache USER_ESSENTIALS impossible`, error);
+                }
+
+                if (window.currentUser && typeof currentUser.image_credits !== 'undefined') {
+                        const fromUser = parseInt(currentUser.image_credits, 10);
+                        if (!isNaN(fromUser)) {
+                                return fromUser;
+                        }
+                }
+
+                return 0;
+        }
+
+        function updateUserCredits(credits) {
+                const creditsEl = document.getElementById('userCredits');
+                if (creditsEl) {
+                        creditsEl.textContent = credits;
+                }
+
+                try {
+                        const cached = sessionStorage.getItem('USER_ESSENTIALS');
+                        if (cached) {
+                                const data = JSON.parse(cached);
+                                if (data && data.user_id === (window.currentUser ? currentUser.ID : null)) {
+                                        data.image_credits = credits;
+                                        sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(data));
+                                }
+                        }
+                } catch (error) {
+                        console.warn(`${LOG_PREFIX} Impossible de mettre à jour USER_ESSENTIALS`, error);
+                }
+
+                if (window.currentUser && typeof currentUser.ID !== 'undefined') {
+                        currentUser.image_credits = credits;
+                }
+        }
+
+        function resetGenerationState() {
+                console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
+                resetLoadingState();
+                id_image = "";
+                prompt = "";
 		settings = "";
 		upscaledImageUrls = [];
 		imagesSaved = false;
@@ -83,13 +141,12 @@ jQuery(function($) {
 			return;
 		}
 
-		const creditsEl = document.getElementById('userCredits');
-		const credits = creditsEl ? parseInt(creditsEl.textContent || "0", 10) : 0;
+                const credits = getUserCredits();
 
-		if (!credits || credits <= 0) {
-			showAlert("Vous n'avez pas assez de crédits pour générer des images.");
-			return;
-		}
+                if (!credits || credits <= 0) {
+                        showAlert("Vous n'avez pas assez de crédits pour générer des images.");
+                        return;
+                }
 
 
 		// Cache l'alerte si tout est OK
@@ -135,28 +192,15 @@ jQuery(function($) {
 				setTimeout(() => checkStatus(), 1000);
 
 				// 💳 Décrémentation des crédits si succès
-				const creditsEl = document.getElementById('userCredits');
-				if (creditsEl) {
-					let currentCredits = parseInt(creditsEl.textContent || "0", 10);
-					if (!isNaN(currentCredits) && currentCredits > 0) {
-						currentCredits -= 1;
-						creditsEl.textContent = currentCredits;
-						console.log(`${LOG_PREFIX} Crédit consommé après génération`, { creditsRestants: currentCredits });
+                                let currentCredits = getUserCredits();
+                                if (currentCredits > 0) {
+                                        currentCredits -= 1;
+                                        updateUserCredits(currentCredits);
+                                        console.log(`${LOG_PREFIX} Crédit consommé après génération`, { creditsRestants: currentCredits });
 
-						// 🧠 Cache sessionStorage à jour
-						const cached = sessionStorage.getItem('USER_ESSENTIALS');
-						if (cached) {
-							let cacheData = JSON.parse(cached);
-							if (cacheData.user_id === currentUser.ID) {
-								cacheData.image_credits = currentCredits;
-								sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(cacheData));
-							}
-						}
-
-						// 🔄 Synchro serveur
-						await updateCreditsInDB(currentUser.ID);
-					}
-				}
+                                        // 🔄 Synchro serveur
+                                        await updateCreditsInDB(currentUser.ID);
+                                }
 
 				lastUpdateTime = Date.now();
 				lastProgress = 15;

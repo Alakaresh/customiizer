@@ -52,31 +52,6 @@
                 right: 8px;
         }
 
-	/* Masquer seulement le texte "Crédits:" mais garder l'icône + nombre */
-        .image-credits-container {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                border: none;
-        }
-
-        .image-credits-label {
-                display: none;
-        }
-
-	.image-credits-container i {
-		font-size: 16px;
-		margin: 0;
-		line-height: 1;
-
-	}
-
-	.image-credits-container #userCredits {
-		font-size: 14px;
-		line-height: 1;
-		display: inline-block;
-	}
-
 	/*==========FOOTER==========*/
 	.upper-band {
 		height: auto;
