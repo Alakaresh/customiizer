@@ -166,7 +166,7 @@ text-align: center;
 }
 
 .carousel-control-prev:hover, .carousel-control-next:hover {
-    background-color: color-mix(in srgb, var(--color-surface-contrast) 40%, transparent);
+    background-color: color-mix(in srgb, var(--color-surface-overlay) 65%, transparent);
 }
 .carousel-control-prev {
     left: 0px; /* Ajustez cette valeur pour positionner hors des images si nécessaire */

@@ -1,18 +1,20 @@
 .customization-section, .image-list-section {
     width: 100%;
     margin: 20px 0;
-    background-color: var(--color-neutral-100);
-    border: 1px solid var(--color-border-light);
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, var(--color-surface-card), color-mix(in srgb, var(--color-surface-card-alt) 60%, transparent));
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 24px 48px rgba(8, 15, 35, 0.45);
+    color: var(--color-text-primary);
 }
 
 .customization-header h1, .image-list-header h2 {
     margin: 0;
-    padding: 10px 0;
+    padding: 10px 0 20px;
     text-align: center;
-    color: var(--color-neutral-800);
+    color: var(--color-text-primary);
+    letter-spacing: 0.04em;
 }
 
 .customization-body {
@@ -22,19 +24,25 @@
 .sidebar {
     flex: 1;
     border-right: 1px solid var(--color-border-medium);
-    padding: 10px;
+    padding: 16px;
+    background: color-mix(in srgb, var(--color-surface-card-alt) 85%, transparent);
+    border-radius: 16px;
 }
 
 .main-content {
     flex: 3;
-    padding: 10px;
+    padding: 16px;
+    background: color-mix(in srgb, var(--color-surface-card) 85%, transparent);
+    border-radius: 16px;
 }
 
 .container-2d, .container-3d {
-    margin: 10px;
-    padding: 20px;
-    background: white;
+    margin: 16px;
+    padding: 24px;
+    background: var(--color-surface-overlay);
     border: 1px solid var(--color-border-medium);
+    border-radius: 18px;
+    box-shadow: 0 18px 36px rgba(8, 15, 35, 0.35);
     height: 300px; /* Adjust height as needed */
 }
 
@@ -44,17 +52,21 @@
 }
 
 .action-button {
-    background-color: var(--color-action-primary);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    background: linear-gradient(135deg, var(--color-action-primary), color-mix(in srgb, var(--color-action-primary) 70%, var(--color-background) 30%));
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-border-strong);
+    padding: 12px 26px;
+    border-radius: 999px;
     cursor: pointer;
     font-size: 16px;
+    box-shadow: 0 16px 32px rgba(13, 110, 139, 0.35);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .action-button:hover {
-    background-color: color-mix(in srgb, var(--color-action-primary) 70%, var(--color-text-contrast) 30%);
+    background: linear-gradient(135deg, var(--color-action-primary-hover), color-mix(in srgb, var(--color-action-primary-hover) 70%, var(--color-background) 30%));
+    box-shadow: 0 20px 38px rgba(13, 110, 139, 0.4);
+    transform: translateY(-2px);
 }
 
 .images-container {
@@ -70,12 +82,17 @@
 
 .images-container li {
     margin: 10px;
-    padding: 10px;
-    border: 1px solid var(--color-border-light);
+    padding: 12px;
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-surface-card-alt);
+    border-radius: 14px;
     display: inline-block;
     cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .images-container li:hover {
     border-color: var(--color-action-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(8, 15, 35, 0.35);
 }

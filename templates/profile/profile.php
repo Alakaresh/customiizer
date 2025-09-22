@@ -15,7 +15,7 @@
 					<div class="form-row">
 						<div class="form-group full-width">
 							<label for="email">Adresse email</label>
-							<input type="email" id="email" name="email" required readonly style="background-color: #cccccc; color: #7f7f7f; cursor: not-allowed;">
+                                                        <input type="email" id="email" name="email" required readonly style="background-color: var(--color-surface-overlay); color: var(--color-text-muted); border: 1px solid var(--color-border-subtle); border-radius: 12px; cursor: not-allowed;">
 						</div>
 					</div>
 					<div class="form-row">

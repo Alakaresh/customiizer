@@ -16,12 +16,13 @@
 
 /* Style pour chaque conteneur individuel d'image */
 .imageContainer {
-    background: var(--color-surface-contrast); /* Arrière-plan blanc pour chaque conteneur d'image */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Ombre légère pour un effet de profondeur */
-    border-radius: 8px; /* Bordures arrondies */
-    overflow: hidden; /* Empêche le contenu de déborder */
-    margin-bottom: 20px; /* Espacement entre les conteneurs d'image */
-    transition: transform 0.3s ease-in-out; /* Transition pour l'effet de survol */
+    background: linear-gradient(135deg, var(--color-surface-card), color-mix(in srgb, var(--color-surface-card-alt) 60%, transparent));
+    box-shadow: 0 20px 42px rgba(8, 15, 35, 0.45);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 /* Style pour les images à l'intérieur des conteneurs */
@@ -33,6 +34,7 @@
 
 /* Effet de survol pour les conteneurs d'image */
 .imageContainer:hover {
-    transform: translateY(-5px); /* Déplace légèrement le conteneur vers le haut au survol */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Ombre plus prononcée pour un effet de soulèvement */
+    transform: translateY(-6px);
+    box-shadow: 0 28px 52px rgba(8, 15, 35, 0.55);
+    border-color: var(--color-border-strong);
 }
