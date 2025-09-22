@@ -162,6 +162,9 @@
 /* Hero */
 .home-experience {
   display: block;
+}
+
+.home-experience.surface-card {
   padding: clamp(36px, 5vw, 64px);
 }
 

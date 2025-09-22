@@ -58,6 +58,10 @@
 
   /* Experience */
   .home-experience {
+    padding: 0;
+  }
+
+  .home-experience.surface-card {
     padding: 32px 24px 40px;
   }
 

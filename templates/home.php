@@ -7,7 +7,7 @@ get_header();
 <main id="site-content" class="site-content home-page">
   <section class="home-section home-section--experience">
     <div class="home-section__inner">
-      <section class="home-experience" aria-labelledby="home-experience-title">
+      <section class="home-experience surface-card" aria-labelledby="home-experience-title">
         <div class="home-hero__content">
           <div class="home-hero__body">
             <span class="home-eyebrow">Studio de personnalisation IA</span>
