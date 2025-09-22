@@ -39,7 +39,7 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: clamp(64px, 8vw, 120px) 0 clamp(120px, 14vw, 200px);
+  padding: clamp(32px, 4vw, 60px) 0 clamp(120px, 14vw, 200px);
   background-color: #0b0b0b;
   color: var(--home-body-text);
 }
