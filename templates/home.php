@@ -232,6 +232,9 @@ get_header();
       </div>
     </div>
   </section>
+  <button class="scroll-to-top" type="button" aria-label="Revenir en haut">
+    <i class="fas fa-arrow-up" aria-hidden="true"></i>
+  </button>
 </main>
 
 <?php get_footer(); ?>
