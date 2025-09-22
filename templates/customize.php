@@ -42,8 +42,8 @@ function load_main_content() {
 		<?php wp_head(); ?>
 	</head>
 	<body>
-		<main id="site-content" class="full-content">
-			<div id="customize-main">
+            <main id="site-content" class="full-content">
+                        <div id="customize-main" class="studio-layout">
 				<?php if (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) { ?>
 				<?php get_template_part('templates/generate/customize', 'main'); ?>
 				<?php } ?>
