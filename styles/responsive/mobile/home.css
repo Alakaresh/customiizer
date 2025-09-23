@@ -96,7 +96,7 @@
   }
 
   /* Spotlights */
-  .home-spotlights.surface-card {
+  .home-panel--spotlights.surface-card {
     gap: 32px;
   }
 
