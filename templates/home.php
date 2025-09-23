@@ -5,44 +5,6 @@ Template Name: Home
 get_header();
 ?>
 <main id="site-content" class="site-content home-page">
-  <section class="home-panel home-panel--hero" aria-labelledby="home-hero-title">
-    <div class="home-panel__intro">
-      <span class="home-eyebrow">Studio de personnalisation IA</span>
-      <h1 class="first_title home-panel__headline" id="home-hero-title">Donne vie à tes idées !</h1>
-      <p class="text home-panel__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
-      <div class="home-panel__actions">
-        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
-          <i class="fas fa-magic"></i>
-          <span>Créer maintenant</span>
-        </a>
-        <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
-          <i class="fas fa-store"></i>
-          <span>Explorer la boutique</span>
-        </a>
-      </div>
-    </div>
-    <div class="home-panel__media">
-      <ul class="home-panel__highlights" aria-label="Points forts Customiizer">
-        <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
-        <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
-      </ul>
-      <div class="home-panel__metrics" aria-label="Chiffres clés Customiizer">
-        <div class="home-panel__metric">
-          <span class="home-panel__metric-value">120</span>
-          <span class="home-panel__metric-label">Supports personnalisables</span>
-        </div>
-        <div class="home-panel__metric">
-          <span class="home-panel__metric-value">24/7</span>
-          <span class="home-panel__metric-label">Assistance dédiée</span>
-        </div>
-        <div class="home-panel__metric">
-          <span class="home-panel__metric-value">+15k</span>
-          <span class="home-panel__metric-label">Créations IA générées</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section class="home-panel home-panel--showcase" aria-labelledby="home-showcase-title">
     <div class="home-panel__intro">
       <span class="home-eyebrow">Boutique immersive</span>
@@ -93,6 +55,44 @@ get_header();
         <button class="carousel-control-next" role="button" aria-label="Voir les créations suivantes">
           <span class="fas fa-chevron-right" aria-hidden="true"></span>
         </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-panel home-panel--hero" aria-labelledby="home-hero-title">
+    <div class="home-panel__intro">
+      <span class="home-eyebrow">Studio de personnalisation IA</span>
+      <h1 class="first_title home-panel__headline" id="home-hero-title">Donne vie à tes idées !</h1>
+      <p class="text home-panel__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
+      <div class="home-panel__actions">
+        <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
+          <i class="fas fa-magic"></i>
+          <span>Créer maintenant</span>
+        </a>
+        <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>" class="home-button home-button--ghost">
+          <i class="fas fa-store"></i>
+          <span>Explorer la boutique</span>
+        </a>
+      </div>
+    </div>
+    <div class="home-panel__media">
+      <ul class="home-panel__highlights" aria-label="Points forts Customiizer">
+        <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
+        <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
+      </ul>
+      <div class="home-panel__metrics" aria-label="Chiffres clés Customiizer">
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">120</span>
+          <span class="home-panel__metric-label">Supports personnalisables</span>
+        </div>
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">24/7</span>
+          <span class="home-panel__metric-label">Assistance dédiée</span>
+        </div>
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">+15k</span>
+          <span class="home-panel__metric-label">Créations IA générées</span>
+        </div>
       </div>
     </div>
   </section>
