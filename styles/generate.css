@@ -298,7 +298,10 @@
 }
 #selected-display {
     margin-top: 6px;
-    text-align: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 #selected-info {
