@@ -175,8 +175,8 @@
 }
 
 .copy-button:hover {
-    background-color: #ccc; /* Gris clair au survol */
-    color: black;
+    background-color: #555; /* Gris foncé au survol */
+    color: #ffffff;
 }
 
 .copy-button i {
@@ -219,8 +219,8 @@
 }
 
 .close-button:hover {
-    background-color: #ccc; /* Gris clair au survol */
-    color: black;
+    background-color: #555; /* Gris foncé au survol */
+    color: #ffffff;
 }
 
 .close-button i {
@@ -349,7 +349,7 @@
         width: 100%;
         padding: 16px 18px;
         background: linear-gradient(145deg, rgba(72, 72, 72, 0.55), rgba(46, 46, 46, 0.6));
-        color: #f5f5f5;
+        color: #ffffff;
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 12px;
         cursor: pointer;
@@ -425,7 +425,7 @@
         padding: 8px 22px;
         font-size: 0.85rem;
         background: transparent;
-        color: #d0d0d0;
+        color: #ffffff;
         border: 1px solid rgba(255, 255, 255, 0.18);
         border-radius: 999px;
         cursor: pointer;

@@ -450,7 +450,7 @@
 
 .format-button {
     background: rgba(24, 24, 24, 0.92);
-    color: rgba(255, 255, 255, 0.85);
+    color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 0.65rem 1.2rem;
     font-size: 0.95rem;
@@ -466,7 +466,7 @@
 .format-button:hover,
 .format-button:focus {
     background: rgba(28, 28, 28, 0.98);
-    color: #f5fff9;
+    color: #ffffff;
     border-color: rgba(43, 216, 121, 0.55);
     box-shadow: 0 18px 28px rgba(43, 216, 121, 0.2);
     outline: none;
@@ -475,7 +475,7 @@
 .format-button.active,
 .format-button.selected {
     border-color: var(--color-brand-500, #1fb86c);
-    color: var(--color-brand-400, #2bd879);
+    color: #ffffff;
 }
 
 
@@ -508,8 +508,8 @@
     border-color: transparent !important;
 }
 #infoButton {
-    background-color: white; /* Fond blanc */
-    color: black; /* Icône noire */
+    background-color: rgba(24, 24, 24, 0.92); /* Fond sombre */
+    color: #ffffff; /* Icône blanche */
     border: none;
     padding: 0.5em; /* Padding basé sur la taille de la police */
     width: 1.5em; /* Largeur du bouton basée sur la taille de la police */
@@ -525,8 +525,8 @@
 }
 
 #infoButton:hover {
-    background-color: #e8e8e8; /* Changement de couleur au survol */
-    color: #333; /* Changement de la couleur de l'icône au survol */
+    background-color: rgba(36, 36, 36, 0.96); /* Changement de couleur au survol */
+    color: #ffffff; /* Icône blanche au survol */
 }
 
 .intro {
@@ -583,7 +583,7 @@ p {
 
 #buttons-container button {
     background: linear-gradient(135deg, rgba(19, 86, 63, 0.95) 0%, rgba(24, 120, 79, 0.95) 50%, rgba(43, 216, 121, 0.95) 100%);
-    color: #f8fffc;
+    color: #ffffff;
     padding: 0.85rem 1.65rem;
     border: 1px solid rgba(43, 216, 121, 0.35);
     border-radius: 999px;
@@ -602,6 +602,7 @@ p {
     transform: translateY(-2px);
     background-position: 100% 50%;
     box-shadow: 0 26px 40px rgba(43, 216, 121, 0.32);
+    color: #ffffff;
 }
 
 #buttons-container button:focus-visible {

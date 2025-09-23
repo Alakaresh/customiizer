@@ -66,14 +66,17 @@ a:hover {
 button,
 .button {
   background-color: var(--color-primary);
-  color: var(--color-text);
+  color: #ffffff;
   border: none;
   cursor: pointer;
 }
 
 button:hover,
-.button:hover {
+.button:hover,
+button:focus-visible,
+.button:focus-visible {
   background: var(--color-secondary);
+  color: #ffffff;
 }
 
 /* Surcharge des styles de WooCommerce pour les images dans le panier */
