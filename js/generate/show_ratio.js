@@ -5,6 +5,19 @@ let selectedProductKey = '';
 let globalProducts = [];
 let ratioFromQuery = '';
 
+function sanitizeRatioText(value) {
+    if (typeof value !== 'string') {
+        return '';
+    }
+
+    let sanitized = value.replace(/ratio\s+brut/gi, '');
+    sanitized = sanitized.replace(/\(\s*\)/g, '');
+    sanitized = sanitized.replace(/\s{2,}/g, ' ');
+    sanitized = sanitized.replace(/^[\s·,:;\-–—]+/, '');
+
+    return sanitized.trim();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     ratioFromQuery = getRatioFromQueryParam();
     loadProductData();
@@ -205,7 +218,8 @@ function displayVariantsForProduct(normalizedName) {
 
         const title = document.createElement('h4');
         title.className = 'product-group-title';
-        title.textContent = ratioKey === '__other__' ? 'Autres formats' : `Format ${ratioKey}`;
+        const displayRatio = sanitizeRatioText(ratioKey);
+        title.textContent = ratioKey === '__other__' || !displayRatio ? 'Autres formats' : `Format ${displayRatio}`;
         section.appendChild(title);
 
         const list = document.createElement('div');
@@ -316,8 +330,9 @@ function updateSelectedInfo(variant) {
     if (variant.size) {
         parts.push(variant.size);
     }
-    if (variant.ratio_image) {
-        parts.push(variant.ratio_image);
+    const ratioLabel = sanitizeRatioText(variant.ratio_image);
+    if (ratioLabel) {
+        parts.push(ratioLabel);
     }
 
     const label = parts.join(' · ') || 'Sélectionnez un format';

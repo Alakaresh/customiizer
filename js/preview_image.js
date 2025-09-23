@@ -1,6 +1,19 @@
 let knownDbRatios = new Set();
 const STANDARD_RATIOS = new Set(['1:1', '3:4', '4:3', '16:9', '9:16']);
 
+function sanitizeRatioText(value) {
+        if (typeof value !== 'string') {
+                return '';
+        }
+
+        let sanitized = value.replace(/ratio\s+brut/gi, '');
+        sanitized = sanitized.replace(/\(\s*\)/g, '');
+        sanitized = sanitized.replace(/\s{2,}/g, ' ');
+        sanitized = sanitized.replace(/^[\s·,:;\-–—]+/, '');
+
+        return sanitized.trim();
+}
+
 function buildVariantLabel(variant) {
         if (!variant || typeof variant !== 'object') {
                 return '';
@@ -31,12 +44,13 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
         container.innerHTML = '';
 
         const normalizedFormat = normalizeFormatValue(targetFormat);
-        const shouldDisplayRatioLabel = Boolean(defaultFormatLabel) && (!normalizedFormat || STANDARD_RATIOS.has(normalizedFormat));
+        const displayLabel = sanitizeRatioText(defaultFormatLabel) || defaultFormatLabel;
+        const shouldDisplayRatioLabel = Boolean(displayLabel) && (!normalizedFormat || STANDARD_RATIOS.has(normalizedFormat));
 
         if (shouldDisplayRatioLabel) {
                 const ratioLabel = document.createElement('div');
                 ratioLabel.classList.add('format-ratio-label');
-                ratioLabel.textContent = defaultFormatLabel;
+                ratioLabel.textContent = displayLabel;
                 container.appendChild(ratioLabel);
         }
 
@@ -58,7 +72,7 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
 
                 const productNameEl = document.createElement('div');
                 productNameEl.classList.add('format-product-name');
-                productNameEl.textContent = product.name || defaultFormatLabel || 'Produit disponible';
+                productNameEl.textContent = product.name || displayLabel || 'Produit disponible';
                 productBlock.appendChild(productNameEl);
 
                 const variants = Array.isArray(product.variants) ? product.variants : [];
@@ -237,6 +251,7 @@ function handleImageClick(event) {
 function openImageOverlay(src, userId, username, formatImage, prompt) {
         const targetFormat = normalizeFormatValue(formatImage);
         const defaultFormatLabel = targetFormat || 'Format non communiqué';
+        const displayFormatLabel = sanitizeRatioText(defaultFormatLabel) || defaultFormatLabel;
         const dbRatios = refreshKnownDbRatios();
         const cacheInstance = window.formatProductsCache || null;
         const initialCachedEntry = cacheInstance && targetFormat ? cacheInstance.get(targetFormat) : undefined;
@@ -338,8 +353,8 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 	const formatTitleContainer = document.createElement('div');
 	formatTitleContainer.classList.add('format-title-container');
 
-	const formatTitle = document.createElement('span');
-	formatTitle.textContent = 'Format';
+        const formatTitle = document.createElement('span');
+        formatTitle.textContent = 'Format';
 	formatTitle.classList.add('format-title');
 
 	const formatTextElement = document.createElement('div');
@@ -441,7 +456,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         productNames: productIds.map((id) => grouped[id].name).filter(Boolean)
                 });
 
-                renderFormatProductList(formatTextElement, grouped, productIds, defaultFormatLabel, targetFormat);
+                renderFormatProductList(formatTextElement, grouped, productIds, displayFormatLabel, targetFormat);
 
                 useImageButton.disabled = false;
 
@@ -495,7 +510,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         });
                         updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
-                        formatTextElement.textContent = defaultFormatLabel;
+                        formatTextElement.textContent = displayFormatLabel;
                         return;
                 }
 
@@ -506,7 +521,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 }
         };
 
-        formatTextElement.textContent = defaultFormatLabel;
+        formatTextElement.textContent = displayFormatLabel;
         updateUseImageButtonHandler(null);
         useImageButton.disabled = true;
 
