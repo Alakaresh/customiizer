@@ -45,6 +45,9 @@ body.shop-flex-layout #customize-main > #content {
         gap: clamp(20px, 4vw, 32px);
         padding: clamp(20px, 4vw, 48px);
         justify-content: center;
+        flex: 1;
+        min-height: calc(100vh - 120px);
+        box-sizing: border-box;
         position: relative;
         z-index: 1;
 }
