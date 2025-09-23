@@ -584,7 +584,7 @@ body {
     border-radius: 999px;
     border: 1px solid rgba(26, 188, 156, 0.65);
     background: linear-gradient(135deg, #1abc9c, #0f7f65);
-    color: #f6fffd;
+    color: #ffffff;
     cursor: pointer;
     box-shadow: 0 26px 48px rgba(26, 188, 156, 0.35);
     transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
@@ -612,6 +612,7 @@ body {
     box-shadow: 0 32px 58px rgba(26, 188, 156, 0.45);
     background: linear-gradient(135deg, #1cd2ae, #109c78);
     outline: none;
+    color: #ffffff;
 }
 
 .design-button:hover::before,
@@ -655,7 +656,7 @@ body {
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
-    color: #f9f9f9;
+    color: #ffffff;
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -684,6 +685,7 @@ body {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
     border-color: rgba(255, 255, 255, 0.38);
     outline: none;
+    color: #ffffff;
 }
 
 .add-to-cart-button:hover::before,
