@@ -61,22 +61,6 @@ function load_main_content() {
 					<?php load_main_content(); ?>
 				</div>
 
-				<!-- Right Sidebar - Only for /generate page -->
-				<div id="right-sidebar" class="sidebar <?php echo (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) ? '' : 'hidden'; ?>">
-					<div id="sidebar-header">
-						<?php
-						// Charge le header de la sidebar uniquement pour les pages spécifiques
-						if (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) {
-							get_template_part('templates/generate/RightSidebar', 'header');
-						}
-						?>
-					</div>
-					<div id="sidebar-content">
-						<?php if (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) {
-	get_template_part('templates/generate/RightSidebar', 'content');
-} ?>
-					</div>
-				</div>
 			</div>
 		</main>
 		<?php wp_footer(); ?>

@@ -67,13 +67,28 @@ function enableInfoModal() {
 
 // Fonction d'ajustement de la hauteur des images
 function adjustImageHeight() {
-	const headerHeight = 90; // Hauteur du header
-	const marginBetweenImages = 30; // Marge totale entre les images
-	const gridHeight = (window.innerHeight - headerHeight - marginBetweenImages) / 2; // Divise l'espace restant par deux pour deux images en hauteur
+        const images = document.querySelectorAll('.image-grid img, #content-images > img.centered-image');
+        if (images.length === 0) {
+                return;
+        }
 
-	document.querySelectorAll('.image-grid img').forEach(img => {
-		img.style.height = `${gridHeight}px`; // Ajuste la hauteur de chaque image
-	});
+        let needsRetry = false;
+
+        images.forEach(img => {
+                img.style.height = '';
+
+                // Utilise la largeur calculée par le layout CSS pour garantir un conteneur carré
+                const width = img.clientWidth;
+                if (width > 0) {
+                        img.style.height = `${width}px`;
+                } else if (img.offsetParent !== null) {
+                        needsRetry = true;
+                }
+        });
+
+        if (needsRetry) {
+                window.requestAnimationFrame(adjustImageHeight);
+        }
 }
 
 function displayPrompt() {
