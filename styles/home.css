@@ -504,17 +504,19 @@
   align-items: center;
   justify-content: center;
   padding: 14px 12px;
-  background: linear-gradient(135deg, rgba(26, 188, 156, 0.82), rgba(109, 242, 210, 0.52));
-  color: #ffffff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  color: var(--home-heading-text);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  border: none;
+  border-top: 1px solid var(--home-subtle-border);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .product-name-link:hover,
 .product-name-link:focus-visible {
-  background: linear-gradient(135deg, rgba(26, 188, 156, 1), rgba(109, 242, 210, 0.72));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  color: var(--home-strong-text);
 }
 
 .product-name {
