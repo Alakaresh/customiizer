@@ -187,48 +187,47 @@ function displayVariantsForProduct(normalizedName) {
         return;
     }
 
-    const groupedByRatio = groupVariantsByRatio(uniqueVariants);
-    const sortedRatioKeys = Array.from(groupedByRatio.keys()).sort(compareRatioKeys);
+    const sortedVariants = uniqueVariants
+        .slice()
+        .sort((a, b) => {
+            const ratioDiff = parseRatioValue(a.ratio_image) - parseRatioValue(b.ratio_image);
+            if (ratioDiff !== 0) {
+                return ratioDiff;
+            }
+
+            return getVariantOrderValue(a) - getVariantOrderValue(b);
+        });
+
+    const section = document.createElement('section');
+    section.className = 'product-group';
+    section.setAttribute('role', 'listitem');
+
+    const title = document.createElement('h4');
+    title.className = 'product-group-title';
+    title.textContent = 'Variantes disponibles';
+    section.appendChild(title);
+
+    const list = document.createElement('div');
+    list.className = 'product-variants-grid';
+    section.appendChild(list);
 
     let firstSelectable = null;
     let ratioMatch = null;
 
-    sortedRatioKeys.forEach(ratioKey => {
-        const variants = groupedByRatio.get(ratioKey) || [];
-        if (variants.length === 0) {
-            return;
+    sortedVariants.forEach(variant => {
+        const item = buildVariantItem(variant);
+        list.appendChild(item);
+
+        if (!firstSelectable) {
+            firstSelectable = { element: item, variant };
         }
 
-        const section = document.createElement('section');
-        section.className = 'product-group';
-        section.setAttribute('role', 'listitem');
-
-        const title = document.createElement('h4');
-        title.className = 'product-group-title';
-        title.textContent = ratioKey === '__other__' ? 'Autres formats' : `Format ${ratioKey}`;
-        section.appendChild(title);
-
-        const list = document.createElement('div');
-        list.className = 'product-variants-grid';
-        section.appendChild(list);
-
-        variants
-            .sort((a, b) => getVariantOrderValue(a) - getVariantOrderValue(b))
-            .forEach(variant => {
-                const item = buildVariantItem(variant);
-                list.appendChild(item);
-
-                if (!firstSelectable) {
-                    firstSelectable = { element: item, variant };
-                }
-
-                if (!ratioMatch && ratioMatches(variant.ratio_image, ratioFromQuery)) {
-                    ratioMatch = { element: item, variant };
-                }
-            });
-
-        container.appendChild(section);
+        if (!ratioMatch && ratioMatches(variant.ratio_image, ratioFromQuery)) {
+            ratioMatch = { element: item, variant };
+        }
     });
+
+    container.appendChild(section);
 
     const targetSelection = ratioMatch || firstSelectable;
     if (targetSelection) {
@@ -316,48 +315,10 @@ function updateSelectedInfo(variant) {
     if (variant.size) {
         parts.push(variant.size);
     }
-    if (variant.ratio_image) {
-        parts.push(variant.ratio_image);
-    }
 
     const label = parts.join(' · ') || 'Sélectionnez un format';
     selectedInfo.textContent = label;
     selectedInfo.setAttribute('title', label);
-}
-
-function groupVariantsByRatio(variants) {
-    const map = new Map();
-
-    variants.forEach(variant => {
-        const key = (variant.ratio_image && variant.ratio_image.trim()) || '__other__';
-        if (!map.has(key)) {
-            map.set(key, []);
-        }
-        map.get(key).push(variant);
-    });
-
-    return map;
-}
-
-function compareRatioKeys(a, b) {
-    if (a === b) {
-        return 0;
-    }
-    if (a === '__other__') {
-        return 1;
-    }
-    if (b === '__other__') {
-        return -1;
-    }
-
-    const valueA = parseRatioValue(a);
-    const valueB = parseRatioValue(b);
-
-    if (valueA === valueB) {
-        return a.localeCompare(b, 'fr', { sensitivity: 'base', numeric: true });
-    }
-
-    return valueA - valueB;
 }
 
 function parseRatioValue(ratio) {
