@@ -25,13 +25,8 @@ get_header();
       <ul class="home-panel__highlights" aria-label="Points forts Customiizer">
         <li><i class="fas fa-star" aria-hidden="true"></i><span>Modèles exclusifs et IA générative</span></li>
         <li><i class="fas fa-bolt" aria-hidden="true"></i><span>Personnalisation en temps réel</span></li>
-        <li><i class="fas fa-truck" aria-hidden="true"></i><span>Produits livrés rapidement</span></li>
       </ul>
       <div class="home-panel__metrics" aria-label="Chiffres clés Customiizer">
-        <div class="home-panel__metric">
-          <span class="home-panel__metric-value">+15k</span>
-          <span class="home-panel__metric-label">Créations IA générées</span>
-        </div>
         <div class="home-panel__metric">
           <span class="home-panel__metric-value">120</span>
           <span class="home-panel__metric-label">Supports personnalisables</span>
@@ -39,6 +34,10 @@ get_header();
         <div class="home-panel__metric">
           <span class="home-panel__metric-value">24/7</span>
           <span class="home-panel__metric-label">Assistance dédiée</span>
+        </div>
+        <div class="home-panel__metric">
+          <span class="home-panel__metric-value">+15k</span>
+          <span class="home-panel__metric-label">Créations IA générées</span>
         </div>
       </div>
     </div>
