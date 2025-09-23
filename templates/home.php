@@ -155,36 +155,36 @@ get_header();
         <div class="home-spotlights__icon" aria-hidden="true">
           <i class="fas fa-magic"></i>
         </div>
-        <h3 class="home-spotlights__card-title">Studio IA complet</h3>
-        <p class="home-spotlights__card-text">Génère des visuels haute définition, ajuste les détails et teste plusieurs styles en quelques secondes.</p>
+        <h3 class="home-spotlights__card-title">Générateur IA simple et efficace</h3>
+        <p class="home-spotlights__card-text">Crée en quelques clics des visuels uniques pour personnaliser tes objets. Accessible, rapide, et déjà prêt à l’usage.</p>
         <ul class="home-spotlights__features">
-          <li><i class="fas fa-check" aria-hidden="true"></i>Prompts assistés multilingues</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Génération d’images IA en ligne</li>
           <li><i class="fas fa-check" aria-hidden="true"></i>Variantes instantanées</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Export optimisé pour l’impression</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Améliorations régulières selon vos retours</li>
         </ul>
       </article>
       <article class="home-spotlights__card">
         <div class="home-spotlights__icon" aria-hidden="true">
           <i class="fas fa-layer-group"></i>
         </div>
-        <h3 class="home-spotlights__card-title">Du concept à l’objet</h3>
-        <p class="home-spotlights__card-text">Personnalise des supports premium et visualise le rendu final grâce à nos mockups dynamiques.</p>
+        <h3 class="home-spotlights__card-title">Prévisualisation produit en direct</h3>
+        <p class="home-spotlights__card-text">Visualise immédiatement tes créations appliquées sur nos produits pour voir le rendu final avant commande.</p>
         <ul class="home-spotlights__features">
-          <li><i class="fas fa-check" aria-hidden="true"></i>Mockups 3D en temps réel</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Options matières et finitions</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Production et livraison suivies</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Aperçu en temps réel</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Premiers produits disponibles dès maintenant</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Nouvelles options en préparation</li>
         </ul>
       </article>
       <article class="home-spotlights__card">
         <div class="home-spotlights__icon" aria-hidden="true">
           <i class="fas fa-users"></i>
         </div>
-        <h3 class="home-spotlights__card-title">Communauté vibrante</h3>
-        <p class="home-spotlights__card-text">Rejoins des designers, artistes et marques qui partagent leurs inspirations et retours d’expérience.</p>
+        <h3 class="home-spotlights__card-title">Une galerie qui se lance</h3>
+        <p class="home-spotlights__card-text">Découvre les premières créations générées par la communauté. Une vitrine qui grandira au fil des utilisateurs.</p>
         <ul class="home-spotlights__features">
-          <li><i class="fas fa-check" aria-hidden="true"></i>Galeries thématiques</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Défis créatifs hebdomadaires</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Programme de fidélité exclusif</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Affichage des images générées</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Inspiration grâce aux créations partagées</li>
+          <li><i class="fas fa-check" aria-hidden="true"></i>Une base qui évoluera avec le temps</li>
         </ul>
       </article>
     </div>
