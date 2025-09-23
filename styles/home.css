@@ -367,6 +367,7 @@
 .home-panel__intro .home-eyebrow {
   margin-bottom: 4px;
   border-color: var(--home-accent-border);
+  align-self: flex-start;
 }
 
 .home-panel__title {
