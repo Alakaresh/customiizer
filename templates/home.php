@@ -87,29 +87,29 @@ get_header();
     <div class="home-panel__intro">
       <span class="home-eyebrow">Expérience guidée</span>
       <h2 class="home-panel__title" id="home-workflow-title">Comment ça fonctionne</h2>
-      <p class="home-panel__text">Suis un parcours fluide : imagine, génère, personnalise et commande ta création en quelques étapes.</p>
+      <p class="home-panel__text">Découvre nos produits dans la boutique, personnalise-les à ta manière et commande en toute simplicité.</p>
     </div>
     <div class="home-panel__media">
       <ol class="workflow" aria-label="Étapes de création">
         <li class="workflow__step">
           <span class="workflow__number" aria-hidden="true">1</span>
           <div class="workflow__content">
-            <h3 class="workflow__title">Choisis ton support</h3>
-            <p class="workflow__description">Rends-toi sur la page « Customiize » et sélectionne le format qui t’inspire.</p>
+            <h3 class="workflow__title">Choisis ton produit</h3>
+            <p class="workflow__description">Rends-toi dans la <a href="<?php echo esc_url( home_url( '/boutique' ) ); ?>">boutique</a> et sélectionne le support qui t’inspire.</p>
           </div>
         </li>
         <li class="workflow__step">
           <span class="workflow__number" aria-hidden="true">2</span>
           <div class="workflow__content">
-            <h3 class="workflow__title">Génère avec l’IA</h3>
-            <p class="workflow__description">Clique sur « Générer » pour obtenir une sélection d’images créatives en quelques secondes.</p>
+            <h3 class="workflow__title">Crée avec l’IA (si besoin)</h3>
+            <p class="workflow__description">Pas trouvé ton bonheur ? Va sur la page <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>">Customiize</a> pour générer en quelques clics un visuel unique grâce à notre IA.</p>
           </div>
         </li>
         <li class="workflow__step">
           <span class="workflow__number" aria-hidden="true">3</span>
           <div class="workflow__content">
-            <h3 class="workflow__title">Personnalise</h3>
-            <p class="workflow__description">Affine ton design, choisis tes finitions et visualise ton produit en temps réel.</p>
+            <h3 class="workflow__title">Visualise ton rendu</h3>
+            <p class="workflow__description">Vois directement le design appliqué sur le produit avant de valider ta commande.</p>
           </div>
         </li>
         <li class="workflow__step">
