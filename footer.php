@@ -31,10 +31,6 @@ if ( $user_logged_in ) {
                                                 <a href="/contact" class="footer-link">Contact</a>
                                         </div>
                                 </div>
-                                <div class="social-icons" aria-label="Réseaux sociaux">
-                                        <a href="https://instagram.com/customiizer" target="_blank" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
-                                        <a href="https://tiktok.com/customiizer" target="_blank" class="social-icon" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
-                                </div>
                         </div>
                 </div>
                 <div class="lower-band">
