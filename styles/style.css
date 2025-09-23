@@ -43,6 +43,10 @@ body {
   color: var(--color-text);
 }
 
+body > #content {
+  padding: 0;
+}
+
 /* Ensure body and Astra container share the same background */
 body,
 .ast-separate-container {
