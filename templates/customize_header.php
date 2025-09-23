@@ -15,6 +15,13 @@ $user_logged_in = is_user_logged_in();
 $user_id = $current_user->ID;
 $user_nicename = $current_user->user_nicename;
 $display_name = $current_user->display_name;
+$image_credits = 0;
+
+if ( $user_logged_in ) {
+        global $wpdb;
+
+        $image_credits = intval( $wpdb->get_var( $wpdb->prepare( 'SELECT image_credits FROM WPC_users WHERE user_id = %d', $user_id ) ) );
+}
 ?>
 
 <!DOCTYPE html>
@@ -61,6 +68,7 @@ $display_name = $current_user->display_name;
         <?php
         $profile_image_url = customiizer_get_profile_image_url($user_id);
         ?>
+        <span id="userCredits" class="user-credits-data" hidden aria-hidden="true"><?php echo esc_html( $image_credits ); ?></span>
         <?php if (class_exists('WooCommerce')): ?>
         <div class="cart-container">
                 <a href="<?php echo wc_get_cart_url(); ?>" class="icon-button">
