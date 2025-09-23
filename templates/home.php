@@ -62,7 +62,7 @@ get_header();
   <section class="home-panel home-panel--hero" aria-labelledby="home-hero-title">
     <div class="home-panel__intro">
       <span class="home-eyebrow">Studio de personnalisation IA</span>
-      <h1 class="first_title home-panel__headline" id="home-hero-title">Donne vie à tes idées !</h1>
+      <h1 class="home-panel__title home-panel__headline" id="home-hero-title">Donne vie à tes idées !</h1>
       <p class="text home-panel__description">Libère ta créativité avec Customiizer ! Crée facilement des designs uniques grâce à notre interface intuitive. Parfait pour des projets personnels ou professionnels. Clique, imagine et personnalise en quelques instants.</p>
       <div class="home-panel__actions">
         <a href="<?php echo esc_url( home_url( '/customiize' ) ); ?>" class="home-button home-button--primary">
