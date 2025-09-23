@@ -63,12 +63,6 @@
     max-width: none;
   }
 
-  .home-panel--hero .home-panel__metrics {
-    width: 100%;
-    flex-direction: column;
-    max-width: none;
-  }
-
   .home-panel {
     display: flex;
     flex-direction: column;
