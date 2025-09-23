@@ -1,34 +1,21 @@
 <div id="content-container">
 	<!-- Menu de ratio masqué au départ -->
-	<div id="ratio-menu" class="ratio-container" style="display: none;">
-		<div id="aspect-ratio-info">
-			<span class="info-text">Choisissez un format d’image</span>
-		</div>
+        <div id="ratio-menu" class="ratio-container" style="display: none;">
+                <div id="aspect-ratio-info">
+                        <span class="info-text">Sélectionnez un produit pour afficher ses formats disponibles</span>
+                </div>
 
-		<div class="ratio-selection">
-			<button class="ratio-button format-button" data-ratio="1:1">
-				<span>1:1</span>
-			</button>
-			<button class="ratio-button format-button" data-ratio="4:3">
-				<span>4:3</span>
-			</button>
-			<button class="ratio-button format-button" data-ratio="16:9">
-				<span>16:9</span>
-			</button>
-			<button class="ratio-button format-button" data-ratio="9:16">
-				<span>9:16</span>
-			</button>
-			<button class="ratio-button format-button" data-ratio="3:4">
-				<span>3:4</span>
-			</button>
-		</div>
-		<!-- Ajout des produits dans le menu de ratio -->
-		<div id="product-container">
-			<!-- Contenu du produit -->
-		</div>
-		<div id="product-groups-container" class="product-groups">
-			<!-- Groupes de produits -->
-		</div>
+                <div class="product-selection">
+                        <h3 class="product-selection-title">Produits</h3>
+                        <p class="product-selection-description">Explorez les formats recommandés pour chaque produit en un clin d'œil.</p>
+                        <div id="product-container" class="product-buttons" role="list">
+                                <!-- Boutons produits injectés en JS -->
+                        </div>
+                </div>
 
-	</div>
+                <div id="product-groups-container" class="product-groups" role="list">
+                        <!-- Groupes de formats injectés en JS -->
+                </div>
+
+        </div>
 </div>

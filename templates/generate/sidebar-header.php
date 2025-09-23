@@ -8,7 +8,7 @@
 
     <!-- Affichage de la sélection du ratio -->
     <div id="selected-display">
-        <button id="selected-info" disabled="disabled">1:1</button>
+        <button id="selected-info" disabled="disabled">Sélectionnez un format</button>
     </div>
 
     <!-- Conteneur pour le choix du ratio -->
@@ -18,7 +18,7 @@
     <div id="buttons-container">
         <!-- Bouton pour ouvrir le menu de ratio -->
         <button id="ratioButton" onclick="toggleRatioMenu()">
-            Format
+            Formats de produit
             <span id="arrow-icon" class="arrow-down"></span>
         </button>
 
