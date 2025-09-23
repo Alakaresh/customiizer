@@ -397,32 +397,21 @@
 
 
 /* Spotlights */
-.home-spotlights.surface-card {
-  display: flex;
-  flex-direction: column;
+.home-panel--spotlights.surface-card {
   gap: clamp(28px, 5vw, 48px);
   background: var(--home-surface-background);
   border-color: var(--home-surface-border);
 }
 
-.home-spotlights__header {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.home-panel--spotlights .home-panel__intro {
   max-width: 760px;
 }
 
-.home-spotlights__title {
-  margin: 0;
+.home-panel--spotlights .home-panel__title {
   font-size: clamp(2rem, 4vw, 2.7rem);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--home-heading-text);
 }
 
-.home-spotlights__description {
-  margin: 0;
-  color: var(--home-muted-text);
+.home-panel--spotlights .home-panel__text {
   font-size: 1.05rem;
   line-height: 1.7;
 }

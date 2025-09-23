@@ -144,49 +144,51 @@ get_header();
     </div>
   </section>
 
-  <section class="home-spotlights surface-card" aria-labelledby="home-spotlights-title">
-    <header class="home-spotlights__header">
+  <section class="home-panel home-panel--spotlights surface-card" aria-labelledby="home-spotlights-title">
+    <div class="home-panel__intro">
       <span class="home-eyebrow">Pourquoi Customiizer ?</span>
-      <h2 class="home-spotlights__title" id="home-spotlights-title">Une expérience pensée pour les créateurs exigeants</h2>
-      <p class="home-spotlights__description">Combine l’intelligence artificielle, un configurateur immersif et une communauté engagée pour donner de l’écho à tes projets.</p>
-    </header>
-    <div class="home-spotlights__grid">
-      <article class="home-spotlights__card">
-        <div class="home-spotlights__icon" aria-hidden="true">
-          <i class="fas fa-magic"></i>
-        </div>
-        <h3 class="home-spotlights__card-title">Générateur IA simple et efficace</h3>
-        <p class="home-spotlights__card-text">Crée en quelques clics des visuels uniques pour personnaliser tes objets. Accessible, rapide, et déjà prêt à l’usage.</p>
-        <ul class="home-spotlights__features">
-          <li><i class="fas fa-check" aria-hidden="true"></i>Génération d’images IA en ligne</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Variantes instantanées</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Améliorations régulières selon vos retours</li>
-        </ul>
-      </article>
-      <article class="home-spotlights__card">
-        <div class="home-spotlights__icon" aria-hidden="true">
-          <i class="fas fa-layer-group"></i>
-        </div>
-        <h3 class="home-spotlights__card-title">Prévisualisation produit en direct</h3>
-        <p class="home-spotlights__card-text">Visualise immédiatement tes créations appliquées sur nos produits pour voir le rendu final avant commande.</p>
-        <ul class="home-spotlights__features">
-          <li><i class="fas fa-check" aria-hidden="true"></i>Aperçu en temps réel</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Premiers produits disponibles dès maintenant</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Nouvelles options en préparation</li>
-        </ul>
-      </article>
-      <article class="home-spotlights__card">
-        <div class="home-spotlights__icon" aria-hidden="true">
-          <i class="fas fa-users"></i>
-        </div>
-        <h3 class="home-spotlights__card-title">Une galerie qui se lance</h3>
-        <p class="home-spotlights__card-text">Découvre les premières créations générées par la communauté. Une vitrine qui grandira au fil des utilisateurs.</p>
-        <ul class="home-spotlights__features">
-          <li><i class="fas fa-check" aria-hidden="true"></i>Affichage des images générées</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Inspiration grâce aux créations partagées</li>
-          <li><i class="fas fa-check" aria-hidden="true"></i>Une base qui évoluera avec le temps</li>
-        </ul>
-      </article>
+      <h2 class="home-panel__title" id="home-spotlights-title">Une expérience pensée pour les créateurs exigeants</h2>
+      <p class="home-panel__text">Combine l’intelligence artificielle, un configurateur immersif et une communauté engagée pour donner de l’écho à tes projets.</p>
+    </div>
+    <div class="home-panel__media">
+      <div class="home-spotlights__grid">
+        <article class="home-spotlights__card">
+          <div class="home-spotlights__icon" aria-hidden="true">
+            <i class="fas fa-magic"></i>
+          </div>
+          <h3 class="home-spotlights__card-title">Générateur IA simple et efficace</h3>
+          <p class="home-spotlights__card-text">Crée en quelques clics des visuels uniques pour personnaliser tes objets. Accessible, rapide, et déjà prêt à l’usage.</p>
+          <ul class="home-spotlights__features">
+            <li><i class="fas fa-check" aria-hidden="true"></i>Génération d’images IA en ligne</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>Variantes instantanées</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>Améliorations régulières selon vos retours</li>
+          </ul>
+        </article>
+        <article class="home-spotlights__card">
+          <div class="home-spotlights__icon" aria-hidden="true">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h3 class="home-spotlights__card-title">Prévisualisation produit en direct</h3>
+          <p class="home-spotlights__card-text">Visualise immédiatement tes créations appliquées sur nos produits pour voir le rendu final avant commande.</p>
+          <ul class="home-spotlights__features">
+            <li><i class="fas fa-check" aria-hidden="true"></i>Aperçu en temps réel</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>Premiers produits disponibles dès maintenant</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>Nouvelles options en préparation</li>
+          </ul>
+        </article>
+        <article class="home-spotlights__card">
+          <div class="home-spotlights__icon" aria-hidden="true">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 class="home-spotlights__card-title">Une galerie qui se lance</h3>
+          <p class="home-spotlights__card-text">Découvre les premières créations générées par la communauté. Une vitrine qui grandira au fil des utilisateurs.</p>
+          <ul class="home-spotlights__features">
+            <li><i class="fas fa-check" aria-hidden="true"></i>Affichage des images générées</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>Inspiration grâce aux créations partagées</li>
+            <li><i class="fas fa-check" aria-hidden="true"></i>Une base qui évoluera avec le temps</li>
+          </ul>
+        </article>
+      </div>
     </div>
   </section>
 
