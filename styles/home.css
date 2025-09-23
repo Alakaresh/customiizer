@@ -35,7 +35,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(72px, 10vw, 140px);
+  gap: clamp(36px, 5vw, 70px);
   width: 100%;
   max-width: none;
   margin: 0;

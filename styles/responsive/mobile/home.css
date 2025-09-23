@@ -1,7 +1,7 @@
 @media screen and (max-width: 1024px) {
   /* Hero */
   #site-content.home-page {
-    gap: 48px;
+    gap: 24px;
     padding: 88px 0 96px;
   }
 
