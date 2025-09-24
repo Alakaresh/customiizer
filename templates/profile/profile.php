@@ -12,12 +12,12 @@
 							<input type="text" id="username" name="username" required>
 						</div>
 					</div>
-					<div class="form-row">
-						<div class="form-group full-width">
-							<label for="email">Adresse email</label>
-							<input type="email" id="email" name="email" required readonly style="background-color: #cccccc; color: #7f7f7f; cursor: not-allowed;">
-						</div>
-					</div>
+                                        <div class="form-row">
+                                                <div class="form-group full-width">
+                                                        <label for="email">Adresse email</label>
+                                                        <input type="email" id="email" name="email" required readonly>
+                                                </div>
+                                        </div>
 					<div class="form-row">
 						<button type="submit">Mettre à jour</button>
 					</div>
