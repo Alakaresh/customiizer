@@ -215,6 +215,10 @@ function customiizer_enqueue_customize_assets() {
 
                 // --- JS internes ---
                 wp_enqueue_script('mycreation-images', get_stylesheet_directory_uri() . '/js/mycreation/show_images.js', ['jquery'], $ver, true);
+       } elseif (strpos($request_uri, '/contact') !== false) {
+               // --- CSS ---
+               wp_enqueue_style('contact-style', get_stylesheet_directory_uri() . '/styles/contact.css', [], $ver);
+
        } elseif (
                strpos($request_uri, '/mentions-legales') !== false ||
                strpos($request_uri, '/conditions') !== false ||
