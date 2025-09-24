@@ -53,6 +53,7 @@
     align-items: stretch;
     justify-content: center;
     overflow-y: auto;
+    margin: 0;
 }
 
 #customize-main > #content {

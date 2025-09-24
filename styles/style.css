@@ -45,6 +45,11 @@ body {
 
 body > #content {
   padding: 0;
+  margin: 0;
+}
+
+#content {
+  margin: 0;
 }
 
 /* Ensure body and Astra container share the same background */
