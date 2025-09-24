@@ -4,6 +4,9 @@
                overflow: hidden;
        }
 
+       body.page-configurateur #header,
+       body.page-template-templatescustomize-php #header,
+       body.page-template-template-customize #header,
        #header {
                position: fixed;
                top: 0;

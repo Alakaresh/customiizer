@@ -1,3 +1,12 @@
+/* Comportement du header */
+body.page-configurateur #header,
+body.page-template-templatescustomize-php #header,
+body.page-template-template-customize #header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
 /* Styles de base */
 html, body {
     margin: 0;
