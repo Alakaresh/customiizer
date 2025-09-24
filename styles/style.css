@@ -2,6 +2,8 @@
   --color-bg: #242424;
   --color-primary: #5a90a0;
   --header-height: 88px;
+  --early-access-banner-height: 0px;
+  --layout-top-offset: var(--header-height, 88px);
   --color-secondary: linear-gradient(135deg, rgba(3, 8, 10, 0.98) 0%, rgba(1, 4, 6, 0.96) 55%, rgba(0, 0, 0, 0.92) 100%);
   --color-secondary-solid: rgba(3, 8, 10, 0.98);
   --color-text: #ffffff;
