@@ -40,7 +40,6 @@ body.shop-flex-layout #customize-main > #content {
         display: block;
         height: auto;
         overflow: visible;
-        padding: clamp(24px, 4vw, 48px);
 }
 
 .product-list {
