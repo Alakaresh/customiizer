@@ -69,7 +69,15 @@ body {
     pointer-events: none; /* ne bloque pas les clics */
 }
 
-
+.product-image,
+#productMain3DContainer,
+.image-thumbnails,
+.product-info,
+.product-details,
+.bottom-bar {
+    position: relative;
+    z-index: 1; /* passe au-dessus */
+}
 .background-image {
     width: auto;
     height: 100%; /* S'ajuste pour occuper toute la hauteur du conteneur */
