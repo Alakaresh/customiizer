@@ -27,21 +27,11 @@
                  height: calc(100dvh - 65px - 100px);
          }
 
-	.band-left,
-	.band-right {
-		display: none;
-	}
-
-	.background {
-		padding: 0;
-		height: auto;
-		align-items: center;
-	}
-
-       .background-image {
-               /* On retire l'image de fond en version mobile */
-               display: none;
-       }
+        .background {
+                padding: 0;
+                height: auto;
+                align-items: center;
+        }
 
         .product-info,
         .product-details {

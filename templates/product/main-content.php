@@ -7,10 +7,8 @@
 	</head>
 	<body>
 		<div class="container">
-			<div class="main-content">
-				<div class="band band-left"></div>
-				<div class="background">
-					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/fond_shop.png" alt="Fond avec promontoire" class="background-image">
+                        <div class="main-content">
+                                <div class="background">
                                        <!-- ✅ Image principale du produit -->
                                        <img id="product-main-image" src="wp-content/themes/customiizer/images/default-image.png" alt="Produit affiché" class="product-image">
                                        <!-- 🆕 Conteneur pour l'affichage 3D du produit -->
@@ -96,8 +94,7 @@
 					<!-- Bulles d'images sous l'image principale -->
 					<div class="image-thumbnails"></div>
 				</div>
-				<div class="band band-right"></div>
-			</div>
+                        </div>
                         <div class="bottom-bar">
                                 <button class="bottom-arrow left">&#10094;</button>
                                 <div class="image-wrapper">
