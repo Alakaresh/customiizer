@@ -1,5 +1,6 @@
 #content {
     max-height: none;
+    margin: 0;
 }
 .image-container {
     display: grid;
