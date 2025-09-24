@@ -63,7 +63,7 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("<?php echo get_stylesheet_directory_uri(); ?>/assets/img/fond_shop.png") center/contain no-repeat;
+    background: url("/wp-content/themes/customiizer/assets/img/fond_shop.png") center/contain no-repeat;
     background-size: contain; /* ou cover si tu veux qu'il prenne tout */
     z-index: 0; /* passe derrière le contenu */
     pointer-events: none; /* ne bloque pas les clics */
