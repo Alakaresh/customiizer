@@ -46,10 +46,6 @@ body {
     position: relative;
     z-index: 1; /* garde le contenu au-dessus */
 
-    /* tes dégradés */
-    background:
-        radial-gradient(125% 110% at 50% 0%, rgba(109, 242, 210, 0.1) 0%, transparent 55%),
-        linear-gradient(150deg, rgba(6, 20, 24, 0.95) 0%, rgba(2, 10, 12, 0.98) 60%, #010405 100%);
 }
 
 .background::after {
