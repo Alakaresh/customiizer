@@ -65,8 +65,11 @@
         }
 
         #user_images img {
-                width: 100%;
+                width: auto;
+                max-width: 100%;
                 height: auto;
+                max-height: min(320px, 50vh);
+                margin: 0 auto;
                 border-radius: 16px;
         }
 

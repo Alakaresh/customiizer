@@ -114,7 +114,11 @@
 }
 
 #user_images img {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: min(420px, 45vh);
+    margin: 0 auto;
     border-radius: 18px;
     display: block;
     background: #191919;
