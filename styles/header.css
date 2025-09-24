@@ -55,7 +55,8 @@
 
 /* Styles généraux pour le header */
 #header {
-        position: relative;
+        position: sticky;
+        top: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -67,13 +68,6 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         box-shadow: 0 22px 48px rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(14px);
-        z-index: 100;
-}
-
-.page-id-413 #header,
-body.shop-flex-layout #header {
-        position: sticky;
-        top: 0;
         z-index: 999;
 }
 
