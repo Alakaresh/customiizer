@@ -1,7 +1,33 @@
 var ImageLoader = (function() {
-	const IMAGES_PER_BATCH = 16;
-	let currentPage = 1;
-	let allImages = []; // Il manquait la déclaration dans ton script
+        const IMAGES_PER_BATCH = 16;
+        const MAX_COLUMNS = 4;
+        const MIN_COLUMN_WIDTH = 180; // Largeur minimale avant de réduire le nombre de colonnes
+        let currentPage = 1;
+        let allImages = []; // Il manquait la déclaration dans ton script
+        let lastColumnCount = null;
+
+        function getContainerWidth() {
+                const container = jQuery('#image-container');
+                let width = container.innerWidth();
+
+                if (!width) {
+                        width = container.parent().innerWidth();
+                }
+
+                if (!width) {
+                        width = window.innerWidth;
+                }
+
+                return width || 0;
+        }
+
+        function calculateColumnCount() {
+                const containerWidth = getContainerWidth();
+                const availableColumns = Math.floor(containerWidth / MIN_COLUMN_WIDTH);
+                const columnCount = Math.max(1, Math.min(MAX_COLUMNS, availableColumns));
+
+                return columnCount || 1;
+        }
 
 	function loadUserGeneratedImages() {
 
@@ -43,28 +69,34 @@ var ImageLoader = (function() {
 	}
 
 
-	function renderImages() {
-		var startIndex = (currentPage - 1) * IMAGES_PER_BATCH;
-		var endIndex = startIndex + IMAGES_PER_BATCH;
-		var imagesToRender = allImages.slice(startIndex, endIndex);
+        function renderImages() {
+                var startIndex = (currentPage - 1) * IMAGES_PER_BATCH;
+                var endIndex = startIndex + IMAGES_PER_BATCH;
+                var imagesToRender = allImages.slice(startIndex, endIndex);
 
-		var container = jQuery('<div/>', { class: 'image-container' }).css({
-			'display': 'flex',
-			'justify-content': 'space-between'
-		});
+                var columnCount = calculateColumnCount();
+                lastColumnCount = columnCount;
 
-		var columns = [];
-		for (var i = 0; i < 4; i++) {
-			columns[i] = jQuery('<div/>', { class: 'imageColumn' }).css({
-				'width': '23%',
-				'display': 'flex',
-				'flex-direction': 'column',
-				'gap': '10px'
-			});
-			container.append(columns[i]);
-		}
+                var columnWidthPercentage = (100 / columnCount).toFixed(4) + '%';
 
-		imagesToRender.forEach(function(image, index) {
+                var container = jQuery('<div/>', { class: 'image-container' }).css({
+                        'display': 'flex',
+                        'justify-content': 'space-between'
+                });
+
+                var columns = [];
+                for (var i = 0; i < columnCount; i++) {
+                        columns[i] = jQuery('<div/>', { class: 'imageColumn' }).css({
+                                'display': 'flex',
+                                'flex-direction': 'column',
+                                'gap': '10px',
+                                'flex': '1 1 ' + columnWidthPercentage,
+                                'min-width': MIN_COLUMN_WIDTH + 'px'
+                        });
+                        container.append(columns[i]);
+                }
+
+                imagesToRender.forEach(function(image, index) {
 			var imageDiv = jQuery('<div/>', { class: 'imageContainer' });
 
                         var img = jQuery('<img/>', {
@@ -82,8 +114,8 @@ var ImageLoader = (function() {
                         });
 
 			imageDiv.append(img);
-			columns[index % 4].append(imageDiv);
-		});
+                        columns[index % columnCount].append(imageDiv);
+                });
 
                 jQuery('#image-container').empty().append(container);
                 checkPagination();
@@ -122,11 +154,28 @@ var ImageLoader = (function() {
 		jQuery('#image-container').append(pagination);
 	}
 
-	return {
-		loadUserGeneratedImages: loadUserGeneratedImages
-	};
+        function handleResize() {
+                var newColumnCount = calculateColumnCount();
+
+                if (newColumnCount !== lastColumnCount) {
+                        renderImages();
+                }
+        }
+
+        return {
+                loadUserGeneratedImages: loadUserGeneratedImages,
+                handleResize: handleResize
+        };
 })();
 
 jQuery(document).ready(function($) {
-	ImageLoader.loadUserGeneratedImages();
+        ImageLoader.loadUserGeneratedImages();
+        var resizeTimeout;
+
+        $(window).on('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                        ImageLoader.handleResize();
+                }, 150);
+        });
 });
