@@ -35,14 +35,15 @@ body {
 /* Section principale */
 .main-content {
     display: flex;
-    flex: 1; /* Prend tout l'espace disponible entre le header et le footer */
+    flex: 1;
     position: relative;
-    overflow: hidden; /* Empêche tout débordement lié à l'image */
+    overflow: hidden;
     background:
-        radial-gradient(140% 110% at 50% 15%, rgba(109, 242, 210, 0.12) 0%, transparent 55%),
-        radial-gradient(120% 120% at 50% 80%, rgba(26, 188, 156, 0.08) 0%, transparent 65%),
-        linear-gradient(150deg, rgba(6, 20, 24, 0.96) 0%, rgba(2, 10, 12, 0.98) 55%, #020607 100%);
+        radial-gradient(120% 100% at 50% 15%, rgba(26, 188, 156, 0.06) 0%, transparent 55%),
+        linear-gradient(150deg, rgba(4, 12, 14, 0.98) 0%, rgba(2, 8, 10, 0.99) 60%, #000 100%);
+    background-color: #000; /* fallback noir pur */
 }
+
 
 .background {
     display: flex;
