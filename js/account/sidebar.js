@@ -245,14 +245,20 @@ function handleImageUpload(event) {
 function setImagePreview(imageSrc, onImageReady = null) {
 	const imagePreview = document.getElementById('imagePreview');
 	imagePreview.innerHTML = ''; // Vide avant d'ajouter
+	imagePreview.classList.add('has-image');
 
 	const imgElement = document.createElement('img');
 	imgElement.id = 'imageToCrop';
 	imgElement.src = imageSrc;
 	imgElement.alt = 'Image Preview';
 	imgElement.style.width = '100%';
+	imgElement.style.height = 'auto';
+	imgElement.style.maxWidth = '100%';
+	imgElement.style.maxHeight = '100%';
+	imgElement.style.objectFit = 'contain';
 
-	imgElement.onload = () => {		if (typeof onImageReady === 'function') {
+	imgElement.onload = () => {
+		if (typeof onImageReady === 'function') {
 			onImageReady(imgElement);
 		}
 	};
@@ -267,6 +273,7 @@ function resetCropper() {
 	}
 	const imagePreview = document.getElementById('imagePreview');
 	imagePreview.innerHTML = ''; // Vider la zone d’aperçu
+	imagePreview.classList.remove('has-image');
 }
 
 function initializeCropper(onReadyCallback = null) {
@@ -310,6 +317,50 @@ function startCropper(imageElement, onReadyCallback = null) {
 		cropBoxMovable: true,
 		cropBoxResizable: true,
 		ready() {
+			const containerData = cropper.getContainerData();
+			const imageData = cropper.getImageData();
+
+			if (containerData && imageData) {
+				const boxSize = Math.min(
+					containerData.width,
+					containerData.height,
+					imageData.width,
+					imageData.height
+				);
+
+				if (Number.isFinite(boxSize) && boxSize > 0) {
+					const offsetLeft = Math.max(0, (containerData.width - boxSize) / 2);
+					const offsetTop = Math.max(0, (containerData.height - boxSize) / 2);
+
+					cropper.setCropBoxData({
+						left: Math.round(offsetLeft),
+						top: Math.round(offsetTop),
+						width: Math.round(boxSize),
+						height: Math.round(boxSize)
+					});
+				}
+
+				const canvasData = cropper.getCanvasData();
+				if (canvasData) {
+					const adjustedCanvasData = { ...canvasData };
+					let canvasChanged = false;
+
+					if (canvasData.width < containerData.width) {
+						adjustedCanvasData.left = Math.round((containerData.width - canvasData.width) / 2);
+						canvasChanged = true;
+					}
+
+					if (canvasData.height < containerData.height) {
+						adjustedCanvasData.top = Math.round((containerData.height - canvasData.height) / 2);
+						canvasChanged = true;
+					}
+
+					if (canvasChanged) {
+						cropper.setCanvasData(adjustedCanvasData);
+					}
+				}
+			}
+
 			if (typeof onReadyCallback === 'function') {
 				onReadyCallback();
 			}
