@@ -1,6 +1,67 @@
 document.addEventListener('DOMContentLoaded', async function() {
     const THEME_BASE = '/wp-content/themes/customiizer';
 
+    const rootElement = document.documentElement;
+    const productListContainer = document.querySelector('.product-list');
+
+    if (!productListContainer) {
+        return;
+    }
+
+    const safeParseFloat = (value) => {
+        const parsed = parseFloat(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const getElementHeightWithMargins = (element) => {
+        if (!element) {
+            return 0;
+        }
+
+        const styles = window.getComputedStyle(element);
+        const margins = safeParseFloat(styles.marginTop) + safeParseFloat(styles.marginBottom);
+        return element.getBoundingClientRect().height + margins;
+    };
+
+    const updateLayoutOffsets = () => {
+        const header = document.querySelector('#header');
+        const banner = document.querySelector('.early-access-banner');
+
+        const headerHeight = getElementHeightWithMargins(header);
+        const bannerHeight = getElementHeightWithMargins(banner);
+        const totalHeight = headerHeight + bannerHeight;
+
+        if (headerHeight > 0) {
+            rootElement.style.setProperty('--header-height', `${Math.round(headerHeight)}px`);
+        }
+        rootElement.style.setProperty('--early-access-banner-height', `${Math.round(bannerHeight)}px`);
+        if (totalHeight > 0) {
+            rootElement.style.setProperty('--layout-top-offset', `${Math.round(totalHeight)}px`);
+        } else {
+            rootElement.style.removeProperty('--layout-top-offset');
+        }
+    };
+
+    const scheduleLayoutUpdate = () => {
+        if (scheduleLayoutUpdate.rafId) {
+            cancelAnimationFrame(scheduleLayoutUpdate.rafId);
+        }
+
+        scheduleLayoutUpdate.rafId = requestAnimationFrame(updateLayoutOffsets);
+    };
+
+    updateLayoutOffsets();
+    window.addEventListener('load', updateLayoutOffsets);
+    window.addEventListener('resize', scheduleLayoutUpdate);
+    window.addEventListener('orientationchange', scheduleLayoutUpdate);
+
+    const bannerElement = document.querySelector('.early-access-banner');
+    if (bannerElement && 'MutationObserver' in window) {
+        const observer = new MutationObserver(scheduleLayoutUpdate);
+        observer.observe(bannerElement, { childList: true, subtree: true, attributes: true });
+        scheduleLayoutUpdate();
+    }
+
     // ---------- Chargement dynamique de Three.js et GLTFLoader ----------
     async function loadScript(src) {
         return new Promise((resolve, reject) => {
@@ -80,18 +141,16 @@ document.addEventListener('DOMContentLoaded', async function() {
                 await preloadVariants(products);
             } else {
                 console.warn("Aucun produit trouvé.");
-                document.querySelector('.product-list').innerHTML = '<p>Aucun produit trouvé.</p>';
+                productListContainer.innerHTML = '<p>Aucun produit trouvé.</p>';
             }
         })
         .catch(error => {
             console.error('Erreur lors de la récupération des produits:', error);
-            document.querySelector('.product-list').innerHTML = '<p>Erreur lors de la récupération des produits.</p>';
+            productListContainer.innerHTML = '<p>Erreur lors de la récupération des produits.</p>';
         });
 
     // Fonction pour afficher les produits
     function displayProducts(products) {
-        const productListContainer = document.querySelector('.product-list');
-
         products.forEach(product => {
             const imageUrl = product.image || 'default-image-url.jpg';
             const title = product.name || "Nom du produit";
