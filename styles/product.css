@@ -33,7 +33,7 @@ body {
     flex: 1; /* Prend tout l'espace disponible entre le header et le footer */
     position: relative;
     overflow: hidden; /* Empêche tout débordement lié à l'image */
-    background: radial-gradient(140% 110% at 50% 45%, rgba(41, 63, 82, 0.42) 0%, rgba(17, 22, 30, 0.95) 55%, #050708 100%);
+    background: var(--color-background, #242424);
 }
 
 /* Bandes noires */
@@ -42,35 +42,19 @@ body {
     position: relative;
     height: 100%; /* S'étendent sur toute la hauteur */
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(7, 10, 16, 0.96) 0%, rgba(5, 7, 11, 0.98) 50%, #050708 100%);
+    background: var(--color-background, #242424);
 }
 
 .band::after {
-    content: '';
-    position: absolute;
-    inset: -35%;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.45;
-    pointer-events: none;
+    content: none;
 }
 
 .band-left {
-    background: radial-gradient(125% 125% at 100% 50%, rgba(36, 53, 70, 0.75) 0%, rgba(14, 19, 27, 0.96) 55%, #050708 100%);
-}
-
-.band-left::after {
-    background: radial-gradient(110% 90% at 110% 50%, rgba(36, 206, 195, 0.55) 0%, rgba(26, 40, 52, 0.35) 45%, rgba(6, 9, 13, 0) 100%);
-    transform: translateX(26%);
+    background: var(--color-background, #242424);
 }
 
 .band-right {
-    background: radial-gradient(125% 125% at 0% 50%, rgba(36, 53, 70, 0.75) 0%, rgba(14, 19, 27, 0.96) 55%, #050708 100%);
-}
-
-.band-right::after {
-    background: radial-gradient(110% 90% at -10% 50%, rgba(36, 206, 195, 0.55) 0%, rgba(26, 40, 52, 0.35) 45%, rgba(6, 9, 13, 0) 100%);
-    transform: translateX(-26%);
+    background: var(--color-background, #242424);
 }
 
 /* Conteneur central */
@@ -82,13 +66,11 @@ body {
     flex: 1; /* Prend toute la hauteur disponible */
     position: relative;
     z-index: 1;
+    background: var(--color-background, #242424);
 }
 
 .background-image {
-    width: auto;
-    height: 100%; /* S'ajuste pour occuper toute la hauteur du conteneur */
-    max-width: none; /* Désactive la limite de largeur */
-    object-fit: contain; /* Conserve les proportions sans déborder */
+    display: none;
 }
 
 /* Footer */
@@ -103,7 +85,7 @@ body {
     min-height: 108px;
     padding: 5px 5px;
     color: #fff;
-    background: linear-gradient(135deg, rgba(16, 16, 16, 0.92), rgba(4, 4, 4, 0.94));
+    background: var(--color-background, #242424);
     border-top: 1px solid var(--product-border-strong);
     box-shadow: 0 -20px 48px rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(16px);
