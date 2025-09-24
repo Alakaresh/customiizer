@@ -48,7 +48,6 @@
 #content {
     flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
     background: radial-gradient(circle at top, rgba(47, 255, 185, 0.08) 0%, rgba(17, 17, 17, 0.92) 45%, #111111 100%);
-    padding: 32px 40px;
     display: flex;
     align-items: stretch;
     justify-content: center;
