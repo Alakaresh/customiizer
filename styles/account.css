@@ -641,6 +641,13 @@ td:last-child {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.form-group input[readonly],
+.form-group input:disabled {
+  background: rgba(32, 32, 32, 0.86);
+  color: rgba(214, 224, 223, 0.68);
+  cursor: not-allowed;
+}
+
 .form-group input:focus {
   border-color: rgba(26, 188, 156, 0.55);
   box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.25);
