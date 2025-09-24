@@ -449,11 +449,22 @@
   background: linear-gradient(135deg, rgba(22, 22, 22, 0.9), rgba(10, 10, 10, 0.92));
 }
 
+.account-page .imageContainer {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
 .imageContainer img {
   width: 100%;
   height: auto;
   display: block;
   border-radius: 18px;
+}
+
+.account-page .imageContainer img {
+  height: 100%;
+  object-fit: contain;
 }
 
 .imageContainer .overlay {
