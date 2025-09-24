@@ -52,52 +52,38 @@ var ImageLoader = (function() {
 	}
 
 
-        function renderImages() {
-                var startIndex = (currentPage - 1) * IMAGES_PER_BATCH;
-                var endIndex = startIndex + IMAGES_PER_BATCH;
-                var imagesToRender = allImages.slice(startIndex, endIndex);
+    function renderImages() {
+    var startIndex = (currentPage - 1) * IMAGES_PER_BATCH;
+    var endIndex = startIndex + IMAGES_PER_BATCH;
+    var imagesToRender = allImages.slice(startIndex, endIndex);
 
-                var columnCount = getColumnCountForImageCount(imagesToRender.length);
-                lastColumnCount = columnCount;
+    var container = jQuery('<div/>', { class: 'image-container' });
 
-                var container = jQuery('<div/>', { class: 'image-container' }).css({
-                        'display': 'flex',
-                        'justify-content': 'space-between'
-                });
+    imagesToRender.forEach(function(image) {
+        var imageDiv = jQuery('<div/>', { class: 'imageContainer' });
 
-                var columns = [];
-                for (var i = 0; i < columnCount; i++) {
-                        columns[i] = jQuery('<div/>', { class: 'imageColumn' });
-                        container.append(columns[i]);
-                }
+        var img = jQuery('<img/>', {
+            src: image.image_url,
+            alt: 'Image générée',
+            class: 'preview-enlarge',
+            css: { 'border-radius': '10px', 'width': '100%' },
+            'data-display_name': image.display_name || '',
+            'data-user-logo': image.user_logo || '',
+            'data-user-id': image.user_id || '',
+            'data-format-image': image.format || '',
+            'data-prompt': (typeof image.prompt === 'object'
+                ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+                : (image.prompt || ''))
+        });
 
-                imagesToRender.forEach(function(image, index) {
-			var imageDiv = jQuery('<div/>', { class: 'imageContainer' });
+        imageDiv.append(img);
+        container.append(imageDiv);
+    });
 
-                        var img = jQuery('<img/>', {
-                                src: image.image_url,
-                                alt: 'Image générée',
-				class: 'preview-enlarge',
-				css: { 'border-radius': '10px', 'width': '100%' },
-				'data-display_name': image.display_name || '',
-				'data-user-logo': image.user_logo || '',
-				'data-user-id': image.user_id || '',
-                                'data-format-image': image.format || '',
-                                'data-prompt': (typeof image.prompt === 'object'
-                                    ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
-                                    : (image.prompt || ''))
-                        });
+    jQuery('#image-container').empty().append(container);
+    checkPagination();
+}
 
-			imageDiv.append(img);
-                        var targetColumn = columns[index % columnCount];
-                        if (targetColumn) {
-                                targetColumn.append(imageDiv);
-                        }
-                });
-
-                jQuery('#image-container').empty().append(container);
-                checkPagination();
-        }
 
         function calculateColumnCount() {
                 var containerWidth = jQuery('#image-container').innerWidth();
