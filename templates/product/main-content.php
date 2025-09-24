@@ -9,7 +9,6 @@
 		<div class="container">
 			<div class="main-content">
 				<div class="background">
-					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/fond_shop.png" alt="Fond avec promontoire" class="background-image">
                                        <!-- ✅ Image principale du produit -->
                                        <img id="product-main-image" src="wp-content/themes/customiizer/images/default-image.png" alt="Produit affiché" class="product-image">
                                        <!-- 🆕 Conteneur pour l'affichage 3D du produit -->
