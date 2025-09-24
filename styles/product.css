@@ -6,6 +6,11 @@ html, body {
 
 body {
     overflow: hidden; /* Empêche le scroll sur la page produit */
+    background:
+        radial-gradient(140% 110% at 50% 15%, rgba(109, 242, 210, 0.12) 0%, transparent 55%),
+        radial-gradient(120% 120% at 50% 80%, rgba(26, 188, 156, 0.08) 0%, transparent 65%),
+        linear-gradient(150deg, rgba(6, 20, 24, 0.96) 0%, rgba(2, 10, 12, 0.98) 55%, #020607 100%);
+    background-color: #020607; /* Couleur de fond de secours si les dégradés ne sont pas pris en charge */
 }
 
 
