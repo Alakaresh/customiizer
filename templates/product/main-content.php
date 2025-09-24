@@ -8,7 +8,6 @@
 	<body>
 		<div class="container">
 			<div class="main-content">
-				<div class="band band-left"></div>
 				<div class="background">
 					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/fond_shop.png" alt="Fond avec promontoire" class="background-image">
                                        <!-- ✅ Image principale du produit -->
@@ -96,7 +95,6 @@
 					<!-- Bulles d'images sous l'image principale -->
 					<div class="image-thumbnails"></div>
 				</div>
-				<div class="band band-right"></div>
 			</div>
                         <div class="bottom-bar">
                                 <button class="bottom-arrow left">&#10094;</button>
