@@ -1,7 +1,10 @@
 var ImageLoader = (function() {
 	const IMAGES_PER_BATCH = 16;
-	let currentPage = 1;
-	let allImages = []; // Il manquait la déclaration dans ton script
+        let currentPage = 1;
+        let allImages = []; // Il manquait la déclaration dans ton script
+        let lastColumnCount = null;
+        let resizeListenerAttached = false;
+        let resizeTimeoutId = null;
 
 	function loadUserGeneratedImages() {
 
@@ -10,12 +13,13 @@ var ImageLoader = (function() {
                 const cacheKey = 'userGeneratedImages_' + uid;
                 const storedImages = sessionStorage.getItem(cacheKey);
 
-		if (storedImages) {
-			allImages = JSON.parse(storedImages);
-			renderImages();
-			enableImageEnlargement();
-			return;
-		}
+                if (storedImages) {
+                        allImages = JSON.parse(storedImages);
+                        renderImages();
+                        enableImageEnlargement();
+                        attachResizeListener();
+                        return;
+                }
 
 		// Sinon, on fetch normalement
 		const apiUrl = `/wp-json/api/v1/images/load/${currentUser.ID}?limit=1000`;
@@ -29,11 +33,12 @@ var ImageLoader = (function() {
 				// Stocker dans sessionStorage
                                 sessionStorage.setItem(cacheKey, JSON.stringify(allImages));
 
-				renderImages();
-				enableImageEnlargement();
-			} else {
-				console.error('Invalid response format or no images found:', data);
-				jQuery('#image-container').html('<p>Aucune image trouvée.</p>');
+                                renderImages();
+                                enableImageEnlargement();
+                                attachResizeListener();
+                        } else {
+                                console.error('Invalid response format or no images found:', data);
+                                jQuery('#image-container').html('<p>Aucune image trouvée.</p>');
 			}
 		})
 			.catch(error => {
@@ -48,23 +53,21 @@ var ImageLoader = (function() {
 		var endIndex = startIndex + IMAGES_PER_BATCH;
 		var imagesToRender = allImages.slice(startIndex, endIndex);
 
-		var container = jQuery('<div/>', { class: 'image-container' }).css({
-			'display': 'flex',
-			'justify-content': 'space-between'
-		});
+                var columnCount = calculateColumnCount();
+                lastColumnCount = columnCount;
 
-		var columns = [];
-		for (var i = 0; i < 4; i++) {
-			columns[i] = jQuery('<div/>', { class: 'imageColumn' }).css({
-				'width': '23%',
-				'display': 'flex',
-				'flex-direction': 'column',
-				'gap': '10px'
-			});
-			container.append(columns[i]);
-		}
+                var container = jQuery('<div/>', { class: 'image-container' }).css({
+                        'display': 'flex',
+                        'justify-content': 'space-between'
+                });
 
-		imagesToRender.forEach(function(image, index) {
+                var columns = [];
+                for (var i = 0; i < columnCount; i++) {
+                        columns[i] = jQuery('<div/>', { class: 'imageColumn' });
+                        container.append(columns[i]);
+                }
+
+                imagesToRender.forEach(function(image, index) {
 			var imageDiv = jQuery('<div/>', { class: 'imageContainer' });
 
                         var img = jQuery('<img/>', {
@@ -82,11 +85,63 @@ var ImageLoader = (function() {
                         });
 
 			imageDiv.append(img);
-			columns[index % 4].append(imageDiv);
-		});
+                        var targetColumn = columns[index % columnCount];
+                        if (targetColumn) {
+                                targetColumn.append(imageDiv);
+                        }
+                });
 
                 jQuery('#image-container').empty().append(container);
                 checkPagination();
+        }
+
+        function calculateColumnCount() {
+                var containerWidth = jQuery('#image-container').innerWidth();
+
+                if (!containerWidth || containerWidth <= 0) {
+                        containerWidth = window.innerWidth || 0;
+                }
+
+                if (containerWidth >= 1440) {
+                        return 4;
+                }
+
+                if (containerWidth >= 1024) {
+                        return 3;
+                }
+
+                if (containerWidth >= 640) {
+                        return 2;
+                }
+
+                return 1;
+        }
+
+        function attachResizeListener() {
+                if (resizeListenerAttached) {
+                        return;
+                }
+
+                resizeListenerAttached = true;
+                jQuery(window).on('resize', handleResize);
+        }
+
+        function handleResize() {
+                if (!allImages.length) {
+                        return;
+                }
+
+                if (resizeTimeoutId) {
+                        clearTimeout(resizeTimeoutId);
+                }
+
+                resizeTimeoutId = setTimeout(function() {
+                        var newColumnCount = calculateColumnCount();
+
+                        if (newColumnCount !== lastColumnCount) {
+                                renderImages();
+                        }
+                }, 150);
         }
 
 	function checkPagination() {
