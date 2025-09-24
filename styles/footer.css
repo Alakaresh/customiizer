@@ -42,6 +42,12 @@
     gap: 32px;
 }
 
+body[class*="page-template-templatescustomize-php"] .upper-band__inner,
+body[class*="page-template-templatescustomize-php"] .lower-band__inner {
+    width: 100%;
+    max-width: none;
+}
+
 .footer-links-container {
     flex: 1;
     display: flex;

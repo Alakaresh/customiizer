@@ -8,6 +8,18 @@
     background: linear-gradient(160deg, #111111 0%, #131313 50%, #1a1a1a 100%);
 }
 
+body[class*="page-template-templatescustomize-php"] > #content,
+body[class*="page-template-templatescustomize-php"] #site-content.full-content,
+body[class*="page-template-templatescustomize-php"] #customize-main {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+body[class*="page-template-templatescustomize-php"] #customize-main > #content {
+    max-width: none;
+}
+
 .sidebar {
     flex: 0 0 auto;
     height: calc(100dvh - var(--header-height, 88px));
