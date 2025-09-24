@@ -473,6 +473,184 @@
   height: 32px;
 }
 
+/* Galerie d'images (alignée sur le configurateur produit) */
+#image-container.file-library-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+#account-images-grid.file-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+#account-images-grid .file-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(22, 22, 22, 0.92), rgba(8, 8, 8, 0.9));
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  isolation: isolate;
+}
+
+#account-images-grid .file-item:hover,
+#account-images-grid .file-item:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(26, 188, 156, 0.55);
+  box-shadow: 0 26px 60px rgba(26, 188, 156, 0.22);
+}
+
+#account-images-grid .file-item img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+}
+
+#account-images-grid .file-item button {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+}
+
+#account-images-grid .file-item button:focus-visible {
+  outline: 2px solid rgba(26, 188, 156, 0.65);
+  outline-offset: 2px;
+}
+
+#account-images-grid .file-item .preview-icon,
+#account-images-grid .file-item .apply-button {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+#account-images-grid .file-item .preview-icon {
+  top: 12px;
+  right: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(10, 10, 10, 0.68);
+  backdrop-filter: blur(10px);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#account-images-grid .file-item .apply-button {
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, rgba(22, 22, 22, 0.9), rgba(10, 10, 10, 0.92));
+  color: var(--color-text);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+#account-images-grid .file-item .apply-button:hover,
+#account-images-grid .file-item .apply-button:focus-visible,
+#account-images-grid .file-item .preview-icon:hover,
+#account-images-grid .file-item .preview-icon:focus-visible {
+  border-color: rgba(26, 188, 156, 0.6);
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.28), rgba(26, 188, 156, 0.12));
+}
+
+#account-images-grid .file-item .preview-icon i {
+  pointer-events: none;
+}
+
+#account-images-grid .file-item:hover .preview-icon,
+#account-images-grid .file-item:hover .apply-button,
+#account-images-grid .file-item:focus-within .preview-icon,
+#account-images-grid .file-item:focus-within .apply-button {
+  opacity: 1;
+}
+
+#account-images-empty {
+  border-radius: 22px;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: rgba(10, 10, 10, 0.6);
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+#account-images-empty[hidden] {
+  display: none !important;
+}
+
+#account-images-empty .file-library-empty-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+#account-images-empty .file-library-empty-message {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+#account-images-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#account-images-pagination[hidden] {
+  display: none !important;
+}
+
+#account-images-pagination .page-info {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+#account-images-pagination .pagination-button {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(135deg, rgba(22, 22, 22, 0.9), rgba(10, 10, 10, 0.92));
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+#account-images-pagination .pagination-button:hover,
+#account-images-pagination .pagination-button:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(26, 188, 156, 0.55);
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.24), rgba(26, 188, 156, 0.1));
+}
+
+#account-images-pagination .pagination-button[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .pagination-container {
   display: flex;
   justify-content: center;
