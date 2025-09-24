@@ -50,8 +50,8 @@
                         </a>
                 </div>
         </div>
-
-        <!-- MODAL CHOIX IMAGE -->
+</aside>
+<!-- MODAL CHOIX IMAGE -->
         <div id="modalChoixImage" class="modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalChoixImageTitle">
                 <div class="modal-header">
                         <button type="button" class="close-btn" onclick="hideElement('modalChoixImage');" aria-label="<?php esc_attr_e( 'Fermer', 'customiizer' ); ?>">&#215;</button>
@@ -82,7 +82,6 @@
                         </div>
                 </div>
         </div>
-</aside>
 
 <script>
         var baseTemplateUrl = "<?php echo get_stylesheet_directory_uri(); ?>/templates/profile/";
