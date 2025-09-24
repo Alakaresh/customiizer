@@ -44,20 +44,31 @@ body {
         linear-gradient(150deg, rgba(6, 20, 24, 0.96) 0%, rgba(2, 10, 12, 0.98) 55%, #020607 100%);
 }
 
-/* Conteneur central */
 .background {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 1; /* Prend toute la hauteur disponible */
+    flex: 1;
     position: relative;
-    z-index: 1;
+    z-index: 1; /* garde le contenu au-dessus */
+
+    /* tes dégradés */
     background:
         radial-gradient(125% 110% at 50% 0%, rgba(109, 242, 210, 0.1) 0%, transparent 55%),
-        linear-gradient(150deg, rgba(6, 20, 24, 0.95) 0%, rgba(2, 10, 12, 0.98) 60%, #010405 100%),
-        url("<?php echo get_stylesheet_directory_uri(); ?>/assets/img/fond_shop.png") center/contain no-repeat;
+        linear-gradient(150deg, rgba(6, 20, 24, 0.95) 0%, rgba(2, 10, 12, 0.98) 60%, #010405 100%);
 }
+
+.background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("<?php echo get_stylesheet_directory_uri(); ?>/assets/img/fond_shop.png") center/contain no-repeat;
+    background-size: contain; /* ou cover si tu veux qu'il prenne tout */
+    z-index: 0; /* passe derrière le contenu */
+    pointer-events: none; /* ne bloque pas les clics */
+}
+
 
 .background-image {
     width: auto;
