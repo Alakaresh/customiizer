@@ -447,13 +447,21 @@
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(135deg, rgba(22, 22, 22, 0.9), rgba(10, 10, 10, 0.92));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .imageContainer img {
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
+  object-fit: contain;
   border-radius: 18px;
+  background: rgba(0, 0, 0, 0.35);
+  display: block;
 }
 
 .imageContainer .overlay {
