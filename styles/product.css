@@ -28,49 +28,27 @@ body {
 }
 
 /* Section principale */
+
 .main-content {
     display: flex;
     flex: 1; /* Prend tout l'espace disponible entre le header et le footer */
+    justify-content: center;
     position: relative;
     overflow: hidden; /* Empêche tout débordement lié à l'image */
-    background: radial-gradient(140% 110% at 50% 45%, rgba(41, 63, 82, 0.42) 0%, rgba(17, 22, 30, 0.95) 55%, #050708 100%);
+    background-color: #050708;
+    background-image: url('../assets/img/fond_shop.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-/* Bandes noires */
-.band {
-    flex: 1; /* Les bandes prennent tout l'espace restant */
-    position: relative;
-    height: 100%; /* S'étendent sur toute la hauteur */
-    overflow: hidden;
-    background: linear-gradient(180deg, rgba(7, 10, 16, 0.96) 0%, rgba(5, 7, 11, 0.98) 50%, #050708 100%);
-}
-
-.band::after {
+.main-content::before {
     content: '';
     position: absolute;
-    inset: -35%;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.45;
+    inset: 0;
+    background: radial-gradient(140% 110% at 50% 45%, rgba(41, 63, 82, 0.42) 0%, rgba(17, 22, 30, 0.82) 55%, rgba(5, 7, 8, 0.9) 100%);
     pointer-events: none;
-}
-
-.band-left {
-    background: radial-gradient(125% 125% at 100% 50%, rgba(36, 53, 70, 0.75) 0%, rgba(14, 19, 27, 0.96) 55%, #050708 100%);
-}
-
-.band-left::after {
-    background: radial-gradient(110% 90% at 110% 50%, rgba(36, 206, 195, 0.55) 0%, rgba(26, 40, 52, 0.35) 45%, rgba(6, 9, 13, 0) 100%);
-    transform: translateX(26%);
-}
-
-.band-right {
-    background: radial-gradient(125% 125% at 0% 50%, rgba(36, 53, 70, 0.75) 0%, rgba(14, 19, 27, 0.96) 55%, #050708 100%);
-}
-
-.band-right::after {
-    background: radial-gradient(110% 90% at -10% 50%, rgba(36, 206, 195, 0.55) 0%, rgba(26, 40, 52, 0.35) 45%, rgba(6, 9, 13, 0) 100%);
-    transform: translateX(-26%);
+    z-index: 0;
 }
 
 /* Conteneur central */
@@ -79,16 +57,13 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 1; /* Prend toute la hauteur disponible */
+    flex: 0 1 1440px; /* Largeur limitée tout en restant responsive */
     position: relative;
     z-index: 1;
-}
-
-.background-image {
-    width: auto;
-    height: 100%; /* S'ajuste pour occuper toute la hauteur du conteneur */
-    max-width: none; /* Désactive la limite de largeur */
-    object-fit: contain; /* Conserve les proportions sans déborder */
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    height: 100%;
 }
 
 /* Footer */
