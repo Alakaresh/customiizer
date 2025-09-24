@@ -27,7 +27,7 @@ body[class*="page-template-templatescustomize-php"] #customize-main > #content {
     flex-direction: column; /* Organise les enfants (header, content, footer) verticalement */
     background: #141414;
     border-radius: 28px 0 0 28px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(5, 5, 5, 0.65);
     box-shadow: 0 24px 40px rgba(0, 0, 0, 0.55);
 }
 
@@ -46,14 +46,14 @@ body[class*="page-template-templatescustomize-php"] #customize-main > #content {
     background: #151515;
     flex: none; /* Empêche la sidebar de s'ajuster ou de se redimensionner */
     max-height: calc(100dvh - var(--header-height, 88px));
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    border-right: 1px solid rgba(5, 5, 5, 0.7);
     border-radius: 28px 0 0 28px;
 }
 
 #right-sidebar {
     width: 280px;
     background: #141414;
-    border-left: 1px solid rgba(255, 255, 255, 0.06);
+    border-left: 1px solid rgba(5, 5, 5, 0.7);
     border-radius: 0 28px 28px 0;
 }
 

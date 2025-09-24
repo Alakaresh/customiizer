@@ -23,6 +23,8 @@ body {
     flex-direction: column;
     width: 100%;
     height: calc(100dvh - 88px);
+    --product-border-color: rgba(8, 8, 8, 0.78);
+    --product-border-strong: rgba(5, 5, 5, 0.85);
 }
 
 /* Section principale */
@@ -102,7 +104,7 @@ body {
     padding: 5px 5px;
     color: #fff;
     background: linear-gradient(135deg, rgba(16, 16, 16, 0.92), rgba(4, 4, 4, 0.94));
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--product-border-strong);
     box-shadow: 0 -20px 48px rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(16px);
     box-sizing: border-box;
@@ -215,7 +217,7 @@ body {
     width: 100%;
     margin: 18px 0;
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--product-border-strong);
     background: linear-gradient(135deg, rgba(18, 18, 18, 0.9), rgba(6, 6, 6, 0.94));
     box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(12px);
@@ -246,7 +248,7 @@ body {
     font-size: 0.95rem;
     line-height: 1.65;
     color: #e0e0e0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--product-border-strong);
     transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
 }
 
@@ -264,7 +266,7 @@ body {
     padding: 16px 18px;
     margin: 5px 0 5px;
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--product-border-strong);
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.92), rgba(6, 6, 6, 0.94));
     box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(12px);
@@ -338,7 +340,7 @@ body {
     min-width: 76px;
     padding: 10px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid var(--product-border-color);
     background: linear-gradient(135deg, rgba(32, 32, 32, 0.86), rgba(14, 14, 14, 0.94));
     color: #f8fafa;
     font-size: 0.85rem;
@@ -404,7 +406,7 @@ body {
     position: relative;
     width: 100%;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid var(--product-border-color);
     background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.94));
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
     overflow: hidden;
@@ -496,7 +498,7 @@ body {
     width: 100%;
     padding: 18px 22px;
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--product-border-strong);
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.94));
     box-shadow: 0 22px 44px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(12px);
@@ -686,7 +688,7 @@ body {
     width: 100%;
     padding: 18px 34px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid var(--product-border-color);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
     color: #ffffff;
     font-size: 0.95rem;
@@ -778,7 +780,7 @@ body {
         gap: 16px;
         padding: 6px 6px;
         border-radius: 28px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--product-border-strong);
         background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(6, 6, 6, 0.88));
         box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
         backdrop-filter: blur(14px);
@@ -789,7 +791,7 @@ body {
         height: 80px;
         border-radius: 22px;
         object-fit: cover;
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        border: 1px solid var(--product-border-color);
         box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
