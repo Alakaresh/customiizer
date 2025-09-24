@@ -52,33 +52,41 @@
         </div>
 
         <!-- MODAL CHOIX IMAGE -->
-        <div id="modalChoixImage" class="modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modalChoixImageTitle">
-                <div class="modal-header">
-                        <button type="button" class="close-btn" onclick="hideElement('modalChoixImage');" aria-label="<?php esc_attr_e( 'Fermer', 'customiizer' ); ?>">&#215;</button>
-                        <h2 id="modalChoixImageTitle"><?php esc_html_e( 'Choisir une image', 'customiizer' ); ?></h2>
-                </div>
-                <div class="modal-body">
-                        <div id="imagePreview" class="image-placeholder">
-                                <img id="imageToCrop" style="display:none;" alt="<?php esc_attr_e( 'Prévisualisation de l\'image', 'customiizer' ); ?>">
+        <div
+                id="modalChoixImage"
+                class="modal-overlay"
+                style="display: none;"
+                aria-hidden="true"
+                onclick="if (event.target === this) { hideElement('modalChoixImage'); }"
+        >
+                <div class="profile-image-modal" role="dialog" aria-modal="true" aria-labelledby="modalChoixImageTitle">
+                        <div class="modal-header">
+                                <button type="button" class="close-btn" onclick="hideElement('modalChoixImage');" aria-label="<?php esc_attr_e( 'Fermer', 'customiizer' ); ?>">&#215;</button>
+                                <h2 id="modalChoixImageTitle"><?php esc_html_e( 'Choisir une image', 'customiizer' ); ?></h2>
                         </div>
-                </div>
-                <div class="modal-footer">
-                        <div class="top-buttons">
-                                <button type="button" onclick="document.getElementById('fileInput').click();">
-                                        <i class="fas fa-upload" aria-hidden="true"></i>
-                                        <span><?php esc_html_e( 'Ordinateur', 'customiizer' ); ?></span>
-                                </button>
-                                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                                <button type="button" onclick="afficherGalerie();">
-                                        <i class="fas fa-images" aria-hidden="true"></i>
-                                        <span><?php esc_html_e( 'Mes créations', 'customiizer' ); ?></span>
-                                </button>
+                        <div class="modal-body">
+                                <div id="imagePreview" class="image-placeholder">
+                                        <img id="imageToCrop" style="display:none;" alt="<?php esc_attr_e( 'Prévisualisation de l\'image', 'customiizer' ); ?>">
+                                </div>
                         </div>
-                        <div class="bottom-button">
-                                <button type="button" onclick="applyCrop();">
-                                        <i class="fas fa-check" aria-hidden="true"></i>
-                                        <span><?php esc_html_e( 'Appliquer', 'customiizer' ); ?></span>
-                                </button>
+                        <div class="modal-footer">
+                                <div class="top-buttons">
+                                        <button type="button" onclick="document.getElementById('fileInput').click();">
+                                                <i class="fas fa-upload" aria-hidden="true"></i>
+                                                <span><?php esc_html_e( 'Ordinateur', 'customiizer' ); ?></span>
+                                        </button>
+                                        <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                                        <button type="button" onclick="afficherGalerie();">
+                                                <i class="fas fa-images" aria-hidden="true"></i>
+                                                <span><?php esc_html_e( 'Mes créations', 'customiizer' ); ?></span>
+                                        </button>
+                                </div>
+                                <div class="bottom-button">
+                                        <button type="button" onclick="applyCrop();">
+                                                <i class="fas fa-check" aria-hidden="true"></i>
+                                                <span><?php esc_html_e( 'Appliquer', 'customiizer' ); ?></span>
+                                        </button>
+                                </div>
                         </div>
                 </div>
         </div>

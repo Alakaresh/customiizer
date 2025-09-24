@@ -204,24 +204,44 @@ function updateActiveLink(currentLink) {
 
 // Fonctions pour montrer et cacher des éléments
 function showElement(elementId) {
-	if (elementId === 'modalChoixImage') {
-		resetCropper();
+        const element = document.getElementById(elementId);
 
-		let imageUrlToLoad = customImageUrl
-		? customImageUrl
-		: baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png?t=' + new Date().getTime();
-		setImagePreview(imageUrlToLoad, function() {
-			initializeCropper();
-		});
-	}
+        if (!element) {
+                return;
+        }
 
-	document.getElementById(elementId).style.display = 'flex';
+        if (elementId === 'modalChoixImage') {
+                resetCropper();
+
+                let imageUrlToLoad = customImageUrl
+                ? customImageUrl
+                : baseUrl + '/wp-sauvegarde/user/' + currentUser.ID + '/user_logo.png?t=' + new Date().getTime();
+                setImagePreview(imageUrlToLoad, function() {
+                        initializeCropper();
+                });
+
+                element.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+        }
+
+        element.style.display = 'flex';
 }
 
 
 
 function hideElement(elementId) {
-	document.getElementById(elementId).style.display = 'none';
+        const element = document.getElementById(elementId);
+
+        if (!element) {
+                return;
+        }
+
+        element.style.display = 'none';
+
+        if (elementId === 'modalChoixImage') {
+                element.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+        }
 }
 
 // Gestion des images avec Cropper.js

@@ -972,37 +972,49 @@ td:last-child {
 /* =========================
    Profile image modal
    ========================= */
-.modal {
+.modal-overlay {
   position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 7, 7, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1050;
+  padding: clamp(16px, 4vw, 32px);
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.profile-image-modal {
   width: min(460px, 90vw);
   background: linear-gradient(135deg, rgba(22, 22, 22, 0.95), rgba(10, 10, 10, 0.98));
   padding: 26px;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 28px 64px rgba(0, 0, 0, 0.65);
-  z-index: 1050;
   display: flex;
   flex-direction: column;
   gap: 20px;
   color: var(--color-text);
+  max-height: min(520px, 90dvh);
 }
 
-.modal-header {
+.profile-image-modal .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.modal-header h2 {
+.profile-image-modal .modal-header h2 {
   margin: 0;
   font-size: 1.25rem;
   letter-spacing: 0.05em;
 }
 
-.close-btn {
+.profile-image-modal .close-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1017,20 +1029,20 @@ td:last-child {
   transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.close-btn:hover,
-.close-btn:focus-visible {
+.profile-image-modal .close-btn:hover,
+.profile-image-modal .close-btn:focus-visible {
   transform: translateY(-2px);
   background: rgba(26, 188, 156, 0.2);
 }
 
-.modal-body {
+.profile-image-modal .modal-body {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.image-placeholder {
+.profile-image-modal .image-placeholder {
   width: 100%;
   min-height: 200px;
   border-radius: 18px;
@@ -1051,29 +1063,29 @@ td:last-child {
   background-position: center;
 }
 
-.modal-footer {
+.profile-image-modal .modal-footer {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.top-buttons {
+.profile-image-modal .top-buttons {
   display: flex;
   gap: 12px;
   width: 100%;
 }
 
-.top-buttons button {
+.profile-image-modal .top-buttons button {
   flex: 1;
   max-width: 220px;
 }
 
-.bottom-button {
+.profile-image-modal .bottom-button {
   display: flex;
   justify-content: center;
 }
 
-.bottom-button button {
+.profile-image-modal .bottom-button button {
   width: min(220px, 80%);
 }
 
