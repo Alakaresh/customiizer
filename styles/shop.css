@@ -31,12 +31,16 @@ body.shop-flex-layout #customize-main {
         display: flex;
         flex-direction: column;
         align-items: stretch;
+        height: auto;
+        min-height: calc(100dvh - var(--header-height, 88px));
 }
 
 body.shop-flex-layout #customize-main > #content {
-        flex: 1 0 auto;
-        display: flex;
-        flex-direction: column;
+        flex: 1 1 auto;
+        display: block;
+        height: auto;
+        overflow: visible;
+        padding: clamp(24px, 4vw, 48px);
 }
 
 .product-list {
@@ -61,6 +65,7 @@ body.shop-flex-layout #customize-main > #content {
         align-items: center;
         gap: 10px;
         width: min(280px, 92vw);
+        height: auto;
         padding: 24px 22px 28px;
         border-radius: 22px;
         border: 1px solid transparent;
