@@ -35,20 +35,11 @@ body {
     justify-content: center;
     position: relative;
     overflow: hidden; /* Empêche tout débordement lié à l'image */
-    background-color: #050708;
-    background-image: url('../assets/img/fond_shop.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: none;
 }
 
 .main-content::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(140% 110% at 50% 45%, rgba(41, 63, 82, 0.42) 0%, rgba(17, 22, 30, 0.82) 55%, rgba(5, 7, 8, 0.9) 100%);
-    pointer-events: none;
-    z-index: 0;
+    content: none;
 }
 
 /* Conteneur central */
@@ -64,6 +55,15 @@ body {
     max-width: 1440px;
     margin: 0 auto;
     height: 100%;
+}
+
+/* Mode sans fond : on affiche uniquement l'image principale du produit */
+.main-content .product-info,
+.main-content .product-details,
+.main-content .image-thumbnails,
+.main-content #productMain3DContainer,
+.bottom-bar {
+    display: none !important;
 }
 
 /* Footer */
