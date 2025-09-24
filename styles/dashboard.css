@@ -131,3 +131,11 @@
 .cropper-face {
     border-radius: 50%;
 }
+
+/* ✅ Points d'accroche plus visibles (blanc avec contour noir) */
+.cropper-point {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 2px #000000;
+    border-radius: 50%;
+    opacity: 1;
+}
