@@ -45,6 +45,9 @@ body {
     flex: 1;
     position: relative;
     z-index: 1; /* garde le contenu au-dessus */
+	--stage-anchor-position: clamp(52%, calc(54% + 2vh), 60%);
+    --stage-translate-y: -62%;
+    --stage-width: clamp(260px, 36vw, 520px);
 
 }
 
@@ -734,16 +737,25 @@ body {
 /* Style pour l'image du produit */
 .product-image {
         position: absolute;
-        transform: translateX(-50%);
-        width: 40%;
+		left: 50%;
+        top: var(--stage-anchor-position);
+        width: var(--stage-width);
+        max-width: 100%;
+        height: auto;
+        transform: translate(-50%, var(--stage-translate-y));
+        transform-origin: 50% 100%;
 }
 
 /* 🆕 Conteneur principal pour l'affichage 3D du produit */
 #productMain3DContainer {
         position: absolute;
-        transform: translateX(-50%);
-        width: 40%;
+		left: 50%;
+        top: var(--stage-anchor-position);
+        width: var(--stage-width);
+        max-width: 100%;
         aspect-ratio: 1/1;
+		transform: translate(-50%, var(--stage-translate-y));
+        transform-origin: 50% 100%;
         display: none;
 }
 
