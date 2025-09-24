@@ -134,3 +134,104 @@ button:focus-visible,
 #mission-achievement .mission-title {
     font-weight: bold;
 }
+
+.contact-section {
+    background: var(--color-secondary);
+    padding: 4rem clamp(1rem, 4vw, 3rem);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    margin: clamp(1rem, 4vw, 3rem) auto;
+    width: min(900px, 100%);
+    text-align: center;
+}
+
+.contact-section h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 0.75rem;
+}
+
+.contact-section p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    color: var(--color-text);
+    opacity: 0.85;
+}
+
+.contact-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contact-form__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.contact-form__field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.5rem;
+}
+
+.contact-form__field label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+}
+
+.contact-form__field input,
+.contact-form__field textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: rgba(0, 0, 0, 0.35);
+    color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-form__field input::placeholder,
+.contact-form__field textarea::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.contact-form__field input:focus,
+.contact-form__field textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(90, 144, 160, 0.2);
+}
+
+.contact-form__field textarea {
+    resize: vertical;
+    min-height: 180px;
+}
+
+.contact-form__actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.contact-form__actions .button {
+    padding: 0.95rem 2.5rem;
+    font-size: 1rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+@media (max-width: 600px) {
+    .contact-section {
+        padding: 3rem 1.25rem;
+    }
+
+    .contact-form__actions {
+        justify-content: center;
+    }
+}
