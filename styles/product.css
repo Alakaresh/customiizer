@@ -39,10 +39,11 @@ body {
     position: relative;
     overflow: hidden;
     background:
-        radial-gradient(120% 100% at 50% 15%, rgba(26, 188, 156, 0.06) 0%, transparent 55%),
-        linear-gradient(150deg, rgba(4, 12, 14, 0.98) 0%, rgba(2, 8, 10, 0.99) 60%, #000 100%);
-    background-color: #000; /* fallback noir pur */
+        radial-gradient(100% 80% at 50% 20%, rgba(26, 188, 156, 0.03) 0%, transparent 50%),
+        linear-gradient(160deg, rgba(3, 8, 10, 0.98) 0%, rgba(1, 4, 5, 0.99) 60%, #000 100%);
+    background-color: #000; /* noir en fallback */
 }
+
 
 
 .background {
