@@ -223,6 +223,7 @@ function customiizer_enqueue_customize_assets() {
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
 
        } elseif (function_exists('is_checkout') && is_checkout()) {
+               wp_enqueue_style('checkout-style', get_stylesheet_directory_uri() . '/styles/checkout.css', [], $ver);
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
 
                // Page /communaute
