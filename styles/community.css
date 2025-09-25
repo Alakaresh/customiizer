@@ -3,9 +3,19 @@
     margin: 0;
 }
 .image-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    column-gap: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.image-container .image-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1 1 200px;
+    max-width: 320px;
 }
 
 .imageContainer {
