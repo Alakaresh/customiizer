@@ -326,3 +326,10 @@ body.woocommerce-checkout button[name="apply_coupon"]:hover {
     justify-content: center;
   }
 }
+/* Override du fond blanc par défaut de WooCommerce */
+body.woocommerce-checkout #payment .payment_box {
+  background: rgba(10, 12, 14, 0.92) !important;
+  border: 1px solid rgba(43, 216, 121, 0.18) !important;
+  border-radius: 16px !important;
+  padding: 18px !important;
+}
