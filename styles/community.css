@@ -22,7 +22,6 @@
 .image-container .image-column {
     display: flex;
     flex-direction: column;
-    gap: 16px;
     flex: 1 1 0;
     min-width: 0;
 }
