@@ -13,6 +13,8 @@ let isLoading = false;
 let currentSort = 'explore';
 let currentSearch = '';
 let searchTimeout;
+let resizeTimeout;
+let currentColumnCount = determineColumnCount();
 
 jQuery(document).ready(function ($) {
         fetchImagesFromAPI(true);
@@ -83,6 +85,8 @@ jQuery(document).ready(function ($) {
                         }
                 });
         }
+
+        $(window).on('resize', handleResizeColumns);
 });
 
 // --- Fonctions principales ---
@@ -263,12 +267,61 @@ function appendImage(image, columns, columnIndex) {
 // --- Utilitaires ---
 
 function initializeColumns() {
+        currentColumnCount = determineColumnCount();
+        return createColumns(currentColumnCount);
+}
+
+function createColumns(count) {
         const columns = [];
-        const columnCount = window.innerWidth <= 1024 ? 2 : 5;
-        for (let i = 0; i < columnCount; i++) {
+        for (let i = 0; i < count; i++) {
                 columns.push($('<div/>', { class: 'image-column' }));
         }
         return columns;
+}
+
+function determineColumnCount() {
+        const width = window.innerWidth;
+        const breakpoints = [
+                { minWidth: 1800, columns: 6 },
+                { minWidth: 1500, columns: 5 },
+                { minWidth: 1200, columns: 4 },
+                { minWidth: 900, columns: 3 },
+                { minWidth: 640, columns: 2 }
+        ];
+
+        for (const { minWidth, columns } of breakpoints) {
+                if (width >= minWidth) {
+                        return columns;
+                }
+        }
+
+        return 1;
+}
+
+function handleResizeColumns() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+                const newCount = determineColumnCount();
+                if (newCount === currentColumnCount) {
+                        return;
+                }
+
+                currentColumnCount = newCount;
+                const container = $('#image-container .image-container');
+                if (!container.length) {
+                        return;
+                }
+
+                const columns = createColumns(newCount);
+                container.empty();
+                columns.forEach(column => container.append(column));
+
+                filteredImages.forEach((img, idx) => {
+                        appendImage(img, columns, idx % columns.length);
+                });
+
+                enableImageEnlargement();
+        }, 150);
 }
 
 function getQueryParam(param) {
