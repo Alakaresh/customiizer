@@ -1,5 +1,5 @@
 const userId = currentUser.ID;
-const imagesPerLoad = 30; // Increased to load more images per batch
+const imagesPerLoad = 45; // Load a few more images before fetching the next batch
 
 // In the WordPress environment jQuery operates in no-conflict mode, so
 // the global `$` alias is not defined. Define it here to reuse jQuery
