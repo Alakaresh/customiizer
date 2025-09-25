@@ -153,6 +153,7 @@ add_action( 'init', function() {
                 '/includes/save_account_image.php',
                 '/includes/save_base64_image.php',
                 '/includes/image_status.php',
+                '/includes/background_generation_state.php',
                 '/includes/missions.php',
                 '/includes/loyalty.php',
                 '/includes/api/api_images.php',
