@@ -333,3 +333,16 @@ body.woocommerce-checkout #payment .payment_box {
   border-radius: 16px !important;
   padding: 18px !important;
 }
+/* Champs internes de la CB */
+body.woocommerce-checkout #payment .payment_box input,
+body.woocommerce-checkout #payment .payment_box .wc-stripe-elements-field,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__field {
+  background: rgba(28, 28, 28, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px !important;
+  color: #f6f9f9 !important;
+}
+
+body.woocommerce-checkout #payment .payment_box input::placeholder {
+  color: rgba(230, 230, 230, 0.55) !important;
+}
