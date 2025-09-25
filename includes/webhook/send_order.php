@@ -72,7 +72,6 @@ function startConsumerLoop() {
 
                 } catch (AMQPTimeoutException $e) {
                     // Simple keepalive → rien reçu
-                    customiizer_log("⏳ Timeout RabbitMQ, pas de message");
                 }
             }
         } catch (\Throwable $e) {
