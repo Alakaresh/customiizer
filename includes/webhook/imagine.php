@@ -79,20 +79,15 @@ if (is_array($input) && !empty($input) && isset($input['hash'])) {
     $update_result = update_post_meta($post_id, 'image_generation', $input);
     if (!$update_result) {
         customiizer_log("Erreur lors de la mise à jour des métadonnées 'image_generation' pour le post ID: $post_id");
-    } else {
-        customiizer_log("Métadonnées 'image_generation' mises à jour pour le post ID: $post_id");
     }
 
     $update_result = update_post_meta($post_id, 'task_hash', $task_hash);
     if (!$update_result) {
         customiizer_log("Erreur lors de la mise à jour des métadonnées 'task_hash' pour le post ID: $post_id");
-    } else {
-        customiizer_log("Métadonnées 'task_hash' mises à jour pour le post ID: $post_id");
     }
 
     // Répondre avec succès
     http_response_code(200);
-    customiizer_log("Données traitées avec succès pour le post ID: $post_id");
     echo json_encode(['status' => 'success']);
 } else {
     // Répondre avec une erreur si les données ne sont pas valides
