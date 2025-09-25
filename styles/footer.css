@@ -42,8 +42,8 @@
     gap: 32px;
 }
 
-body[class*="page-template-templatescustomize-php"] .upper-band__inner,
-body[class*="page-template-templatescustomize-php"] .lower-band__inner {
+body.customize-layout-page .upper-band__inner,
+body.customize-layout-page .lower-band__inner {
     width: 100%;
     max-width: none;
 }

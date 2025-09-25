@@ -8,16 +8,12 @@
     background: linear-gradient(160deg, #111111 0%, #131313 50%, #1a1a1a 100%);
 }
 
-body[class*="page-template-templatescustomize-php"] > #content,
-body[class*="page-template-templatescustomize-php"] #site-content.full-content,
-body[class*="page-template-templatescustomize-php"] #customize-main {
+body.customize-layout-page > #content,
+body.customize-layout-page #site-content.full-content,
+body.customize-layout-page #customize-main.customize-layout {
     width: 100%;
     max-width: none;
     margin: 0;
-}
-
-body[class*="page-template-templatescustomize-php"] #customize-main > #content {
-    max-width: none;
 }
 
 .sidebar {
@@ -57,7 +53,7 @@ body[class*="page-template-templatescustomize-php"] #customize-main > #content {
     border-radius: 0 28px 28px 0;
 }
 
-#content {
+body.customize-layout-page #customize-main.customize-layout > #content {
     flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
     background: radial-gradient(circle at top, rgba(47, 255, 185, 0.08) 0%, rgba(17, 17, 17, 0.92) 45%, #111111 100%);
     display: flex;
@@ -65,9 +61,6 @@ body[class*="page-template-templatescustomize-php"] #customize-main > #content {
     justify-content: center;
     overflow-y: auto;
     margin: 0;
-}
-
-#customize-main > #content {
     height: 100%;
 }
 
