@@ -7,7 +7,7 @@ get_template_part('header');
 
 
 function load_sidebar_content() {
-	$path = $_SERVER['REQUEST_URI'];
+        $path = $_SERVER['REQUEST_URI'];
 
 	if (strpos($path, '/customiize') !== false) {
 		get_template_part('templates/generate/sidebar', 'header');
@@ -19,7 +19,7 @@ function load_sidebar_content() {
 }
 
 function load_main_content() {
-	$path = $_SERVER['REQUEST_URI'];
+        $path = $_SERVER['REQUEST_URI'];
 	if (strpos($path, '/customiize') !== false) {
 		get_template_part('templates/generate/main', 'content');
 	} elseif (strpos($path, '/boutique') !== false) {
@@ -29,21 +29,24 @@ function load_main_content() {
 		get_template_part('templates/product/main', 'design');
 	} elseif (strpos($path, '/communaute') !== false) {
 		get_template_part('templates/community/main', 'content');
-	} elseif (strpos($path, '/mycreation') !== false) {
-		get_template_part('templates/mycreation/main', 'content');
-	}
+        } elseif (strpos($path, '/mycreation') !== false) {
+                get_template_part('templates/mycreation/main', 'content');
+        }
 }
+
+$path = $_SERVER['REQUEST_URI'];
+$is_customize_layout = (strpos($path, '/customiize') !== false || strpos($path, '/v2shop') !== false);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<?php wp_head(); ?>
-	</head>
-	<body>
-		<main id="site-content" class="full-content">
-			<div id="customize-main">
+        <head>
+                <meta charset="utf-8">
+                <?php wp_head(); ?>
+        </head>
+        <body <?php body_class( $is_customize_layout ? 'customize-layout-page' : '' ); ?>>
+                <main id="site-content" class="full-content">
+                        <div id="customize-main"<?php echo $is_customize_layout ? ' class="customize-layout"' : ''; ?>>
 				<?php if (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) { ?>
 				<?php get_template_part('templates/generate/customize', 'main'); ?>
 				<?php } ?>
@@ -57,9 +60,9 @@ function load_main_content() {
 
 
 				<!-- Main Content -->
-				<div id="content">
-					<?php load_main_content(); ?>
-				</div>
+                                <div id="content">
+                                        <?php load_main_content(); ?>
+                                </div>
 
 			</div>
 		</main>
