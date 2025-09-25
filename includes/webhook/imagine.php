@@ -77,13 +77,19 @@ if (is_array($input) && !empty($input) && isset($input['hash'])) {
 
     // Stocker les données complètes du webhook dans les méta-posts
     $update_result = update_post_meta($post_id, 'image_generation', $input);
-    if (!$update_result) {
-        customiizer_log("Erreur lors de la mise à jour des métadonnées 'image_generation' pour le post ID: $post_id");
+    if ($update_result === false) {
+        $current_value = get_post_meta($post_id, 'image_generation', true);
+        if ($current_value !== $input) {
+            customiizer_log("Erreur lors de la mise à jour des métadonnées 'image_generation' pour le post ID: $post_id");
+        }
     }
 
     $update_result = update_post_meta($post_id, 'task_hash', $task_hash);
-    if (!$update_result) {
-        customiizer_log("Erreur lors de la mise à jour des métadonnées 'task_hash' pour le post ID: $post_id");
+    if ($update_result === false) {
+        $current_value = get_post_meta($post_id, 'task_hash', true);
+        if ($current_value !== $task_hash) {
+            customiizer_log("Erreur lors de la mise à jour des métadonnées 'task_hash' pour le post ID: $post_id");
+        }
     }
 
     // Répondre avec succès
