@@ -636,16 +636,26 @@ td:last-child {
   padding: 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(24, 24, 24, 0.86);
+  background: rgba(18, 18, 18, 0.92); /* fond sombre */
   color: var(--color-text);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .form-group input:focus {
-  border-color: rgba(26, 188, 156, 0.55);
+  border-color: rgba(26, 188, 156, 0.55); /* vert accent */
+  background: rgba(24, 24, 24, 0.95); /* légèrement plus clair au focus */
   box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.25);
   outline: none;
 }
+
+/* input readonly (comme email) */
+.form-group input[readonly] {
+  background: rgba(30, 30, 30, 0.75);
+  color: rgba(200, 200, 200, 0.55);
+  cursor: not-allowed;
+}
+
 
 .site-content.account-page button,
 .site-content.account-page .button {
