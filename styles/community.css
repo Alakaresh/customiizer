@@ -2,6 +2,16 @@
     max-height: none;
     margin: 0;
 }
+
+/*
+ * Le style global applique display:flex sur #site-content pour certaines pages
+ * (ex: accueil, boutique). Cela perturbe la mise en page de la communauté où le
+ * contenu doit s'empiler naturellement. On neutralise donc ce comportement
+ * uniquement pour la page communauté.
+ */
+#site-content {
+    display: block;
+}
 .image-container {
     display: flex;
     justify-content: center;
