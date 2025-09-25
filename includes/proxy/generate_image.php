@@ -56,7 +56,8 @@ $taskId = uniqid('task_', true);
 $now = current_time('mysql');
 
 global $wpdb;
-$jobsTable = $wpdb->prefix . 'generation_jobs';
+$customPrefix = 'WPC_';
+$jobsTable = $customPrefix . 'generation_jobs';
 
 $inserted = $wpdb->insert(
     $jobsTable,

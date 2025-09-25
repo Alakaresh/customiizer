@@ -24,8 +24,9 @@ function check_image_status() {
         wp_send_json_error(['message' => 'taskId manquant']);
     }
 
-    $jobsTable = $wpdb->prefix . 'generation_jobs';
-    $imagesTable = $wpdb->prefix . 'generated_image';
+    $customPrefix = 'WPC_';
+    $jobsTable = $customPrefix . 'generation_jobs';
+    $imagesTable = $customPrefix . 'generated_image';
 
     $job = $wpdb->get_row(
         $wpdb->prepare(

@@ -19,7 +19,8 @@ function save_generated_image(WP_REST_Request $request) {
                 ], 400);
         }
 
-        $jobsTable = $wpdb->prefix . 'generation_jobs';
+        $customPrefix = 'WPC_';
+        $jobsTable = $customPrefix . 'generation_jobs';
 
         if ($jobId) {
                 $job = $wpdb->get_row(
@@ -40,7 +41,7 @@ function save_generated_image(WP_REST_Request $request) {
                 ], 404);
         }
 
-        $imagesTable = $wpdb->prefix . 'generated_image';
+        $imagesTable = $customPrefix . 'generated_image';
         $imageUrl = esc_url_raw($request->get_param('image_url'));
 
         if (empty($imageUrl)) {
