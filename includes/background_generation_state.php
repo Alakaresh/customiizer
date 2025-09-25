@@ -72,20 +72,34 @@ function customiizer_set_active_generation() {
 
     $payload = isset($_POST['payload']) ? wp_unslash($_POST['payload']) : '';
     if (empty($payload)) {
+        customiizer_log('background_generation', "Payload manquant pour set_active_generation user_id={$user_id}");
         wp_send_json_error(['message' => 'Payload manquant']);
     }
 
     $decoded = json_decode($payload, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
+        customiizer_log('background_generation', "JSON invalide pour set_active_generation user_id={$user_id}: " . json_last_error_msg());
         wp_send_json_error(['message' => 'Payload invalide']);
     }
 
     $sanitised = customiizer_sanitise_generation_snapshot($decoded, $user_id);
     if (!$sanitised) {
+        customiizer_log('background_generation', "Instantané invalide pour set_active_generation user_id={$user_id}");
         wp_send_json_error(['message' => 'Instantané invalide']);
     }
 
     update_user_meta($user_id, CUSTOMIIZER_ACTIVE_GENERATION_META, $sanitised);
+
+    customiizer_log(
+        'background_generation',
+        sprintf(
+            'Génération active stockée pour user_id=%d hash=%s stage=%s status=%s',
+            $user_id,
+            isset($sanitised['hash']) ? $sanitised['hash'] : 'n/a',
+            isset($sanitised['stage']) ? $sanitised['stage'] : 'n/a',
+            isset($sanitised['status']) ? $sanitised['status'] : 'n/a'
+        )
+    );
 
     wp_send_json_success(['stored' => true]);
 }
@@ -98,11 +112,23 @@ function customiizer_get_active_generation() {
 
     if (empty($stored) || !is_array($stored) || empty($stored['hash'])) {
         delete_user_meta($user_id, CUSTOMIIZER_ACTIVE_GENERATION_META);
+        customiizer_log('background_generation', "Aucune génération active trouvée pour user_id={$user_id}");
         wp_send_json_success(['job' => null]);
     }
 
     $stored['userId'] = intval($user_id);
     $stored['progress'] = isset($stored['progress']) ? floatval($stored['progress']) : 0;
+
+    customiizer_log(
+        'background_generation',
+        sprintf(
+            'Génération active récupérée pour user_id=%d hash=%s stage=%s status=%s',
+            $user_id,
+            isset($stored['hash']) ? $stored['hash'] : 'n/a',
+            isset($stored['stage']) ? $stored['stage'] : 'n/a',
+            isset($stored['status']) ? $stored['status'] : 'n/a'
+        )
+    );
 
     wp_send_json_success(['job' => $stored]);
 }
@@ -111,6 +137,7 @@ add_action('wp_ajax_customiizer_get_active_generation', 'customiizer_get_active_
 function customiizer_clear_active_generation() {
     $user_id = customiizer_require_logged_in_user();
     delete_user_meta($user_id, CUSTOMIIZER_ACTIVE_GENERATION_META);
+    customiizer_log('background_generation', "Génération active supprimée pour user_id={$user_id}");
     wp_send_json_success(['cleared' => true]);
 }
 add_action('wp_ajax_customiizer_clear_active_generation', 'customiizer_clear_active_generation');
