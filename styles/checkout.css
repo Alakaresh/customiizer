@@ -119,6 +119,16 @@ body.woocommerce-checkout #order_review td {
   padding: 12px;
 }
 
+body.woocommerce-checkout #order_review .loyalty-points-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+body.woocommerce-checkout #order_review .loyalty-points-controls input[type=number] {
+  max-width: 120px;
+}
+
 /* ===========================
    Fieldsets (paiement, livraison, etc.)
    =========================== */
