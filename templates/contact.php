@@ -10,7 +10,7 @@ get_header();
                 <div class="contact-container">
                         <div class="contact-intro">
                                 <h2>Une question&nbsp;?</h2>
-                                <p>Notre équipe vous accompagne du lundi au vendredi pour donner vie à vos créations. Remplissez le formulaire ou contactez-nous directement via les coordonnées ci-dessous.</p>
+                                <p>Notre équipe vous accompagne du lundi au vendredi pour donner vie à vos créations.</p>
                         </div>
                         <div class="contact-content">
                                 <div class="contact-form">
