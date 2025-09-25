@@ -11,7 +11,7 @@
 		<button id="search-button"><i class="fas fa-search"></i></button>
 	</div>
 </div>
-<div class="content-container" id="image-container" style="width: 100%; height: auto">
+<div class="content-container" id="image-container" style="width: 100%;">
         <div class="image-column" id="image-container1"></div>
 </div>
 <div id="scroll-message">Chargement des images suivantes...</div>

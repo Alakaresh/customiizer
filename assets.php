@@ -60,7 +60,19 @@ function customiizer_enqueue_customize_assets() {
         wp_enqueue_style('child-style', get_stylesheet_directory_uri().'/style.css', ['parent-style'], $ver);
         wp_enqueue_style('customiizer-style', get_stylesheet_directory_uri() . '/styles/style.css', [], $ver);
         wp_enqueue_style('preview-image-style', get_stylesheet_directory_uri() . '/styles/preview_image.css', [], $ver);
-       wp_enqueue_style('customize-style', get_stylesheet_directory_uri() . '/styles/customize.css', [], $ver);
+
+        $needs_customize_styles = (
+                strpos($request_uri, '/customiize') !== false ||
+                strpos($request_uri, '/v2shop') !== false ||
+                strpos($request_uri, '/configurateur') !== false ||
+                strpos($request_uri, '/boutique') !== false ||
+                strpos($request_uri, '/mycreation') !== false
+        );
+
+        if ($needs_customize_styles) {
+                wp_enqueue_style('customize-style', get_stylesheet_directory_uri() . '/styles/customize.css', [], $ver);
+        }
+
        wp_enqueue_style('header-style', get_stylesheet_directory_uri() . '/styles/header.css', [], $ver);
        wp_enqueue_style('footer-style', get_stylesheet_directory_uri() . '/styles/footer.css', [], $ver);
        wp_enqueue_style('fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', [], $ver);
