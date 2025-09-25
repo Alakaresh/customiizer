@@ -1,5 +1,4 @@
 #customize-main {
-    display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
     flex-grow: 1;
     height: calc(100dvh - var(--header-height, 88px));
     min-height: calc(100dvh - var(--header-height, 88px));
@@ -7,7 +6,9 @@
     font-family: 'Inter', 'Arial', sans-serif;
     background: linear-gradient(160deg, #111111 0%, #131313 50%, #1a1a1a 100%);
 }
-
+#customize-main.customize-layout {
+    display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
+}
 body.customize-layout-page > #content,
 body.customize-layout-page #site-content.full-content,
 body.customize-layout-page #customize-main.customize-layout {
