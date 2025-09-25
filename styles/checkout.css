@@ -146,6 +146,58 @@ body.woocommerce-checkout #payment .payment_box {
 }
 
 /* ===========================
+   Zone de carte de crédit
+   =========================== */
+body.woocommerce-checkout #payment .payment_box .wc-payment-form,
+body.woocommerce-checkout #payment .payment_box .wc-credit-card-form,
+body.woocommerce-checkout #payment .payment_box .wcpay-card {
+  background: rgba(15, 17, 19, 0.92);
+  border: 1px solid rgba(43, 216, 121, 0.25);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+body.woocommerce-checkout #payment .payment_box .wc-payment-form label,
+body.woocommerce-checkout #payment .payment_box .wc-credit-card-form label,
+body.woocommerce-checkout #payment .payment_box .wcpay-card label {
+  color: var(--color-text, #f6f9f9);
+}
+
+body.woocommerce-checkout #payment .payment_box .StripeElement,
+body.woocommerce-checkout #payment .payment_box .wc-stripe-elements-field,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__field,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__input,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__field-wrapper {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(43, 216, 121, 0.35) !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  color: var(--color-text, #f6f9f9) !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+body.woocommerce-checkout #payment .payment_box .StripeElement--focus,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__field:focus-within,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__input:focus-within,
+body.woocommerce-checkout #payment .payment_box .wc-stripe-elements-field.is-focused {
+  border-color: var(--color-brand-400, rgba(43, 216, 121, 0.7)) !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  box-shadow: 0 0 0 4px rgba(43, 216, 121, 0.2) !important;
+}
+
+body.woocommerce-checkout #payment .payment_box .StripeElement--invalid,
+body.woocommerce-checkout #payment .payment_box .wcpay-card__field.is-invalid,
+body.woocommerce-checkout #payment .payment_box .wc-stripe-elements-field.is-invalid {
+  border-color: rgba(255, 99, 71, 0.75) !important;
+  box-shadow: 0 0 0 4px rgba(255, 99, 71, 0.2) !important;
+}
+
+/* ===========================
    Notices (infos, erreurs, succès)
    =========================== */
 body.woocommerce-checkout .woocommerce-info,
