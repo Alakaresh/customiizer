@@ -192,7 +192,11 @@ function customiizer_enqueue_customize_assets() {
                wp_enqueue_script('account-pictures', get_stylesheet_directory_uri() . '/js/account/pictures.js', ['jquery'], $ver, true);
                wp_enqueue_script('account-missions', get_stylesheet_directory_uri() . '/js/account/missions.js', ['jquery'], $ver, true);
 
-       } elseif (strpos($request_uri, '/panier') !== false) {
+        } elseif (is_page('contact')) {
+                // --- CSS ---
+                wp_enqueue_style('contact-style', get_stylesheet_directory_uri() . '/styles/contact.css', [], $ver);
+
+        } elseif (strpos($request_uri, '/panier') !== false) {
                // --- CSS ---
                wp_enqueue_style('cart-style', get_stylesheet_directory_uri() . '/styles/cart.css', [], $ver);
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
