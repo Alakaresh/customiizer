@@ -14,18 +14,17 @@
 }
 .image-container {
     display: flex;
-    justify-content: center;
     align-items: flex-start;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
 }
 
 .image-container .image-column {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    flex: 1 1 200px;
-    max-width: 320px;
+    gap: 16px;
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .imageContainer {

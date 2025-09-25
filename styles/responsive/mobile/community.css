@@ -4,9 +4,17 @@
                 overflow-x: hidden;
         }
         .image-container {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                column-gap: 10px;
+                gap: 12px;
                 box-sizing: border-box;
+        }
+
+        .image-container .image-column {
+                flex: 1 1 0;
+        }
+}
+
+@media screen and (max-width: 640px) {
+        .image-container {
+                flex-direction: column;
         }
 }
