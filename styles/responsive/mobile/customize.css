@@ -84,6 +84,22 @@
        }
 
        /* Adjust generate grid spacing */
+       body.customize-layout-page .content-images {
+               height: auto;
+               max-height: none;
+               padding: 16px 0 32px;
+       }
+
+       body.customize-layout-page .image-grid {
+               width: 100%;
+               max-height: none;
+               aspect-ratio: auto;
+       }
+
+       body.customize-layout-page .image-grid img {
+               height: auto;
+       }
+
        body.customize-layout-page .image-container {
                height: auto;
        }
