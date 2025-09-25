@@ -9,12 +9,32 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
-add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
+<?php
 add_action( 'wp_enqueue_scripts', function() {
-    // Supprime les styles WooCommerce d'Astra
-    wp_dequeue_style( 'astra-woocommerce' );
-    wp_deregister_style( 'astra-woocommerce' );
-}, 20 );
+    // Ajout d'un script inline après le script Stripe de WooCommerce
+    wp_add_inline_script( 'wc-stripe', "
+        jQuery( function( $ ) {
+            if ( typeof wc_stripe_form !== 'undefined' ) {
+                var darkStyle = {
+                    base: {
+                        color: '#f6f9f9',                        // texte
+                        fontSize: '16px',
+                        fontFamily: 'Inter, sans-serif',
+                        iconColor: '#1abc9c',                    // icônes Visa/Mastercard
+                        '::placeholder': { color: 'rgba(230,230,230,0.55)' }
+                    },
+                    invalid: {
+                        color: '#ff6b6b',                        // erreurs
+                        iconColor: '#ff6b6b'
+                    }
+                };
+                // Injection du style sombre
+                wc_stripe_form.elements_options = { style: darkStyle };
+            }
+        });
+    ");
+});
+
 
 add_filter(
         'body_class',
