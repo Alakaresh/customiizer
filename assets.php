@@ -196,6 +196,27 @@ function customiizer_enqueue_customize_assets() {
                 // --- CSS ---
                 wp_enqueue_style('contact-style', get_stylesheet_directory_uri() . '/styles/contact.css', [], $ver);
 
+                // --- JS internes ---
+                wp_enqueue_script('contact-prefill', get_stylesheet_directory_uri() . '/js/contact/prefill.js', [], $ver, true);
+
+                $current_user = wp_get_current_user();
+                $prefill_name = '';
+                $prefill_email = '';
+
+                if (! empty($current_user->ID)) {
+                        $prefill_name  = $current_user->display_name;
+                        $prefill_email = $current_user->user_email;
+                }
+
+                wp_localize_script(
+                        'contact-prefill',
+                        'customiizerContactPrefill',
+                        [
+                                'name'  => $prefill_name,
+                                'email' => $prefill_email,
+                        ]
+                );
+
         } elseif (strpos($request_uri, '/panier') !== false) {
                // --- CSS ---
                wp_enqueue_style('cart-style', get_stylesheet_directory_uri() . '/styles/cart.css', [], $ver);
