@@ -9,6 +9,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
+add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
 
 add_filter(
         'body_class',
