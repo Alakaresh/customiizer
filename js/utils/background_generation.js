@@ -15,6 +15,15 @@
     let job = null;
     let pollTimeout = null;
     let upscaleInterval = null;
+    const SERVER_SYNC_ACTIONS = {
+        save: 'customiizer_set_active_generation',
+        fetch: 'customiizer_get_active_generation',
+        clear: 'customiizer_clear_active_generation'
+    };
+    const canSyncWithServer = typeof ajaxurl !== 'undefined';
+    const isUserLoggedIn = typeof window.userIsLoggedIn !== 'undefined' ? !!window.userIsLoggedIn : false;
+    let lastServerSyncSignature = null;
+    let lastServerSyncAt = 0;
 
     function log(message, context) {
         if (context) {
@@ -69,6 +78,170 @@
         }
     }
 
+    function normaliseJobForSync(snapshot) {
+        if (!snapshot || !snapshot.hash || !snapshot.userId) {
+            return null;
+        }
+
+        const upscaleHashes = {};
+        if (snapshot.upscaleHashes && typeof snapshot.upscaleHashes === 'object') {
+            Object.keys(snapshot.upscaleHashes).forEach(key => {
+                if (snapshot.upscaleHashes[key]) {
+                    upscaleHashes[key] = String(snapshot.upscaleHashes[key]);
+                }
+            });
+        }
+
+        return {
+            hash: String(snapshot.hash),
+            prompt: snapshot.prompt || '',
+            settings: snapshot.settings || '',
+            ratio: snapshot.ratio || '',
+            userId: snapshot.userId,
+            displayName: snapshot.displayName || '',
+            userLogo: snapshot.userLogo || '',
+            progress: typeof snapshot.progress === 'number' ? snapshot.progress : 0,
+            stage: snapshot.stage || 'generation',
+            status: snapshot.status || 'running',
+            startedAt: snapshot.startedAt || Date.now(),
+            displayedUrl: snapshot.displayedUrl || '',
+            rawUrl: snapshot.rawUrl || '',
+            upscaleHashes: Object.keys(upscaleHashes).length ? upscaleHashes : null,
+            updatedAt: Date.now()
+        };
+    }
+
+    async function saveJobToServer(snapshot) {
+        if (!canSyncWithServer || !isUserLoggedIn) {
+            return;
+        }
+
+        const payload = normaliseJobForSync(snapshot);
+        if (!payload) {
+            return;
+        }
+
+        try {
+            const response = await fetch(ajaxurl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: new URLSearchParams({
+                    action: SERVER_SYNC_ACTIONS.save,
+                    payload: JSON.stringify(payload)
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`synchronisation serveur renvoyée avec le statut ${response.status}`);
+            }
+
+            const result = await response.json().catch(() => null);
+            if (!result || !result.success) {
+                throw new Error('réponse inattendue lors de la synchronisation serveur');
+            }
+        } catch (syncError) {
+            warn('Impossible de synchroniser la génération active avec le serveur', syncError);
+        }
+    }
+
+    async function clearJobOnServer() {
+        if (!canSyncWithServer || !isUserLoggedIn) {
+            return;
+        }
+
+        try {
+            const response = await fetch(ajaxurl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: new URLSearchParams({
+                    action: SERVER_SYNC_ACTIONS.clear
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`suppression serveur renvoyée avec le statut ${response.status}`);
+            }
+        } catch (syncError) {
+            warn('Impossible de supprimer la génération active côté serveur', syncError);
+        }
+    }
+
+    async function fetchJobFromServer() {
+        if (!canSyncWithServer || !isUserLoggedIn) {
+            return null;
+        }
+
+        try {
+            const response = await fetch(ajaxurl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: new URLSearchParams({
+                    action: SERVER_SYNC_ACTIONS.fetch
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`lecture serveur renvoyée avec le statut ${response.status}`);
+            }
+
+            const result = await response.json().catch(() => null);
+            if (!result || !result.success || !result.data) {
+                return null;
+            }
+
+            const jobData = result.data.job || null;
+            if (!jobData || !jobData.hash) {
+                return null;
+            }
+
+            if (jobData.upscaleHashes && typeof jobData.upscaleHashes === 'object') {
+                Object.keys(jobData.upscaleHashes).forEach(key => {
+                    if (!jobData.upscaleHashes[key]) {
+                        delete jobData.upscaleHashes[key];
+                    } else {
+                        jobData.upscaleHashes[key] = String(jobData.upscaleHashes[key]);
+                    }
+                });
+                if (!Object.keys(jobData.upscaleHashes).length) {
+                    jobData.upscaleHashes = null;
+                }
+            } else {
+                jobData.upscaleHashes = null;
+            }
+
+            jobData.progress = typeof jobData.progress === 'number' ? jobData.progress : 0;
+            jobData.stage = jobData.stage || 'generation';
+            jobData.userId = jobData.userId || (window.currentUser && window.currentUser.ID ? window.currentUser.ID : null);
+            return jobData;
+        } catch (syncError) {
+            warn('Impossible de récupérer la génération active depuis le serveur', syncError);
+            return null;
+        }
+    }
+
+    function syncJobToServer(options = {}) {
+        if (!job || !canSyncWithServer || !isUserLoggedIn) {
+            return;
+        }
+
+        const signature = `${job.hash}|${job.stage}|${Math.round(job.progress || 0)}`;
+        if (!options.force) {
+            if (signature === lastServerSyncSignature && Date.now() - lastServerSyncAt < 4000) {
+                return;
+            }
+        }
+
+        lastServerSyncSignature = signature;
+        lastServerSyncAt = Date.now();
+        saveJobToServer(job);
+    }
+
     function notify(type, payload = {}) {
         listeners.forEach(listener => {
             try {
@@ -82,6 +255,7 @@
     function setJob(nextJob) {
         job = nextJob;
         persistJob();
+        syncJobToServer({ force: true });
     }
 
     function updateJob(partial, eventType, payload) {
@@ -92,6 +266,13 @@
         persistJob();
         if (eventType) {
             notify(eventType, payload);
+        }
+        if (job.stage === 'completed' || job.stage === 'error') {
+            clearJobOnServer();
+            lastServerSyncSignature = null;
+            lastServerSyncAt = 0;
+        } else {
+            syncJobToServer();
         }
     }
 
@@ -106,6 +287,9 @@
         }
         job = null;
         persistJob();
+        clearJobOnServer();
+        lastServerSyncSignature = null;
+        lastServerSyncAt = 0;
         updateToast({ progress: 0 });
         notify('job-cleared', {});
     }
@@ -587,6 +771,9 @@
             stage: 'generation',
             status: 'running',
             startedAt: Date.now(),
+            displayedUrl: '',
+            rawUrl: '',
+            upscaleHashes: null,
             images: []
         };
 
@@ -599,14 +786,24 @@
         checkGenerationStatus();
     }
 
-    function restoreJob() {
-        const stored = loadStoredJob();
+    async function restoreJob() {
+        let stored = loadStoredJob();
+
+        if (!stored) {
+            stored = await fetchJobFromServer();
+        }
+
         if (!stored) {
             return;
         }
+
         job = stored;
+        persistJob();
         notify('job-restored', {});
         updateToast({ progress: job.progress || 0 });
+        if (job.stage !== 'completed' && job.stage !== 'error') {
+            syncJobToServer({ force: true });
+        }
 
         if (job.stage === 'generation') {
             checkGenerationStatus();
@@ -633,5 +830,9 @@
         clear: clearJob
     };
 
-    document.addEventListener('DOMContentLoaded', restoreJob);
+    document.addEventListener('DOMContentLoaded', () => {
+        restoreJob().catch(err => {
+            warn('Impossible de restaurer la génération active', err);
+        });
+    });
 })(window, document);

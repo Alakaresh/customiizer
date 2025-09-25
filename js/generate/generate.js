@@ -34,22 +34,53 @@ jQuery(function($) {
 
         // Initialisation des éléments après le chargement du DOM
         const alertBox = document.getElementById('alert-box');
-	const placeholderDiv = document.getElementById('placeholder');
-	const validateButton = document.getElementById('validate-button');  // Assure que validateButton est chargé
-	const customTextInput = document.getElementById('custom-text');  // Assure que customTextInput est chargé
-	const savedPromptText = localStorage.getItem('savedPromptText');
-	let fullprompt = '';
+        const placeholderDiv = document.getElementById('placeholder');
+        const validateButton = document.getElementById('validate-button');  // Assure que validateButton est chargé
+        const customTextInput = document.getElementById('custom-text');  // Assure que customTextInput est chargé
+        const savedPromptText = localStorage.getItem('savedPromptText');
+        let fullprompt = '';
+
+        function resolveRatio(jobData) {
+                if (jobData && jobData.ratio) {
+                        return jobData.ratio;
+                }
+                if (typeof selectedRatio !== 'undefined' && selectedRatio) {
+                        return selectedRatio;
+                }
+                return '';
+        }
 
 	// Si du texte a été sauvegardé, on le réinjecte dans l'input et on masque le placeholder
-	if (savedPromptText) {
-		customTextInput.textContent = savedPromptText;
-		placeholderDiv.style.display = 'none';
-		localStorage.removeItem('savedPromptText');
-	}
+        if (savedPromptText && customTextInput) {
+                customTextInput.textContent = savedPromptText;
+                if (placeholderDiv) {
+                        placeholderDiv.style.display = 'none';
+                }
+                localStorage.removeItem('savedPromptText');
+        }
 
         function showAlert(message) {
+                if (!alertBox) {
+                        console.warn(`${LOG_PREFIX} Impossible d'afficher l'alerte :`, message);
+                        return;
+                }
+
                 alertBox.textContent = message;
                 alertBox.style.display = 'block';
+        }
+
+        function disableValidateButton() {
+                if (!validateButton) {
+                        return;
+                }
+                validateButton.disabled = true;
+        }
+
+        function enableValidateButton() {
+                if (!validateButton) {
+                        return;
+                }
+                validateButton.disabled = false;
         }
 
         // Gestion des événements du suivi en arrière-plan
@@ -62,148 +93,148 @@ jQuery(function($) {
         }
 
         // Écouteur d'événements pour le bouton de validation
-        validateButton.addEventListener('click', async function(e) {
-                e.preventDefault();
+        if (validateButton) {
+                validateButton.addEventListener('click', async function(e) {
+                        e.preventDefault();
 
-		resetGenerationState();
-		resetLoadingState();
+                        resetGenerationState();
+                        resetLoadingState();
 
-		settings = ' --ar ' + selectedRatio;
-		prompt = customTextInput.textContent.trim();  // Récupère le texte de l'input
-		console.log(`${LOG_PREFIX} Demande de génération reçue`, {
-			prompt,
-			settings,
-			ratio: selectedRatio,
-			userId: currentUser.ID,
-		});
-		if (!prompt) {
-			showAlert('Veuillez entrer du texte avant de générer des images.');
-			return;
-		}
+                        const ratioValue = resolveRatio();
+                        settings = ratioValue ? ' --ar ' + ratioValue : '';
+                        prompt = customTextInput ? customTextInput.textContent.trim() : '';
+                        console.log(`${LOG_PREFIX} Demande de génération reçue`, {
+                                prompt,
+                                settings,
+                                ratio: ratioValue,
+                                userId: currentUser.ID,
+                        });
+                        if (!prompt) {
+                                showAlert('Veuillez entrer du texte avant de générer des images.');
+                                return;
+                        }
 
-		if (!settings) {
-			showAlert("Veuillez choisir une taille d'image avant de générer des images.");
-			return;
-		}
+                        if (!ratioValue) {
+                                showAlert("Veuillez choisir une taille d'image avant de générer des images.");
+                                return;
+                        }
 
-		if (!currentUser.ID || currentUser.ID === 0) {
-			localStorage.setItem('savedPromptText', prompt);  // Enregistre le texte dans localStorage
-			showAlert("Vous devez être connecté pour générer des images.");
-			openLoginModal();
-			return;
-		}
+                        if (!currentUser.ID || currentUser.ID === 0) {
+                                localStorage.setItem('savedPromptText', prompt);  // Enregistre le texte dans localStorage
+                                showAlert("Vous devez être connecté pour générer des images.");
+                                openLoginModal();
+                                return;
+                        }
 
-		const creditsEl = document.getElementById('userCredits');
-		const credits = creditsEl ? parseInt(creditsEl.textContent || "0", 10) : 0;
+                        const creditsEl = document.getElementById('userCredits');
+                        const credits = creditsEl ? parseInt(creditsEl.textContent || "0", 10) : 0;
 
-		if (!credits || credits <= 0) {
-			showAlert("Vous n'avez pas assez de crédits pour générer des images.");
-			return;
-		}
-
-
-		// Cache l'alerte si tout est OK
-		alertBox.style.display = 'none';
-
-		// Combine prompt et settings
-		fullprompt = prompt + settings;
-
-		// Désactive le bouton pour éviter les doubles clics
-		validateButton.disabled = true;
-		animateLoadingWithHumor();
-		updateImageGrid();
-                toggleLoading(true);
-		//updateLoading(0); // Assure l'affichage initial de la barre de chargement
+                        if (!credits || credits <= 0) {
+                                showAlert("Vous n'avez pas assez de crédits pour générer des images.");
+                                return;
+                        }
 
 
-		try {
-			console.log(`${LOG_PREFIX} Envoi de la requête de génération à l'API`, {
-				endpoint: '/wp-content/themes/customiizer/includes/proxy/generate_image.php',
-				webhook: baseUrl + '/wp-content/themes/customiizer/includes/webhook/imagine.php',
-			});
-			const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					prompt: fullprompt,
-					webhook_url: baseUrl + '/wp-content/themes/customiizer/includes/webhook/imagine.php',
-					webhook_type: 'progress',
-					is_disable_prefilter: false
-				})
-			});
+                        // Cache l'alerte si tout est OK
+                        if (alertBox) {
+                                alertBox.style.display = 'none';
+                        }
 
-			if (!response.ok) throw new Error("Échec de la récupération du statut de l'image");
+                        // Combine prompt et settings
+                        fullprompt = prompt + settings;
 
-			const data = await response.json();
-			console.log(`${LOG_PREFIX} Réponse reçue du proxy de génération`, data);
+                        // Désactive le bouton pour éviter les doubles clics
+                        disableValidateButton();
+                        animateLoadingWithHumor();
+                        updateImageGrid();
+                        toggleLoading(true);
+                        //updateLoading(0); // Assure l'affichage initial de la barre de chargement
 
-                        if (data.status === 'success') {
-                                id_image = data.data.hash;
-                                console.log(`${LOG_PREFIX} Génération acceptée`, { hash: id_image });
 
-                                if (backgroundGeneration) {
-                                        backgroundGeneration.startTracking({
-                                                hash: id_image,
-                                                prompt,
-                                                settings,
-                                                ratio: selectedRatio,
-                                                userId: currentUser.ID,
-                                                displayName: currentUser.display_name || '',
-                                                userLogo: currentUser.user_logo || ''
-                                        });
+                        try {
+                                console.log(`${LOG_PREFIX} Envoi de la requête de génération à l'API`, {
+                                        endpoint: '/wp-content/themes/customiizer/includes/proxy/generate_image.php',
+                                        webhook: baseUrl + '/wp-content/themes/customiizer/includes/webhook/imagine.php',
+                                });
+                                const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
+                                        method: 'POST',
+                                        headers: {
+                                                'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                                prompt: fullprompt,
+                                                webhook_url: baseUrl + '/wp-content/themes/customiizer/includes/webhook/imagine.php',
+                                                webhook_type: 'progress',
+                                                is_disable_prefilter: false
+                                        })
+                                });
+
+                                if (!response.ok) throw new Error("Échec de la récupération du statut de l'image");
+
+                                const data = await response.json();
+                                console.log(`${LOG_PREFIX} Réponse reçue du proxy de génération`, data);
+
+                                if (data.status === 'success') {
+                                        id_image = data.data.hash;
+                                        console.log(`${LOG_PREFIX} Génération acceptée`, { hash: id_image });
+
+                                        if (backgroundGeneration) {
+                                                backgroundGeneration.startTracking({
+                                                        hash: id_image,
+                                                        prompt,
+                                                        settings,
+                                                        ratio: ratioValue,
+                                                        userId: currentUser.ID,
+                                                        displayName: currentUser.display_name || '',
+                                                        userLogo: currentUser.user_logo || ''
+                                                });
+                                        } else {
+                                                console.warn(`${LOG_PREFIX} Module de suivi en arrière-plan indisponible`);
+                                        }
+
+                                        // 💳 Décrémentation des crédits si succès
+                                        const creditsEl = document.getElementById('userCredits');
+                                        if (creditsEl) {
+                                                let currentCredits = parseInt(creditsEl.textContent || "0", 10);
+                                                if (!isNaN(currentCredits) && currentCredits > 0) {
+                                                        currentCredits -= 1;
+                                                        creditsEl.textContent = currentCredits;
+                                                        console.log(`${LOG_PREFIX} Crédit consommé après génération`, { creditsRestants: currentCredits });
+
+                                                        // 🧠 Cache sessionStorage à jour
+                                                        const cached = sessionStorage.getItem('USER_ESSENTIALS');
+                                                        if (cached) {
+                                                                let cacheData = JSON.parse(cached);
+                                                                if (cacheData.user_id === currentUser.ID) {
+                                                                        cacheData.image_credits = currentCredits;
+                                                                        sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(cacheData));
+                                                                }
+                                                        }
+
+                                                        // 🔄 Synchro serveur
+                                                        await updateCreditsInDB(currentUser.ID);
+                                                }
+                                        }
+
+                                        lastUpdateTime = Date.now();
+                                        lastProgress = 15;
+
                                 } else {
-                                        console.warn(`${LOG_PREFIX} Module de suivi en arrière-plan indisponible`);
+                                        console.error("❌ Erreur dans les données reçues :", data.message);
+                                        console.log(`${LOG_PREFIX} Erreur signalée par l'API de génération`, data);
+                                        showAlert("Une erreur est survenue pendant la génération. Veuillez réessayer.");
                                 }
 
-				// 💳 Décrémentation des crédits si succès
-				const creditsEl = document.getElementById('userCredits');
-				if (creditsEl) {
-					let currentCredits = parseInt(creditsEl.textContent || "0", 10);
-					if (!isNaN(currentCredits) && currentCredits > 0) {
-						currentCredits -= 1;
-						creditsEl.textContent = currentCredits;
-						console.log(`${LOG_PREFIX} Crédit consommé après génération`, { creditsRestants: currentCredits });
-
-						// 🧠 Cache sessionStorage à jour
-						const cached = sessionStorage.getItem('USER_ESSENTIALS');
-						if (cached) {
-							let cacheData = JSON.parse(cached);
-							if (cacheData.user_id === currentUser.ID) {
-								cacheData.image_credits = currentCredits;
-								sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(cacheData));
-							}
-						}
-
-						// 🔄 Synchro serveur
-						await updateCreditsInDB(currentUser.ID);
-					}
-				}
-
-				lastUpdateTime = Date.now();
-				lastProgress = 15;
-
-			} else {
-				console.error("❌ Erreur dans les données reçues :", data.message);
-				console.log(`${LOG_PREFIX} Erreur signalée par l'API de génération`, data);
-				showAlert("Une erreur est survenue pendant la génération. Veuillez réessayer.");
-			}
-
-		} catch (error) {
-			console.error("❌ Erreur de la requête POST:", error);
-			console.log(`${LOG_PREFIX} Erreur lors de l'appel API`, { error });
-			showAlert("Une erreur réseau est survenue. Vérifiez votre connexion ou réessayez plus tard.");
-			validateButton.disabled = false;
-		}
-
-
-		// Affiche une alerte
-		function showAlert(message) {
-			alertBox.textContent = message;
-			alertBox.style.display = 'block';
-		}
-	});
+                        } catch (error) {
+                                console.error("❌ Erreur de la requête POST:", error);
+                                console.log(`${LOG_PREFIX} Erreur lors de l'appel API`, { error });
+                                showAlert("Une erreur réseau est survenue. Vérifiez votre connexion ou réessayez plus tard.");
+                                enableValidateButton();
+                        }
+                });
+        } else {
+                console.warn(`${LOG_PREFIX} Bouton de validation introuvable, la génération en arrière-plan restera active.`);
+        }
 
         async function updateCreditsInDB(userId) {
                 try {
@@ -227,6 +258,9 @@ jQuery(function($) {
         // Fonction pour mettre à jour une image dans la grille
         function updateImageInGrid(imageUrl, index, metadata = {}) {
                 const grid = document.getElementById('image-grid');
+                if (!grid) {
+                        return;
+                }
                 const imageContainers = grid.querySelectorAll('.image-container');
                 if (imageContainers && imageContainers.length > index) {
                         const imgElement = imageContainers[index].querySelector('img');
@@ -237,7 +271,7 @@ jQuery(function($) {
                                 const displayName = metadata.displayName || currentUser.display_name || '';
                                 const userLogo = metadata.userLogo || currentUser.user_logo || '';
                                 const userId = metadata.userId || currentUser.ID || '';
-                                const format = metadata.format || selectedRatio || '';
+                                const format = metadata.format || resolveRatio();
                                 const promptSource = metadata.prompt !== undefined ? metadata.prompt : prompt;
                                 const promptTextUpdate = typeof promptSource === 'object'
                                     ? (promptSource.text || promptSource.prompt || JSON.stringify(promptSource))
@@ -276,7 +310,7 @@ jQuery(function($) {
                         const displayName = (jobData && jobData.displayName) || currentUser.display_name || '';
                         const userLogo = (jobData && jobData.userLogo) || currentUser.user_logo || '';
                         const userId = (jobData && jobData.userId) || currentUser.ID || '';
-                        const format = (jobData && jobData.ratio) || selectedRatio || '';
+                        const format = resolveRatio(jobData);
 
                         const $newImage = $('<img>')
                                 .attr('src', imageUrl)
@@ -312,7 +346,7 @@ jQuery(function($) {
                         displayName: jobData && jobData.displayName ? jobData.displayName : currentUser.display_name || '',
                         userLogo: jobData && jobData.userLogo ? jobData.userLogo : currentUser.user_logo || '',
                         userId: jobData && jobData.userId ? jobData.userId : currentUser.ID || '',
-                        format: jobData && jobData.ratio ? jobData.ratio : selectedRatio || '',
+                        format: resolveRatio(jobData),
                         prompt: jobData && jobData.prompt !== undefined ? jobData.prompt : prompt
                 };
 
@@ -349,7 +383,7 @@ jQuery(function($) {
                 }
 
                 if (jobData.status !== 'completed') {
-                        validateButton.disabled = true;
+                        disableValidateButton();
                         toggleLoading(true);
                         if (!humorIntervalId) {
                                 animateLoadingWithHumor();
@@ -366,13 +400,13 @@ jQuery(function($) {
 
                 if (Array.isArray(jobData.images) && jobData.images.length) {
                         handleImagesSaved(jobData.images, jobData);
-                        validateButton.disabled = false;
+                        enableValidateButton();
                 }
 
                 if (jobData.stage === 'error') {
                         showAlert("Une erreur est survenue pendant la génération. Veuillez réessayer.");
                         toggleLoading(false);
-                        validateButton.disabled = false;
+                        enableValidateButton();
                 }
         }
 
@@ -382,7 +416,7 @@ jQuery(function($) {
 
                 switch (event.type) {
                         case 'job-started':
-                                validateButton.disabled = true;
+                                disableValidateButton();
                                 animateLoadingWithHumor();
                                 updateImageGrid();
                                 toggleLoading(true);
@@ -405,16 +439,16 @@ jQuery(function($) {
                                 break;
                         case 'job-images-saved':
                                 handleImagesSaved(payload.images || [], jobData);
-                                validateButton.disabled = false;
+                                enableValidateButton();
                                 break;
                         case 'job-completed':
                                 handleImagesSaved((payload && payload.images) || (jobData && jobData.images) || [], jobData);
-                                validateButton.disabled = false;
+                                enableValidateButton();
                                 break;
                         case 'job-error':
                                 showAlert(payload && payload.message ? payload.message : "Une erreur est survenue pendant la génération. Veuillez réessayer.");
                                 toggleLoading(false);
-                                validateButton.disabled = false;
+                                enableValidateButton();
                                 clearHumorInterval();
                                 break;
                         case 'job-restored':
@@ -422,7 +456,7 @@ jQuery(function($) {
                                 break;
                         case 'job-cleared':
                                 toggleLoading(false);
-                                validateButton.disabled = false;
+                                enableValidateButton();
                                 clearHumorInterval();
                                 break;
                         default:
