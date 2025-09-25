@@ -9,3 +9,14 @@
 .return-to-shop .button.wc-backward {
     display: inline-block; /* Afficher le bouton en ligne pour le centrage */
 }
+
+.woocommerce-cart-form .loyalty-points-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.woocommerce-cart-form .loyalty-points-controls input[type="number"] {
+    max-width: 120px;
+}

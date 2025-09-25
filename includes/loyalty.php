@@ -110,8 +110,12 @@ function customiizer_loyalty_redeem_field() {
     $points = customiizer_get_loyalty_points($user_id);
 
     echo '<tr class="loyalty-points-redeem"><th>' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</th><td>';
+    echo '<div class="loyalty-points-controls">';
+    echo '<label for="loyalty_points_amount" class="screen-reader-text">' . esc_html__( 'Nombre de points à utiliser', 'customiizer' ) . '</label>';
+    echo '<input type="number" id="loyalty_points_amount" class="input-text" min="0" step="10" max="' . esc_attr( $points ) . '" placeholder="' . esc_attr__( 'ex : 200', 'customiizer' ) . '" />';
     echo '<input type="hidden" name="loyalty_points_to_use" id="loyalty_points_to_use" value="" />';
     echo '<button type="button" id="loyalty_points_button" class="button" data-points="' . esc_attr( $points ) . '">' . esc_html__( 'Utiliser mes points', 'customiizer' ) . '</button>';
+    echo '</div>';
     echo '<p class="description">' . esc_html( sprintf( __( 'Vous avez %d points disponibles', 'customiizer' ), $points ) ) . '</p>';
     echo '</td></tr>';
 }
@@ -139,6 +143,19 @@ function customiizer_apply_loyalty_discount( $cart ) {
         $points_to_use = intval($_POST['loyalty_points_to_use']);
         WC()->session->set('loyalty_points_to_use', $points_to_use);
         customiizer_log('discount', "POST -> $points_to_use points pour user_id=$user_id");
+    } elseif ( isset($_POST['post_data']) ) {
+        $raw_post_data = wp_unslash($_POST['post_data']);
+        $parsed_post   = array();
+        parse_str($raw_post_data, $parsed_post);
+
+        if ( isset($parsed_post['loyalty_points_to_use']) ) {
+            $points_to_use = intval($parsed_post['loyalty_points_to_use']);
+            WC()->session->set('loyalty_points_to_use', $points_to_use);
+            customiizer_log('discount', "AJAX POST -> $points_to_use points pour user_id=$user_id");
+        } else {
+            $points_to_use = intval(WC()->session->get('loyalty_points_to_use'));
+            customiizer_log('discount', "SESSION -> $points_to_use points pour user_id=$user_id");
+        }
     } else {
         $points_to_use = intval(WC()->session->get('loyalty_points_to_use'));
         customiizer_log('discount', "SESSION -> $points_to_use points pour user_id=$user_id");

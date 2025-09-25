@@ -1,7 +1,23 @@
 jQuery(function($) {
     $(document).on('click', '#loyalty_points_button', function(e) {
         e.preventDefault();
-        var points = $(this).data('points') || 0;
+        var maxPoints = parseInt($(this).data('points'), 10) || 0;
+        var $amountField = $('#loyalty_points_amount');
+        var requested = parseInt($amountField.val(), 10);
+
+        if (isNaN(requested) || requested <= 0) {
+            var message = 'Veuillez indiquer le nombre de points à utiliser.';
+            if (window.customiizerLoyaltyUsePoints && customiizerLoyaltyUsePoints.invalidAmountMessage) {
+                message = customiizerLoyaltyUsePoints.invalidAmountMessage;
+            }
+            alert(message);
+            $amountField.focus();
+            return;
+        }
+
+        if (maxPoints && requested > maxPoints) {
+            requested = maxPoints;
+        }
 
         // Mettre à jour/ajouter le champ caché dans le formulaire concerné
         var $cartForm = $('form.woocommerce-cart-form');
@@ -10,7 +26,7 @@ jQuery(function($) {
             $cartForm.find('input[name="loyalty_points_to_use"]').remove();
             $cartForm.find('input[name="update_cart"]').remove();
             $cartForm.append(
-                $('<input>', {type: 'hidden', name: 'loyalty_points_to_use', value: points})
+                $('<input>', {type: 'hidden', name: 'loyalty_points_to_use', value: requested})
             );
             $cartForm.append('<input type="hidden" name="update_cart" value="1">');
             $cartForm.trigger('submit');
@@ -21,7 +37,7 @@ jQuery(function($) {
                 $input = $('<input>', {type: 'hidden', name: 'loyalty_points_to_use'});
                 $('form.checkout').append($input);
             }
-            $input.val(points);
+            $input.val(requested);
             $(document.body).trigger('update_checkout');
         }
     });
