@@ -9,7 +9,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
-<?php
 add_action( 'wp_enqueue_scripts', function() {
     // Ajout d'un script inline après le script Stripe de WooCommerce
     wp_add_inline_script( 'wc-stripe', "
