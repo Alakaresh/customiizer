@@ -1,31 +1,126 @@
 <?php
+
 register_rest_route('api/v1/images', '/save', [
-	'methods' => 'POST',
-	'callback' => 'save_generated_image',
-	'permission_callback' => '__return_true',
+        'methods' => 'POST',
+        'callback' => 'save_generated_image',
+        'permission_callback' => '__return_true',
 ]);
+
 function save_generated_image(WP_REST_Request $request) {
-	global $wpdb;
+        global $wpdb;
 
-	$user_id = intval($request->get_param('user_id'));
-	$image_url = sanitize_text_field($request->get_param('image_url'));
-	$prompt = sanitize_text_field($request->get_param('prompt'));
-	$format = sanitize_text_field($request->get_param('format_image'));
+        $jobId = intval($request->get_param('job_id'));
+        $taskId = sanitize_text_field($request->get_param('task_id'));
 
-	if (!$user_id || !$image_url) {
-		return new WP_REST_Response(['success' => false, 'message' => 'Missing required fields'], 400);
-	}
+        if (!$jobId && empty($taskId)) {
+                return new WP_REST_Response([
+                        'success' => false,
+                        'message' => 'job_id ou task_id requis'
+                ], 400);
+        }
 
-	$wpdb->insert("WPC_generated_image", [
-		'user_id' => $user_id,
-		'image_url' => $image_url,
-		'prompt' => $prompt,
-		'format_image' => $format,
-		'image_date' => current_time('mysql')
-	]);
+        $jobsTable = $wpdb->prefix . 'generation_jobs';
 
-	return [
-		'success' => true,
-		'image_number' => $wpdb->insert_id
-	];
+        if ($jobId) {
+                $job = $wpdb->get_row(
+                        $wpdb->prepare("SELECT * FROM {$jobsTable} WHERE id = %d", $jobId),
+                        ARRAY_A
+                );
+        } else {
+                $job = $wpdb->get_row(
+                        $wpdb->prepare("SELECT * FROM {$jobsTable} WHERE task_id = %s", $taskId),
+                        ARRAY_A
+                );
+        }
+
+        if (!$job) {
+                return new WP_REST_Response([
+                        'success' => false,
+                        'message' => 'Job introuvable'
+                ], 404);
+        }
+
+        $imagesTable = $wpdb->prefix . 'generated_image';
+        $imageUrl = esc_url_raw($request->get_param('image_url'));
+
+        if (empty($imageUrl)) {
+                return new WP_REST_Response([
+                        'success' => false,
+                        'message' => 'image_url requis'
+                ], 400);
+        }
+
+        $existing = $wpdb->get_var(
+                $wpdb->prepare(
+                        "SELECT COUNT(*) FROM {$imagesTable} WHERE job_id = %d AND image_url = %s",
+                        $job['id'],
+                        $imageUrl
+                )
+        );
+
+        if ($existing) {
+                return new WP_REST_Response([
+                        'success' => true,
+                        'message' => 'Image déjà enregistrée'
+                ], 200);
+        }
+
+        $position = intval($request->get_param('position'));
+        $prompt = $request->get_param('prompt');
+        $format = $request->get_param('format_image');
+        $settingsParam = $request->get_param('settings');
+        $sourceId = $request->get_param('source_id');
+        $upscaledId = $request->get_param('upscaled_id');
+
+        if ($prompt === null || $prompt === '') {
+                $prompt = $job['prompt'];
+        }
+
+        $settingsValue = $job['settings'];
+        if (is_array($settingsParam)) {
+                $settingsValue = wp_json_encode($settingsParam);
+        } elseif ($settingsParam !== null) {
+                $settingsValue = (string) wp_unslash($settingsParam);
+        }
+
+        $formatValue = $format !== null ? sanitize_text_field($format) : '';
+
+        $imageData = [
+                'job_id' => (int) $job['id'],
+                'user_id' => (int) $job['user_id'],
+                'image_url' => $imageUrl,
+                'prompt' => sanitize_text_field($prompt),
+                'format_image' => $formatValue,
+                'settings' => $settingsValue,
+                'image_date' => current_time('mysql'),
+        ];
+
+        if ($position > 0) {
+                $imageData['image_prefix'] = $position;
+        }
+
+        if ($sourceId !== null) {
+                $imageData['source_id'] = sanitize_text_field($sourceId);
+        }
+
+        if ($upscaledId !== null) {
+                $imageData['upscaled_id'] = sanitize_text_field($upscaledId);
+        }
+
+        $nextNumber = (int) $wpdb->get_var("SELECT MAX(image_number) FROM {$imagesTable}") + 1;
+        $imageData['image_number'] = $nextNumber;
+
+        $result = $wpdb->insert($imagesTable, $imageData);
+
+        if ($result === false) {
+                return new WP_REST_Response([
+                        'success' => false,
+                        'message' => 'Insertion échouée'
+                ], 500);
+        }
+
+        return new WP_REST_Response([
+                'success' => true,
+                'image_number' => $nextNumber,
+        ], 201);
 }
