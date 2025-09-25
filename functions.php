@@ -10,6 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit; // Sortir si accédé directement.
 }
 add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
+add_action( 'wp_enqueue_scripts', function() {
+    // Supprime les styles WooCommerce d'Astra
+    wp_dequeue_style( 'astra-woocommerce' );
+    wp_deregister_style( 'astra-woocommerce' );
+}, 20 );
+
 add_filter(
         'body_class',
         function ( $classes ) {
