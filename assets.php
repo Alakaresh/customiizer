@@ -221,10 +221,24 @@ function customiizer_enqueue_customize_assets() {
                // --- CSS ---
                wp_enqueue_style('cart-style', get_stylesheet_directory_uri() . '/styles/cart.css', [], $ver);
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
+               wp_localize_script(
+                       'loyalty-use-points',
+                       'customiizerLoyaltyUsePoints',
+                       [
+                               'invalidAmountMessage' => __( 'Veuillez indiquer le nombre de points à utiliser.', 'customiizer' ),
+                       ]
+               );
 
        } elseif (function_exists('is_checkout') && is_checkout()) {
 		   		wp_enqueue_style('checkout-style', get_stylesheet_directory_uri() . '/styles/checkout.css', [], $ver);
                wp_enqueue_script('loyalty-use-points', get_stylesheet_directory_uri() . '/js/loyalty/use_points.js', ['jquery'], $ver, true);
+               wp_localize_script(
+                       'loyalty-use-points',
+                       'customiizerLoyaltyUsePoints',
+                       [
+                               'invalidAmountMessage' => __( 'Veuillez indiquer le nombre de points à utiliser.', 'customiizer' ),
+                       ]
+               );
 
                // Page /communaute
 	} elseif (strpos($request_uri, '/communaute') !== false) {
