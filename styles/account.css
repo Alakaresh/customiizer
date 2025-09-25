@@ -633,16 +633,17 @@ td:last-child {
 }
 .woocommerce-js input,
 .woocommerce-js textarea {
-  all: unset !important; /* Reset total */
-  display: block;        /* Repose la base */
-  width: 100%;           /* Prend la largeur */
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(28, 28, 28, 0.92); /* Ton fond sombre */
-  color: #f6f9f9;                     /* Ton texte clair */
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(28, 28, 28, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  padding: 12px !important;
+  width: 100% !important;
+  color: var(--color-text) !important;
+  font-size: 0.95rem;
   box-sizing: border-box;
 }
+
 
 
 .form-group input {
