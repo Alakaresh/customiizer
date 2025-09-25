@@ -1,153 +1,80 @@
 <?php
-function check_image_status() {
 
-    // Récupérer le hash depuis la requête AJAX
-    $task_hash = isset($_POST['hash']) ? sanitize_text_field($_POST['hash']) : '';
-    customiizer_log('image_status', "check_image_status appelé pour hash={$task_hash}");
-
-    if (empty($task_hash)) {
-        customiizer_log('image_status', 'Hash manquant pour check_image_status');
-        wp_send_json_error(array('message' => 'Hash manquant'));
-        return;
+function customiizer_decode_settings($value) {
+    if ($value === '' || $value === null) {
+        return [];
     }
 
+    $decoded = json_decode($value, true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+        return $decoded;
+    }
 
-    // Rechercher le post basé sur le hash
-    $args = array(
-        'post_type' => 'image_task',
-        'meta_query' => array(
-            array(
-                'key' => 'task_hash',
-                'value' => $task_hash,
-                'compare' => '='
-            )
-        )
+    return $value;
+}
+
+function check_image_status() {
+    global $wpdb;
+
+    $taskId = isset($_POST['taskId']) ? sanitize_text_field(wp_unslash($_POST['taskId'])) : '';
+    customiizer_log('image_status', "check_image_status appelé pour taskId={$taskId}");
+
+    if ($taskId === '') {
+        customiizer_log('image_status', 'taskId manquant pour check_image_status');
+        wp_send_json_error(['message' => 'taskId manquant']);
+    }
+
+    $jobsTable = $wpdb->prefix . 'generation_jobs';
+    $imagesTable = $wpdb->prefix . 'generated_image';
+
+    $job = $wpdb->get_row(
+        $wpdb->prepare(
+            "SELECT id, status, prompt, settings, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
+            $taskId
+        ),
+        ARRAY_A
     );
 
-    $query = new WP_Query($args);
-
-    if ($query->have_posts()) {
-        $query->the_post();
-        $post_id = get_the_ID();
-        customiizer_log('image_status', "Post trouvé {$post_id} pour hash={$task_hash}");
-
-        // Récupérer les métadonnées
-        $webhook_data = get_post_meta($post_id, 'image_generation', true);
-
-        wp_reset_postdata(); // Reset the global $post object
-
-        if ($webhook_data) {
-            customiizer_log('image_status', 'Données de génération récupérées avec succès');
-            wp_send_json_success($webhook_data);
-        } else {
-            customiizer_log('image_status', 'Aucune donnée de génération trouvée');
-            wp_send_json_error(array('message' => 'Aucune donnée trouvée pour ce hash'));
-        }
-    } else {
-        customiizer_log('image_status', 'Aucun post trouvé pour ce hash');
-        wp_send_json_error(array('message' => 'Aucun post trouvé pour ce hash'));
+    if (!$job) {
+        customiizer_log('image_status', "Aucun job trouvé pour taskId={$taskId}");
+        wp_send_json_error(['message' => 'Aucun job trouvé']);
     }
 
+    $response = [
+        'taskId' => $taskId,
+        'jobId' => (int) $job['id'],
+        'status' => $job['status'],
+        'prompt' => $job['prompt'],
+        'settings' => customiizer_decode_settings($job['settings']),
+        'createdAt' => $job['created_at'],
+        'updatedAt' => $job['updated_at'],
+    ];
+
+    if ($job['status'] === 'done') {
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT image_number, image_url, format_image, prompt, settings FROM {$imagesTable} WHERE job_id = %d ORDER BY image_number ASC",
+                $job['id']
+            ),
+            ARRAY_A
+        );
+
+        $response['images'] = array_map(
+            static function ($row) {
+                return [
+                    'id' => isset($row['image_number']) ? (int) $row['image_number'] : null,
+                    'url' => $row['image_url'] ?? '',
+                    'format' => $row['format_image'] ?? '',
+                    'prompt' => $row['prompt'] ?? '',
+                    'settings' => customiizer_decode_settings($row['settings'] ?? ''),
+                ];
+            },
+            $rows ?: []
+        );
+    }
+
+    wp_send_json_success($response);
 }
 
 add_action('wp_ajax_check_image_status', 'check_image_status');
 add_action('wp_ajax_nopriv_check_image_status', 'check_image_status');
-
-
-function check_image_choices() {
-
-    $task_hash = isset($_POST['hash']) ? sanitize_text_field($_POST['hash']) : '';
-    customiizer_log('image_status', "check_image_choices appelé pour hash={$task_hash}");
-
-    if (empty($task_hash)) {
-        customiizer_log('image_status', 'Hash manquant pour check_image_choices');
-        wp_send_json_error(array('message' => 'Hash manquant'));
-        return;
-    }
-
-
-    // Rechercher le post basé sur le hash
-    $args = array(
-        'post_type' => 'image_task',
-        'meta_query' => array(
-            array(
-                'key' => 'task_hash',
-                'value' => $task_hash,
-                'compare' => '='
-            )
-        )
-    );
-
-    $query = new WP_Query($args);
-
-    if ($query->have_posts()) {
-        $query->the_post();
-        $post_id = get_the_ID();
-        customiizer_log('image_status', "Post trouvé {$post_id} pour check_image_choices");
-
-        // Récupérer les métadonnées pour les choix d'images
-        $choices = array();
-        for ($i = 1; $i <= 4; $i++) {
-            $choices["image_choice_$i"] = get_post_meta($post_id, "image_choice_$i", true);
-        }
-
-        wp_reset_postdata(); // Reset the global $post object
-
-        customiizer_log('image_status', 'Choix renvoyés : ' . json_encode($choices));
-        wp_send_json_success($choices);
-    } else {
-        customiizer_log('image_status', 'Aucun post trouvé pour ce hash (choices)');
-        wp_send_json_error(array('message' => 'Aucun post trouvé pour ce hash'));
-    }
-
-}
-
-add_action('wp_ajax_check_image_choices', 'check_image_choices');
-add_action('wp_ajax_nopriv_check_image_choices', 'check_image_choices');
-
-function delete_image_task() {
-
-    // Récupérer le hash depuis la requête AJAX
-    $task_hash = isset($_POST['hash']) ? sanitize_text_field($_POST['hash']) : '';
-    customiizer_log('image_status', "delete_image_task appelé pour hash={$task_hash}");
-
-    if (empty($task_hash)) {
-        customiizer_log('image_status', 'Hash manquant pour delete_image_task');
-        wp_send_json_error(array('message' => 'Hash manquant'));
-        return;
-    }
-
-
-    // Rechercher le post basé sur le hash
-    $args = array(
-        'post_type' => 'image_task',
-        'meta_query' => array(
-            array(
-                'key' => 'task_hash',
-                'value' => $task_hash,
-                'compare' => '='
-            )
-        )
-    );
-
-    $query = new WP_Query($args);
-
-    if ($query->have_posts()) {
-        $query->the_post();
-        $post_id = get_the_ID();
-        customiizer_log('image_status', "Suppression du post {$post_id} pour hash={$task_hash}");
-
-        // Supprimer le post
-        wp_delete_post($post_id, true);
-
-        customiizer_log('image_status', "Post {$post_id} supprimé");
-        wp_send_json_success(array('message' => 'Post supprimé avec succès'));
-    } else {
-        customiizer_log('image_status', 'Aucun post trouvé pour ce hash (delete)');
-        wp_send_json_error(array('message' => 'Aucun post trouvé pour ce hash'));
-    }
-
-}
-
-add_action('wp_ajax_delete_image_task', 'delete_image_task');
-add_action('wp_ajax_nopriv_delete_image_task', 'delete_image_task');

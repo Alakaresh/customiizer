@@ -114,36 +114,8 @@ function ajusterEtSauvegarderImageWebP($sourceUrl, $blobName, $ratio) {
 
 // Fonction pour sauvegarder les métadonnées d'une image dans la base de données
 function save_image_data() {
-        global $wpdb;
-
-        customiizer_log('save_image_data', 'Enregistrement des métadonnées demandé');
-        $data = array(
-                'user_id' => sanitize_text_field($_POST['user_id']),
-                'image_url' => esc_url_raw($_POST['image_url']),
-                'source_id' => sanitize_text_field($_POST['source_id']),
-                'image_prefix' => sanitize_text_field($_POST['image_prefix']),
-		'prompt' => sanitize_text_field($_POST['prompt']),
-		'format_image' => sanitize_text_field($_POST['format_image']),
-		'upscaled_id' => sanitize_text_field($_POST['upscaled_id']),
-		'settings' => sanitize_text_field($_POST['settings']),
-		'image_date' => current_time('mysql'),
-	);
-
-        $existingImage = $wpdb->get_row(
-                $wpdb->prepare("SELECT * FROM WPC_generated_image WHERE image_url = %s", $data['image_url'])
-        );
-
-        if ($existingImage) {
-                customiizer_log('save_image_data', 'Image déjà existante : ' . $data['image_url']);
-                wp_send_json_error("L'image existe déjà.");
-        } else {
-                $lastNumber = intval($wpdb->get_var("SELECT MAX(image_number) FROM WPC_generated_image")) + 1;
-                $data['image_number'] = $lastNumber;
-
-                $wpdb->insert('WPC_generated_image', $data);
-                customiizer_log('save_image_data', 'Image enregistrée : ' . json_encode($data));
-                wp_send_json_success("Données enregistrées avec succès.");
-        }
+        customiizer_log('save_image_data', 'Appel bloqué : génération désormais gérée par les jobs RabbitMQ');
+        wp_send_json_error("L'enregistrement direct des images est désactivé.", 403);
 }
 add_action('wp_ajax_save_image_data', 'save_image_data');
 add_action('wp_ajax_nopriv_save_image_data', 'save_image_data');
