@@ -15,6 +15,7 @@ let currentSearch = '';
 let searchTimeout;
 let resizeTimeout;
 let currentColumnCount = determineColumnCount();
+let columnHeights = [];
 
 jQuery(document).ready(function ($) {
         fetchImagesFromAPI(true);
@@ -180,8 +181,8 @@ function displayImages(images) {
         columns.forEach(c => container.append(c));
         $('#image-container').empty().append(container);
 
-        filteredImages.forEach((img, idx) => {
-                appendImage(img, columns, idx % columns.length);
+        filteredImages.forEach((img) => {
+                appendImage(img, columns);
         });
 
         enableImageEnlargement();
@@ -200,10 +201,10 @@ function appendImages(images) {
         const filteredNew = userFilter ? images.filter(i => i.display_name === userFilter) : images;
         filteredImages = filteredImages.concat(filteredNew);
 
-        const existingCount = container.find('.imageContainer').length;
+        syncColumnHeights(columns);
 
-        filteredNew.forEach((img, idx) => {
-                appendImage(img, columns, (existingCount + idx) % columns.length);
+        filteredNew.forEach((img) => {
+                appendImage(img, columns);
         });
 
         enableImageEnlargement();
@@ -242,14 +243,13 @@ function appendImage(image, columns, columnIndex) {
 	}).toggleClass('disabled', !userId);
 
         const img = $('<img/>', {
-                src: imageUrl,
                 alt: 'Image générée',
-		class: 'preview-enlarge',
-		'data-user-id': userId || '',
-		'data-display_name': image.display_name || '',
-		'data-format-image': image.format || '',
-		'data-prompt': promptText
-	});
+                class: 'preview-enlarge',
+                'data-user-id': userId || '',
+                'data-display_name': image.display_name || '',
+                'data-format-image': image.format || '',
+                'data-prompt': promptText
+        });
 
 	const overlayDiv = $('<div/>', { class: 'overlay', style: 'display: none;' });
 	const iconOverlay = $('<div/>', { class: 'icon-overlay', style: 'display: none;' }).append(likeIcon, starIcon);
@@ -260,14 +260,38 @@ function appendImage(image, columns, columnIndex) {
 	});
 	overlayDiv.append(userLoginLink).data('prompt', image.prompt);
 
-	imageDiv.append(img, iconOverlay, overlayDiv);
-	columns[columnIndex].append(imageDiv);
+        imageDiv.append(img, iconOverlay, overlayDiv);
+
+        let appended = false;
+
+        const placeImageInColumn = () => {
+                if (appended) {
+                        return;
+                }
+                appended = true;
+
+                const targetIndex = (typeof columnIndex === 'number' && columns[columnIndex])
+                        ? columnIndex
+                        : getShortestColumnIndex(columns);
+
+                columns[targetIndex].append(imageDiv);
+                updateColumnHeight(columns, targetIndex);
+        };
+
+        img.on('load', placeImageInColumn);
+        img.on('error', placeImageInColumn);
+        img.attr('src', imageUrl);
+
+        if (img[0].complete) {
+                placeImageInColumn();
+        }
 }
 
 // --- Utilitaires ---
 
 function initializeColumns() {
         currentColumnCount = determineColumnCount();
+        columnHeights = new Array(currentColumnCount).fill(0);
         return createColumns(currentColumnCount);
 }
 
@@ -316,8 +340,10 @@ function handleResizeColumns() {
                 container.empty();
                 columns.forEach(column => container.append(column));
 
-                filteredImages.forEach((img, idx) => {
-                        appendImage(img, columns, idx % columns.length);
+                columnHeights = new Array(newCount).fill(0);
+
+                filteredImages.forEach((img) => {
+                        appendImage(img, columns);
                 });
 
                 enableImageEnlargement();
@@ -330,10 +356,48 @@ function getQueryParam(param) {
 }
 
 function shuffleArray(array) {
-	for (let i = array.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[array[i], array[j]] = [array[j], array[i]];
-	}
+        for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+        }
+}
+
+function syncColumnHeights(columns) {
+        if (!Array.isArray(columns) || !columns.length) {
+                return;
+        }
+        columnHeights = columns.map(col => col.outerHeight());
+}
+
+function getShortestColumnIndex(columns) {
+        if (!Array.isArray(columns) || columns.length === 0) {
+                return 0;
+        }
+
+        if (columnHeights.length !== columns.length) {
+                columnHeights = columns.map((col, idx) => columnHeights[idx] || col.outerHeight());
+        }
+
+        let minIndex = 0;
+        let minHeight = columnHeights[0] || 0;
+
+        for (let i = 1; i < columnHeights.length; i++) {
+                const height = columnHeights[i] || 0;
+                if (height < minHeight) {
+                        minHeight = height;
+                        minIndex = i;
+                }
+        }
+
+        return minIndex;
+}
+
+function updateColumnHeight(columns, index) {
+        if (!Array.isArray(columns) || !columns[index]) {
+                return;
+        }
+
+        columnHeights[index] = columns[index].outerHeight();
 }
 
 function toggleLike(imageId, iconElement) {
