@@ -53,7 +53,7 @@ $jobsTable = 'WPC_generation_jobs';
 $imagesTable = 'WPC_generated_image';
 
 $job = $wpdb->get_row(
-    $wpdb->prepare("SELECT id, user_id, prompt, settings FROM {$jobsTable} WHERE task_id = %s", $taskHash),
+    $wpdb->prepare("SELECT id, user_id, prompt, format_image FROM {$jobsTable} WHERE task_id = %s", $taskHash),
     ARRAY_A
 );
 
@@ -108,16 +108,14 @@ if ($imageUrl !== '') {
 
     $width = isset($result['width']) ? absint($result['width']) : 0;
     $height = isset($result['height']) ? absint($result['height']) : 0;
-    $format = ($width > 0 && $height > 0) ? sprintf('%dx%d', $width, $height) : '';
+    $format = !empty($job['format_image']) ? sanitize_text_field($job['format_image']) : '';
+    if ($format === '' && $width > 0 && $height > 0) {
+        $format = sprintf('%dx%d', $width, $height);
+    }
 
     if (!$existing) {
         $nextNumber = (int) $wpdb->get_var("SELECT MAX(image_number) FROM {$imagesTable}");
         $nextNumber = $nextNumber ? $nextNumber + 1 : 1;
-
-        $settingsValue = '';
-        if (isset($job['settings'])) {
-            $settingsValue = is_string($job['settings']) ? $job['settings'] : wp_json_encode($job['settings']);
-        }
 
         $data = [
             'image_number' => $nextNumber,
@@ -125,7 +123,7 @@ if ($imageUrl !== '') {
             'user_id' => (int) $job['user_id'],
             'image_url' => $imageUrl,
             'prompt' => isset($job['prompt']) ? sanitize_text_field($job['prompt']) : '',
-            'settings' => $settingsValue,
+            'settings' => '',
         ];
 
         $formats = ['%d', '%d', '%d', '%s', '%s', '%s'];

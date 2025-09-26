@@ -52,7 +52,7 @@ $jobsTable = 'WPC_generation_jobs';
 $imagesTable = 'WPC_generated_image';
 
 $job = $wpdb->get_row(
-    $wpdb->prepare("SELECT id, user_id, prompt, settings FROM {$jobsTable} WHERE task_id = %s", $taskHash),
+    $wpdb->prepare("SELECT id, user_id, prompt, format_image FROM {$jobsTable} WHERE task_id = %s", $taskHash),
     ARRAY_A
 );
 
@@ -133,10 +133,6 @@ if (isset($result['url'])) {
 }
 
 $variants = array_slice($variants, 0, 4);
-$settingsValue = '';
-if (isset($job['settings'])) {
-    $settingsValue = is_string($job['settings']) ? $job['settings'] : wp_json_encode($job['settings']);
-}
 
 $promptValue = isset($job['prompt']) ? sanitize_text_field($job['prompt']) : '';
 $insertedVariant = false;
@@ -166,7 +162,10 @@ foreach ($variants as $variant) {
 
     $width = isset($data['width']) ? absint($data['width']) : 0;
     $height = isset($data['height']) ? absint($data['height']) : 0;
-    $format = ($width > 0 && $height > 0) ? sprintf('%dx%d', $width, $height) : '';
+    $format = !empty($job['format_image']) ? sanitize_text_field($job['format_image']) : '';
+    if ($format === '' && $width > 0 && $height > 0) {
+        $format = sprintf('%dx%d', $width, $height);
+    }
 
     $nextNumber = (int) $wpdb->get_var("SELECT MAX(image_number) FROM {$imagesTable}");
     $nextNumber = $nextNumber ? $nextNumber + 1 : 1;
@@ -177,7 +176,7 @@ foreach ($variants as $variant) {
         'user_id' => (int) $job['user_id'],
         'image_url' => $imageUrl,
         'prompt' => $promptValue,
-        'settings' => $settingsValue,
+        'settings' => '',
     ];
 
     $formats = ['%d', '%d', '%d', '%s', '%s', '%s'];

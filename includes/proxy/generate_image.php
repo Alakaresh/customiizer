@@ -39,7 +39,7 @@ if (!is_user_logged_in()) {
 }
 
 $prompt = isset($payload['prompt']) ? trim(wp_unslash($payload['prompt'])) : '';
-$rawSettings = $payload['settings'] ?? [];
+$formatImage = isset($payload['format_image']) ? sanitize_text_field($payload['format_image']) : '';
 
 if ($prompt === '') {
     http_response_code(400);
@@ -50,7 +50,15 @@ if ($prompt === '') {
     exit;
 }
 
-$settingsText = is_array($rawSettings) ? wp_json_encode($rawSettings) : (string) $rawSettings;
+if ($formatImage === '') {
+    http_response_code(400);
+    echo wp_json_encode([
+        'success' => false,
+        'message' => "Le format de l'image est obligatoire."
+    ]);
+    exit;
+}
+
 $userId = get_current_user_id();
 $taskId = uniqid('task_', true);
 $now = current_time('mysql');
@@ -65,7 +73,7 @@ $inserted = $wpdb->insert(
         'task_id' => $taskId,
         'user_id' => $userId,
         'prompt' => $prompt,
-        'settings' => $settingsText,
+        'format_image' => $formatImage,
         'status' => 'pending',
         'created_at' => $now,
         'updated_at' => $now,
@@ -103,7 +111,8 @@ try {
         'jobId' => $jobId,
         'userId' => $userId,
         'prompt' => $prompt,
-        'settings' => $settingsText,
+        'formatImage' => $formatImage,
+        'format_image' => $formatImage,
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     $message = new AMQPMessage(

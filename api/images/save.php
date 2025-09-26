@@ -77,14 +77,17 @@ function save_generated_image(WP_REST_Request $request) {
                 $prompt = $job['prompt'];
         }
 
-        $settingsValue = $job['settings'];
+        $settingsValue = '';
         if (is_array($settingsParam)) {
                 $settingsValue = wp_json_encode($settingsParam);
-        } elseif ($settingsParam !== null) {
+        } elseif ($settingsParam !== null && $settingsParam !== '') {
                 $settingsValue = (string) wp_unslash($settingsParam);
         }
 
         $formatValue = $format !== null ? sanitize_text_field($format) : '';
+        if ($formatValue === '' && !empty($job['format_image'])) {
+                $formatValue = sanitize_text_field($job['format_image']);
+        }
 
         $imageData = [
                 'job_id' => (int) $job['id'],

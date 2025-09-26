@@ -10,7 +10,7 @@ let currentJobId = null;
 let pollTimeoutId = null;
 let lastKnownStatus = null;
 let prompt = '';
-let jobSettings = {};
+let jobFormat = '';
 let humorIntervalId = null;
 let loadingToggled = false;
 
@@ -69,7 +69,7 @@ jQuery(function($) {
                 currentJobId = null;
                 lastKnownStatus = null;
                 prompt = '';
-                jobSettings = {};
+                jobFormat = '';
 
                 const container = document.getElementById('content-images');
                 if (container) {
@@ -268,12 +268,12 @@ jQuery(function($) {
                 resetLoadingState();
 
                 const ratioSetting = selectedRatio;
-                jobSettings = { ratio: ratioSetting };
+                jobFormat = ratioSetting;
                 prompt = customTextInput.textContent.trim();
 
                 console.log(`${LOG_PREFIX} Demande de génération`, {
                         prompt,
-                        jobSettings,
+                        format_image: jobFormat,
                         userId: currentUser && currentUser.ID,
                 });
 
@@ -317,7 +317,7 @@ jQuery(function($) {
                                 },
                                 body: JSON.stringify({
                                         prompt,
-                                        settings: jobSettings,
+                                        format_image: jobFormat,
                                 }),
                         });
 

@@ -30,7 +30,7 @@ function check_image_status() {
 
     $job = $wpdb->get_row(
         $wpdb->prepare(
-            "SELECT id, status, prompt, settings, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
+            "SELECT id, status, prompt, format_image, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
             $taskId
         ),
         ARRAY_A
@@ -46,7 +46,7 @@ function check_image_status() {
         'jobId' => (int) $job['id'],
         'status' => $job['status'],
         'prompt' => $job['prompt'],
-        'settings' => customiizer_decode_settings($job['settings']),
+        'format' => $job['format_image'],
         'createdAt' => $job['created_at'],
         'updatedAt' => $job['updated_at'],
     ];
