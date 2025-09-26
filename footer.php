@@ -39,6 +39,26 @@ if ( $user_logged_in ) {
                         </div>
                 </div>
         </footer>
+        <div id="generation-tracker-modal" class="generation-tracker">
+                <div class="generation-tracker__content">
+                        <div class="generation-tracker__header">
+                                <span class="generation-tracker__title">Génération en cours</span>
+                                <span class="generation-tracker__status-badge" data-generation-status-badge>EN COURS</span>
+                        </div>
+                        <div class="generation-tracker__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                                <div class="generation-tracker__progress-bar" data-generation-progress-bar aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                                <span class="generation-tracker__progress-value" data-generation-progress-value>0%</span>
+                        </div>
+                        <p class="generation-tracker__status" data-generation-status>Préparation de votre image...</p>
+                        <div class="generation-tracker__prompt is-hidden" data-generation-prompt-wrapper>
+                                <span class="generation-tracker__prompt-label">Prompt&nbsp;:</span>
+                                <span class="generation-tracker__prompt-value" data-generation-prompt></span>
+                        </div>
+                        <div class="generation-tracker__preview is-hidden" data-generation-preview>
+                                <img src="" alt="" loading="lazy" />
+                        </div>
+                </div>
+        </div>
         <?php wp_footer(); ?>
         <script>
                 document.addEventListener('DOMContentLoaded', function () {

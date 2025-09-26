@@ -134,3 +134,144 @@ button:focus-visible,
 #mission-achievement .mission-title {
     font-weight: bold;
 }
+
+.generation-tracker {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 9999;
+    width: 340px;
+    max-width: calc(100% - 48px);
+    background: rgba(17, 17, 24, 0.95);
+    color: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.generation-tracker.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.generation-tracker__content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.generation-tracker__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.generation-tracker__title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.generation-tracker__status-badge {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.generation-tracker__progress {
+    position: relative;
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.generation-tracker__progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #7f5bff 0%, #4facfe 100%);
+    transition: width 0.35s ease;
+}
+
+.generation-tracker__progress-value {
+    position: absolute;
+    top: -26px;
+    right: 0;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.generation-tracker__status {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.generation-tracker__prompt {
+    font-size: 0.78rem;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.generation-tracker__prompt-label {
+    font-weight: 600;
+}
+
+.generation-tracker__prompt-value {
+    display: block;
+    margin-top: 4px;
+    word-break: break-word;
+}
+
+.generation-tracker__preview {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.generation-tracker__preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.generation-tracker__prompt.is-hidden,
+.generation-tracker__preview.is-hidden {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .generation-tracker {
+        right: 20px;
+        bottom: 20px;
+        width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .generation-tracker {
+        right: 16px;
+        left: 16px;
+        bottom: 16px;
+        width: auto;
+        max-width: none;
+    }
+
+    .generation-tracker__progress-value {
+        top: -22px;
+    }
+}
