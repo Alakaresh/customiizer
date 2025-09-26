@@ -13,6 +13,13 @@ let prompt = '';
 let jobFormat = '';
 let humorIntervalId = null;
 let loadingToggled = false;
+let generationClearTimeoutId = null;
+
+const ACTIVE_GENERATION_STORAGE_KEY = 'customiizerActiveGeneration';
+const STATUS_GENERATION_STORAGE_KEY = 'customiizerGenerationStatus';
+const GENERATION_ACTIVE_EVENT = 'customiizer:generation-active';
+const GENERATION_STATUS_EVENT = 'customiizer:generation-status';
+const GENERATION_COMPLETE_EVENT = 'customiizer:generation-complete';
 
 jQuery(function($) {
         const validateButton = document.getElementById('validate-button');
@@ -20,6 +27,92 @@ jQuery(function($) {
         const alertBox = document.getElementById('alert-box');
         const placeholderDiv = document.getElementById('placeholder');
         const savedPromptText = localStorage.getItem('savedPromptText');
+
+        function dispatchGenerationEvent(eventName, detail = {}) {
+                try {
+                        window.dispatchEvent(new CustomEvent(eventName, { detail }));
+                } catch (error) {
+                        console.warn(`${LOG_PREFIX} Impossible d'émettre l'événement ${eventName}`, error);
+                }
+        }
+
+        function clearGenerationPersistence() {
+                if (generationClearTimeoutId) {
+                        clearTimeout(generationClearTimeoutId);
+                        generationClearTimeoutId = null;
+                }
+
+                if (window.localStorage) {
+                        localStorage.removeItem(ACTIVE_GENERATION_STORAGE_KEY);
+                        localStorage.removeItem(STATUS_GENERATION_STORAGE_KEY);
+                }
+
+                dispatchGenerationEvent(GENERATION_COMPLETE_EVENT, {
+                        taskId: currentTaskId,
+                        jobId: currentJobId,
+                });
+        }
+
+        function scheduleGenerationPersistenceClear(delay = 0) {
+                if (generationClearTimeoutId) {
+                        clearTimeout(generationClearTimeoutId);
+                }
+
+                generationClearTimeoutId = setTimeout(() => {
+                        generationClearTimeoutId = null;
+                        clearGenerationPersistence();
+                }, Math.max(0, delay));
+        }
+
+        function persistActiveGeneration(taskId, jobId) {
+                if (!window.localStorage) {
+                        return;
+                }
+
+                const payload = {
+                        taskId,
+                        jobId: jobId || null,
+                        startedAt: Date.now(),
+                };
+
+                try {
+                        localStorage.setItem(ACTIVE_GENERATION_STORAGE_KEY, JSON.stringify(payload));
+                } catch (error) {
+                        console.warn(`${LOG_PREFIX} Impossible d'enregistrer la génération active`, error);
+                }
+
+                dispatchGenerationEvent(GENERATION_ACTIVE_EVENT, payload);
+        }
+
+        function persistGenerationStatus(data) {
+                if (!window.localStorage) {
+                        dispatchGenerationEvent(GENERATION_STATUS_EVENT, data);
+                        return;
+                }
+
+                const progressValue = typeof data.progress === 'number'
+                        ? Math.max(0, Math.min(100, Math.round(data.progress)))
+                        : null;
+
+                const payload = {
+                        taskId: data.taskId || currentTaskId || '',
+                        jobId: data.jobId || currentJobId || null,
+                        status: data.status || '',
+                        progress: progressValue,
+                        message: data.message || '',
+                        previewUrl: data.previewUrl || '',
+                        prompt: data.prompt || prompt || '',
+                        updatedAt: data.updatedAt || new Date().toISOString(),
+                };
+
+                try {
+                        localStorage.setItem(STATUS_GENERATION_STORAGE_KEY, JSON.stringify(payload));
+                } catch (error) {
+                        console.warn(`${LOG_PREFIX} Impossible d'enregistrer le statut de génération`, error);
+                }
+
+                dispatchGenerationEvent(GENERATION_STATUS_EVENT, payload);
+        }
 
         if (!validateButton || !customTextInput) {
                 console.warn(`${LOG_PREFIX} Éléments requis introuvables, annulation du script`);
@@ -59,6 +152,7 @@ jQuery(function($) {
         function resetGenerationState() {
                 console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
                 stopPolling();
+                clearGenerationPersistence();
 
                 if (humorIntervalId) {
                         clearInterval(humorIntervalId);
@@ -105,6 +199,7 @@ jQuery(function($) {
                         updateLoading(100);
                 }
 
+                scheduleGenerationPersistenceClear(hasError ? 5000 : 3000);
                 validateButton.disabled = false;
         }
 
@@ -154,7 +249,17 @@ jQuery(function($) {
         }
 
         function handleJobStatus(job) {
-                currentJobId = job.jobId || null;
+                if (!job) {
+                        return;
+                }
+
+                if (job.taskId) {
+                        currentTaskId = job.taskId;
+                }
+
+                if (job.jobId) {
+                        currentJobId = job.jobId;
+                }
 
                 if (job.status !== lastKnownStatus) {
                         console.log(`${LOG_PREFIX} Statut mis à jour`, job);
@@ -162,32 +267,69 @@ jQuery(function($) {
 
                 lastKnownStatus = job.status;
 
+                const rawProgress = typeof job.progress === 'number'
+                        ? job.progress
+                        : (typeof job.progress === 'string' ? parseInt(job.progress, 10) : null);
+                const hasProgress = rawProgress !== null && !Number.isNaN(rawProgress);
+                const safeProgress = hasProgress ? Math.max(0, Math.min(100, Math.round(rawProgress))) : null;
+
+                let message = job.progressMessage || job.message || '';
+                const previewUrl = job.previewUrl || (job.result && job.result.url) || '';
+
                 switch (job.status) {
                         case 'pending':
-                                updateLoading(15);
-                                updateLoadingText("Job enregistré, attente du worker...");
+                                updateLoading(safeProgress !== null ? safeProgress : 15);
+                                if (!message) {
+                                        message = "Job enregistré, attente du worker...";
+                                }
                                 scheduleNextPoll();
                                 break;
                         case 'processing':
-                                updateLoading(60);
-                                updateLoadingText('Notre IA travaille sur votre création...');
+                                updateLoading(safeProgress !== null ? safeProgress : 60);
+                                if (!message) {
+                                        message = 'Notre IA travaille sur votre création...';
+                                }
                                 scheduleNextPoll();
                                 break;
                         case 'done':
                                 updateLoading(100);
-                                updateLoadingText('Génération terminée !');
+                                if (!message) {
+                                        message = 'Génération terminée !';
+                                }
                                 renderGeneratedImages(job.images || []);
                                 finalizeGeneration(false);
                                 break;
                         case 'error':
-                                updateLoadingText('La génération a échoué.');
+                                if (!message) {
+                                        message = 'La génération a échoué.';
+                                }
                                 showAlert("La génération a échoué. Veuillez réessayer.");
                                 finalizeGeneration(true);
                                 break;
                         default:
+                                if (safeProgress !== null) {
+                                        updateLoading(safeProgress);
+                                }
                                 scheduleNextPoll();
                                 break;
                 }
+
+                if (message) {
+                        updateLoadingText(message);
+                }
+
+                const statusPayload = {
+                        taskId: job.taskId || currentTaskId || '',
+                        jobId: currentJobId || job.jobId || null,
+                        status: job.status || '',
+                        progress: safeProgress,
+                        message,
+                        previewUrl,
+                        prompt: job.prompt || prompt || '',
+                        updatedAt: job.progressUpdatedAt || job.updatedAt || new Date().toISOString(),
+                };
+
+                persistGenerationStatus(statusPayload);
         }
 
         function renderGeneratedImages(images) {
@@ -333,7 +475,17 @@ jQuery(function($) {
                         }
 
                         currentTaskId = data.taskId;
+                        currentJobId = data.jobId || null;
                         lastKnownStatus = data.status || 'pending';
+                        persistActiveGeneration(currentTaskId, currentJobId);
+                        persistGenerationStatus({
+                                taskId: currentTaskId,
+                                jobId: currentJobId,
+                                status: lastKnownStatus,
+                                progress: 0,
+                                message: 'Job envoyé au worker...',
+                                prompt,
+                        });
                         updateLoading(10);
                         updateLoadingText('Job envoyé au worker...');
 

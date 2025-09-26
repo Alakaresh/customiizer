@@ -1,5 +1,78 @@
 <?php
 
+function customiizer_job_progress_key($taskId) {
+    return 'customiizer_job_progress_' . md5((string) $taskId);
+}
+
+function customiizer_store_job_progress($taskId, array $payload, $expiration = HOUR_IN_SECONDS) {
+    if (!function_exists('set_transient')) {
+        return false;
+    }
+
+    $key = customiizer_job_progress_key($taskId);
+    $sanitized = [
+        'taskId' => (string) $taskId,
+        'jobId' => isset($payload['jobId']) ? (int) $payload['jobId'] : null,
+        'status' => isset($payload['status']) ? sanitize_text_field($payload['status']) : '',
+        'progress' => isset($payload['progress']) ? max(0, min(100, (int) $payload['progress'])) : null,
+        'message' => isset($payload['message']) ? sanitize_text_field($payload['message']) : '',
+        'updated_at' => isset($payload['updated_at']) ? sanitize_text_field($payload['updated_at']) : current_time('mysql'),
+        'metadata' => isset($payload['metadata']) && is_array($payload['metadata']) ? $payload['metadata'] : [],
+        'result' => isset($payload['result']) && is_array($payload['result']) ? $payload['result'] : [],
+    ];
+
+    if (!empty($sanitized['metadata'])) {
+        array_walk_recursive(
+            $sanitized['metadata'],
+            static function (&$value) {
+                if (is_scalar($value)) {
+                    $value = sanitize_text_field((string) $value);
+                }
+            }
+        );
+    }
+
+    if (!empty($sanitized['result'])) {
+        if (isset($sanitized['result']['url'])) {
+            $sanitized['result']['url'] = esc_url_raw($sanitized['result']['url']);
+        }
+        if (isset($sanitized['result']['thumbnail'])) {
+            $sanitized['result']['thumbnail'] = esc_url_raw($sanitized['result']['thumbnail']);
+        }
+    }
+
+    return set_transient($key, $sanitized, max(5 * MINUTE_IN_SECONDS, (int) $expiration));
+}
+
+function customiizer_fetch_job_progress($taskId) {
+    if (!function_exists('get_transient')) {
+        return [];
+    }
+
+    $key = customiizer_job_progress_key($taskId);
+    $stored = get_transient($key);
+
+    return is_array($stored) ? $stored : [];
+}
+
+function customiizer_clear_job_progress($taskId) {
+    if (!function_exists('delete_transient')) {
+        return false;
+    }
+
+    return delete_transient(customiizer_job_progress_key($taskId));
+}
+
+function customiizer_clear_generation_progress_event($taskId) {
+    if ($taskId === null || $taskId === '') {
+        return;
+    }
+
+    customiizer_clear_job_progress($taskId);
+}
+
+add_action('customiizer_clear_generation_progress', 'customiizer_clear_generation_progress_event', 10, 1);
+
 function customiizer_decode_settings($value) {
     if ($value === '' || $value === null) {
         return [];
@@ -50,6 +123,18 @@ function check_image_status() {
         'createdAt' => $job['created_at'],
         'updatedAt' => $job['updated_at'],
     ];
+
+    $progressData = customiizer_fetch_job_progress($taskId);
+    if (!empty($progressData)) {
+        $response['progress'] = isset($progressData['progress']) ? (int) $progressData['progress'] : null;
+        $response['progressStatus'] = $progressData['status'] ?? '';
+        $response['progressMessage'] = $progressData['message'] ?? '';
+        $response['progressUpdatedAt'] = $progressData['updated_at'] ?? '';
+
+        if (!empty($progressData['result']['url'])) {
+            $response['previewUrl'] = esc_url_raw($progressData['result']['url']);
+        }
+    }
 
     if ($job['status'] === 'done') {
         $rows = $wpdb->get_results(
