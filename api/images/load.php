@@ -31,7 +31,7 @@ function load_community_images(WP_REST_Request $request) {
         $query = $wpdb->prepare(
                 "
     SELECT
-        g.image_number,
+        g.id AS image_number,
         g.image_url,
         g.format_image,
         g.prompt,
@@ -48,16 +48,15 @@ function load_community_images(WP_REST_Request $request) {
         SELECT image_id, COUNT(*) AS like_count
         FROM WPC_image_likes
         GROUP BY image_id
-    ) l ON l.image_id = g.image_number
+    ) l ON l.image_id = g.id
     LEFT JOIN (
         SELECT image_id, COUNT(*) AS favorite_count
         FROM WPC_image_favorites
         GROUP BY image_id
-    ) f ON f.image_id = g.image_number
-    LEFT JOIN WPC_image_likes ul ON ul.image_id = g.image_number AND ul.user_id = %d
-    LEFT JOIN WPC_image_favorites uf ON uf.image_id = g.image_number AND uf.user_id = %d
+    ) f ON f.image_id = g.id
+    LEFT JOIN WPC_image_likes ul ON ul.image_id = g.id AND ul.user_id = %d
+    LEFT JOIN WPC_image_favorites uf ON uf.image_id = g.id AND uf.user_id = %d
     WHERE g.image_url IS NOT NULL{$searchClause}
-    GROUP BY g.image_number
     ORDER BY {$orderBy}
     ",
                 $current_user_id,
@@ -68,10 +67,14 @@ function load_community_images(WP_REST_Request $request) {
 	// Ajouter dynamiquement le LIMIT si besoin
 	$query .= " " . $limitClause;
 
-	$results = $wpdb->get_results($query);
+        $results = $wpdb->get_results($query);
 
-	if (empty($results)) {
-		return new WP_REST_Response([
+        if ($results === false) {
+                customiizer_log('api_images_load', 'SQL error: ' . $wpdb->last_error . '\nQuery: ' . $query);
+        }
+
+        if (empty($results)) {
+                return new WP_REST_Response([
 			'success' => false,
 			'message' => 'No community images found.'
 		], 200);
