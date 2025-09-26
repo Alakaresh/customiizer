@@ -6,98 +6,170 @@ if (defined('WP_DEBUG') && WP_DEBUG) {
     error_reporting(E_ALL);
 }
 
-// Inclure WordPress pour accéder à ses fonctions
 define('WP_USE_THEMES', false);
 $wp_load_path = dirname(__FILE__) . '/../../../../../wp-load.php';
+$logContext = 'webhook_imagine';
+
+require_once dirname(__FILE__) . '/../../utilities.php';
+
 if (file_exists($wp_load_path)) {
-    require_once($wp_load_path);
+    require_once $wp_load_path;
 } else {
-    customiizer_log("Erreur : wp-load.php introuvable.");
+    customiizer_log($logContext, 'Erreur : wp-load.php introuvable.');
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => 'wp-load.php not found']);
     exit;
 }
 
-// Lire le corps de la requête JSON
 $inputJSON = file_get_contents('php://input');
 if ($inputJSON === false) {
-    customiizer_log("Erreur : Impossible de lire l'entrée JSON.");
+    customiizer_log($logContext, "Erreur : Impossible de lire l'entrée JSON.");
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => "Impossible de lire l'entrée JSON."]);
+    echo wp_json_encode(['status' => 'error', 'message' => "Impossible de lire l'entrée JSON."]);
     exit;
 }
 
 $input = json_decode($inputJSON, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
-    customiizer_log("Erreur de décodage JSON: " . json_last_error_msg());
+    customiizer_log($logContext, 'Erreur de décodage JSON: ' . json_last_error_msg());
     http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'JSON mal formé.']);
+    echo wp_json_encode(['status' => 'error', 'message' => 'JSON mal formé.']);
     exit;
 }
 
-// Vérifier les données reçues
-if (is_array($input) && !empty($input) && isset($input['hash'])) {
-    $task_hash = sanitize_text_field($input['hash']);
+if (!is_array($input) || empty($input['hash'])) {
+    customiizer_log($logContext, 'Structure de données invalide: ' . print_r($input, true));
+    http_response_code(400);
+    echo wp_json_encode(['status' => 'error', 'message' => 'Structure de données invalide']);
+    exit;
+}
 
-    // Vérifier si un post avec ce hash existe déjà
-    $args = array(
-        'post_type' => 'image_task',
-        'meta_query' => array(
-            array(
-                'key' => 'task_hash',
-                'value' => $task_hash,
-                'compare' => '='
-            )
+$taskHash = sanitize_text_field($input['hash']);
+$now = current_time('mysql');
+$status = isset($input['status']) ? strtolower(sanitize_text_field($input['status'])) : '';
+
+global $wpdb;
+$jobsTable = 'WPC_generation_jobs';
+$imagesTable = 'WPC_generated_image';
+
+$job = $wpdb->get_row(
+    $wpdb->prepare("SELECT id, user_id, prompt, settings FROM {$jobsTable} WHERE task_id = %s", $taskHash),
+    ARRAY_A
+);
+
+if (!$job) {
+    customiizer_log($logContext, "Job introuvable pour le hash {$taskHash}");
+    http_response_code(404);
+    echo wp_json_encode(['status' => 'error', 'message' => 'Job introuvable']);
+    exit;
+}
+
+if ($status === 'error' || isset($input['error'])) {
+    $wpdb->update(
+        $jobsTable,
+        [
+            'status' => 'error',
+            'updated_at' => $now,
+        ],
+        ['id' => (int) $job['id']],
+        ['%s', '%s'],
+        ['%d']
+    );
+
+    customiizer_log($logContext, "Job {$job['id']} marqué en erreur");
+    http_response_code(200);
+    echo wp_json_encode(['status' => 'error', 'message' => 'Job marqué en erreur']);
+    exit;
+}
+
+$wpdb->update(
+    $jobsTable,
+    [
+        'status' => 'processing',
+        'updated_at' => $now,
+    ],
+    ['id' => (int) $job['id']],
+    ['%s', '%s'],
+    ['%d']
+);
+
+$result = isset($input['result']) && is_array($input['result']) ? $input['result'] : [];
+$imageUrl = isset($result['url']) ? esc_url_raw($result['url']) : '';
+$imageHandled = false;
+
+if ($imageUrl !== '') {
+    $existing = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$imagesTable} WHERE job_id = %d AND image_url = %s",
+            (int) $job['id'],
+            $imageUrl
         )
     );
 
-    $query = new WP_Query($args);
+    $width = isset($result['width']) ? absint($result['width']) : 0;
+    $height = isset($result['height']) ? absint($result['height']) : 0;
+    $format = ($width > 0 && $height > 0) ? sprintf('%dx%d', $width, $height) : '';
 
-    if ($query->have_posts()) {
-        $query->the_post();
-        $post_id = get_the_ID();
-    } else {
-        customiizer_log("Aucun post existant trouvé pour le hash: $task_hash. Création d'un nouveau post.");
-        
-        // Créer un nouveau post pour cette tâche
-        $post_data = array(
-            'post_title' => $task_hash,
-            'post_type' => 'image_task',
-            'post_status' => 'publish',
-        );
-        $post_id = wp_insert_post($post_data);
+    if (!$existing) {
+        $nextNumber = (int) $wpdb->get_var("SELECT MAX(image_number) FROM {$imagesTable}");
+        $nextNumber = $nextNumber ? $nextNumber + 1 : 1;
 
-        if (is_wp_error($post_id)) {
-            customiizer_log("Erreur lors de la création du post: " . $post_id->get_error_message());
+        $settingsValue = '';
+        if (isset($job['settings'])) {
+            $settingsValue = is_string($job['settings']) ? $job['settings'] : wp_json_encode($job['settings']);
+        }
+
+        $data = [
+            'image_number' => $nextNumber,
+            'job_id' => (int) $job['id'],
+            'user_id' => (int) $job['user_id'],
+            'image_url' => $imageUrl,
+            'prompt' => isset($job['prompt']) ? sanitize_text_field($job['prompt']) : '',
+            'settings' => $settingsValue,
+        ];
+
+        $formats = ['%d', '%d', '%d', '%s', '%s', '%s'];
+
+        if ($format !== '') {
+            $data['format_image'] = $format;
+            $formats[] = '%s';
+        }
+
+        $data['image_date'] = $now;
+        $formats[] = '%s';
+
+        $inserted = $wpdb->insert($imagesTable, $data, $formats);
+
+        if ($inserted === false) {
+            customiizer_log($logContext, 'Erreur insertion image : ' . $wpdb->last_error);
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Failed to create post']);
+            echo wp_json_encode(['status' => 'error', 'message' => "Échec de l'enregistrement de l'image"]);
             exit;
         }
-    }
 
-    // Stocker les données complètes du webhook dans les méta-posts
-    $update_result = update_post_meta($post_id, 'image_generation', $input);
-    if (!$update_result) {
-        customiizer_log("Erreur lors de la mise à jour des métadonnées 'image_generation' pour le post ID: $post_id");
+        customiizer_log($logContext, "Image enregistrée pour le job {$job['id']} (image_number {$nextNumber})");
     } else {
-        customiizer_log("Métadonnées 'image_generation' mises à jour pour le post ID: $post_id");
+        customiizer_log($logContext, "Image déjà enregistrée pour le job {$job['id']}");
     }
 
-    $update_result = update_post_meta($post_id, 'task_hash', $task_hash);
-    if (!$update_result) {
-        customiizer_log("Erreur lors de la mise à jour des métadonnées 'task_hash' pour le post ID: $post_id");
-    } else {
-        customiizer_log("Métadonnées 'task_hash' mises à jour pour le post ID: $post_id");
-    }
-
-    // Répondre avec succès
-    http_response_code(200);
-    customiizer_log("Données traitées avec succès pour le post ID: $post_id");
-    echo json_encode(['status' => 'success']);
-} else {
-    // Répondre avec une erreur si les données ne sont pas valides
-    customiizer_log("Structure de données invalide: " . print_r($input, true));
-    http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Structure de données invalide']);
+    $imageHandled = true;
 }
-?>
+
+if ($imageHandled) {
+    $wpdb->update(
+        $jobsTable,
+        [
+            'status' => 'done',
+            'updated_at' => $now,
+        ],
+        ['id' => (int) $job['id']],
+        ['%s', '%s'],
+        ['%d']
+    );
+}
+
+http_response_code(200);
+echo wp_json_encode([
+    'status' => 'success',
+    'message' => $imageHandled ? 'Image enregistrée' : 'Statut mis à jour',
+]);
