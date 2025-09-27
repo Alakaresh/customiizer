@@ -84,9 +84,7 @@ jQuery(function($) {
 
         function startLoadingUI() {
                 resetLoadingState();
-                if (!loadingToggled) {
-                        toggleLoading();
-                }
+                openProgressModal();
                 animateLoadingWithHumor();
         }
 
@@ -98,16 +96,16 @@ jQuery(function($) {
                         humorIntervalId = null;
                 }
 
-                if (loadingToggled) {
-                        toggleLoading();
-                }
-
                 if (hasError) {
                         updateLoading(0);
                         lastKnownProgress = 0;
                 } else {
                         updateLoading(100);
                         lastKnownProgress = 100;
+                }
+
+                if (loadingToggled) {
+                        closeProgressModal();
                 }
 
                 validateButton.disabled = false;
@@ -395,6 +393,7 @@ jQuery(function($) {
         }
 
         function resetLoadingState() {
+                closeProgressModal();
                 const loadingBar = document.getElementById('loading-bar');
                 const loadingText = document.getElementById('loading-text');
                 if (loadingBar) {
@@ -403,17 +402,34 @@ jQuery(function($) {
                 if (loadingText) {
                         loadingText.textContent = 'Notre IA est en pleine méditation créative...';
                 }
-                loadingToggled = false;
                 lastKnownProgress = null;
                 completionAnimationTriggered = false;
         }
 
-        function toggleLoading() {
-                const loadingContainer = document.querySelector('.loading-container');
-                if (loadingContainer) {
-                        loadingContainer.classList.toggle('hide');
-                        loadingToggled = !loadingToggled;
+        function openProgressModal() {
+                const modal = document.getElementById('generation-progress-modal');
+                if (!modal || loadingToggled) {
+                        return;
                 }
+
+                modal.classList.remove('hide');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+                loadingToggled = true;
+        }
+
+        function closeProgressModal() {
+                const modal = document.getElementById('generation-progress-modal');
+                if (!modal) {
+                        return;
+                }
+
+                modal.classList.add('hide');
+                modal.setAttribute('aria-hidden', 'true');
+                if (loadingToggled) {
+                        document.body.classList.remove('modal-open');
+                }
+                loadingToggled = false;
         }
 
         function animateLoadingWithHumor() {

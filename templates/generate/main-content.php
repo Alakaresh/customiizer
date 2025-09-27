@@ -9,20 +9,22 @@
 </div>
 -->
 
-<div class="content-images" id="content-images">
-	<div class="loading-container hide">
-    <div class="loading-bar-border">
-        <div class="loading-bar" id="loading-bar">
-            <!-- Ajout du texte de pourcentage à l'intérieur de la barre -->
+<div id="generation-progress-modal" class="generation-progress-modal hide" role="dialog" aria-modal="true" aria-labelledby="generation-progress-title" aria-describedby="loading-text" aria-hidden="true">
+        <div class="generation-progress-dialog" role="document">
+                <h2 id="generation-progress-title" class="generation-progress-title">Génération en cours</h2>
+                <div class="loading-container">
+                        <div class="loading-bar-border" role="presentation">
+                                <div class="loading-bar" id="loading-bar"></div>
+                        </div>
+                        <div class="loading-text" id="loading-text" aria-live="polite">Chargement... Veuillez patienter !</div>
+                </div>
         </div>
-        <div class="loading-text" id="loading-text">Chargement... Veuillez patienter !</div>
-    </div>
 </div>
 
-
-	<div id="image-grid" class="image-grid">
-		<img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0">
-		<img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1">
+<div class="content-images" id="content-images">
+        <div id="image-grid" class="image-grid">
+                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0">
+                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1">
 		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 2">
 		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 3">
 	</div>
