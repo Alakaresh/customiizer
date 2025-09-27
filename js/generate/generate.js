@@ -14,6 +14,10 @@ let jobFormat = '';
 let humorIntervalId = null;
 let loadingToggled = false;
 let generationClearTimeoutId = null;
+let websocketConnected = false;
+let pollInProgress = false;
+let lastPollTimestamp = 0;
+const MIN_SOCKET_REFRESH_INTERVAL = 1000;
 
 const ACTIVE_GENERATION_STORAGE_KEY = 'customiizerActiveGeneration';
 const STATUS_GENERATION_STORAGE_KEY = 'customiizerGenerationStatus';
@@ -142,12 +146,56 @@ jQuery(function($) {
                 alertBox.style.display = 'none';
         }
 
+        function isEventForCurrentJob(payload) {
+                if (!payload || typeof payload !== 'object') {
+                        return true;
+                }
+
+                if (payload.jobId && currentJobId && parseInt(payload.jobId, 10) === parseInt(currentJobId, 10)) {
+                        return true;
+                }
+
+                const hash = payload.taskId || payload.mjHash || payload.hash;
+                if (hash && currentTaskId && hash === currentTaskId) {
+                        return true;
+                }
+
+                return false;
+        }
+
         function stopPolling() {
                 if (pollTimeoutId) {
                         clearTimeout(pollTimeoutId);
                         pollTimeoutId = null;
                 }
         }
+
+        window.addEventListener('customiizer:generation-socket-status', (event) => {
+                const detail = event && event.detail ? event.detail : {};
+                websocketConnected = !!detail.connected;
+
+                if (!websocketConnected && currentTaskId) {
+                        scheduleNextPoll();
+                }
+        });
+
+        window.addEventListener('customiizer:generation-refresh-request', (event) => {
+                if (!currentTaskId) {
+                        return;
+                }
+
+                const payload = event && event.detail ? event.detail.payload : null;
+                if (!isEventForCurrentJob(payload)) {
+                        return;
+                }
+
+                const now = Date.now();
+                if (pollInProgress || (now - lastPollTimestamp) < MIN_SOCKET_REFRESH_INTERVAL) {
+                        return;
+                }
+
+                pollJobStatus();
+        });
 
         function resetGenerationState() {
                 console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
@@ -203,15 +251,24 @@ jQuery(function($) {
                 validateButton.disabled = false;
         }
 
-        function scheduleNextPoll() {
+        function scheduleNextPoll(customDelay) {
                 stopPolling();
-                pollTimeoutId = setTimeout(() => pollJobStatus(), 1500);
+                const delay = typeof customDelay === 'number'
+                        ? customDelay
+                        : (websocketConnected ? 15000 : 1500);
+                pollTimeoutId = setTimeout(() => pollJobStatus(), delay);
         }
 
         async function pollJobStatus() {
                 if (!currentTaskId) {
                         return;
                 }
+
+                if (pollInProgress) {
+                        return;
+                }
+
+                pollInProgress = true;
 
                 try {
                         const response = await fetch(ajaxurl, {
@@ -245,6 +302,9 @@ jQuery(function($) {
                         console.error(`${LOG_PREFIX} Erreur lors du suivi du job`, error);
                         showAlert("Une erreur est survenue pendant le suivi de la génération.");
                         finalizeGeneration(true);
+                } finally {
+                        pollInProgress = false;
+                        lastPollTimestamp = Date.now();
                 }
         }
 

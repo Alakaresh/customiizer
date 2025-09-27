@@ -12,6 +12,10 @@
 
     let pollTimeoutId = null;
     let autoHideTimeoutId = null;
+    let websocketConnected = false;
+    let pollInProgress = false;
+    let lastPollTimestamp = 0;
+    const MIN_SOCKET_REFRESH_INTERVAL = 1000;
 
     function parseJSON(value) {
         if (!value) {
@@ -109,7 +113,12 @@
 
     function scheduleNextPoll(delay = POLL_INTERVAL) {
         stopPolling();
-        pollTimeoutId = window.setTimeout(pollActiveJob, delay);
+        const hasDefaultDelay = arguments.length === 0;
+        const baseDelay = typeof delay === 'number' ? delay : POLL_INTERVAL;
+        const effectiveDelay = hasDefaultDelay && websocketConnected
+            ? baseDelay * 3
+            : baseDelay;
+        pollTimeoutId = window.setTimeout(pollActiveJob, effectiveDelay);
     }
 
     function sanitizeProgress(progress) {
@@ -202,6 +211,28 @@
         return normalized !== 'done' && normalized !== 'error';
     }
 
+    function isEventForActiveJob(payload) {
+        const activeJob = getActiveJob();
+        if (!activeJob || (!activeJob.taskId && !activeJob.jobId)) {
+            return false;
+        }
+
+        if (!payload || typeof payload !== 'object') {
+            return true;
+        }
+
+        if (payload.jobId && activeJob.jobId && parseInt(payload.jobId, 10) === parseInt(activeJob.jobId, 10)) {
+            return true;
+        }
+
+        const hash = payload.taskId || payload.mjHash || payload.hash;
+        if (hash && activeJob.taskId && hash === activeJob.taskId) {
+            return true;
+        }
+
+        return false;
+    }
+
     async function pollActiveJob() {
         const activeJob = getActiveJob();
         if (!activeJob || !activeJob.taskId) {
@@ -210,8 +241,15 @@
             return;
         }
 
+        if (pollInProgress) {
+            return;
+        }
+
+        pollInProgress = true;
+
         if (typeof window.ajaxurl === 'undefined') {
             console.warn(`${LOG_PREFIX} ajaxurl indisponible. Impossible de suivre la génération.`);
+            pollInProgress = false;
             return;
         }
 
@@ -270,7 +308,10 @@
             }
         } catch (error) {
             console.error(`${LOG_PREFIX} Erreur lors du suivi du job`, error);
-            scheduleNextPoll(POLL_INTERVAL * 2);
+            scheduleNextPoll(websocketConnected ? POLL_INTERVAL : POLL_INTERVAL * 2);
+        } finally {
+            pollInProgress = false;
+            lastPollTimestamp = Date.now();
         }
     }
 
@@ -313,6 +354,30 @@
     }
 
     document.addEventListener('DOMContentLoaded', initialiseTracker);
+
+    window.addEventListener('customiizer:generation-socket-status', (event) => {
+        const detail = event && event.detail ? event.detail : {};
+        websocketConnected = !!detail.connected;
+
+        if (!websocketConnected) {
+            scheduleNextPoll();
+        }
+    });
+
+    window.addEventListener('customiizer:generation-refresh-request', (event) => {
+        const payload = event && event.detail ? event.detail.payload : null;
+
+        if (!isEventForActiveJob(payload)) {
+            return;
+        }
+
+        const now = Date.now();
+        if (pollInProgress || (now - lastPollTimestamp) < MIN_SOCKET_REFRESH_INTERVAL) {
+            return;
+        }
+
+        pollActiveJob();
+    });
 
     window.addEventListener('storage', (event) => {
         if (event.key === ACTIVE_KEY) {
