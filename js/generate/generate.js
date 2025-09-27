@@ -7,7 +7,6 @@ console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 let currentTaskId = null;
 let currentJobId = null;
-let pollTimeoutId = null;
 let lastKnownStatus = null;
 let prompt = '';
 let jobFormat = '';
@@ -18,6 +17,7 @@ let completionAnimationTriggered = false;
 let clearStateTimeoutId = null;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
+const LOCAL_PROGRESS_SOURCE = 'generator';
 
 jQuery(function($) {
         const validateButton = document.getElementById('validate-button');
@@ -25,6 +25,7 @@ jQuery(function($) {
         const alertBox = document.getElementById('alert-box');
         const placeholderDiv = document.getElementById('placeholder');
         const savedPromptText = localStorage.getItem('savedPromptText');
+        const originalButtonLabel = validateButton ? validateButton.textContent : '';
 
         if (!validateButton || !customTextInput) {
                 console.warn(`${LOG_PREFIX} Éléments requis introuvables, annulation du script`);
@@ -43,14 +44,37 @@ jQuery(function($) {
                 localStorage.removeItem('savedPromptText');
         }
 
+        customTextInput.addEventListener('input', () => {
+                if (!placeholderDiv) {
+                        return;
+                }
+                placeholderDiv.style.display = customTextInput.textContent.trim() === '' ? 'block' : 'none';
+        });
+
         restoreGenerationProgress();
 
-        function showAlert(message) {
+        window.addEventListener(PROGRESS_EVENT_NAME, (event) => {
+                const detail = event.detail;
+                if (!detail || detail._source === LOCAL_PROGRESS_SOURCE) {
+                        return;
+                }
+                applyExternalProgressUpdate(detail);
+        });
+
+        function showAlert(message, type = 'error') {
                 if (!alertBox) {
                         return;
                 }
+
                 alertBox.textContent = message;
                 alertBox.style.display = 'block';
+                alertBox.classList.remove('alert-error', 'alert-success', 'alert-info', 'alert-visible');
+                const className = type === 'success'
+                        ? 'alert-success'
+                        : type === 'info'
+                                ? 'alert-info'
+                                : 'alert-error';
+                alertBox.classList.add(className, 'alert-visible');
         }
 
         function hideAlert() {
@@ -58,14 +82,25 @@ jQuery(function($) {
                         return;
                 }
                 alertBox.style.display = 'none';
+                alertBox.classList.remove('alert-error', 'alert-success', 'alert-info', 'alert-visible');
+                alertBox.textContent = '';
         }
 
-        function stopPolling() {
-                if (pollTimeoutId) {
-                        clearTimeout(pollTimeoutId);
-                        pollTimeoutId = null;
+        function setButtonLoading(isLoading) {
+                if (!validateButton) {
+                        return;
+                }
+
+                if (isLoading) {
+                        validateButton.dataset.loading = '1';
+                        validateButton.textContent = 'Envoi…';
+                } else {
+                        validateButton.textContent = originalButtonLabel;
+                        validateButton.removeAttribute('data-loading');
                 }
         }
+
+        function stopPolling() {}
 
         function resetGenerationState() {
                 console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
@@ -145,112 +180,11 @@ jQuery(function($) {
                         closeProgressModal();
                 }
 
+                setButtonLoading(false);
                 validateButton.disabled = false;
         }
 
-        function scheduleNextPoll() {
-                stopPolling();
-                pollTimeoutId = setTimeout(() => pollJobStatus(), 1500);
-        }
 
-        async function pollJobStatus() {
-                if (!currentTaskId) {
-                        return;
-                }
-
-                try {
-                        const response = await fetch(ajaxurl, {
-                                method: 'POST',
-                                headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                                },
-                                body: new URLSearchParams({
-                                        action: 'check_image_status',
-                                        taskId: currentTaskId,
-                                }),
-                        });
-
-                        if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}`);
-                        }
-
-                        const payload = await response.json();
-                        if (!payload.success) {
-                                const statusMessage = payload.data && payload.data.message ? payload.data.message : 'Statut indisponible';
-                                throw new Error(statusMessage);
-                        }
-
-                        const job = payload.data;
-                        if (!job) {
-                                throw new Error('Réponse vide du serveur');
-                        }
-
-                        handleJobStatus(job);
-                } catch (error) {
-                        console.error(`${LOG_PREFIX} Erreur lors du suivi du job`, error);
-                        showAlert("Une erreur est survenue pendant le suivi de la génération.");
-                        finalizeGeneration(true);
-                }
-        }
-
-        function handleJobStatus(job) {
-                currentJobId = job.jobId || null;
-
-                if (job.status !== lastKnownStatus) {
-                        console.log(`${LOG_PREFIX} Statut mis à jour`, job);
-                }
-
-                const progressValue = clampProgress(job.progress);
-                const hasProgressUpdate = progressValue !== null;
-
-                if (hasProgressUpdate) {
-                        lastKnownProgress = progressValue;
-                        updateLoading(progressValue);
-
-                        if (job.status !== 'done' && job.status !== 'error') {
-                                updateLoadingText(`Progression : ${Math.round(progressValue)}%`);
-                        }
-                }
-
-                lastKnownStatus = job.status;
-                persistProgressState({
-                        status: lastKnownStatus,
-                        jobId: currentJobId,
-                        taskId: currentTaskId,
-                        progress: lastKnownProgress,
-                });
-
-                switch (job.status) {
-                        case 'pending':
-                                if (!hasProgressUpdate) {
-                                        updateLoading(15);
-                                        updateLoadingText("Job enregistré, attente du worker...");
-                                }
-                                scheduleNextPoll();
-                                break;
-                        case 'processing':
-                                if (!hasProgressUpdate) {
-                                        updateLoading(60);
-                                        updateLoadingText('Notre IA travaille sur votre création...');
-                                }
-                                scheduleNextPoll();
-                                break;
-                        case 'done':
-                                updateLoading(100);
-                                updateLoadingText('Génération terminée !');
-                                renderGeneratedImages(job.images || []);
-                                finalizeGeneration(false);
-                                break;
-                        case 'error':
-                                updateLoadingText('La génération a échoué.');
-                                showAlert("La génération a échoué. Veuillez réessayer.");
-                                finalizeGeneration(true);
-                                break;
-                        default:
-                                scheduleNextPoll();
-                                break;
-                }
-        }
 
         function renderGeneratedImages(images) {
                 const container = document.getElementById('content-images');
@@ -287,6 +221,58 @@ jQuery(function($) {
                 }
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
+        }
+
+        function applyExternalProgressUpdate(update) {
+                if (!update || !update.taskId) {
+                        return;
+                }
+
+                currentTaskId = update.taskId;
+                currentJobId = update.jobId || currentJobId;
+                if (typeof update.prompt === 'string' && update.prompt) {
+                        prompt = update.prompt;
+                }
+                if (typeof update.format === 'string' && update.format) {
+                        jobFormat = update.format;
+                }
+
+                if (typeof update.status === 'string') {
+                        lastKnownStatus = update.status;
+                }
+
+                const normalizedProgress = clampProgress(update.progress);
+                if (normalizedProgress !== null) {
+                        lastKnownProgress = normalizedProgress;
+                        updateLoading(normalizedProgress);
+                }
+
+                if (typeof update.message === 'string' && update.message) {
+                        updateLoadingText(update.message);
+                }
+
+                if (Array.isArray(update.images) && update.images.length) {
+                        renderGeneratedImages(update.images);
+                }
+
+                const statePayload = {
+                        status: lastKnownStatus,
+                        jobId: currentJobId,
+                        taskId: currentTaskId,
+                };
+
+                if (update.status === 'done' || update.status === 'error') {
+                        statePayload.completed = true;
+                }
+
+                persistProgressState(statePayload);
+
+                if (update.status === 'done') {
+                        finalizeGeneration(false);
+                } else if (update.status === 'error') {
+                        showAlert("La génération a échoué. Veuillez réessayer.");
+                        finalizeGeneration(true);
+                }
         }
 
         async function consumeCredit() {
@@ -368,6 +354,7 @@ jQuery(function($) {
 
                 hideAlert();
                 validateButton.disabled = true;
+                setButtonLoading(true);
                 startLoadingUI();
                 updateImageGrid();
 
@@ -404,7 +391,6 @@ jQuery(function($) {
                         });
 
                         consumeCredit();
-                        scheduleNextPoll();
                 } catch (error) {
                         console.error(`${LOG_PREFIX} Erreur lors de la création du job`, error);
                         showAlert("Une erreur est survenue pendant la génération. Veuillez réessayer.");
@@ -436,6 +422,10 @@ jQuery(function($) {
                 gridImages.forEach(image => {
                         image.src = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
                         image.alt = "Image d'attente";
+                        image.removeAttribute('data-job-id');
+                        image.removeAttribute('data-task-id');
+                        image.removeAttribute('data-format-image');
+                        image.removeAttribute('data-prompt');
                 });
         }
 
@@ -456,6 +446,7 @@ jQuery(function($) {
                 }
                 lastKnownProgress = null;
                 completionAnimationTriggered = false;
+                setButtonLoading(false);
         }
 
         function openProgressModal() {
@@ -565,6 +556,7 @@ jQuery(function($) {
                                 ...previousState,
                                 ...partialState,
                                 updatedAt: Date.now(),
+                                _source: LOCAL_PROGRESS_SOURCE,
                         };
                         localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(nextState));
                         broadcastProgressUpdate(nextState);
@@ -613,9 +605,10 @@ jQuery(function($) {
 
                 if (!isFinal) {
                         validateButton.disabled = true;
-                        scheduleNextPoll();
+                        setButtonLoading(true);
                 } else {
-                        pollJobStatus();
+                        setButtonLoading(false);
+                        validateButton.disabled = false;
                 }
         }
 
