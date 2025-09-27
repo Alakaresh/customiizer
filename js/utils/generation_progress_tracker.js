@@ -10,6 +10,8 @@
     let loadingText = null;
     let hideTimeoutId = null;
     let ignoreNextEvent = false;
+    let previewContainer = null;
+    let previewImage = null;
 
     document.addEventListener('DOMContentLoaded', initialize);
 
@@ -18,6 +20,8 @@
         loadingBar = document.getElementById('loading-bar');
         loadingText = document.getElementById('loading-text');
         title = document.getElementById('generation-progress-title');
+        previewContainer = document.getElementById('generation-progress-preview');
+        previewImage = document.getElementById('generation-progress-preview-image');
 
         if (!modal || !loadingBar || !loadingText) {
             return;
@@ -47,6 +51,7 @@
         const currentState = normalizeState(state);
 
         if (!currentState) {
+            clearPreview();
             hideModal();
             return;
         }
@@ -80,6 +85,27 @@
             normalized.status = 'pending';
         }
 
+        if (typeof normalized.previewUrl === 'string') {
+            normalized.previewUrl = normalized.previewUrl.trim();
+        } else {
+            normalized.previewUrl = '';
+        }
+
+        if (Array.isArray(normalized.previewHistory)) {
+            normalized.previewHistory = normalized.previewHistory
+                .map(sanitizePreviewHistoryEntry)
+                .filter(Boolean);
+        } else {
+            normalized.previewHistory = [];
+        }
+
+        if (!normalized.previewUrl && normalized.previewHistory.length) {
+            const latestEntry = normalized.previewHistory[normalized.previewHistory.length - 1];
+            if (latestEntry && typeof latestEntry.url === 'string') {
+                normalized.previewUrl = latestEntry.url;
+            }
+        }
+
         return normalized;
     }
 
@@ -107,6 +133,8 @@
         if (title && state.title) {
             title.textContent = state.title;
         }
+
+        updatePreview(state);
     }
 
     function shouldAutoHide(state) {
@@ -163,5 +191,75 @@
             return 100;
         }
         return value;
+    }
+
+    function sanitizePreviewHistoryEntry(entry) {
+        if (!entry || typeof entry !== 'object') {
+            return null;
+        }
+
+        const url = typeof entry.url === 'string' ? entry.url.trim() : '';
+        if (!url) {
+            return null;
+        }
+
+        const normalized = { url };
+
+        if (typeof entry.progress === 'number') {
+            normalized.progress = clamp(entry.progress);
+        } else if (typeof entry.progress === 'string') {
+            const parsed = Number(entry.progress);
+            if (Number.isFinite(parsed)) {
+                normalized.progress = clamp(parsed);
+            }
+        }
+
+        if (typeof entry.timestamp === 'number' && Number.isFinite(entry.timestamp)) {
+            normalized.timestamp = entry.timestamp;
+        }
+
+        return normalized;
+    }
+
+    function updatePreview(state) {
+        if (!previewContainer || !previewImage) {
+            return;
+        }
+
+        const history = Array.isArray(state.previewHistory) ? state.previewHistory : [];
+        let resolvedUrl = typeof state.previewUrl === 'string' ? state.previewUrl.trim() : '';
+
+        if (!resolvedUrl && history.length) {
+            for (let index = history.length - 1; index >= 0; index -= 1) {
+                const entry = history[index];
+                if (entry && typeof entry.url === 'string' && entry.url) {
+                    resolvedUrl = entry.url;
+                    break;
+                }
+            }
+        }
+
+        if (!resolvedUrl) {
+            clearPreview();
+            return;
+        }
+
+        previewImage.src = resolvedUrl;
+        previewImage.alt = typeof state.previewAlt === 'string' && state.previewAlt
+            ? state.previewAlt
+            : 'Aperçu de la génération en cours';
+        previewContainer.classList.remove('hide');
+        previewContainer.setAttribute('aria-hidden', 'false');
+    }
+
+    function clearPreview() {
+        if (!previewContainer || !previewImage) {
+            return;
+        }
+
+        previewContainer.classList.add('hide');
+        previewContainer.setAttribute('aria-hidden', 'true');
+        previewImage.removeAttribute('src');
+        previewImage.alt = 'Aperçu de la génération en cours';
     }
 })();

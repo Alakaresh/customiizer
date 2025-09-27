@@ -12,5 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="loading-text" id="loading-text" aria-live="polite">Chargement... Veuillez patienter !</div>
         </div>
+        <div id="generation-progress-preview" class="progress-preview hide" aria-hidden="true" aria-live="polite">
+            <img id="generation-progress-preview-image" src="" alt="Aperçu de la génération en cours" loading="lazy" decoding="async" />
+        </div>
     </div>
 </div>

@@ -18,6 +18,13 @@ let clearStateTimeoutId = null;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
 const LOCAL_PROGRESS_SOURCE = 'generator';
+const PROGRESS_API_ENDPOINT = '/wp-json/api/v1/generation/progress';
+const PROGRESS_POLL_INTERVAL = 4000;
+const PROGRESS_POLL_FAST_INTERVAL = 2000;
+const PROGRESS_POLL_MAX_ERRORS = 5;
+let pollTimeoutId = null;
+let pollErrorCount = 0;
+let isPollingActive = false;
 
 jQuery(function($) {
         const validateButton = document.getElementById('validate-button');
@@ -100,7 +107,168 @@ jQuery(function($) {
                 }
         }
 
-        function stopPolling() {}
+        function stopPolling() {
+                isPollingActive = false;
+                if (pollTimeoutId) {
+                        clearTimeout(pollTimeoutId);
+                        pollTimeoutId = null;
+                }
+        }
+
+        function scheduleProgressPoll(delay = PROGRESS_POLL_INTERVAL) {
+                if (!isPollingActive) {
+                        return;
+                }
+
+                const safeDelay = Math.max(250, Math.floor(delay));
+
+                if (pollTimeoutId) {
+                        clearTimeout(pollTimeoutId);
+                }
+
+                pollTimeoutId = window.setTimeout(fetchProgressUpdate, safeDelay);
+        }
+
+        function startPolling(immediate = false) {
+                if (!currentTaskId && !currentJobId) {
+                        return;
+                }
+
+                if (isPollingActive && pollTimeoutId !== null) {
+                        if (immediate) {
+                                scheduleProgressPoll(0);
+                        }
+                        return;
+                }
+
+                isPollingActive = true;
+                pollErrorCount = 0;
+                scheduleProgressPoll(immediate ? 0 : PROGRESS_POLL_FAST_INTERVAL);
+        }
+
+        async function fetchProgressUpdate() {
+                pollTimeoutId = null;
+
+                if (!isPollingActive) {
+                        return;
+                }
+
+                if (!currentTaskId && !currentJobId) {
+                        stopPolling();
+                        return;
+                }
+
+                const params = new URLSearchParams();
+                if (currentJobId) {
+                        params.set('job_id', currentJobId);
+                }
+                if (currentTaskId) {
+                        params.set('task_id', currentTaskId);
+                }
+
+                const endpoint = `${baseUrl}${PROGRESS_API_ENDPOINT}?${params.toString()}`;
+                let nextDelay = PROGRESS_POLL_INTERVAL;
+
+                try {
+                        const response = await fetch(endpoint, {
+                                credentials: 'include',
+                        });
+
+                        if (response.status === 401) {
+                                console.warn(`${LOG_PREFIX} Progression inaccessible (401)`);
+                                stopPolling();
+                                return;
+                        }
+
+                        if (response.status === 404) {
+                                pollErrorCount = 0;
+                                nextDelay = PROGRESS_POLL_INTERVAL * 2;
+                                scheduleProgressPoll(nextDelay);
+                                return;
+                        }
+
+                        if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                        }
+
+                        const payload = await response.json();
+
+                        if (!payload || payload.success === false) {
+                                pollErrorCount += 1;
+                        } else {
+                                const job = payload.job || {};
+                                const progressData = payload.progress || {};
+                                const update = {
+                                        taskId: job.task_id || currentTaskId,
+                                        jobId: job.id || currentJobId,
+                                };
+
+                                if (Object.prototype.hasOwnProperty.call(progressData, 'progress')) {
+                                        update.progress = progressData.progress;
+                                }
+                                if (typeof progressData.message === 'string' && progressData.message) {
+                                        update.message = progressData.message;
+                                }
+
+                                const statusCandidate = progressData.status || job.status;
+                                if (typeof statusCandidate === 'string' && statusCandidate) {
+                                        update.status = statusCandidate;
+                                }
+
+                                if (progressData.latest_image_url) {
+                                        update.previewUrl = progressData.latest_image_url;
+                                } else if (progressData.url) {
+                                        update.previewUrl = progressData.url;
+                                }
+
+                                if (Array.isArray(progressData.history) && progressData.history.length) {
+                                        update.previewHistory = progressData.history;
+                                }
+
+                                applyExternalProgressUpdate(update);
+
+                                if (update.jobId) {
+                                        currentJobId = update.jobId;
+                                }
+
+                                pollErrorCount = 0;
+
+                                const numericProgress = typeof update.progress === 'number'
+                                        ? update.progress
+                                        : Number(update.progress);
+
+                                if (Number.isFinite(numericProgress)) {
+                                        if (numericProgress >= 95) {
+                                                nextDelay = Math.floor(PROGRESS_POLL_INTERVAL * 1.5);
+                                        } else if (numericProgress <= 25) {
+                                                nextDelay = PROGRESS_POLL_FAST_INTERVAL;
+                                        } else {
+                                                nextDelay = PROGRESS_POLL_INTERVAL;
+                                        }
+                                } else {
+                                        nextDelay = PROGRESS_POLL_INTERVAL;
+                                }
+
+                                const statusValue = typeof update.status === 'string' ? update.status.toLowerCase() : '';
+                                if (payload.completed || statusValue === 'done' || statusValue === 'error') {
+                                        stopPolling();
+                                        return;
+                                }
+                        }
+                } catch (error) {
+                        console.warn(`${LOG_PREFIX} Erreur de récupération de la progression`, error);
+                        pollErrorCount += 1;
+
+                        if (pollErrorCount >= PROGRESS_POLL_MAX_ERRORS) {
+                                stopPolling();
+                                return;
+                        }
+
+                        nextDelay = PROGRESS_POLL_INTERVAL * Math.min(4, pollErrorCount + 1);
+                }
+
+                scheduleProgressPoll(nextDelay);
+        }
 
         function resetGenerationState() {
                 console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
@@ -271,8 +439,10 @@ jQuery(function($) {
                         jobFormat = update.format;
                 }
 
+                let updateStatus = null;
                 if (typeof update.status === 'string') {
-                        lastKnownStatus = update.status;
+                        updateStatus = update.status.toLowerCase();
+                        lastKnownStatus = updateStatus;
                 }
 
                 const normalizedProgress = clampProgress(update.progress);
@@ -295,15 +465,31 @@ jQuery(function($) {
                         taskId: currentTaskId,
                 };
 
-                if (update.status === 'done' || update.status === 'error') {
+                if (typeof update.previewUrl === 'string' && update.previewUrl) {
+                        statePayload.previewUrl = update.previewUrl;
+                }
+
+                if (Array.isArray(update.previewHistory) && update.previewHistory.length) {
+                        statePayload.previewHistory = update.previewHistory;
+                }
+
+                if (typeof update.previewAlt === 'string' && update.previewAlt) {
+                        statePayload.previewAlt = update.previewAlt;
+                }
+
+                if (updateStatus === 'done' || updateStatus === 'error') {
                         statePayload.completed = true;
                 }
 
                 persistProgressState(statePayload);
 
-                if (update.status === 'done') {
+                if (!statePayload.completed && !isPollingActive) {
+                        startPolling();
+                }
+
+                if (updateStatus === 'done') {
                         finalizeGeneration(false);
-                } else if (update.status === 'error') {
+                } else if (updateStatus === 'error') {
                         showAlert("La génération a échoué. Veuillez réessayer.");
                         finalizeGeneration(true);
                 }
@@ -423,6 +609,8 @@ jQuery(function($) {
                                 taskId: currentTaskId,
                                 status: lastKnownStatus,
                         });
+
+                        startPolling(true);
 
                         consumeCredit();
                 } catch (error) {
@@ -640,6 +828,7 @@ jQuery(function($) {
                 if (!isFinal) {
                         validateButton.disabled = true;
                         setButtonLoading(true);
+                        startPolling(true);
                 } else {
                         setButtonLoading(false);
                         validateButton.disabled = false;

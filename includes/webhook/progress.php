@@ -66,6 +66,10 @@ foreach ($requiredKeys as $key) {
 
 $jobId = (int) $data['jobId'];
 $progressValue = is_numeric($data['progress']) ? (float) $data['progress'] : sanitize_text_field($data['progress']);
+$hash = isset($data['mjHash']) ? sanitize_text_field($data['mjHash']) : '';
+$status = isset($data['status']) ? sanitize_text_field($data['status']) : '';
+$message = isset($data['message']) ? sanitize_text_field($data['message']) : '';
+$imageUrl = isset($data['url']) ? esc_url_raw($data['url']) : '';
 
 if ($jobId <= 0) {
     customiizer_log($logContext, "Identifiant de job invalide: {$jobId}");
@@ -120,6 +124,63 @@ if ($result === 0) {
         'error' => 'Job introuvable.',
     ]);
     exit;
+}
+
+$transientTtl = defined('HOUR_IN_SECONDS') ? (int) (HOUR_IN_SECONDS * 2) : 7200;
+$transientKeyByJob = sprintf('customiizer_progress_job_%d', $jobId);
+$transientKeyByHash = $hash !== '' ? sprintf('customiizer_progress_hash_%s', $hash) : null;
+$existingTransient = get_transient($transientKeyByJob);
+
+if (!is_array($existingTransient)) {
+    $existingTransient = [];
+}
+
+$history = isset($existingTransient['history']) && is_array($existingTransient['history'])
+    ? $existingTransient['history']
+    : [];
+
+if ($imageUrl !== '') {
+    $alreadyTracked = false;
+    foreach ($history as $entry) {
+        if (isset($entry['url']) && $entry['url'] === $imageUrl) {
+            $alreadyTracked = true;
+            break;
+        }
+    }
+
+    if (!$alreadyTracked) {
+        $history[] = [
+            'url' => $imageUrl,
+            'progress' => $progressValue,
+            'timestamp' => time(),
+        ];
+
+        if (count($history) > 10) {
+            $history = array_slice($history, -10);
+        }
+    }
+}
+
+$latestImageUrl = $imageUrl !== ''
+    ? $imageUrl
+    : (isset($existingTransient['latest_image_url']) ? esc_url_raw($existingTransient['latest_image_url']) : '');
+
+$transientPayload = [
+    'job_id' => $jobId,
+    'hash' => $hash,
+    'progress' => $progressValue,
+    'status' => $status !== '' ? $status : ($existingTransient['status'] ?? ''),
+    'message' => $message !== '' ? $message : ($existingTransient['message'] ?? ''),
+    'url' => $imageUrl,
+    'latest_image_url' => $latestImageUrl,
+    'history' => $history,
+    'updated_at' => time(),
+];
+
+set_transient($transientKeyByJob, $transientPayload, $transientTtl);
+
+if ($transientKeyByHash) {
+    set_transient($transientKeyByHash, $transientPayload, $transientTtl);
 }
 
 header('Content-Type: application/json');
