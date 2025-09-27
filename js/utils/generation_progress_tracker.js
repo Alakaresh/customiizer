@@ -4,6 +4,7 @@
     const LOG_PREFIX = '[Customiizer][ProgressTracker]';
     const AJAX_URL = typeof window.ajaxurl === 'string' ? window.ajaxurl : '/wp-admin/admin-ajax.php';
     const FINAL_STATUSES = new Set(['done', 'error']);
+    const POLL_INTERVAL_MS = 1000;
 
     let modal = null;
     let title = null;
@@ -80,7 +81,7 @@
         }
 
         if (typeof normalized.message !== 'string') {
-            normalized.message = 'Génération en cours...';
+            normalized.message = '';
         }
 
         if (typeof normalized.status !== 'string') {
@@ -109,15 +110,24 @@
             loadingBar.style.width = `${state.progress}%`;
         }
         if (loadingText) {
-            loadingText.textContent = state.message;
+            loadingText.textContent = '';
         }
-        if (title && state.title) {
-            title.textContent = state.title;
+        if (title) {
+            title.textContent = '';
         }
     }
 
     function shouldAutoHide(state) {
-        return FINAL_STATUSES.has(state.status) || state.completed === true;
+        if (!state) {
+            return true;
+        }
+        if (state.completed === true) {
+            return true;
+        }
+        if (Number.isFinite(state.progress) && state.progress >= 100) {
+            return true;
+        }
+        return FINAL_STATUSES.has(state.status);
     }
 
     function scheduleAutoHide() {
@@ -140,7 +150,7 @@
         pollTimeoutId = window.setTimeout(async () => {
             pollTimeoutId = null;
             await pollJobStatus();
-        }, 1500);
+        }, POLL_INTERVAL_MS);
     }
 
     async function pollJobStatus() {
@@ -171,15 +181,14 @@
 
             const job = payload.data;
             const progress = clamp(job.progress);
-            const status = typeof job.status === 'string' ? job.status : currentState.status;
-            const message = buildMessage(status, progress, job);
+            const status = Number.isFinite(progress) && progress >= 100 ? 'done' : 'processing';
 
             const nextState = {
                 ...currentState,
                 jobId: job.jobId ?? currentState.jobId ?? null,
                 status,
                 progress,
-                message,
+                message: '',
             };
 
             if (shouldAutoHide(nextState)) {
@@ -192,22 +201,6 @@
             console.warn(`${LOG_PREFIX} Impossible de récupérer le statut`, error);
             startPolling();
         }
-    }
-
-    function buildMessage(status, progress, job) {
-        if (status === 'done') {
-            return "Génération terminée !";
-        }
-        if (status === 'error') {
-            return "La génération a échoué.";
-        }
-        if (typeof job?.progress === 'string' && job.progress.includes('%')) {
-            return `Progression : ${job.progress}`;
-        }
-        if (Number.isFinite(progress)) {
-            return `Progression : ${Math.round(progress)}%`;
-        }
-        return 'Notre IA prépare votre création...';
     }
 
     function stopPolling() {
