@@ -25,6 +25,45 @@ jQuery(function($) {
         const alertBox = document.getElementById('alert-box');
         const placeholderDiv = document.getElementById('placeholder');
         const savedPromptText = localStorage.getItem('savedPromptText');
+        const PLACEHOLDER_IMAGE_SRC = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
+
+        function getPreviewImageElement() {
+                const existing = document.getElementById('generation-preview-image');
+                if (existing) {
+                        return existing;
+                }
+
+                const container = document.getElementById('content-images');
+                if (!container) {
+                        return null;
+                }
+
+                const createdImage = document.createElement('img');
+                createdImage.id = 'generation-preview-image';
+                createdImage.className = 'centered-image';
+                createdImage.src = PLACEHOLDER_IMAGE_SRC;
+                createdImage.alt = "Image d'attente";
+
+                container.innerHTML = '';
+                container.appendChild(createdImage);
+
+                return createdImage;
+        }
+
+        function clearPreviewImageDatasets(imageElement) {
+                if (!imageElement) {
+                        return;
+                }
+
+                imageElement.removeAttribute('data-job-id');
+                imageElement.removeAttribute('data-task-id');
+                imageElement.removeAttribute('data-format-image');
+                imageElement.removeAttribute('data-prompt');
+
+                if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
+                        delete imageElement.dataset.livePreviewUrl;
+                }
+        }
 
         if (!validateButton || !customTextInput) {
                 console.warn(`${LOG_PREFIX} Éléments requis introuvables, annulation du script`);
@@ -77,11 +116,6 @@ jQuery(function($) {
                 lastKnownProgress = null;
                 prompt = '';
                 jobFormat = '';
-
-                const container = document.getElementById('content-images');
-                if (container) {
-                        container.innerHTML = '';
-                }
 
                 updateImageGrid();
         }
@@ -217,43 +251,29 @@ jQuery(function($) {
         }
 
         function renderGeneratedImages(images) {
-                const container = document.getElementById('content-images');
-                if (container) {
-                        container.innerHTML = '';
-                }
-
-                const gridElement = document.getElementById('image-grid');
-                if (gridElement) {
-                        gridElement.classList.remove('hide');
-                }
-
-                const gridImages = document.querySelectorAll('.image-grid img');
-
+                const previewImage = getPreviewImageElement();
                 persistProgressState({ imageUrl: '' });
 
-                if (gridImages.length) {
-                        gridImages.forEach((imageElement, index) => {
-                                const imageData = images[index];
+                if (!previewImage) {
+                        console.warn(`${LOG_PREFIX} Impossible de rendre l'image finale : élément introuvable.`);
+                        return;
+                }
 
-                                if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
-                                        delete imageElement.dataset.livePreviewUrl;
-                                }
+                clearPreviewImageDatasets(previewImage);
 
-                                if (imageData && imageData.url) {
-                                        imageElement.src = imageData.url;
-                                        imageElement.alt = imageData.prompt || 'Image générée';
-                                        imageElement.dataset.jobId = currentJobId || '';
-                                        imageElement.dataset.taskId = currentTaskId || '';
-                                        imageElement.dataset.formatImage = imageData.format || '';
-                                        imageElement.dataset.prompt = imageData.prompt || prompt;
-                                        imageElement.classList.add('preview-enlarge');
-                                } else {
-                                        imageElement.src = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
-                                        imageElement.alt = "En attente d'image";
-                                        imageElement.removeAttribute('data-job-id');
-                                        imageElement.removeAttribute('data-task-id');
-                                }
-                        });
+                const firstImage = Array.isArray(images) ? images[0] : null;
+                if (firstImage && firstImage.url) {
+                        previewImage.src = firstImage.url;
+                        previewImage.alt = firstImage.prompt || 'Image générée';
+                        previewImage.dataset.jobId = currentJobId || '';
+                        previewImage.dataset.taskId = currentTaskId || '';
+                        previewImage.dataset.formatImage = firstImage.format || '';
+                        previewImage.dataset.prompt = firstImage.prompt || prompt;
+                        previewImage.classList.add('preview-enlarge');
+                } else {
+                        previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                        previewImage.alt = "En attente d'image";
+                        previewImage.classList.remove('preview-enlarge');
                 }
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
@@ -264,26 +284,24 @@ jQuery(function($) {
                         return;
                 }
 
-                const gridImages = document.querySelectorAll('.image-grid img');
-                if (!gridImages.length) {
+                const previewImage = getPreviewImageElement();
+                if (!previewImage) {
                         return;
                 }
 
-                const primaryImage = gridImages[0];
-                if (!primaryImage) {
+                if (previewImage.dataset && previewImage.dataset.livePreviewUrl === imageUrl) {
                         return;
                 }
 
-                if (primaryImage.dataset && primaryImage.dataset.livePreviewUrl === imageUrl) {
-                        return;
+                clearPreviewImageDatasets(previewImage);
+
+                if (previewImage.dataset) {
+                        previewImage.dataset.livePreviewUrl = imageUrl;
                 }
 
-                if (primaryImage.dataset) {
-                        primaryImage.dataset.livePreviewUrl = imageUrl;
-                }
-
-                primaryImage.src = imageUrl;
-                primaryImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
+                previewImage.classList.remove('preview-enlarge');
+                previewImage.src = imageUrl;
+                previewImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
         }
 
         async function consumeCredit() {
@@ -430,14 +448,15 @@ jQuery(function($) {
         }
 
         function updateImageGrid() {
-                const gridImages = document.querySelectorAll('.image-grid img');
-                gridImages.forEach(image => {
-                        image.src = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
-                        image.alt = "Image d'attente";
-                        if (image.dataset && image.dataset.livePreviewUrl) {
-                                delete image.dataset.livePreviewUrl;
-                        }
-                });
+                const previewImage = getPreviewImageElement();
+                if (!previewImage) {
+                        return;
+                }
+
+                clearPreviewImageDatasets(previewImage);
+                previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                previewImage.alt = "Image d'attente";
+                previewImage.classList.remove('preview-enlarge');
         }
 
         function resetLoadingState() {

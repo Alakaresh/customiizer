@@ -10,10 +10,10 @@
 -->
 
 <div class="content-images" id="content-images">
-        <div id="image-grid" class="image-grid">
-                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0">
-                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1">
-		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 2">
-		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 3">
-	</div>
+        <img
+                id="generation-preview-image"
+                class="centered-image"
+                src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png"
+                alt="Image d'attente"
+        />
 </div>
