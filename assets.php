@@ -39,16 +39,41 @@ function customiizer_enqueue_customize_assets() {
         wp_enqueue_script('jquery-migrate');
 
         $current_user = wp_get_current_user();
+        $site_url = get_site_url();
+        $parsed_site_url = wp_parse_url($site_url);
+        $scheme = isset($parsed_site_url['scheme']) ? $parsed_site_url['scheme'] : 'https';
+        $host = isset($parsed_site_url['host']) ? $parsed_site_url['host'] : 'localhost';
+        $default_ws_scheme = $scheme === 'https' ? 'wss' : 'ws';
+        $worker_ws_url = '';
+
+        if (defined('CUSTOMIIZER_WORKER_WS_URL') && CUSTOMIIZER_WORKER_WS_URL) {
+                $worker_ws_url = CUSTOMIIZER_WORKER_WS_URL;
+        } else {
+                $worker_host = defined('CUSTOMIIZER_WORKER_WS_HOST') && CUSTOMIIZER_WORKER_WS_HOST ? CUSTOMIIZER_WORKER_WS_HOST : $host;
+                $worker_port = defined('CUSTOMIIZER_WORKER_WS_PORT') && CUSTOMIIZER_WORKER_WS_PORT ? CUSTOMIIZER_WORKER_WS_PORT : 3000;
+
+                if ($worker_host) {
+                        $worker_ws_url = sprintf('%s://%s', $default_ws_scheme, $worker_host);
+
+                        if ($worker_port && strpos($worker_host, ':') === false) {
+                                $worker_ws_url .= ':' . $worker_port;
+                        }
+                }
+        }
+
         $inline_js    = sprintf(
                 "var baseUrl = %s;\n" .
                 "var ajaxurl = baseUrl + '/wp-admin/admin-ajax.php';\n" .
                 "var userIsLoggedIn = %s;\n" .
-                "var currentUser = {ID: %d, user_nicename: %s, display_name: %s};",
-                json_encode(get_site_url()),
+                "var currentUser = {ID: %d, user_nicename: %s, display_name: %s};\n" .
+                "window.customiizerWorker = Object.assign({}, window.customiizerWorker || {}, { websocketUrl: %s, websocketEnabled: %s });",
+                json_encode($site_url),
                 is_user_logged_in() ? 'true' : 'false',
                 $current_user->ID,
                 json_encode($current_user->user_nicename),
-                json_encode($current_user->display_name)
+                json_encode($current_user->display_name),
+                $worker_ws_url !== '' ? json_encode($worker_ws_url) : 'null',
+                $worker_ws_url !== '' ? 'true' : 'false'
         );
 
         wp_add_inline_script('jquery', $inline_js, 'before');
@@ -97,7 +122,8 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
        wp_enqueue_script('referral-script', get_stylesheet_directory_uri() . '/js/referral/referral.js', [], $ver, true);
        wp_enqueue_script('mission-indicator', get_stylesheet_directory_uri() . '/js/mission_indicator.js', ['jquery'], $ver, true);
-       wp_enqueue_script('generation-tracker', get_stylesheet_directory_uri() . '/js/utils/generation_tracker.js', [], $ver, true);
+       wp_enqueue_script('generation-socket', get_stylesheet_directory_uri() . '/js/utils/generation_socket.js', [], $ver, true);
+       wp_enqueue_script('generation-tracker', get_stylesheet_directory_uri() . '/js/utils/generation_tracker.js', ['generation-socket'], $ver, true);
 
         // Mark the preload-products script as async on all pages except the shop
         add_filter('script_loader_tag', function($tag, $handle) {
@@ -144,7 +170,7 @@ function customiizer_enqueue_customize_assets() {
 		// --- JS internes ---
                 wp_enqueue_script('generate-ratio', get_stylesheet_directory_uri() . '/js/generate/show_ratio.js', ['jquery'], $ver, true);
                 wp_enqueue_script('generate-images', get_stylesheet_directory_uri() . '/js/generate/show_images.js', ['jquery'], $ver, true);
-                wp_enqueue_script('generate-main', get_stylesheet_directory_uri() . '/js/generate/generate.js', ['jquery'], $ver, true);
+                wp_enqueue_script('generate-main', get_stylesheet_directory_uri() . '/js/generate/generate.js', ['jquery', 'generation-socket'], $ver, true);
                 wp_enqueue_script('generate-screen', get_stylesheet_directory_uri() . '/js/generate/screen.js', ['jquery'], $ver, true);
                 wp_enqueue_script('generate-tutorial', get_stylesheet_directory_uri() . '/js/generate/tutorial.js', ['jquery'], $ver, true);
 
