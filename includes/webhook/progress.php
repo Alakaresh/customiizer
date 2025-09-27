@@ -82,15 +82,46 @@ global $wpdb;
 $jobsTable = 'WPC_generation_jobs';
 $now = current_time('mysql');
 
+$job = $wpdb->get_row(
+    $wpdb->prepare(
+        "SELECT status FROM {$jobsTable} WHERE id = %d",
+        $jobId
+    ),
+    ARRAY_A
+);
+
+if (!$job) {
+    customiizer_log($logContext, "Aucun job trouvé pour l'identifiant {$jobId}");
+    http_response_code(404);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'error' => 'Job introuvable.',
+    ]);
+    exit;
+}
+
+$boundedProgress = $progressValue;
+if (is_float($progressValue)) {
+    $boundedProgress = max(0.0, min(100.0, round($progressValue, 2)));
+}
+
 $updateData = [
-    'progress' => $progressValue,
+    'progress' => $boundedProgress,
     'updated_at' => $now,
 ];
 
 $updateFormats = [
-    is_float($progressValue) ? '%f' : '%s',
+    is_float($boundedProgress) ? '%f' : '%s',
     '%s',
 ];
+
+$statusAfterUpdate = $job['status'];
+if ('pending' === $job['status']) {
+    $statusAfterUpdate = 'processing';
+    $updateData['status'] = $statusAfterUpdate;
+    $updateFormats[] = '%s';
+}
 
 $result = $wpdb->update(
     $jobsTable,
@@ -111,22 +142,12 @@ if ($result === false) {
     exit;
 }
 
-if ($result === 0) {
-    customiizer_log($logContext, "Aucun job trouvé pour l'identifiant {$jobId}");
-    http_response_code(404);
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => false,
-        'error' => 'Job introuvable.',
-    ]);
-    exit;
-}
-
 header('Content-Type: application/json');
 echo json_encode([
     'success' => true,
     'jobId' => $jobId,
-    'progress' => $progressValue,
+    'progress' => $boundedProgress,
+    'status' => $statusAfterUpdate,
 ]);
-customiizer_log($logContext, sprintf('Progression mise à jour pour job %d : %s', $jobId, (string) $progressValue));
+customiizer_log($logContext, sprintf('Progression mise à jour pour job %d : %s', $jobId, (string) $boundedProgress));
 exit;

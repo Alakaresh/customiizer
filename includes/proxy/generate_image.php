@@ -149,6 +149,8 @@ customiizer_log('generate_image', sprintf('Job %s (%d) créé pour utilisateur %
 echo wp_json_encode([
     'success' => true,
     'taskId' => $taskId,
-    'status' => 'pending'
+    'jobId' => $jobId,
+    'status' => 'pending',
+    'progress' => 0,
 ]);
 exit;
