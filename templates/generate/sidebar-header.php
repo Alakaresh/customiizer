@@ -29,6 +29,6 @@
     </div>
 
     <!-- Zone d'alerte pour les messages d'erreur ou autres alertes -->
-    <div id="alert-box" style="display: none; color: red; margin-bottom: 10px;"></div>
+    <div id="alert-box" role="status" aria-live="polite"></div>
 
 </div>
