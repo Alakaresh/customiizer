@@ -13,6 +13,8 @@ let prompt = '';
 let jobFormat = '';
 let humorIntervalId = null;
 let loadingToggled = false;
+let lastKnownProgress = null;
+let completionAnimationTriggered = false;
 
 jQuery(function($) {
         const validateButton = document.getElementById('validate-button');
@@ -68,6 +70,7 @@ jQuery(function($) {
                 currentTaskId = null;
                 currentJobId = null;
                 lastKnownStatus = null;
+                lastKnownProgress = null;
                 prompt = '';
                 jobFormat = '';
 
@@ -101,8 +104,10 @@ jQuery(function($) {
 
                 if (hasError) {
                         updateLoading(0);
+                        lastKnownProgress = 0;
                 } else {
                         updateLoading(100);
+                        lastKnownProgress = 100;
                 }
 
                 validateButton.disabled = false;
@@ -160,17 +165,33 @@ jQuery(function($) {
                         console.log(`${LOG_PREFIX} Statut mis à jour`, job);
                 }
 
+                const progressValue = clampProgress(job.progress);
+                const hasProgressUpdate = progressValue !== null;
+
+                if (hasProgressUpdate) {
+                        lastKnownProgress = progressValue;
+                        updateLoading(progressValue);
+
+                        if (job.status !== 'done' && job.status !== 'error') {
+                                updateLoadingText(`Progression : ${Math.round(progressValue)}%`);
+                        }
+                }
+
                 lastKnownStatus = job.status;
 
                 switch (job.status) {
                         case 'pending':
-                                updateLoading(15);
-                                updateLoadingText("Job enregistré, attente du worker...");
+                                if (!hasProgressUpdate) {
+                                        updateLoading(15);
+                                        updateLoadingText("Job enregistré, attente du worker...");
+                                }
                                 scheduleNextPoll();
                                 break;
                         case 'processing':
-                                updateLoading(60);
-                                updateLoadingText('Notre IA travaille sur votre création...');
+                                if (!hasProgressUpdate) {
+                                        updateLoading(60);
+                                        updateLoadingText('Notre IA travaille sur votre création...');
+                                }
                                 scheduleNextPoll();
                                 break;
                         case 'done':
@@ -383,6 +404,8 @@ jQuery(function($) {
                         loadingText.textContent = 'Notre IA est en pleine méditation créative...';
                 }
                 loadingToggled = false;
+                lastKnownProgress = null;
+                completionAnimationTriggered = false;
         }
 
         function toggleLoading() {
@@ -460,19 +483,27 @@ jQuery(function($) {
                         return;
                 }
 
-                loadingBar.style.width = `${percent}%`;
+                const normalizedPercent = clampProgress(percent);
+                const percentValue = normalizedPercent === null ? 0 : normalizedPercent;
 
-                if (percent > 0) {
-                        loadingText.textContent = `Chargement : ${percent}%`;
+                loadingBar.style.width = `${percentValue}%`;
+
+                if (percentValue > 0) {
+                        loadingText.textContent = `Chargement : ${Math.round(percentValue)}%`;
                 }
 
-                if (percent > 0 && humorIntervalId && percent < 100) {
+                if (percentValue > 0 && humorIntervalId && percentValue < 100) {
                         clearInterval(humorIntervalId);
                         humorIntervalId = null;
                 }
 
-                if (percent === 100) {
-                        animateCompletionWithHumor();
+                if (percentValue === 100) {
+                        if (!completionAnimationTriggered) {
+                                animateCompletionWithHumor();
+                                completionAnimationTriggered = true;
+                        }
+                } else {
+                        completionAnimationTriggered = false;
                 }
         }
 
@@ -481,5 +512,30 @@ jQuery(function($) {
                 if (loadingText) {
                         loadingText.textContent = text;
                 }
+        }
+
+        function clampProgress(value) {
+                if (typeof value === 'undefined' || value === null || value === '') {
+                        return null;
+                }
+
+                const sanitizedValue = typeof value === 'string'
+                        ? value.replace(/%/g, '').trim()
+                        : value;
+
+                const numericValue = Number(sanitizedValue);
+                if (!Number.isFinite(numericValue)) {
+                        return null;
+                }
+
+                if (numericValue < 0) {
+                        return 0;
+                }
+
+                if (numericValue > 100) {
+                        return 100;
+                }
+
+                return numericValue;
         }
 });
