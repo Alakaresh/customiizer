@@ -30,7 +30,7 @@ function check_image_status() {
 
     $job = $wpdb->get_row(
         $wpdb->prepare(
-            "SELECT id, status, prompt, format_image, progress, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
+            "SELECT id, status, prompt, format_image, progress, image_url, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
             $taskId
         ),
         ARRAY_A
@@ -57,6 +57,7 @@ function check_image_status() {
         'progress' => $progressValue,
         'createdAt' => $job['created_at'],
         'updatedAt' => $job['updated_at'],
+        'imageUrl' => isset($job['image_url']) ? $job['image_url'] : '',
     ];
 
     if ($job['status'] === 'done') {

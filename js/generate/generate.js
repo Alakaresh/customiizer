@@ -201,6 +201,12 @@ jQuery(function($) {
                         message: '',
                 });
 
+                const livePreviewUrl = typeof job.imageUrl === 'string' ? job.imageUrl : '';
+                if (livePreviewUrl) {
+                        updateLivePreview(livePreviewUrl);
+                        persistProgressState({ imageUrl: livePreviewUrl });
+                }
+
                 if (progressValue >= 100) {
                         renderGeneratedImages(job.images || []);
                         finalizeGeneration(false);
@@ -223,9 +229,15 @@ jQuery(function($) {
 
                 const gridImages = document.querySelectorAll('.image-grid img');
 
+                persistProgressState({ imageUrl: '' });
+
                 if (gridImages.length) {
                         gridImages.forEach((imageElement, index) => {
                                 const imageData = images[index];
+
+                                if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
+                                        delete imageElement.dataset.livePreviewUrl;
+                                }
 
                                 if (imageData && imageData.url) {
                                         imageElement.src = imageData.url;
@@ -245,6 +257,33 @@ jQuery(function($) {
                 }
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
+        }
+
+        function updateLivePreview(imageUrl) {
+                if (!imageUrl) {
+                        return;
+                }
+
+                const gridImages = document.querySelectorAll('.image-grid img');
+                if (!gridImages.length) {
+                        return;
+                }
+
+                const primaryImage = gridImages[0];
+                if (!primaryImage) {
+                        return;
+                }
+
+                if (primaryImage.dataset && primaryImage.dataset.livePreviewUrl === imageUrl) {
+                        return;
+                }
+
+                if (primaryImage.dataset) {
+                        primaryImage.dataset.livePreviewUrl = imageUrl;
+                }
+
+                primaryImage.src = imageUrl;
+                primaryImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
         }
 
         async function consumeCredit() {
@@ -395,6 +434,9 @@ jQuery(function($) {
                 gridImages.forEach(image => {
                         image.src = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
                         image.alt = "Image d'attente";
+                        if (image.dataset && image.dataset.livePreviewUrl) {
+                                delete image.dataset.livePreviewUrl;
+                        }
                 });
         }
 
@@ -505,6 +547,10 @@ jQuery(function($) {
 
                 if (typeof storedState.message === 'string' && storedState.message) {
                         updateLoadingText(storedState.message);
+                }
+
+                if (typeof storedState.imageUrl === 'string' && storedState.imageUrl) {
+                        updateLivePreview(storedState.imageUrl);
                 }
 
                 const status = storedState.status;

@@ -191,6 +191,10 @@
                 message: '',
             };
 
+            if (typeof job.imageUrl === 'string' && job.imageUrl) {
+                nextState.imageUrl = job.imageUrl;
+            }
+
             if (shouldAutoHide(nextState)) {
                 nextState.completed = true;
             }
