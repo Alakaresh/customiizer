@@ -10,6 +10,20 @@ $logContext = 'webhook_progress';
 
 require_once dirname(__FILE__) . '/../../utilities.php';
 
+$wp_load_path = dirname(__FILE__) . '/../../../../../wp-load.php';
+if (!file_exists($wp_load_path)) {
+    customiizer_log($logContext, 'Erreur : wp-load.php introuvable.');
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'error' => 'wp-load.php introuvable.',
+    ]);
+    exit;
+}
+
+require_once $wp_load_path;
+
 $inputJSON = file_get_contents('php://input');
 if ($inputJSON === false) {
     customiizer_log($logContext, "Erreur : Impossible de lire l'entrée JSON.");
@@ -49,20 +63,6 @@ foreach ($requiredKeys as $key) {
         exit;
     }
 }
-
-$wp_load_path = dirname(__FILE__, 5) . '/wp-load.php';
-if (!file_exists($wp_load_path)) {
-    customiizer_log($logContext, 'Erreur : wp-load.php introuvable.');
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => false,
-        'error' => 'wp-load.php introuvable.',
-    ]);
-    exit;
-}
-
-require_once $wp_load_path;
 
 $jobId = (int) $data['jobId'];
 $progressValue = is_numeric($data['progress']) ? (float) $data['progress'] : sanitize_text_field($data['progress']);
