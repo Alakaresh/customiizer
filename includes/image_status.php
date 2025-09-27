@@ -30,7 +30,7 @@ function check_image_status() {
 
     $job = $wpdb->get_row(
         $wpdb->prepare(
-            "SELECT id, status, prompt, format_image, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
+            "SELECT id, status, prompt, format_image, progress, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
             $taskId
         ),
         ARRAY_A
@@ -41,12 +41,20 @@ function check_image_status() {
         wp_send_json_error(['message' => 'Aucun job trouvé']);
     }
 
+    $rawProgress = $job['progress'] ?? null;
+    if (is_string($rawProgress)) {
+        $rawProgress = trim(str_replace('%', '', $rawProgress));
+    }
+
+    $progressValue = is_numeric($rawProgress) ? (float) $rawProgress : null;
+
     $response = [
         'taskId' => $taskId,
         'jobId' => (int) $job['id'],
         'status' => $job['status'],
         'prompt' => $job['prompt'],
         'format' => $job['format_image'],
+        'progress' => $progressValue,
         'createdAt' => $job['created_at'],
         'updatedAt' => $job['updated_at'],
     ];

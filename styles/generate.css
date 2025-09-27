@@ -467,19 +467,40 @@
     box-sizing: border-box;
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
+.generation-progress-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(5, 5, 5, 0.82);
+    z-index: 9999;
+}
+
+.generation-progress-dialog {
+    width: clamp(260px, 36vw, 440px);
+}
+
+.generation-progress-title {
+    margin: 0 0 16px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    text-align: center;
+}
+
 .loading-container {
-    position: absolute;
-    width: clamp(260px, 32vw, 420px);
+    width: 100%;
     height: auto;
-    z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     gap: 12px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     background: rgba(14, 14, 14, 0.95);
     padding: 24px;
     border-radius: 24px;
