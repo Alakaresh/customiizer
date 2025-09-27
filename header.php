@@ -148,6 +148,7 @@ if ( $user_logged_in ) {
 get_template_part('templates/modal', 'login');
 get_template_part('templates/modal', 'user');
 get_template_part('templates/modal', 'cart');
+get_template_part('templates/modal', 'generation-progress');
 ?>
                        <div id="mission-achievement">
                                <img class="mission-icon" alt="Logo">
