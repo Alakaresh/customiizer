@@ -1,69 +1,73 @@
 .generation-progress-modal {
     position: fixed;
-    right: clamp(16px, 3vw, 32px);
-    bottom: clamp(16px, 3vw, 32px);
+    inset: 0;
+    z-index: 1100;
     display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    max-width: min(360px, 90vw);
-    pointer-events: none;
-    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.65);
+    transition: opacity 0.3s ease;
 }
 
 .generation-progress-modal.hide {
-    display: none !important;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .generation-progress-dialog {
-    pointer-events: auto;
-    width: min(360px, 90vw);
+    width: min(420px, 90vw);
+    padding: 32px 28px;
+    background-color: #111827;
+    border-radius: 18px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    text-align: center;
+    color: #f9fafb;
 }
 
 .generation-progress-title {
-    margin: 0 0 12px;
-    color: rgba(255, 255, 255, 0.86);
-    font-size: clamp(1rem, 1.8vw, 1.25rem);
+    margin: 0 0 18px;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .loading-container {
-    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    background: rgba(14, 14, 14, 0.95);
-    padding: 18px 20px;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.45);
+    gap: 16px;
 }
 
 .loading-bar-border {
     width: 100%;
     height: 12px;
-    background-color: rgba(32, 32, 32, 0.92);
-    border-radius: 999px;
-    padding: 3px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    border: 1px solid rgba(43, 216, 121, 0.4);
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.16);
+    overflow: hidden;
 }
 
 .loading-bar {
-    width: 0%;
+    width: 0;
     height: 100%;
-    background: linear-gradient(135deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
-    transition: width 0.5s ease-in-out;
-    border-radius: 999px;
+    background: linear-gradient(90deg, #38bdf8, #6366f1);
+    border-radius: inherit;
+    transition: width 0.3s ease;
 }
 
 .loading-text {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.85);
-    text-align: left;
-    width: 100%;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: rgba(249, 250, 251, 0.9);
 }
 
-.hide {
-    display: none !important;
+@media (max-width: 480px) {
+    .generation-progress-dialog {
+        padding: 26px 22px;
+    }
+
+    .generation-progress-title {
+        font-size: 1.25rem;
+    }
+
+    .loading-text {
+        font-size: 0.9rem;
+    }
 }
