@@ -55,7 +55,7 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("/wp-content/themes/customiizer/assets/img/fond_shop.png") center/contain no-repeat;
+    background: url("https://customiizer.blob.core.windows.net/assets/SiteDesign/backgrounds/fond_shop.png") center/contain no-repeat;
     background-size: contain; /* ou cover si tu veux qu'il prenne tout */
     z-index: 0; /* passe derrière le contenu */
     pointer-events: none; /* ne bloque pas les clics */
