@@ -70,7 +70,6 @@ function customiizer_log($context, $message = '') {
     file_put_contents($log_file, $line, FILE_APPEND);
 }
 
-
 /**
  * Get the frontend version defined in version.json for cache busting.
  *
