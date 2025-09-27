@@ -8,18 +8,28 @@ if (defined('WP_DEBUG') && WP_DEBUG) {
 define('WP_USE_THEMES', false);
 
 $logContext = 'webhook_generation_callback';
+$utilitiesPath = dirname(__FILE__) . '/../../utilities.php';
+if (file_exists($utilitiesPath)) {
+    require_once $utilitiesPath;
+}
+
+if (!function_exists('customiizer_log')) {
+    function customiizer_log($context, $message = '') {
+        error_log('[' . $context . '] ' . $message);
+    }
+}
+
 $wpLoadPath = dirname(__FILE__) . '/../../../../../wp-load.php';
 
 if (file_exists($wpLoadPath)) {
     require_once $wpLoadPath;
 } else {
-    error_log('[' . $logContext . "] wp-load.php introuvable");
+    customiizer_log($logContext, 'wp-load.php introuvable');
     http_response_code(500);
     echo wp_json_encode(['success' => false, 'message' => 'wp-load.php not found']);
     exit;
 }
 
-require_once dirname(__FILE__) . '/../../utilities.php';
 require_once dirname(__FILE__) . '/../image_status.php';
 
 function customiizer_normalize_worker_status($status)
@@ -61,6 +71,15 @@ if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
     echo wp_json_encode(['success' => false, 'message' => 'JSON mal formé.']);
     exit;
 }
+
+$logSummary = sprintf(
+    'Webhook reçu : jobId=%s, hash=%s, status=%s, progress=%s',
+    isset($payload['jobId']) ? $payload['jobId'] : 'null',
+    isset($payload['hash']) ? $payload['hash'] : 'null',
+    isset($payload['status']) ? $payload['status'] : 'null',
+    isset($payload['progress']) ? $payload['progress'] : 'null'
+);
+customiizer_log($logContext, $logSummary);
 
 $jobId = isset($payload['jobId']) ? absint($payload['jobId']) : 0;
 $hash = isset($payload['hash']) ? sanitize_text_field($payload['hash']) : '';
@@ -151,12 +170,23 @@ $updateData = [
     'updated_at' => $now,
 ];
 
-$wpdb->update(
+$updateResult = $wpdb->update(
     $jobsTable,
     $updateData,
     ['id' => (int) $job['id']],
     ['%s', '%s'],
     ['%d']
+);
+
+customiizer_log(
+    $logContext,
+    sprintf(
+        'Mise à jour job=%d → status=%s (progress=%s) résultat=%s',
+        (int) $job['id'],
+        $dbStatus,
+        $progressValue !== null ? $progressValue : 'null',
+        $updateResult === false ? 'erreur' : 'ok'
+    )
 );
 
 $imageUrl = isset($result['url']) ? $result['url'] : '';
@@ -240,6 +270,15 @@ $progressPayload = [
 
 $expiration = ($dbStatus === 'done' || $dbStatus === 'error') ? 30 * MINUTE_IN_SECONDS : 2 * HOUR_IN_SECONDS;
 customiizer_store_job_progress($job['task_id'], $progressPayload, $expiration);
+
+customiizer_log(
+    $logContext,
+    sprintf(
+        'Progression enregistrée pour task=%s (expiration=%ds)',
+        $job['task_id'],
+        (int) $expiration
+    )
+);
 
 if (($dbStatus === 'done' || $dbStatus === 'error') && function_exists('wp_schedule_single_event')) {
     // Garder les informations pendant quelques minutes pour permettre aux clients de se synchroniser

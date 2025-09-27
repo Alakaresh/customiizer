@@ -45,19 +45,69 @@ function customiizer_enqueue_customize_assets() {
         $host = isset($parsed_site_url['host']) ? $parsed_site_url['host'] : 'localhost';
         $default_ws_scheme = $scheme === 'https' ? 'wss' : 'ws';
         $worker_ws_url = '';
+        $worker_log_context = 'worker_ws';
+
+        customiizer_log($worker_log_context, 'Detected site URL: ' . $site_url);
+        customiizer_log($worker_log_context, 'Parsed scheme: ' . $scheme . ' | host: ' . $host);
 
         if (defined('CUSTOMIIZER_WORKER_WS_URL') && CUSTOMIIZER_WORKER_WS_URL) {
                 $worker_ws_url = CUSTOMIIZER_WORKER_WS_URL;
+                customiizer_log($worker_log_context, 'Using explicit CUSTOMIIZER_WORKER_WS_URL: ' . $worker_ws_url);
         } else {
                 $worker_host = defined('CUSTOMIIZER_WORKER_WS_HOST') && CUSTOMIIZER_WORKER_WS_HOST ? CUSTOMIIZER_WORKER_WS_HOST : $host;
-                $worker_port = defined('CUSTOMIIZER_WORKER_WS_PORT') && CUSTOMIIZER_WORKER_WS_PORT ? CUSTOMIIZER_WORKER_WS_PORT : 3000;
+                $worker_port = null;
+
+                customiizer_log($worker_log_context, 'Initial worker host: ' . $worker_host);
+                if (defined('CUSTOMIIZER_WORKER_WS_HOST') && CUSTOMIIZER_WORKER_WS_HOST) {
+                        customiizer_log($worker_log_context, 'CUSTOMIIZER_WORKER_WS_HOST constant detected.');
+                }
+
+                if (defined('CUSTOMIIZER_WORKER_WS_PORT') && CUSTOMIIZER_WORKER_WS_PORT) {
+                        $worker_port = CUSTOMIIZER_WORKER_WS_PORT;
+                        customiizer_log($worker_log_context, 'Using explicit CUSTOMIIZER_WORKER_WS_PORT: ' . $worker_port);
+                } elseif ($worker_host) {
+                        $is_local_host = in_array($worker_host, ['localhost', '127.0.0.1', '0.0.0.0'], true)
+                                || preg_match('/(^|\.)local$/i', $worker_host)
+                                || preg_match('/(^|\.)test$/i', $worker_host);
+
+                        $is_private_ip = false;
+                        if (!$is_local_host && function_exists('filter_var')) {
+                                $is_valid_ip = filter_var($worker_host, FILTER_VALIDATE_IP);
+                                if ($is_valid_ip) {
+                                        $is_private_ip = !filter_var(
+                                                $worker_host,
+                                                FILTER_VALIDATE_IP,
+                                                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+                                        );
+                                }
+                        }
+
+                        customiizer_log(
+                                $worker_log_context,
+                                'Host locality detection | is_local_host=' . ($is_local_host ? 'true' : 'false') . ' | is_private_ip=' . ($is_private_ip ? 'true' : 'false')
+                        );
+
+                        if ($is_local_host || $is_private_ip) {
+                                $worker_port = 3000;
+                                customiizer_log($worker_log_context, 'Defaulting to port 3000 for local/private host');
+                        }
+                }
 
                 if ($worker_host) {
                         $worker_ws_url = sprintf('%s://%s', $default_ws_scheme, $worker_host);
 
                         if ($worker_port && strpos($worker_host, ':') === false) {
                                 $worker_ws_url .= ':' . $worker_port;
+                                customiizer_log($worker_log_context, 'Appended port to worker URL: ' . $worker_port);
+                        } elseif (!$worker_port) {
+                                customiizer_log($worker_log_context, 'No port will be appended to worker URL');
+                        } else {
+                                customiizer_log($worker_log_context, 'Host already contains a port. Skipping append.');
                         }
+
+                        customiizer_log($worker_log_context, 'Resolved worker websocket URL: ' . $worker_ws_url);
+                } else {
+                        customiizer_log($worker_log_context, 'No worker host resolved; websocket URL remains empty.');
                 }
         }
 
@@ -75,6 +125,8 @@ function customiizer_enqueue_customize_assets() {
                 $worker_ws_url !== '' ? json_encode($worker_ws_url) : 'null',
                 $worker_ws_url !== '' ? 'true' : 'false'
         );
+
+        customiizer_log($worker_log_context, 'Final websocket enabled flag: ' . ($worker_ws_url !== '' ? 'true' : 'false'));
 
         wp_add_inline_script('jquery', $inline_js, 'before');
 
