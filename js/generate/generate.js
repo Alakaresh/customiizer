@@ -5,16 +5,16 @@ if (typeof baseUrl === 'undefined') {
 const LOG_PREFIX = '[Customiizer][Generate]';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
+const POLL_INTERVAL_MS = 1000;
+
 let currentTaskId = null;
 let currentJobId = null;
 let pollTimeoutId = null;
 let lastKnownStatus = null;
 let prompt = '';
 let jobFormat = '';
-let humorIntervalId = null;
 let loadingToggled = false;
 let lastKnownProgress = null;
-let completionAnimationTriggered = false;
 let clearStateTimeoutId = null;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
@@ -71,11 +71,6 @@ jQuery(function($) {
                 console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
                 stopPolling();
 
-                if (humorIntervalId) {
-                        clearInterval(humorIntervalId);
-                        humorIntervalId = null;
-                }
-
                 currentTaskId = null;
                 currentJobId = null;
                 lastKnownStatus = null;
@@ -97,23 +92,17 @@ jQuery(function($) {
                 persistProgressState({
                         status: 'pending',
                         progress: 0,
-                        message: "Notre IA est en pleine méditation créative...",
+                        message: '',
                         taskId: currentTaskId,
                         jobId: currentJobId,
                         prompt,
                         format: jobFormat,
-                        title: 'Génération en cours',
+                        title: '',
                 });
-                animateLoadingWithHumor();
         }
 
         function finalizeGeneration(hasError = false) {
                 stopPolling();
-
-                if (humorIntervalId) {
-                        clearInterval(humorIntervalId);
-                        humorIntervalId = null;
-                }
 
                 if (hasError) {
                         updateLoading(0);
@@ -128,7 +117,7 @@ jQuery(function($) {
                         jobId: currentJobId,
                         taskId: currentTaskId,
                         progress: lastKnownProgress,
-                        message: hasError ? 'La génération a échoué.' : 'Génération terminée !',
+                        message: '',
                         completed: true,
                 });
 
@@ -150,7 +139,7 @@ jQuery(function($) {
 
         function scheduleNextPoll() {
                 stopPolling();
-                pollTimeoutId = setTimeout(() => pollJobStatus(), 1500);
+                pollTimeoutId = setTimeout(() => pollJobStatus(), POLL_INTERVAL_MS);
         }
 
         async function pollJobStatus() {
@@ -196,60 +185,29 @@ jQuery(function($) {
         function handleJobStatus(job) {
                 currentJobId = job.jobId || null;
 
-                if (job.status !== lastKnownStatus) {
-                        console.log(`${LOG_PREFIX} Statut mis à jour`, job);
-                }
-
                 const progressValue = clampProgress(job.progress);
-                const hasProgressUpdate = progressValue !== null;
-
-                if (hasProgressUpdate) {
+                if (progressValue !== null) {
                         lastKnownProgress = progressValue;
                         updateLoading(progressValue);
-
-                        if (job.status !== 'done' && job.status !== 'error') {
-                                updateLoadingText(`Progression : ${Math.round(progressValue)}%`);
-                        }
                 }
 
-                lastKnownStatus = job.status;
+                const derivedStatus = progressValue >= 100 ? 'done' : 'processing';
+                lastKnownStatus = derivedStatus;
                 persistProgressState({
-                        status: lastKnownStatus,
+                        status: derivedStatus,
                         jobId: currentJobId,
                         taskId: currentTaskId,
                         progress: lastKnownProgress,
+                        message: '',
                 });
 
-                switch (job.status) {
-                        case 'pending':
-                                if (!hasProgressUpdate) {
-                                        updateLoading(15);
-                                        updateLoadingText("Job enregistré, attente du worker...");
-                                }
-                                scheduleNextPoll();
-                                break;
-                        case 'processing':
-                                if (!hasProgressUpdate) {
-                                        updateLoading(60);
-                                        updateLoadingText('Notre IA travaille sur votre création...');
-                                }
-                                scheduleNextPoll();
-                                break;
-                        case 'done':
-                                updateLoading(100);
-                                updateLoadingText('Génération terminée !');
-                                renderGeneratedImages(job.images || []);
-                                finalizeGeneration(false);
-                                break;
-                        case 'error':
-                                updateLoadingText('La génération a échoué.');
-                                showAlert("La génération a échoué. Veuillez réessayer.");
-                                finalizeGeneration(true);
-                                break;
-                        default:
-                                scheduleNextPoll();
-                                break;
+                if (progressValue >= 100) {
+                        renderGeneratedImages(job.images || []);
+                        finalizeGeneration(false);
+                        return;
                 }
+
+                scheduleNextPoll();
         }
 
         function renderGeneratedImages(images) {
@@ -395,12 +353,13 @@ jQuery(function($) {
                         }
 
                         currentTaskId = data.taskId;
-                        lastKnownStatus = data.status || 'pending';
-                        updateLoading(10);
-                        updateLoadingText('Job envoyé au worker...');
+                        lastKnownStatus = 'pending';
+                        updateLoading(0);
+                        updateLoadingText('');
                         persistProgressState({
                                 taskId: currentTaskId,
                                 status: lastKnownStatus,
+                                message: '',
                         });
 
                         consumeCredit();
@@ -452,10 +411,9 @@ jQuery(function($) {
                         loadingBar.style.width = '0%';
                 }
                 if (loadingText) {
-                        loadingText.textContent = 'Notre IA est en pleine méditation créative...';
+                        loadingText.textContent = '';
                 }
                 lastKnownProgress = null;
-                completionAnimationTriggered = false;
         }
 
         function openProgressModal() {
@@ -480,65 +438,6 @@ jQuery(function($) {
                 loadingToggled = false;
         }
 
-        function animateLoadingWithHumor() {
-                const humorousPhrases = [
-                        "L'IA prend son café...",
-                        'Les pixels se mettent en place... doucement.',
-                        "Les algorithmes dansent la valse des neurones...",
-                        "Consultation du manuel 'Comment créer une œuvre d'art'...",
-                        "Préparation de l'image parfaite (ou presque)...",
-                        'Les maths font leur magie en coulisse...',
-                        'Génération de quelque chose de vraiment cool...',
-                        "Application de la sauce IA secrète...",
-                        'Vérification des probabilités de chef-d\'œuvre...',
-                        "En train de demander l'aide d'un supercalculateur...",
-                ];
-                let currentIndex = 0;
-
-                if (humorIntervalId) {
-                        clearInterval(humorIntervalId);
-                }
-
-                humorIntervalId = setInterval(() => {
-                        if (currentIndex >= humorousPhrases.length) {
-                                currentIndex = 0;
-                        }
-                        updateLoadingText(humorousPhrases[currentIndex]);
-                        currentIndex += 1;
-                }, 2500);
-        }
-
-        function animateCompletionWithHumor() {
-                const completionPhrases = [
-                        "L'IA met les derniers coups de pinceau ...",
-                        'Raffinement final... presque prêt à vous épater !',
-                        "Encore un peu de magie... L'image est en cours de finition...",
-                        "L'IA ajuste les derniers détails pour la perfection...",
-                        'Finalisation en cours... C\'est bientôt prêt !',
-                        'Derniers réglages... L\'image arrive dans un instant...',
-                        'Votre image est en train de recevoir sa touche finale...',
-                        'Optimisation des pixels pour un rendu optimal...',
-                        "L'IA prend un pas de recul pour admirer... c'est presque prêt.",
-                        'Finalisation... Préparez-vous à voir le résultat !',
-                ];
-                let currentIndex = 0;
-
-                updateLoadingText(completionPhrases[currentIndex]);
-                currentIndex += 1;
-
-                if (humorIntervalId) {
-                        clearInterval(humorIntervalId);
-                }
-
-                humorIntervalId = setInterval(() => {
-                        if (currentIndex >= completionPhrases.length) {
-                                currentIndex = 0;
-                        }
-                        updateLoadingText(completionPhrases[currentIndex]);
-                        currentIndex += 1;
-                }, 2500);
-        }
-
         function getStoredProgressState() {
                 try {
                         const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
@@ -561,7 +460,7 @@ jQuery(function($) {
                 try {
                         const previousState = getStoredProgressState() || {};
                         const nextState = {
-                                title: 'Génération en cours',
+                                title: '',
                                 ...previousState,
                                 ...partialState,
                                 updatedAt: Date.now(),
@@ -635,33 +534,16 @@ jQuery(function($) {
                 }
 
                 loadingBar.style.width = `${percentValue}%`;
-
-                if (percentValue > 0) {
-                        loadingText.textContent = `Chargement : ${Math.round(percentValue)}%`;
-                }
-
-                if (percentValue > 0 && humorIntervalId && percentValue < 100) {
-                        clearInterval(humorIntervalId);
-                        humorIntervalId = null;
-                }
-
-                if (percentValue === 100) {
-                        if (!completionAnimationTriggered) {
-                                animateCompletionWithHumor();
-                                completionAnimationTriggered = true;
-                        }
-                } else {
-                        completionAnimationTriggered = false;
-                }
+                loadingText.textContent = '';
         }
 
         function updateLoadingText(text) {
                 persistProgressState({
-                        message: text,
+                        message: '',
                 });
                 const loadingText = document.getElementById('loading-text');
                 if (loadingText) {
-                        loadingText.textContent = text;
+                        loadingText.textContent = '';
                 }
         }
 
