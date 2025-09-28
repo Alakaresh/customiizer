@@ -37,35 +37,20 @@
 
 .image-grid,
 .generation-preview {
-    height: min(100%, max(0px, calc(100dvh - var(--header-height, 88px) - 120px)));
-    max-height: max(0px, calc(100dvh - var(--header-height, 88px) - 120px));
-    aspect-ratio: 1 / 1;
     margin-inline: auto;
 }
 
 .grid-wrapper {
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
     width: 100%;
-}
-
-.grid-wrapper .image-grid {
-    width: auto;
-    max-width: min(100%, max(0px, calc(100dvh - var(--header-height, 88px) - 120px)));
-}
-
-.generation-preview {
-    width: min(100%, max(0px, calc(100dvh - var(--header-height, 88px) - 120px)));
-    max-width: 100%;
 }
 
 .image-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Deux colonnes */
-    grid-auto-rows: 1fr;
-    gap: 24px; /* Espacement entre les images */
-    justify-content: center; /* Centre la grille dans son conteneur */
-    justify-items: center; /* Centre chaque élément horizontalement */
+    gap: 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    place-items: center;
 }
 
 .image-grid.is-hidden {
