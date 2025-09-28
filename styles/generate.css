@@ -44,8 +44,9 @@
 }
 
 .grid-wrapper {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    place-items: center;
+    width: 100%;
 }
 
 .grid-wrapper .image-grid {
@@ -63,6 +64,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)); /* Deux colonnes */
     grid-auto-rows: 1fr;
     gap: 24px; /* Espacement entre les images */
+    justify-content: center; /* Centre la grille dans son conteneur */
     justify-items: center; /* Centre chaque élément horizontalement */
 }
 
