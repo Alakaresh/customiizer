@@ -5,11 +5,13 @@
     const AJAX_URL = typeof window.ajaxurl === 'string' ? window.ajaxurl : '/wp-admin/admin-ajax.php';
     const FINAL_STATUSES = new Set(['done', 'error']);
     const POLL_INTERVAL_MS = 1000;
+    const DEFAULT_TITLE = 'Génération en cours';
 
     let modal = null;
     let title = null;
     let loadingBar = null;
     let loadingText = null;
+    let loadingPercentage = null;
     let currentState = null;
     let pollTimeoutId = null;
     let hideTimeoutId = null;
@@ -22,6 +24,7 @@
         loadingBar = document.getElementById('loading-bar');
         loadingText = document.getElementById('loading-text');
         title = document.getElementById('generation-progress-title');
+        loadingPercentage = document.getElementById('loading-percentage');
 
         if (!modal || !loadingBar || !loadingText) {
             return;
@@ -106,14 +109,28 @@
     }
 
     function updateUI(state) {
+        const progressValue = clamp(state.progress);
+        const roundedProgress = Math.round(progressValue);
+        const message = buildProgressMessage(progressValue, state.message);
+
         if (loadingBar) {
-            loadingBar.style.width = `${state.progress}%`;
+            loadingBar.style.width = `${progressValue}%`;
+            loadingBar.setAttribute('aria-valuenow', String(roundedProgress));
         }
+
+        if (loadingPercentage) {
+            loadingPercentage.textContent = `${roundedProgress}%`;
+        }
+
         if (loadingText) {
-            loadingText.textContent = '';
+            loadingText.textContent = message;
         }
+
         if (title) {
-            title.textContent = '';
+            const normalizedTitle = typeof state.title === 'string' && state.title.trim()
+                ? state.title.trim()
+                : DEFAULT_TITLE;
+            title.textContent = normalizedTitle;
         }
     }
 
@@ -275,5 +292,24 @@
 
     function isGenerationPage() {
         return document.body && document.body.dataset && document.body.dataset.generationPage === '1';
+    }
+
+    function buildProgressMessage(progress, customMessage) {
+        const rounded = Math.round(progress);
+        const sanitizedMessage = typeof customMessage === 'string' ? customMessage.trim() : '';
+
+        if (rounded <= 0) {
+            return 'Préparation de votre génération personnalisée…';
+        }
+
+        if (sanitizedMessage) {
+            return rounded >= 100 ? sanitizedMessage : `${sanitizedMessage} (${rounded}%)`;
+        }
+
+        if (rounded >= 100) {
+            return 'Génération finalisée !';
+        }
+
+        return `Génération en cours… ${rounded}%`;
     }
 })();
