@@ -15,6 +15,7 @@ let prompt = '';
 let jobFormat = '';
 let loadingToggled = false;
 let lastKnownProgress = null;
+let lastKnownMessage = '';
 let clearStateTimeoutId = null;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
@@ -29,6 +30,27 @@ jQuery(function($) {
 
         function getPreviewImageElement() {
                 return document.getElementById('generation-preview-image');
+        }
+
+        function buildProgressMessage(progress, customMessage = '') {
+                const numericProgress = Number(progress);
+                const boundedProgress = Number.isFinite(numericProgress) ? Math.max(0, Math.min(100, numericProgress)) : 0;
+                const rounded = Math.round(boundedProgress);
+                const sanitizedMessage = typeof customMessage === 'string' ? customMessage.trim() : '';
+
+                if (rounded <= 0) {
+                        return 'Préparation de votre génération personnalisée…';
+                }
+
+                if (sanitizedMessage) {
+                        return rounded >= 100 ? sanitizedMessage : `${sanitizedMessage} (${rounded}%)`;
+                }
+
+                if (rounded >= 100) {
+                        return 'Génération finalisée !';
+                }
+
+                return `Génération en cours… ${rounded}%`;
         }
 
         function getPreviewWrapper() {
@@ -171,6 +193,7 @@ jQuery(function($) {
                 currentJobId = null;
                 lastKnownStatus = null;
                 lastKnownProgress = null;
+                lastKnownMessage = '';
                 prompt = '';
                 jobFormat = '';
 
@@ -180,6 +203,7 @@ jQuery(function($) {
         function startLoadingUI() {
                 resetLoadingState();
                 openProgressModal();
+                lastKnownMessage = '';
                 persistProgressState({
                         status: 'pending',
                         progress: 0,
@@ -211,6 +235,7 @@ jQuery(function($) {
                         message: '',
                         completed: true,
                 });
+                lastKnownMessage = '';
 
                 if (clearStateTimeoutId) {
                         clearTimeout(clearStateTimeoutId);
@@ -288,6 +313,7 @@ jQuery(function($) {
 
                 const derivedStatus = progressValue >= 100 ? 'done' : 'processing';
                 lastKnownStatus = derivedStatus;
+                lastKnownMessage = '';
                 persistProgressState({
                         status: derivedStatus,
                         jobId: currentJobId,
@@ -577,13 +603,19 @@ jQuery(function($) {
                 closeProgressModal();
                 const loadingBar = document.getElementById('loading-bar');
                 const loadingText = document.getElementById('loading-text');
+                const loadingPercentage = document.getElementById('loading-percentage');
                 if (loadingBar) {
                         loadingBar.style.width = '0%';
+                        loadingBar.setAttribute('aria-valuenow', '0');
                 }
                 if (loadingText) {
                         loadingText.textContent = '';
                 }
+                if (loadingPercentage) {
+                        loadingPercentage.textContent = '0%';
+                }
                 lastKnownProgress = null;
+                lastKnownMessage = '';
         }
 
         function openProgressModal() {
@@ -666,6 +698,7 @@ jQuery(function($) {
                 lastKnownStatus = typeof storedState.status === 'string' ? storedState.status : null;
                 const normalizedProgress = clampProgress(storedState.progress);
                 lastKnownProgress = normalizedProgress === null ? null : normalizedProgress;
+                lastKnownMessage = typeof storedState.message === 'string' ? storedState.message.trim() : '';
 
                 openProgressModal();
 
@@ -699,29 +732,47 @@ jQuery(function($) {
         function updateLoading(percent) {
                 const loadingBar = document.getElementById('loading-bar');
                 const loadingText = document.getElementById('loading-text');
+                const loadingPercentage = document.getElementById('loading-percentage');
 
                 const normalizedPercent = clampProgress(percent);
                 const percentValue = normalizedPercent === null ? 0 : normalizedPercent;
+                const roundedPercent = Math.round(percentValue);
 
                 persistProgressState({
                         progress: percentValue,
                 });
+
+                const message = buildProgressMessage(percentValue, lastKnownMessage);
 
                 if (!loadingBar || !loadingText) {
                         return;
                 }
 
                 loadingBar.style.width = `${percentValue}%`;
-                loadingText.textContent = '';
+                loadingBar.setAttribute('aria-valuenow', String(roundedPercent));
+                if (loadingPercentage) {
+                        loadingPercentage.textContent = `${roundedPercent}%`;
+                }
+                loadingText.textContent = message;
         }
 
         function updateLoadingText(text) {
+                const sanitizedText = typeof text === 'string' ? text.trim() : '';
+                lastKnownMessage = sanitizedText;
                 persistProgressState({
-                        message: '',
+                        message: sanitizedText,
                 });
                 const loadingText = document.getElementById('loading-text');
+                const loadingPercentage = document.getElementById('loading-percentage');
+                const progressValue = lastKnownProgress === null ? 0 : lastKnownProgress;
+                const roundedPercent = Math.round(progressValue);
+                const message = buildProgressMessage(progressValue, sanitizedText);
+
                 if (loadingText) {
-                        loadingText.textContent = '';
+                        loadingText.textContent = message;
+                }
+                if (loadingPercentage) {
+                        loadingPercentage.textContent = `${roundedPercent}%`;
                 }
         }
 
