@@ -28,12 +28,12 @@
   --color-brand-600: #148556;
 }
 
-#site-content {
+body:not(.customize-layout-page) #site-content {
         display: flex;
         margin: auto;
 }
 
-.site-content {
+body:not(.customize-layout-page) .site-content {
     /* Use the dynamic viewport unit to avoid layout jumps */
     min-height: calc(100dvh - 215px);
     max-width: 1250px;
