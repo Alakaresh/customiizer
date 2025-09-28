@@ -6,6 +6,8 @@
     const FINAL_STATUSES = new Set(['done', 'error']);
     const POLL_INTERVAL_MS = 1000;
     const DEFAULT_TITLE = 'Génération en cours';
+    const INIT_RETRY_DELAY_MS = 75;
+    const MAX_INIT_RETRIES = 20;
 
     let modal = null;
     let title = null;
@@ -16,21 +18,51 @@
     let pollTimeoutId = null;
     let hideTimeoutId = null;
     let ignoreNextEvent = false;
+    let isInitialized = false;
+    let initRetryCount = 0;
 
-    document.addEventListener('DOMContentLoaded', initialize);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => tryInitialize(false));
+    } else {
+        tryInitialize(false);
+    }
 
-    function initialize() {
-        modal = document.getElementById('generation-progress-modal');
-        loadingBar = document.getElementById('loading-bar');
-        loadingText = document.getElementById('loading-text');
-        title = document.getElementById('generation-progress-title');
-        loadingPercentage = document.getElementById('loading-percentage');
+    window.addEventListener('pageshow', () => tryInitialize(true));
+    window.addEventListener('focus', handleVisibilityGain);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            handleVisibilityGain();
+        }
+    });
 
-        if (!modal || !loadingBar || !loadingText) {
+    function tryInitialize(forceRefresh) {
+        if (isInitialized && !forceRefresh) {
             return;
         }
 
+        if (!ensureElements()) {
+            if (initRetryCount >= MAX_INIT_RETRIES) {
+                return;
+            }
+            initRetryCount += 1;
+            window.setTimeout(() => tryInitialize(forceRefresh), INIT_RETRY_DELAY_MS);
+            return;
+        }
+
+        initRetryCount = 0;
+
+        if (!isInitialized) {
+            isInitialized = true;
+            bindGlobalListeners();
+        }
+
         setCurrentState(readStoredState());
+    }
+
+    function bindGlobalListeners() {
+        if (!ensureElements()) {
+            return;
+        }
 
         window.addEventListener('storage', (event) => {
             if (event.key !== STORAGE_KEY) {
@@ -47,6 +79,30 @@
             }
             setCurrentState(event.detail ?? readStoredState());
         });
+
+        handleVisibilityGain();
+    }
+
+    function handleVisibilityGain() {
+        if (!ensureElements()) {
+            tryInitialize(false);
+            return;
+        }
+        setCurrentState(readStoredState());
+    }
+
+    function ensureElements() {
+        if (modal && loadingBar && loadingText && loadingPercentage && title) {
+            return true;
+        }
+
+        modal = document.getElementById('generation-progress-modal');
+        loadingBar = document.getElementById('loading-bar');
+        loadingText = document.getElementById('loading-text');
+        title = document.getElementById('generation-progress-title');
+        loadingPercentage = document.getElementById('loading-percentage');
+
+        return Boolean(modal && loadingBar && loadingText && loadingPercentage && title);
     }
 
     function setCurrentState(state) {
