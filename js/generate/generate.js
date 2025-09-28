@@ -315,42 +315,57 @@ jQuery(function($) {
                 const gridContainer = getGridContainer();
                 persistProgressState({ imageUrl: '' });
 
-                ensureGridPlaceholders();
+                const hasRenderableImages = Array.isArray(images) && images.some(function(image) {
+                        return image && typeof image.url === 'string' && image.url.trim() !== '';
+                });
+
+                if (!hasRenderableImages) {
+                        console.warn(`${LOG_PREFIX} Aucune image valide à afficher`, { images });
+                        return;
+                }
+
+                let hasUpdatedImage = false;
 
                 if (gridContainer) {
-                        const gridImages = gridContainer.querySelectorAll('img');
+                        let gridImages = gridContainer.querySelectorAll('img');
+
+                        if (gridImages.length < 4) {
+                                ensureGridPlaceholders();
+                                gridImages = gridContainer.querySelectorAll('img');
+                        }
+
                         gridImages.forEach((imageElement, index) => {
                                 const imageData = Array.isArray(images) ? images[index] : null;
+                                const hasValidUrl = imageData && typeof imageData.url === 'string' && imageData.url.trim() !== '';
+
+                                if (!hasValidUrl) {
+                                        return;
+                                }
+
+                                const trimmedUrl = imageData.url.trim();
 
                                 if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
                                         delete imageElement.dataset.livePreviewUrl;
                                 }
 
                                 imageElement.classList.remove('preview-enlarge');
-
-                                if (imageData && imageData.url) {
-                                        imageElement.src = imageData.url;
-                                        imageElement.alt = imageData.prompt || 'Image générée';
-                                        imageElement.dataset.jobId = currentJobId || '';
-                                        imageElement.dataset.taskId = currentTaskId || '';
-                                        imageElement.dataset.formatImage = imageData.format || '';
-                                        imageElement.dataset.prompt = imageData.prompt || prompt;
-                                        imageElement.setAttribute('data-display_name', imageData.display_name || '');
-                                        imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
-                                        imageElement.setAttribute('data-user-id', imageData.user_id || '');
-                                        imageElement.classList.add('preview-enlarge');
-                                } else {
-                                        imageElement.src = PLACEHOLDER_IMAGE_SRC;
-                                        imageElement.alt = "En attente d'image";
-                                        imageElement.removeAttribute('data-job-id');
-                                        imageElement.removeAttribute('data-task-id');
-                                        imageElement.removeAttribute('data-format-image');
-                                        imageElement.removeAttribute('data-prompt');
-                                        imageElement.removeAttribute('data-display_name');
-                                        imageElement.removeAttribute('data-user-logo');
-                                        imageElement.removeAttribute('data-user-id');
-                                }
+                                imageElement.src = trimmedUrl;
+                                imageElement.alt = imageData.prompt || 'Image générée';
+                                imageElement.dataset.jobId = currentJobId || '';
+                                imageElement.dataset.taskId = currentTaskId || '';
+                                imageElement.dataset.formatImage = imageData.format || '';
+                                imageElement.dataset.prompt = imageData.prompt || prompt;
+                                imageElement.setAttribute('data-display_name', imageData.display_name || '');
+                                imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
+                                imageElement.setAttribute('data-user-id', imageData.user_id || '');
+                                imageElement.classList.add('preview-enlarge');
+                                hasUpdatedImage = true;
                         });
+                }
+
+                if (!hasUpdatedImage) {
+                        console.warn(`${LOG_PREFIX} Les images renvoyées sont vides, aucune mise à jour effectuée.`);
+                        return;
                 }
 
                 togglePreviewMode(false);
