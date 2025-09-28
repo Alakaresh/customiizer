@@ -39,9 +39,10 @@ body.customize-layout-page #customize-main.customize-layout {
     height: 100%;
     display: flex; /* Assurer que les enfants peuvent utiliser flexbox */
     flex-direction: column; /* Aligner les enfants en colonne */
-    width: 360px;
+    flex: 0 0 30%;
+    width: 30%;
+    max-width: 30%;
     background: #151515;
-    flex: none; /* Empêche la sidebar de s'ajuster ou de se redimensionner */
     max-height: calc(100dvh - var(--header-height, 88px));
     border-right: 1px solid rgba(5, 5, 5, 0.7);
     border-radius: 28px 0 0 28px;
@@ -55,7 +56,9 @@ body.customize-layout-page #customize-main.customize-layout {
 }
 
 body.customize-layout-page #customize-main.customize-layout > #content {
-    flex-grow: 1; /* Permet au contenu de remplir l'espace restant */
+    flex: 1 1 70%; /* Répartition 70/30 avec la sidebar */
+    width: 70%;
+    max-width: 70%;
     background: radial-gradient(circle at top, rgba(47, 255, 185, 0.08) 0%, rgba(17, 17, 17, 0.92) 45%, #111111 100%);
     display: flex;
     align-items: stretch;
@@ -63,6 +66,7 @@ body.customize-layout-page #customize-main.customize-layout > #content {
     overflow-y: auto;
     margin: 0;
     height: 100%;
+    min-width: 0; /* Évite les débordements lors du calcul flex */
 }
 
 #sidebar-header,
