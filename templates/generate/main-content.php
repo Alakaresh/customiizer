@@ -12,16 +12,16 @@
 <div class="content-images" id="content-images">
         <div id="image-grid" class="image-grid">
                 <div class="image-container top">
-                        <img class="top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0" />
+                        <img class="top" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 0" />
                 </div>
                 <div class="image-container top">
-                        <img class="top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1" />
+                        <img class="top" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 1" />
                 </div>
                 <div class="image-container bottom">
-                        <img class="bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 2" />
+                        <img class="bottom" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 2" />
                 </div>
                 <div class="image-container bottom">
-                        <img class="bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 3" />
+                        <img class="bottom" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 3" />
                 </div>
         </div>
 
@@ -29,7 +29,7 @@
                 <img
                         id="generation-preview-image"
                         class="centered-image"
-                        src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png"
+                        src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
                         alt="Image d'attente"
                 />
         </div>
