@@ -1,23 +1,22 @@
-#customize-main {
+/* Layout principal pour les pages type hub (v2shop, configurateur, boutique, mycreation). */
+#customize-main.hub-layout {
     flex-grow: 1;
     height: calc(100dvh - var(--header-height, 88px));
     min-height: calc(100dvh - var(--header-height, 88px));
     color: #f5f7f4;
     font-family: 'Inter', 'Arial', sans-serif;
     background: linear-gradient(160deg, #111111 0%, #131313 50%, #1a1a1a 100%);
-}
-#customize-main.customize-layout {
     display: flex; /* Assure que tous les enfants de customize-main sont alignés horizontalement */
 }
-body.customize-layout-page > #content,
-body.customize-layout-page #site-content.full-content,
-body.customize-layout-page #customize-main.customize-layout {
+body.hub-layout-page > #content,
+body.hub-layout-page #site-content.full-content,
+body.hub-layout-page #customize-main.hub-layout {
     width: 100%;
     max-width: none;
     margin: 0;
 }
 
-.sidebar {
+#customize-main.hub-layout .sidebar {
     flex: 0 0 auto;
     height: calc(100dvh - var(--header-height, 88px));
     display: flex;
@@ -28,14 +27,14 @@ body.customize-layout-page #customize-main.customize-layout {
     box-shadow: 0 24px 40px rgba(0, 0, 0, 0.55);
 }
 
-#sidebar-main {
+#customize-main.hub-layout #sidebar-main {
     display: flex;
     flex-direction: column;
     height: 100%; /* Assurez-vous que cela prend toute la hauteur de la sidebar */
 }
 
 
-#left-sidebar {
+#customize-main.hub-layout #left-sidebar {
     height: 100%;
     display: flex; /* Assurer que les enfants peuvent utiliser flexbox */
     flex-direction: column; /* Aligner les enfants en colonne */
@@ -48,14 +47,14 @@ body.customize-layout-page #customize-main.customize-layout {
     border-radius: 28px 0 0 28px;
 }
 
-#right-sidebar {
+#customize-main.hub-layout #right-sidebar {
     width: 280px;
     background: #141414;
     border-left: 1px solid rgba(5, 5, 5, 0.7);
     border-radius: 0 28px 28px 0;
 }
 
-body.customize-layout-page #customize-main.customize-layout > #content {
+body.hub-layout-page #customize-main.hub-layout > #content {
     flex: 1 1 70%; /* Répartition 70/30 avec la sidebar */
     width: 70%;
     max-width: 70%;
@@ -69,17 +68,17 @@ body.customize-layout-page #customize-main.customize-layout > #content {
     min-width: 0; /* Évite les débordements lors du calcul flex */
 }
 
-#sidebar-header,
-#sidebar-footer {
+#customize-main.hub-layout #sidebar-header,
+#customize-main.hub-layout #sidebar-footer {
     background: transparent;
     color: inherit;
 }
 
-#sidebar-header {
+#customize-main.hub-layout #sidebar-header {
     padding: 24px 28px 18px;
 }
 
-#sidebar-content {
+#customize-main.hub-layout #sidebar-content {
     display: flex;
     flex-direction: column; /* Organisation verticale des éléments */
     padding: 0 28px 28px;
@@ -89,13 +88,13 @@ body.customize-layout-page #customize-main.customize-layout > #content {
 }
 
 
-#sidebar-footer {
+#customize-main.hub-layout #sidebar-footer {
     padding: 22px 28px 26px;
     align-items: center; /* Centre verticalement */
     text-align: center;
 }
 
-#right-sidebar .title {
+#customize-main.hub-layout #right-sidebar .title {
     font-size: 1.05rem;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -103,18 +102,18 @@ body.customize-layout-page #customize-main.customize-layout > #content {
     color: #f4f4f4;
 }
 
-#sidebar-content::-webkit-scrollbar,
-#user_images::-webkit-scrollbar {
+#customize-main.hub-layout #sidebar-content::-webkit-scrollbar,
+#customize-main.hub-layout #user_images::-webkit-scrollbar {
     width: 6px;
 }
 
-#sidebar-content::-webkit-scrollbar-thumb,
-#user_images::-webkit-scrollbar-thumb {
+#customize-main.hub-layout #sidebar-content::-webkit-scrollbar-thumb,
+#customize-main.hub-layout #user_images::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, var(--color-brand-600, #148556), var(--color-brand-400, #2bd879));
     border-radius: 9999px;
 }
 
-#user_images {
+#customize-main.hub-layout #user_images {
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -123,7 +122,7 @@ body.customize-layout-page #customize-main.customize-layout > #content {
     max-height: calc(100dvh - 160px);
 }
 
-#user_images img {
+#customize-main.hub-layout #user_images img {
     width: 100%;
     border-radius: 18px;
     display: block;
@@ -133,17 +132,17 @@ body.customize-layout-page #customize-main.customize-layout > #content {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-#user_images img:hover {
+#customize-main.hub-layout #user_images img:hover {
     border-color: var(--color-brand-500, #1fb86c);
     transform: translateY(-2px);
 }
 
-#user_images p {
+#customize-main.hub-layout #user_images p {
     font-size: 0.95rem;
     color: rgba(255, 255, 255, 0.55);
     margin: 0;
 }
 
-.hidden {
+#customize-main.hub-layout .hidden {
     display: none;
 }

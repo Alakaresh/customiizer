@@ -61,16 +61,15 @@ function customiizer_enqueue_customize_assets() {
         wp_enqueue_style('customiizer-style', get_stylesheet_directory_uri() . '/styles/style.css', [], $ver);
         wp_enqueue_style('preview-image-style', get_stylesheet_directory_uri() . '/styles/preview_image.css', [], $ver);
 
-        $needs_customize_styles = (
-                strpos($request_uri, '/customiize') !== false ||
+        $needs_hub_layout_styles = (
                 strpos($request_uri, '/v2shop') !== false ||
                 strpos($request_uri, '/configurateur') !== false ||
                 strpos($request_uri, '/boutique') !== false ||
                 strpos($request_uri, '/mycreation') !== false
         );
 
-        if ($needs_customize_styles) {
-                wp_enqueue_style('customize-style', get_stylesheet_directory_uri() . '/styles/customize.css', [], $ver);
+        if ($needs_hub_layout_styles) {
+                wp_enqueue_style('hub-layout-style', get_stylesheet_directory_uri() . '/styles/hub-layout.css', [], $ver);
         }
 
        wp_enqueue_style('header-style', get_stylesheet_directory_uri() . '/styles/header.css', [], $ver);
@@ -284,8 +283,6 @@ function customiizer_enqueue_customize_assets() {
 
        if (is_front_page() || is_page('home')) {
                wp_enqueue_style('mobile-home', get_stylesheet_directory_uri() . '/styles/responsive/mobile/home.css', [], $ver, 'all');
-       } elseif (strpos($request_uri, '/customiize') !== false) {
-               wp_enqueue_style('mobile-customize', get_stylesheet_directory_uri() . '/styles/responsive/mobile/customize.css', [], $ver, 'all');
        } elseif (strpos($request_uri, '/configurateur') !== false) {
                wp_enqueue_style('mobile-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/product.css', [], $ver, 'all');
                wp_enqueue_style('mobile-design-product', get_stylesheet_directory_uri() . '/styles/responsive/mobile/design_product.css', [], $ver, 'all');
@@ -304,5 +301,9 @@ function customiizer_enqueue_customize_assets() {
                strpos($request_uri, '/cookies') !== false
        ) {
                wp_enqueue_style('mobile-legal', get_stylesheet_directory_uri() . '/styles/responsive/mobile/legal.css', [], $ver, 'all');
+       }
+
+       if ($needs_hub_layout_styles) {
+               wp_enqueue_style('mobile-hub-layout', get_stylesheet_directory_uri() . '/styles/responsive/mobile/hub-layout.css', [], $ver, 'all');
        }
 }
