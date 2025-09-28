@@ -11,9 +11,26 @@
 
 <div class="content-images" id="content-images">
         <div id="image-grid" class="image-grid">
-                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0">
-                <img class="main-image top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1">
-		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 2">
-		<img class="main-image bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 3">
-	</div>
+                <div class="image-container top">
+                        <img class="top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 0" />
+                </div>
+                <div class="image-container top">
+                        <img class="top" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 1" />
+                </div>
+                <div class="image-container bottom">
+                        <img class="bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 2" />
+                </div>
+                <div class="image-container bottom">
+                        <img class="bottom" src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png" alt="Image 3" />
+                </div>
+        </div>
+
+        <div id="generation-preview" class="generation-preview">
+                <img
+                        id="generation-preview-image"
+                        class="centered-image"
+                        src="/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png"
+                        alt="Image d'attente"
+                />
+        </div>
 </div>

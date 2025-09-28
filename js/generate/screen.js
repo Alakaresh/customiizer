@@ -67,7 +67,7 @@ function enableInfoModal() {
 
 // Fonction d'ajustement de la hauteur des images
 function adjustImageHeight() {
-        const images = document.querySelectorAll('.image-grid img, #content-images > img.centered-image');
+        const images = document.querySelectorAll('.image-grid img, #generation-preview img.centered-image');
         if (images.length === 0) {
                 return;
         }

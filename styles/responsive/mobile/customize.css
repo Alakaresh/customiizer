@@ -96,6 +96,12 @@
                aspect-ratio: auto;
        }
 
+       body.customize-layout-page .generation-preview {
+               width: 100%;
+               max-height: none;
+               aspect-ratio: auto;
+       }
+
        body.customize-layout-page .image-grid img {
                height: auto;
        }
@@ -107,5 +113,9 @@
        body.customize-layout-page .centered-image {
                height: auto;
                 width: 100%;
+       }
+
+       body.customize-layout-page .generation-preview .centered-image {
+               padding: 16px;
        }
 }
