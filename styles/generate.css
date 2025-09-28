@@ -347,10 +347,14 @@
     font-weight: 500;
 }
 
-#product-groups-container {
+.product-groups {
     display: flex;
     flex-direction: column;
     gap: 18px;
+}
+
+.product-groups.is-hidden {
+    display: none;
 }
 
 #ratio-menu {
@@ -374,12 +378,54 @@
 
 /* styles.css */
 #product-container {
-    display: flex; /* Active Flexbox pour aligner les enfants horizontalement */
-    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne suivante si l'espace horizontal est insuffisant */
-    justify-content: flex-start;
-    align-items: center; /* Centre les éléments verticalement */
-    margin-bottom: 16px; /* Espace en dessous du conteneur pour la clarté */
-    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.product-dropdown-wrapper {
+    position: relative;
+    display: block;
+}
+
+.product-dropdown {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(18, 18, 18, 0.92);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.product-dropdown:focus-visible {
+    outline: 2px solid var(--color-brand-400, #2bd879);
+    outline-offset: 3px;
+    border-color: rgba(43, 216, 121, 0.5);
+    box-shadow: 0 18px 32px rgba(43, 216, 121, 0.25);
+}
+
+.product-dropdown-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    width: 10px;
+    height: 6px;
+    background: currentColor;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path fill="white" d="M0.293 1.293a1 1 0 0 1 1.414 0L5 4.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414Z"/></svg>') center / contain no-repeat;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.product-dropdown option {
+    background: #0f0f0f;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .empty-state {
@@ -409,6 +455,17 @@
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.02em;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
 }
 
 #alert-box {
