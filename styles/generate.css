@@ -42,6 +42,7 @@
     max-width: 100%;
     max-height: max(0px, calc(100dvh - var(--header-height, 88px) - 120px));
     aspect-ratio: 1 / 1;
+    margin-inline: auto;
 }
 
 .image-grid {
@@ -49,8 +50,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)); /* Deux colonnes */
     grid-auto-rows: 1fr;
     gap: 24px; /* Espacement entre les images */
-    margin: 0 auto; /* Centre la grille dans la zone principale */
-    justify-content: center; /* Aligne la grille horizontalement */
     justify-items: center; /* Centre chaque élément horizontalement */
 }
 
@@ -62,7 +61,6 @@
     display: none;
     align-items: center;
     justify-content: center;
-    margin: 0 auto; /* Aligne l'aperçu centré comme la grille */
 }
 
 .generation-preview.is-active {
