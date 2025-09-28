@@ -1,4 +1,5 @@
 var allImages = [];
+const PLACEHOLDER_IMAGE_SRC = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
 
 jQuery(document).ready(function() {
 	// Requête AJAX pour récupérer les images
@@ -31,35 +32,75 @@ function loadImages() {
 }
 
 function displayImages() {
-        var container = jQuery('#content-images .image-grid');
-        container.empty(); // Nettoyer la grille avant d'ajouter de nouvelles images
+        var gridContainer = jQuery('#content-images .image-grid');
+        var singlePreview = jQuery('#generation-preview-image');
 
         var filteredImages = allImages.filter(function(image) {
                 return image.format === selectedRatio; // Filtrer les images selon le ratio global
         });
 
-        if (filteredImages.length === 0) {
-                for (var i = 0; i < 4; i++) {
-                        var imgElement = jQuery('<img>')
-                                .attr('src', '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png')
-                                .attr('alt', 'Image d\'attente ' + i)
-                                .addClass(i < 2 ? 'top' : 'bottom');
+        if (gridContainer.length) {
+                gridContainer.empty(); // Nettoyer la grille avant d'ajouter de nouvelles images
 
-                        var imgContainer = jQuery('<div>')
-                                .addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
-                                .append(imgElement);
+                if (filteredImages.length === 0) {
+                        for (var i = 0; i < 4; i++) {
+                                var imgElement = jQuery('<img>')
+                                        .attr('src', PLACEHOLDER_IMAGE_SRC)
+                                        .attr('alt', "Image d'attente " + i)
+                                        .addClass(i < 2 ? 'top' : 'bottom');
 
-                        container.append(imgContainer);
+                                var imgContainer = jQuery('<div>')
+                                        .addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
+                                        .append(imgElement);
+
+                                gridContainer.append(imgContainer);
+                        }
+                } else {
+                        shuffleArray(filteredImages);
+
+                        filteredImages.slice(0, 4).forEach(function(image, index) {
+                                const promptText = typeof image.prompt === 'object'
+                                        ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
+                                        : (image.prompt || '');
+
+                                var imgElement = jQuery('<img>')
+                                        .attr('src', image.image_url)
+                                        .attr('alt', 'Image ' + image.image_number)
+                                        .attr('data-display_name', image.display_name || '')
+                                        .attr('data-user-logo', image.user_logo || '')
+                                        .attr('data-user-id', image.user_id || '')
+                                        .attr('data-format-image', image.format || '')
+                                        .attr('data-prompt', promptText)
+                                        .addClass('preview-enlarge')
+                                        .addClass(index < 2 ? 'top' : 'bottom');
+
+                                var imgContainer = jQuery('<div>')
+                                        .addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
+                                        .append(imgElement);
+
+                                gridContainer.append(imgContainer);
+                        });
                 }
-        } else {
-                shuffleArray(filteredImages);
+        } else if (singlePreview.length) {
+                var targetImage = singlePreview.first();
 
-                filteredImages.slice(0, 4).forEach(function(image, index) {
+                if (filteredImages.length === 0) {
+                        targetImage
+                                .attr('src', PLACEHOLDER_IMAGE_SRC)
+                                .attr('alt', "Image d'attente")
+                                .removeClass('preview-enlarge')
+                                .removeAttr('data-display_name')
+                                .removeAttr('data-user-logo')
+                                .removeAttr('data-user-id')
+                                .removeAttr('data-format-image')
+                                .removeAttr('data-prompt');
+                } else {
+                        const image = filteredImages[0];
                         const promptText = typeof image.prompt === 'object'
                                 ? (image.prompt.text || image.prompt.prompt || JSON.stringify(image.prompt))
                                 : (image.prompt || '');
 
-                        var imgElement = jQuery('<img>')
+                        targetImage
                                 .attr('src', image.image_url)
                                 .attr('alt', 'Image ' + image.image_number)
                                 .attr('data-display_name', image.display_name || '')
@@ -67,15 +108,8 @@ function displayImages() {
                                 .attr('data-user-id', image.user_id || '')
                                 .attr('data-format-image', image.format || '')
                                 .attr('data-prompt', promptText)
-                                .addClass('preview-enlarge')
-                                .addClass(index < 2 ? 'top' : 'bottom');
-
-                        var imgContainer = jQuery('<div>')
-                                .addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
-                                .append(imgElement);
-
-                        container.append(imgContainer);
-                });
+                                .addClass('preview-enlarge');
+                }
         }
 
         if (typeof adjustImageHeight === 'function') {

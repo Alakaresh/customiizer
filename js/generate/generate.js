@@ -25,6 +25,102 @@ jQuery(function($) {
         const alertBox = document.getElementById('alert-box');
         const placeholderDiv = document.getElementById('placeholder');
         const savedPromptText = localStorage.getItem('savedPromptText');
+        const PLACEHOLDER_IMAGE_SRC = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
+
+        function getPreviewImageElement() {
+                return document.getElementById('generation-preview-image');
+        }
+
+        function getPreviewWrapper() {
+                return document.getElementById('generation-preview');
+        }
+
+        function getGridContainer() {
+                return document.getElementById('image-grid');
+        }
+
+        function togglePreviewMode(isActive) {
+                const previewWrapper = getPreviewWrapper();
+                const gridContainer = getGridContainer();
+
+                if (previewWrapper) {
+                        previewWrapper.classList.toggle('is-active', Boolean(isActive));
+                }
+
+                if (gridContainer) {
+                        gridContainer.classList.toggle('is-hidden', Boolean(isActive));
+                }
+        }
+
+        function ensureGridPlaceholders() {
+                const gridContainer = getGridContainer();
+                if (!gridContainer) {
+                        return;
+                }
+
+                if (gridContainer.children.length < 4) {
+                        gridContainer.innerHTML = '';
+                        for (let i = 0; i < 4; i++) {
+                                const wrapper = document.createElement('div');
+                                wrapper.className = `image-container ${i < 2 ? 'top' : 'bottom'}`;
+
+                                const image = document.createElement('img');
+                                image.className = i < 2 ? 'top' : 'bottom';
+                                image.alt = `Image ${i}`;
+                                image.src = PLACEHOLDER_IMAGE_SRC;
+
+                                wrapper.appendChild(image);
+                                gridContainer.appendChild(wrapper);
+                        }
+                }
+
+                gridContainer.querySelectorAll('img').forEach(image => {
+                        image.src = PLACEHOLDER_IMAGE_SRC;
+                        image.alt = "Image d'attente";
+                        image.classList.remove('preview-enlarge');
+                        if (image.dataset && image.dataset.livePreviewUrl) {
+                                delete image.dataset.livePreviewUrl;
+                        }
+                        image.removeAttribute('data-job-id');
+                        image.removeAttribute('data-task-id');
+                        image.removeAttribute('data-format-image');
+                        image.removeAttribute('data-prompt');
+                        image.removeAttribute('data-display_name');
+                        image.removeAttribute('data-user-logo');
+                        image.removeAttribute('data-user-id');
+                });
+        }
+
+        function showPreviewPlaceholder() {
+                const previewImage = getPreviewImageElement();
+                if (!previewImage) {
+                        return;
+                }
+
+                togglePreviewMode(true);
+                clearPreviewImageDatasets(previewImage);
+                previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                previewImage.alt = "Image d'attente";
+                previewImage.classList.remove('preview-enlarge');
+        }
+
+        function clearPreviewImageDatasets(imageElement) {
+                if (!imageElement) {
+                        return;
+                }
+
+                imageElement.removeAttribute('data-job-id');
+                imageElement.removeAttribute('data-task-id');
+                imageElement.removeAttribute('data-format-image');
+                imageElement.removeAttribute('data-prompt');
+                imageElement.removeAttribute('data-display_name');
+                imageElement.removeAttribute('data-user-logo');
+                imageElement.removeAttribute('data-user-id');
+
+                if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
+                        delete imageElement.dataset.livePreviewUrl;
+                }
+        }
 
         if (!validateButton || !customTextInput) {
                 console.warn(`${LOG_PREFIX} Éléments requis introuvables, annulation du script`);
@@ -78,12 +174,7 @@ jQuery(function($) {
                 prompt = '';
                 jobFormat = '';
 
-                const container = document.getElementById('content-images');
-                if (container) {
-                        container.innerHTML = '';
-                }
-
-                updateImageGrid();
+                resetImageDisplay();
         }
 
         function startLoadingUI() {
@@ -132,6 +223,10 @@ jQuery(function($) {
 
                 if (loadingToggled) {
                         closeProgressModal();
+                }
+
+                if (hasError) {
+                        resetImageDisplay();
                 }
 
                 validateButton.disabled = false;
@@ -217,27 +312,21 @@ jQuery(function($) {
         }
 
         function renderGeneratedImages(images) {
-                const container = document.getElementById('content-images');
-                if (container) {
-                        container.innerHTML = '';
-                }
-
-                const gridElement = document.getElementById('image-grid');
-                if (gridElement) {
-                        gridElement.classList.remove('hide');
-                }
-
-                const gridImages = document.querySelectorAll('.image-grid img');
-
+                const gridContainer = getGridContainer();
                 persistProgressState({ imageUrl: '' });
 
-                if (gridImages.length) {
+                ensureGridPlaceholders();
+
+                if (gridContainer) {
+                        const gridImages = gridContainer.querySelectorAll('img');
                         gridImages.forEach((imageElement, index) => {
-                                const imageData = images[index];
+                                const imageData = Array.isArray(images) ? images[index] : null;
 
                                 if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
                                         delete imageElement.dataset.livePreviewUrl;
                                 }
+
+                                imageElement.classList.remove('preview-enlarge');
 
                                 if (imageData && imageData.url) {
                                         imageElement.src = imageData.url;
@@ -246,14 +335,32 @@ jQuery(function($) {
                                         imageElement.dataset.taskId = currentTaskId || '';
                                         imageElement.dataset.formatImage = imageData.format || '';
                                         imageElement.dataset.prompt = imageData.prompt || prompt;
+                                        imageElement.setAttribute('data-display_name', imageData.display_name || '');
+                                        imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
+                                        imageElement.setAttribute('data-user-id', imageData.user_id || '');
                                         imageElement.classList.add('preview-enlarge');
                                 } else {
-                                        imageElement.src = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
+                                        imageElement.src = PLACEHOLDER_IMAGE_SRC;
                                         imageElement.alt = "En attente d'image";
                                         imageElement.removeAttribute('data-job-id');
                                         imageElement.removeAttribute('data-task-id');
+                                        imageElement.removeAttribute('data-format-image');
+                                        imageElement.removeAttribute('data-prompt');
+                                        imageElement.removeAttribute('data-display_name');
+                                        imageElement.removeAttribute('data-user-logo');
+                                        imageElement.removeAttribute('data-user-id');
                                 }
                         });
+                }
+
+                togglePreviewMode(false);
+
+                const previewImage = getPreviewImageElement();
+                if (previewImage) {
+                        clearPreviewImageDatasets(previewImage);
+                        previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                        previewImage.alt = "Image d'attente";
+                        previewImage.classList.remove('preview-enlarge');
                 }
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
@@ -264,26 +371,25 @@ jQuery(function($) {
                         return;
                 }
 
-                const gridImages = document.querySelectorAll('.image-grid img');
-                if (!gridImages.length) {
+                const previewImage = getPreviewImageElement();
+                if (!previewImage) {
                         return;
                 }
 
-                const primaryImage = gridImages[0];
-                if (!primaryImage) {
+                togglePreviewMode(true);
+                if (previewImage.dataset && previewImage.dataset.livePreviewUrl === imageUrl) {
                         return;
                 }
 
-                if (primaryImage.dataset && primaryImage.dataset.livePreviewUrl === imageUrl) {
-                        return;
+                clearPreviewImageDatasets(previewImage);
+
+                if (previewImage.dataset) {
+                        previewImage.dataset.livePreviewUrl = imageUrl;
                 }
 
-                if (primaryImage.dataset) {
-                        primaryImage.dataset.livePreviewUrl = imageUrl;
-                }
-
-                primaryImage.src = imageUrl;
-                primaryImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
+                previewImage.classList.remove('preview-enlarge');
+                previewImage.src = imageUrl;
+                previewImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
         }
 
         async function consumeCredit() {
@@ -366,7 +472,7 @@ jQuery(function($) {
                 hideAlert();
                 validateButton.disabled = true;
                 startLoadingUI();
-                updateImageGrid();
+                showPreviewPlaceholder();
 
                 try {
                         const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
@@ -429,15 +535,22 @@ jQuery(function($) {
                 await response.json();
         }
 
-        function updateImageGrid() {
-                const gridImages = document.querySelectorAll('.image-grid img');
-                gridImages.forEach(image => {
-                        image.src = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
-                        image.alt = "Image d'attente";
-                        if (image.dataset && image.dataset.livePreviewUrl) {
-                                delete image.dataset.livePreviewUrl;
-                        }
-                });
+        function resetImageDisplay() {
+                ensureGridPlaceholders();
+                togglePreviewMode(false);
+
+                const previewImage = getPreviewImageElement();
+                if (!previewImage) {
+                        return;
+                }
+
+                clearPreviewImageDatasets(previewImage);
+                previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                previewImage.alt = "Image d'attente";
+                previewImage.classList.remove('preview-enlarge');
+                previewImage.removeAttribute('data-display_name');
+                previewImage.removeAttribute('data-user-logo');
+                previewImage.removeAttribute('data-user-id');
         }
 
         function resetLoadingState() {
@@ -549,12 +662,16 @@ jQuery(function($) {
                         updateLoadingText(storedState.message);
                 }
 
+                const status = storedState.status;
+                const isFinal = status === 'done' || status === 'error';
+
+                if (!isFinal) {
+                        showPreviewPlaceholder();
+                }
+
                 if (typeof storedState.imageUrl === 'string' && storedState.imageUrl) {
                         updateLivePreview(storedState.imageUrl);
                 }
-
-                const status = storedState.status;
-                const isFinal = status === 'done' || status === 'error';
 
                 if (!isFinal) {
                         validateButton.disabled = true;
