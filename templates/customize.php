@@ -35,7 +35,34 @@ function load_main_content() {
 }
 
 $path = $_SERVER['REQUEST_URI'];
-$is_customize_layout = (strpos($path, '/customiize') !== false || strpos($path, '/v2shop') !== false);
+$is_customiize_page = strpos($path, '/customiize') !== false;
+$is_hub_layout = (
+        !$is_customiize_page && (
+                strpos($path, '/v2shop') !== false ||
+                strpos($path, '/configurateur') !== false ||
+                strpos($path, '/boutique') !== false ||
+                strpos($path, '/mycreation') !== false
+        )
+);
+
+$body_classes = [];
+if ($is_customiize_page) {
+        $body_classes[] = 'customize-layout-page';
+}
+if ($is_hub_layout) {
+        $body_classes[] = 'customize-layout-page';
+        $body_classes[] = 'hub-layout-page';
+}
+
+$main_classes = [];
+if ($is_customiize_page) {
+        $main_classes[] = 'customize-layout';
+}
+if ($is_hub_layout) {
+        $main_classes[] = 'customize-layout';
+        $main_classes[] = 'hub-layout';
+}
+$main_class_attribute = $main_classes ? ' class="' . esc_attr(implode(' ', $main_classes)) . '"' : '';
 ?>
 
 <!DOCTYPE html>
@@ -44,9 +71,9 @@ $is_customize_layout = (strpos($path, '/customiize') !== false || strpos($path, 
                 <meta charset="utf-8">
                 <?php wp_head(); ?>
         </head>
-        <body <?php body_class( $is_customize_layout ? 'customize-layout-page' : '' ); ?>>
+        <body <?php body_class( $body_classes ); ?>>
                 <main id="site-content" class="full-content">
-                        <div id="customize-main"<?php echo $is_customize_layout ? ' class="customize-layout"' : ''; ?>>
+                        <div id="customize-main"<?php echo $main_class_attribute; ?>>
 				<?php if (strpos($_SERVER['REQUEST_URI'], '/customiize') !== false) { ?>
 				<?php get_template_part('templates/generate/customize', 'main'); ?>
 				<?php } ?>
