@@ -136,8 +136,9 @@ function customiizer_enqueue_customize_assets() {
         } elseif (strpos($request_uri, '/customiize') !== false) {
                 // --- CSS ---
                 wp_enqueue_style('driver-style', 'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css', [], $ver);
+                wp_enqueue_style('customiize-page-style', get_stylesheet_directory_uri() . '/styles/customiize.css', ['customiizer-style'], $ver);
 
-		// --- JS externes ---
+                // --- JS externes ---
                 wp_enqueue_script('driver-js', 'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js', [], $ver, true);
 
 		// --- JS internes ---

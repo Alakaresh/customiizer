@@ -1,0 +1,44 @@
+/*
+ * Layout spécifique à la page /customiize.
+ * La structure partage des classes avec la version "hub" mais ne doit pas
+ * hériter de ce style. Nous ciblons donc explicitement les conteneurs qui ne
+ * possèdent pas la classe .hub-layout.
+ */
+body.customize-layout-page:not(.hub-layout-page) > #content,
+body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+#customize-main.customize-layout:not(.hub-layout) {
+    display: flex;
+    gap: 24px;
+    min-height: calc(100dvh - var(--header-height, 88px));
+    padding: 24px;
+    box-sizing: border-box;
+    background: radial-gradient(circle at top, rgba(47, 255, 185, 0.06) 0%, rgba(17, 17, 17, 0.92) 45%, #111111 100%);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar {
+    flex: 0 0 30%;
+    max-width: 30%;
+    background: rgba(17, 17, 17, 0.85);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content {
+    flex: 1 1 70%;
+    max-width: 70%;
+    background: rgba(10, 10, 10, 0.85);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
