@@ -364,10 +364,40 @@
     box-shadow: 0 22px 40px rgba(0, 0, 0, 0.55);
     padding: 22px 24px 26px;
     display: none;
+    flex-direction: column;
+    gap: 18px;
+    max-height: min(72vh, calc(100dvh - 220px));
+}
+
+#ratio-menu #aspect-ratio-info,
+#ratio-menu .product-selection {
+    flex-shrink: 0;
+}
+
+#ratio-menu .product-groups {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+}
+
+#ratio-menu .product-groups::-webkit-scrollbar {
+    width: 8px;
+}
+
+#ratio-menu .product-groups::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+}
+
+#ratio-menu .product-groups::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 #ratio-menu > * + * {
-    margin-top: 18px;
+    margin-top: 0;
 }
 
 #ratio-container {

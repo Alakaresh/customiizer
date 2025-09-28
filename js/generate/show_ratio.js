@@ -27,9 +27,9 @@ function toggleRatioMenu() {
     const ratioMenu = document.getElementById('ratio-menu');
     const arrowIcon = document.getElementById('arrow-icon');
 
-    const isMenuOpen = ratioMenu && ratioMenu.style.display === 'block';
+    const isMenuOpen = ratioMenu && ratioMenu.style.display !== 'none' && ratioMenu.style.display !== '';
     if (ratioMenu) {
-        ratioMenu.style.display = isMenuOpen ? 'none' : 'block';
+        ratioMenu.style.display = isMenuOpen ? 'none' : 'flex';
     }
     if (arrowIcon) {
         arrowIcon.classList.toggle('open', !isMenuOpen);
@@ -215,6 +215,7 @@ function displayVariantsForProduct(normalizedName) {
 
     container.classList.remove('is-hidden');
     container.innerHTML = '';
+    container.scrollTop = 0;
 
     const filtered = globalProducts.filter(variant =>
         normalizeProductName(variant.product_name) === normalizedName
