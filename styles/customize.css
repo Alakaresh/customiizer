@@ -17,6 +17,10 @@ body.customize-layout-page #customize-main.customize-layout {
     margin: 0;
 }
 
+body.customize-layout-page #site-content.full-content {
+    max-height: calc(100dvh - var(--header-height, 88px));
+}
+
 .sidebar {
     flex: 0 0 auto;
     height: calc(100dvh - var(--header-height, 88px));
