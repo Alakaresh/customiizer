@@ -1,5 +1,5 @@
 var allImages = [];
-const PLACEHOLDER_IMAGE_SRC = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
+const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 
 jQuery(document).ready(function() {
 	// Requête AJAX pour récupérer les images

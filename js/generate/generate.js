@@ -26,7 +26,7 @@ jQuery(function($) {
         const alertBox = document.getElementById('alert-box');
         const placeholderDiv = document.getElementById('placeholder');
         const savedPromptText = localStorage.getItem('savedPromptText');
-        const PLACEHOLDER_IMAGE_SRC = '/wp-content/themes/customiizer/images/customiizerSiteImages/attente.png';
+        const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 
         function getPreviewImageElement() {
                 return document.getElementById('generation-preview-image');
