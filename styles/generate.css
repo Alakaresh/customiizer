@@ -50,6 +50,8 @@
     grid-auto-rows: 1fr;
     gap: 24px; /* Espacement entre les images */
     margin: 0 auto; /* Centre la grille dans la zone principale */
+    justify-content: center; /* Aligne la grille horizontalement */
+    justify-items: center; /* Centre chaque élément horizontalement */
 }
 
 .image-grid.is-hidden {
