@@ -54,6 +54,12 @@ body > #content {
   margin: 0;
 }
 
+#content img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Ensure body and Astra container share the same background */
 body,
 .ast-separate-container {
