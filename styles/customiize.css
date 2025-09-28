@@ -14,6 +14,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) {
     display: flex;
     gap: 24px;
+    width: 100%;
+    max-width: none;
     height: calc(100dvh - var(--header-height, 88px));
     min-height: calc(100dvh - var(--header-height, 88px));
     padding: 24px;
