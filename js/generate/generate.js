@@ -3,6 +3,7 @@ if (typeof baseUrl === 'undefined') {
 }
 
 const LOG_PREFIX = '[Customiizer][Generate]';
+const SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
@@ -498,6 +499,23 @@ jQuery(function($) {
 
                 if (!currentUser || !currentUser.ID) {
                         localStorage.setItem('savedPromptText', prompt);
+
+                        const activeVariant = typeof window !== 'undefined' ? window.selectedVariant : null;
+                        if (activeVariant && typeof activeVariant === 'object' && activeVariant.variant_id != null) {
+                                try {
+                                        const payload = {
+                                                variantId: activeVariant.variant_id,
+                                                productName: activeVariant.product_name || '',
+                                                ratio: activeVariant.ratio_image || '',
+                                        };
+                                        localStorage.setItem(SAVED_VARIANT_STORAGE_KEY, JSON.stringify(payload));
+                                } catch (storageError) {
+                                        console.warn(`${LOG_PREFIX} Impossible d'enregistrer la variante sélectionnée`, storageError);
+                                }
+                        } else {
+                                localStorage.removeItem(SAVED_VARIANT_STORAGE_KEY);
+                        }
+
                         showAlert('Vous devez être connecté pour générer des images.');
                         if (typeof openLoginModal === 'function') {
                                 openLoginModal();
