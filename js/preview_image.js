@@ -23,20 +23,21 @@ function buildVariantLabel(variant) {
         return parts.join(' – ');
 }
 
-function renderFormatProductList(container, grouped, productIds, defaultFormatLabel, targetFormat) {
+function renderFormatProductList(container, grouped, productIds, displayFormatLabel, targetFormat) {
         if (!container) {
                 return;
         }
 
         container.innerHTML = '';
 
-        const normalizedFormat = normalizeFormatValue(targetFormat);
-        const shouldDisplayRatioLabel = Boolean(defaultFormatLabel) && (!normalizedFormat || STANDARD_RATIOS.has(normalizedFormat));
+        const ratioLabelText = getRatioLabel(targetFormat);
+        const fallbackLabelText = !ratioLabelText && displayFormatLabel !== 'Format non communiqué' ? displayFormatLabel : '';
+        const labelToDisplay = ratioLabelText || fallbackLabelText;
 
-        if (shouldDisplayRatioLabel) {
+        if (labelToDisplay) {
                 const ratioLabel = document.createElement('div');
                 ratioLabel.classList.add('format-ratio-label');
-                ratioLabel.textContent = defaultFormatLabel;
+                ratioLabel.textContent = labelToDisplay;
                 container.appendChild(ratioLabel);
         }
 
@@ -58,7 +59,7 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
 
                 const productNameEl = document.createElement('div');
                 productNameEl.classList.add('format-product-name');
-                productNameEl.textContent = product.name || defaultFormatLabel || 'Produit disponible';
+                productNameEl.textContent = product.name || displayFormatLabel || 'Produit disponible';
                 productBlock.appendChild(productNameEl);
 
                 const variants = Array.isArray(product.variants) ? product.variants : [];
@@ -112,6 +113,61 @@ function normalizeFormatValue(value) {
     }
 
     return raw;
+}
+
+function formatSlugToLabel(text) {
+    return text
+        .split(/[_-]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+function getDisplayFormatLabel(value) {
+    const normalized = normalizeFormatValue(value);
+    if (!normalized) {
+        return 'Format non communiqué';
+    }
+
+    const lowered = normalized.toLowerCase();
+    if (lowered === 'brut' || lowered === 'format brut' || lowered === 'raw') {
+        return 'Format non communiqué';
+    }
+
+    const ratioPattern = /^\d+(?:\.\d+)?\s*:\s*\d+(?:\.\d+)?$/;
+    if (ratioPattern.test(normalized)) {
+        return normalized.replace(/\s*/g, '');
+    }
+
+    const dimensionPattern = /^(\d+(?:[\.,]\d+)?)\s*x\s*(\d+(?:[\.,]\d+)?)(\s*(cm|mm|in|"))?$/i;
+    if (dimensionPattern.test(normalized)) {
+        return normalized.replace(/\s*x\s*/i, ' × ');
+    }
+
+    if (normalized.includes('_') || normalized.includes('-')) {
+        const label = formatSlugToLabel(normalized);
+        return label || 'Format non communiqué';
+    }
+
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function getRatioLabel(value) {
+    const normalized = normalizeFormatValue(value);
+    if (!normalized) {
+        return '';
+    }
+
+    if (STANDARD_RATIOS.has(normalized)) {
+        return normalized;
+    }
+
+    const ratioPattern = /^\d+(?:\.\d+)?\s*:\s*\d+(?:\.\d+)?$/;
+    if (ratioPattern.test(normalized)) {
+        return normalized.replace(/\s*/g, '');
+    }
+
+    return '';
 }
 
 function collectRatiosFromCacheSources() {
@@ -236,7 +292,7 @@ function handleImageClick(event) {
 
 function openImageOverlay(src, userId, username, formatImage, prompt) {
         const targetFormat = normalizeFormatValue(formatImage);
-        const defaultFormatLabel = targetFormat || 'Format non communiqué';
+        const displayFormatLabel = getDisplayFormatLabel(targetFormat);
         const dbRatios = refreshKnownDbRatios();
         const cacheInstance = window.formatProductsCache || null;
         const initialCachedEntry = cacheInstance && targetFormat ? cacheInstance.get(targetFormat) : undefined;
@@ -441,7 +497,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         productNames: productIds.map((id) => grouped[id].name).filter(Boolean)
                 });
 
-                renderFormatProductList(formatTextElement, grouped, productIds, defaultFormatLabel, targetFormat);
+                renderFormatProductList(formatTextElement, grouped, productIds, displayFormatLabel, targetFormat);
 
                 useImageButton.disabled = false;
 
@@ -495,7 +551,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         });
                         updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
-                        formatTextElement.textContent = defaultFormatLabel;
+                        formatTextElement.textContent = displayFormatLabel;
                         return;
                 }
 
@@ -506,7 +562,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 }
         };
 
-        formatTextElement.textContent = defaultFormatLabel;
+        formatTextElement.textContent = displayFormatLabel;
         updateUseImageButtonHandler(null);
         useImageButton.disabled = true;
 
