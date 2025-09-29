@@ -36,10 +36,11 @@ function load_main_content() {
 
 $path = $_SERVER['REQUEST_URI'];
 $is_customiize_page = strpos($path, '/customiize') !== false;
+$is_configurator_page = strpos($path, '/configurateur') !== false;
 $is_hub_layout = (
         !$is_customiize_page && (
                 strpos($path, '/v2shop') !== false ||
-                strpos($path, '/configurateur') !== false ||
+                $is_configurator_page ||
                 strpos($path, '/boutique') !== false ||
                 strpos($path, '/mycreation') !== false
         )
@@ -52,6 +53,9 @@ if ($is_customiize_page) {
 if ($is_hub_layout) {
         $body_classes[] = 'customize-layout-page';
         $body_classes[] = 'hub-layout-page';
+}
+if ($is_configurator_page) {
+        $body_classes[] = 'configurator-page';
 }
 
 $main_classes = [];

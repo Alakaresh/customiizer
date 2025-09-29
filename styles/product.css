@@ -8,6 +8,14 @@ body {
     overflow: hidden; /* Empêche le scroll sur la page produit */
 }
 
+body.configurator-page #content,
+body.configurator-page #customize-main.hub-layout > #content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    flex: 1 1 100%;
+}
+
 
 .product-section-label {
     margin: 0 0 6px;
