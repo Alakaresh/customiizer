@@ -29,10 +29,14 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: rgba(17, 17, 17, 0.85);
+    gap: 28px;
+    padding: 28px;
+    box-sizing: border-box;
+    background: linear-gradient(160deg, rgba(18, 18, 18, 0.94) 0%, rgba(10, 10, 10, 0.9) 100%);
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 24px 40px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(14px);
     overflow: hidden;
 }
 
@@ -53,6 +57,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) #left-sidebar #content-container {
     flex: 1 1 auto;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
     padding-right: 8px;
 }
 
@@ -148,5 +155,387 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images::-webkit-scrollbar-thumb {
     background: linear-gradient(135deg, var(--color-brand-600, #148556), var(--color-brand-400, #2bd879));
     border-radius: 9999px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sidebar content styling aligned with the Customiizer art direction         */
+/* -------------------------------------------------------------------------- */
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar > * {
+    width: 100%;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 24px 26px 40px;
+    min-height: 160px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.88) 0%, rgba(14, 14, 14, 0.92) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.55);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #container:focus-within {
+    border-color: rgba(31, 184, 108, 0.55);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(31, 184, 108, 0.35);
+    transform: translateY(-1px);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #custom-text {
+    flex: 1 1 auto;
+    min-height: 96px;
+    max-height: 240px;
+    color: rgba(245, 247, 244, 0.94);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
+    overflow-y: auto;
+    outline: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #custom-text::-webkit-scrollbar {
+    width: 6px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #custom-text::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--color-brand-600, #148556), var(--color-brand-400, #2bd879));
+    border-radius: 9999px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #placeholder {
+    position: absolute;
+    top: 26px;
+    left: 28px;
+    right: 28px;
+    color: rgba(214, 224, 223, 0.7);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #resizer {
+    position: absolute;
+    left: 26px;
+    right: 26px;
+    bottom: 16px;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent 0%, rgba(31, 184, 108, 0.45) 45%, rgba(43, 216, 121, 0.5) 55%, transparent 100%);
+    cursor: ns-resize;
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #container:hover #resizer,
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #container:focus-within #resizer {
+    opacity: 1;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #selected-display {
+    display: flex;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #selected-info {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(31, 184, 108, 0.4);
+    background: rgba(31, 184, 108, 0.14);
+    color: rgba(242, 250, 248, 0.92);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    text-align: left;
+    cursor: default;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(26, 26, 26, 0.88);
+    color: rgba(244, 248, 247, 0.92);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button:hover,
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button:focus-visible {
+    border-color: rgba(31, 184, 108, 0.45);
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.55);
+    transform: translateY(-1px);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #ratioButton {
+    position: relative;
+    justify-content: space-between;
+    padding-right: 20px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #ratioButton #arrow-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.25s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #ratioButton #arrow-icon.open {
+    transform: rotate(-135deg);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button {
+    flex: 0 0 auto;
+    padding-inline: 26px;
+    background: linear-gradient(135deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
+    border-color: rgba(43, 216, 121, 0.65);
+    box-shadow: 0 20px 36px rgba(27, 90, 70, 0.45);
+    color: #07120c;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button:hover,
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button:focus-visible {
+    box-shadow: 0 24px 40px rgba(27, 90, 70, 0.55);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #ratio-menu {
+    display: none;
+    padding: 26px;
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(20, 20, 20, 0.92) 0%, rgba(12, 12, 12, 0.94) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.55);
+    animation: sidebarFadeIn 0.25s ease;
+}
+
+@keyframes sidebarFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #aspect-ratio-info {
+    position: relative;
+    padding-left: 40px;
+    color: rgba(235, 244, 241, 0.9);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #aspect-ratio-info::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(31, 184, 108, 0.3), rgba(43, 216, 121, 0.55));
+    border: 1px solid rgba(43, 216, 121, 0.5);
+    box-shadow: 0 0 0 6px rgba(43, 216, 121, 0.12);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #aspect-ratio-info .info-text {
+    display: block;
+    color: rgba(214, 224, 223, 0.78);
+    letter-spacing: 0.02em;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-selection-title {
+    margin: 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(239, 248, 246, 0.72);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-selection-description {
+    margin: 0;
+    color: rgba(214, 224, 223, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown-wrapper {
+    position: relative;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown {
+    width: 100%;
+    padding: 12px 42px 12px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(22, 22, 22, 0.9);
+    color: rgba(244, 248, 247, 0.92);
+    font-size: 0.95rem;
+    appearance: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown:focus,
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown:hover {
+    border-color: rgba(31, 184, 108, 0.45);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+    outline: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid rgba(244, 248, 247, 0.7);
+    border-bottom: 2px solid rgba(244, 248, 247, 0.7);
+    pointer-events: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #product-groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-top: 24px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar #product-groups-container.is-hidden {
+    display: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-group {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-group-title {
+    margin: 0;
+    font-size: 0.88rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(239, 248, 246, 0.74);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-variants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 18px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(18, 18, 18, 0.92);
+    color: rgba(244, 248, 247, 0.9);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-item img {
+    width: 100%;
+    border-radius: 14px;
+    background: rgba(12, 12, 12, 0.94);
+    box-shadow: 0 12px 22px rgba(0, 0, 0, 0.45);
+    object-fit: contain;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-item p {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-item:hover,
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-item:focus-visible {
+    border-color: rgba(31, 184, 108, 0.45);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.55);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-item.selected {
+    border-color: rgba(43, 216, 121, 0.7);
+    box-shadow: 0 20px 40px rgba(27, 90, 70, 0.55), 0 0 0 1px rgba(43, 216, 121, 0.4);
+    transform: translateY(-2px);
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .empty-state {
+    margin: 12px 0 0;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 1px dashed rgba(31, 184, 108, 0.4);
+    background: rgba(31, 184, 108, 0.12);
+    color: rgba(214, 224, 223, 0.78);
+    text-align: center;
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+}
+
+@media (max-width: 1200px) {
+    #customize-main.customize-layout:not(.hub-layout) #left-sidebar {
+        padding: 22px;
+        gap: 22px;
+    }
+
+    #customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-variants-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
 }
 
