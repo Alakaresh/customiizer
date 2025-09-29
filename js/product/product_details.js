@@ -3,6 +3,8 @@ let myGeneratedImages = [];
 let communityImages = [];
 window.currentProductId = window.currentProductId || null;
 let currentMockup = null;
+let selectableColorCount = 0;
+let selectableSizeCount = 0;
 
 // Certains produits n'ont qu'un seul mockup initial pertinent
 const SINGLE_MOCKUP_PRODUCTS = [382, 585];
@@ -443,9 +445,16 @@ try {
 jQuery(document).ready(function ($) {
         const apiBaseURL = '/wp-json/api/v1/products';
         const mainProductImage = $('#product-main-image');
+        const defaultProductImageSrc = mainProductImage.attr('data-default-src') || mainProductImage.attr('src');
+        if (!mainProductImage.attr('data-default-src')) {
+                mainProductImage.attr('data-default-src', defaultProductImageSrc);
+        }
 
         let currentVariants = [];
         let main3DInitialized = false;
+
+        $('#customize-button').prop('disabled', true).addClass('disabled');
+        $('#no-stock-message').hide();
 
         // Préchargement du template et du modèle 3D pour une variante
         async function preloadVariantAssets(variant) {
@@ -567,58 +576,32 @@ jQuery(document).ready(function ($) {
                         v.mockups = dedupeMockups(v.mockups);
                 });
                 const urlParams = new URLSearchParams(window.location.search);
-		const variantParam = urlParams.get('variant');
-                selectedVariant = variants[0];
+                const variantParam = urlParams.get('variant');
+                const matchedVariant = variantParam
+                        ? variants.find(v => v.variant_id == variantParam)
+                        : null;
+                const shouldAutoSelectSingleVariant = variants.length === 1;
+                const initialVariant = matchedVariant || (shouldAutoSelectSingleVariant ? variants[0] : null);
 
-                updateColors(variants);
-                updateSizes(variants);
-
-                // Si aucun variant spécifique n'est indiqué, simule un clic sur
-                // la première couleur et la première taille disponibles pour
-                // appliquer correctement la sélection initiale
-                if (!variantParam) {
-                        const firstColor = $('.color-option:not(.disabled)').first();
-                        if (firstColor.length) firstColor.trigger('click');
-                        const sizeSelector = $('.size-selector');
-                        if (sizeSelector.length) {
-                                const firstSelectable = sizeSelector.find('option:not([disabled])').first();
-                                if (firstSelectable.length) {
-                                        sizeSelector.val(firstSelectable.val());
-                                        sizeSelector.trigger('change');
-                                }
-                        } else {
-                                const firstSize = $('.size-option:not(:disabled)').first();
-                                if (firstSize.length) firstSize.trigger('click');
+                if (variantParam && !matchedVariant) {
+                        try {
+                                const url = new URL(window.location.href);
+                                url.searchParams.delete('variant');
+                                history.replaceState(null, '', url.toString());
+                        } catch (e) {
+                                console.warn('Impossible de nettoyer le paramètre variant dans l’URL :', e);
                         }
                 }
 
-                // ✅ Si un paramètre variant est présent dans l'URL
-                if (variantParam) {
-                        const foundVariant = variants.find(v => v.variant_id == variantParam);
-			if (foundVariant) {
-				selectedVariant = foundVariant;
+                updateColors(variants, { initialVariant });
+                updateSizes(variants, { initialVariant });
 
-				// 👉 Sélectionne automatiquement les bonnes options dans l'interface
-				$('.color-option').removeClass('selected');
-				$(`.color-option[data-color="${selectedVariant.color}"]`).addClass('selected');
-
-                                const sizeSelector = $('.size-selector');
-                                if (sizeSelector.length) {
-                                        sizeSelector.val(selectedVariant.size);
-                                        sizeSelector.trigger('change');
-                                } else {
-                                        $('.size-option')
-                                                .removeClass('selected')
-                                                .attr('aria-selected', 'false');
-                                        $(`.size-option[data-size="${selectedVariant.size}"]`)
-                                                .addClass('selected')
-                                                .attr('aria-selected', 'true');
-                                }
-                        }
+                if (initialVariant) {
+                        applyVariantSelection(initialVariant);
+                } else {
+                        setVariantPendingState();
                 }
-
-		updateSelectedVariant();
-	}
+        }
 
 
         function updateMainImage(variant) {
@@ -639,68 +622,139 @@ jQuery(document).ready(function ($) {
                 }
         }
 
+        function setVariantPendingState() {
+                selectedVariant = null;
+                currentMockup = null;
+                main3DInitialized = false;
+
+                const dropdownImage = $('#dropdown-image').attr('src');
+                const fallbackImage = dropdownImage || defaultProductImageSrc;
+
+                mainProductImage.attr('src', fallbackImage).css({
+                        position: '',
+                        top: '',
+                        left: ''
+                });
+                mainProductImage.show();
+                jQuery('#productMain3DContainer').hide();
+
+                $('.image-thumbnails').empty();
+
+                $('.price-value span').text('--');
+                $('.discounted-price span').text('--');
+                $('.delivery-time span').text('--');
+                $('.shipping-cost span').text('--');
+
+                $('#no-stock-message')
+                        .hide()
+                        .text("❌ Ce produit n’est actuellement pas disponible.");
+
+                $('#customize-button').prop('disabled', true).addClass('disabled');
+
+                if (typeof displayImagesInBottomBar === 'function') {
+                        displayImagesInBottomBar([]);
+                }
+
+                try {
+                        const url = new URL(window.location.href);
+                        if (url.searchParams.has('variant')) {
+                                url.searchParams.delete('variant');
+                                history.replaceState(null, '', url.toString());
+                        }
+                } catch (e) {
+                        console.warn('Impossible de mettre à jour le paramètre variant dans l’URL :', e);
+                }
+        }
+
         function updateSelectedVariant() {
                 const selectedColorElement = $('.color-option.selected').first();
-                const selectedColor = selectedColorElement.attr('data-color');
-                const selectedHexRaw = selectedColorElement.attr('data-color-hex');
+                const hasColorSelection = selectedColorElement.length > 0;
+                const selectedColor = hasColorSelection ? (selectedColorElement.attr('data-color') || null) : null;
+                const selectedHexRaw = hasColorSelection ? selectedColorElement.attr('data-color-hex') : null;
                 const normalizedSelectedHex = typeof selectedHexRaw === 'string' && selectedHexRaw.trim()
                         ? selectedHexRaw.trim().toLowerCase()
                         : null;
-                const sizeSelector = $('.size-selector');
-                const selectedSizeFromSelect = sizeSelector.length ? sizeSelector.val() : null;
-                const selectedSize = $('.size-option.selected').attr('data-size') || selectedSizeFromSelect;
 
-                const newVariant = currentVariants.find(variant => {
+                const sizeSelector = $('.size-selector');
+                const selectedSizeFromSelect = sizeSelector.length ? (sizeSelector.val() || null) : null;
+                const selectedSizeButton = $('.size-option.selected').first();
+                const hasSizeSelection = sizeSelector.length
+                        ? Boolean(selectedSizeFromSelect)
+                        : selectedSizeButton.length > 0;
+                const selectedSize = sizeSelector.length
+                        ? selectedSizeFromSelect
+                        : (selectedSizeButton.attr('data-size') || null);
+
+                const needsColorSelection = selectableColorCount > 1;
+                const needsSizeSelection = selectableSizeCount > 1;
+
+                if (needsColorSelection && !hasColorSelection) {
+                        setVariantPendingState();
+                        return;
+                }
+
+                if (needsSizeSelection && !hasSizeSelection) {
+                        setVariantPendingState();
+                        return;
+                }
+
+                const matchingVariants = currentVariants.filter(variant => {
                         const variantHex = typeof variant.hexa === 'string' && variant.hexa.trim()
                                 ? variant.hexa.trim().toLowerCase()
                                 : null;
-                        const matchesColor = (!selectedColor && !normalizedSelectedHex)
-                                || (typeof variant.color === 'string' && variant.color === selectedColor)
+
+                        const colorMatches = !needsColorSelection
+                                || (selectedColor && typeof variant.color === 'string' && variant.color === selectedColor)
                                 || (normalizedSelectedHex && variantHex === normalizedSelectedHex);
-                        const matchesSize = !selectedSize || variant.size === selectedSize;
-                        return matchesColor && matchesSize;
+
+                        const sizeMatches = !needsSizeSelection
+                                || (selectedSize && variant.size === selectedSize);
+
+                        return colorMatches && sizeMatches;
                 });
 
-		if (newVariant) {
-                        selectedVariant = newVariant;
-
-                        if (sizeSelector.length && selectedVariant.size) {
-                                sizeSelector.val(selectedVariant.size);
-                        }
-
-			// 🔄 Mise à jour de l'URL
-			const url = new URL(window.location.href);
-			url.searchParams.set("variant", selectedVariant.variant_id);
-			history.replaceState(null, '', url.toString());
-
-			updatePriceAndDelivery(selectedVariant);
-			updateMainImage(selectedVariant);
-			updateThumbnails([selectedVariant]);
-
-			// Gestion du stock
-			const outOfStock = selectedVariant.stock === 'out of stock' || selectedVariant.stock === 'discontinued';
-
-			$('#customize-button')
-				.prop('disabled', outOfStock)
-				.toggleClass('disabled', outOfStock);
-
-			$('#no-stock-message').toggle(outOfStock);
-
-			// Affichage des images communautaires selon le ratio
-			const allImages = getAllCommunityImages();
-			const filteredImages = allImages.filter(img => img.format === selectedVariant.ratio_image);
-                        displayImagesInBottomBar(filteredImages);
-
-                        // 🚀 Précharge les ressources du configurateur pour la variante courante
-                        preloadVariantAssets(selectedVariant);
-
-                        // 📢 Signale que la variante est prête pour d'autres scripts
-                        $(document).trigger('variantReady', [selectedVariant]);
-                } else {
-			console.warn("Aucune variante trouvée pour cette combinaison !");
-			$('#customize-button').prop('disabled', true).addClass('disabled');
-			$('#no-stock-message').text("❌ Cette combinaison est indisponible.").show();
+                if (!matchingVariants.length) {
+                        console.warn("Aucune variante trouvée pour cette combinaison !");
+                        $('#customize-button').prop('disabled', true).addClass('disabled');
+                        $('#no-stock-message').text("❌ Cette combinaison est indisponible.").show();
+                        return;
                 }
+
+                const availableVariant = matchingVariants.find(v => v.stock !== 'out of stock' && v.stock !== 'discontinued');
+                const newVariant = availableVariant || matchingVariants[0];
+
+                selectedVariant = newVariant;
+
+                if (sizeSelector.length && selectedVariant.size) {
+                        sizeSelector.val(selectedVariant.size);
+                }
+
+                try {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('variant', selectedVariant.variant_id);
+                        history.replaceState(null, '', url.toString());
+                } catch (e) {
+                        console.warn('Impossible de mettre à jour le paramètre variant dans l’URL :', e);
+                }
+
+                updatePriceAndDelivery(selectedVariant);
+                updateMainImage(selectedVariant);
+                updateThumbnails([selectedVariant]);
+
+                const outOfStock = selectedVariant.stock === 'out of stock' || selectedVariant.stock === 'discontinued';
+
+                $('#customize-button')
+                        .prop('disabled', outOfStock)
+                        .toggleClass('disabled', outOfStock);
+
+                $('#no-stock-message').toggle(outOfStock);
+
+                const allImages = getAllCommunityImages();
+                const filteredImages = allImages.filter(img => img.format === selectedVariant.ratio_image);
+                displayImagesInBottomBar(filteredImages);
+
+                preloadVariantAssets(selectedVariant);
+                $(document).trigger('variantReady', [selectedVariant]);
         }
 
 
@@ -770,31 +824,52 @@ jQuery(document).ready(function ($) {
 
 
 
-        function updateColors(variants) {
+        function updateColors(variants, options = {}) {
+                const { initialVariant = null } = options;
                 const colorsContainer = $('.colors-container').empty();
-                const colorSet = new Set();
-                const colorHexMap = new Map();
+                const colorMap = new Map();
 
                 variants.forEach(v => {
-                        if (v.color) {
-                                colorSet.add(v.color);
-                                if (v.hexa && !colorHexMap.has(v.color)) {
-                                        colorHexMap.set(v.color, v.hexa);
-                                }
+                        if (!v || !v.color) {
+                                return;
+                        }
+
+                        if (!colorMap.has(v.color)) {
+                                colorMap.set(v.color, {
+                                        color: v.color,
+                                        hex: v.hexa || null,
+                                        available: false
+                                });
+                        }
+
+                        const entry = colorMap.get(v.color);
+                        if (!entry.available && v.stock !== 'out of stock' && v.stock !== 'discontinued') {
+                                entry.available = true;
+                        }
+
+                        if (!entry.hex && v.hexa) {
+                                entry.hex = v.hexa;
                         }
                 });
 
-                Array.from(colorSet).forEach((color, index) => {
-                        const fallbackHex = colorHexMap.get(color) || null;
+                const colorEntries = Array.from(colorMap.values());
+                selectableColorCount = colorEntries.filter(entry => entry.available).length;
+
+                const initialHex = initialVariant && typeof initialVariant.hexa === 'string' && initialVariant.hexa.trim()
+                        ? initialVariant.hexa.trim().toLowerCase()
+                        : null;
+
+                colorEntries.forEach((entry) => {
+                        const fallbackHex = entry.hex || null;
                         const appearance = typeof window.resolveVariantColorAppearance === 'function'
-                                ? window.resolveVariantColorAppearance(color, fallbackHex)
-                                : { cssColor: fallbackHex || color, label: color };
-                        const isOutOfStock = !variants.some(v => v.color === color && v.stock !== 'out of stock' && v.stock !== 'discontinued');
+                                ? window.resolveVariantColorAppearance(entry.color, fallbackHex)
+                                : { cssColor: fallbackHex || entry.color, label: entry.color };
+                        const isOutOfStock = !entry.available;
 
                         const colorOption = $('<div>')
                                 .addClass('color-option')
                                 .css('background-color', appearance.cssColor)
-                                .attr('data-color', color)
+                                .attr('data-color', entry.color)
                                 .attr('data-color-hex', fallbackHex || '')
                                 .attr('title', appearance.label)
                                 .attr('aria-label', appearance.label)
@@ -806,24 +881,34 @@ jQuery(document).ready(function ($) {
                                         updateSelectedVariant();
                                 });
 
-                        colorsContainer.append(colorOption);
-
-                        if (index === 0 && !isOutOfStock) {
-                                colorOption.addClass('selected');
+                        if (initialVariant && !isOutOfStock) {
+                                const matchesColor = typeof initialVariant.color === 'string' && initialVariant.color === entry.color;
+                                const optionHex = fallbackHex ? fallbackHex.toLowerCase() : null;
+                                const matchesHex = Boolean(initialHex && optionHex && optionHex === initialHex);
+                                if (matchesColor || matchesHex) {
+                                        colorOption.addClass('selected');
+                                }
                         }
+
+                        colorsContainer.append(colorOption);
                 });
-                // ✅ Affichage conditionnel
-                if (colorSet.size <= 1) {
+
+                if (colorEntries.length <= 1) {
                         $('.product-colors').hide();
                 } else {
                         $('.product-colors').show();
+                }
+
+                if (!colorEntries.length) {
+                        selectableColorCount = 0;
                 }
 
         }
 
 
 
-        function updateSizes(variants) {
+        function updateSizes(variants, options = {}) {
+                const { initialVariant = null } = options;
                 const sizesContainer = $('.sizes-container').empty();
                 const listLabel = sizesContainer.data('label') || 'Tailles disponibles';
 
@@ -836,30 +921,23 @@ jQuery(document).ready(function ($) {
                 const orderedSizes = [];
 
                 variants.forEach(v => {
-                        if (v.size && !seenSizes.has(v.size)) {
+                        if (v && v.size && !seenSizes.has(v.size)) {
                                 seenSizes.add(v.size);
                                 orderedSizes.push({ size: v.size, stock: v.stock });
                         }
                 });
 
+                const availableSizes = orderedSizes.filter(({ stock }) => stock !== 'out of stock' && stock !== 'discontinued');
+                selectableSizeCount = availableSizes.length;
+
                 const shouldUseSelect = orderedSizes.length > PRODUCT_SIZE_SELECT_THRESHOLD;
 
                 let preferredSize = null;
-                if (selectedVariant && orderedSizes.some(entry => entry.size === selectedVariant.size)) {
-                        preferredSize = selectedVariant.size;
-                }
-
-                if (preferredSize) {
+                if (initialVariant && initialVariant.size && orderedSizes.some(entry => entry.size === initialVariant.size)) {
+                        preferredSize = initialVariant.size;
                         const preferredEntry = orderedSizes.find(entry => entry.size === preferredSize);
                         if (!preferredEntry || preferredEntry.stock === 'out of stock' || preferredEntry.stock === 'discontinued') {
                                 preferredSize = null;
-                        }
-                }
-
-                if (!preferredSize) {
-                        const firstAvailable = orderedSizes.find(({ stock }) => stock !== 'out of stock' && stock !== 'discontinued');
-                        if (firstAvailable) {
-                                preferredSize = firstAvailable.size;
                         }
                 }
 
@@ -875,7 +953,8 @@ jQuery(document).ready(function ($) {
                                 .val('')
                                 .text('Sélectionner une taille')
                                 .prop('disabled', true)
-                                .prop('hidden', true);
+                                .prop('hidden', true)
+                                .prop('selected', true);
                         selectElement.append(placeholder);
 
                         orderedSizes.forEach(({ size, stock }) => {
@@ -891,6 +970,8 @@ jQuery(document).ready(function ($) {
 
                         if (preferredSize) {
                                 selectElement.val(preferredSize);
+                        } else {
+                                selectElement.val('');
                         }
 
                         selectElement.on('change', function () {
