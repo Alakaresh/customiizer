@@ -10,8 +10,6 @@
 -->
 
 <div class="content-images" id="content-images">
-        <div id="generation-progress-inline-wrapper" class="generation-progress-inline-wrapper" role="region" aria-live="polite" aria-hidden="true"></div>
-
         <section
                 id="variant-display"
                 class="variant-display is-hidden"
@@ -80,6 +78,13 @@
 
         <div id="generation-preview" class="generation-preview">
                 <div class="generation-preview__main">
+                        <div
+                                id="generation-progress-inline-wrapper"
+                                class="generation-progress-inline-wrapper"
+                                role="region"
+                                aria-live="polite"
+                                aria-hidden="true"
+                        ></div>
                         <img
                                 id="generation-preview-image"
                                 class="centered-image"
