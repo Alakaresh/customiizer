@@ -67,7 +67,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images {
     flex: 1 1 auto;
-    overflow-y: auto;
+    overflow: hidden;
     padding-right: 8px;
     display: flex;
     flex-direction: column;
@@ -79,15 +79,27 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    box-sizing: border-box;
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 16px;
-    width: 100%;
+    width: min(100%, calc(100dvh - var(--header-height, 88px) - 120px));
+    max-width: 100%;
     min-height: 0;
-    align-content: start;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    max-height: 100%;
+    margin: 0 auto;
+    align-content: stretch;
+    align-items: stretch;
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid.is-hidden {
@@ -118,6 +130,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 0;
+    min-height: 0;
     aspect-ratio: 1 / 1;
 }
 
