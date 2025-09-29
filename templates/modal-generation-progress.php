@@ -3,9 +3,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<div id="generation-progress-modal" class="generation-progress-modal hide" role="dialog" aria-modal="true" aria-labelledby="generation-progress-title" aria-describedby="loading-text" aria-hidden="true">
+<div id="generation-progress-modal" class="generation-progress-modal hide" role="dialog" aria-modal="true" aria-labelledby="loading-text" aria-describedby="loading-text" aria-hidden="true">
     <div class="generation-progress-dialog" role="document">
-        <h2 id="generation-progress-title" class="generation-progress-title">Génération en cours</h2>
         <div class="loading-container">
             <div class="loading-bar-border" role="presentation">
                 <div
