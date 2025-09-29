@@ -33,7 +33,7 @@ function setVariantPanelVisibility(forceState) {
     const summary = document.getElementById('variant-summary');
 
     if (!panel) {
-        return;
+        return false;
     }
 
     const isCurrentlyHidden = panel.classList.contains('is-hidden');
@@ -46,6 +46,10 @@ function setVariantPanelVisibility(forceState) {
     if (summary) {
         summary.setAttribute('aria-expanded', shouldBeVisible ? 'true' : 'false');
     }
+
+    toggleImageGrid(shouldBeVisible);
+
+    return shouldBeVisible;
 }
 
 function setDefaultSelectedInfo() {
@@ -278,8 +282,6 @@ function displayVariantsForProduct(normalizedName) {
 
     const uniqueVariants = deduplicateVariantsById(filtered).filter(variant => isValidMockupImage(variant.image));
 
-    toggleImageGrid(true);
-
     if (uniqueVariants.length === 0) {
         containers.forEach(container => {
             container.appendChild(createEmptyState('Aucun format avec visuel disponible pour ce produit.'));
@@ -422,7 +424,6 @@ function handleVariantSelection(element, variant, options = {}) {
     }
 
     setVariantPanelVisibility(false);
-    toggleImageGrid(false);
 }
 
 function highlightVariantSelection(selectedElement) {
