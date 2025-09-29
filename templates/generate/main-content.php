@@ -79,11 +79,24 @@
         </div>
 
         <div id="generation-preview" class="generation-preview">
-                <img
-                        id="generation-preview-image"
-                        class="centered-image"
-                        src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
-                        alt="Image d'attente"
-                />
+                <div class="generation-preview__main">
+                        <img
+                                id="generation-preview-image"
+                                class="centered-image"
+                                src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
+                                alt="Image d'attente"
+                        />
+                </div>
+                <div id="generation-preview-thumbnails" class="generation-preview__thumbnails" aria-label="Variations générées">
+                        <button type="button" class="generation-preview__thumbnail is-placeholder" disabled>
+                                <img src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image d'attente" />
+                        </button>
+                        <button type="button" class="generation-preview__thumbnail is-placeholder" disabled>
+                                <img src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image d'attente" />
+                        </button>
+                        <button type="button" class="generation-preview__thumbnail is-placeholder" disabled>
+                                <img src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image d'attente" />
+                        </button>
+                </div>
         </div>
 </div>
