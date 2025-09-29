@@ -313,19 +313,8 @@ function displayVariantsForProduct(normalizedName) {
         return;
     }
 
-    const sortedVariants = uniqueVariants
-        .slice()
-        .sort((a, b) => {
-            const ratioDiff = parseRatioValue(a.ratio_image) - parseRatioValue(b.ratio_image);
-            if (ratioDiff !== 0) {
-                return ratioDiff;
-            }
-
-            return getVariantOrderValue(a) - getVariantOrderValue(b);
-        });
-
     containers.forEach(container => {
-        const sectionData = buildVariantSection(sortedVariants, {
+        const sectionData = buildVariantSection(uniqueVariants, {
             ratioToMatch: ratioFromQuery
         });
 
@@ -539,21 +528,6 @@ function deduplicateVariantsById(variants) {
     });
 
     return Array.from(variantsById.values());
-}
-
-function getVariantOrderValue(variant) {
-    if (!variant || typeof variant !== 'object') {
-        return Number.MAX_SAFE_INTEGER;
-    }
-
-    const rawOrder = variant.variant_order ??
-        variant.display_order ??
-        variant.order ??
-        variant.order_index ??
-        variant.variant_id;
-
-    const orderNumber = Number(rawOrder);
-    return Number.isFinite(orderNumber) ? orderNumber : Number.MAX_SAFE_INTEGER;
 }
 
 function createEmptyState(message) {
