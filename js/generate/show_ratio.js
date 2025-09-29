@@ -375,10 +375,40 @@ function buildVariantItem(variant) {
     image.alt = variant.product_name.includes('Clear Case') ? '' : (variant.size || 'Format');
     item.appendChild(image);
 
-    if (!variant.product_name.includes('Clear Case')) {
+    const metaWrapper = document.createElement('div');
+    metaWrapper.className = 'product-item__meta';
+
+    if (!variant.product_name.includes('Clear Case') && variant.size) {
         const sizeText = document.createElement('p');
         sizeText.textContent = variant.size;
-        item.appendChild(sizeText);
+        sizeText.className = 'product-item__size';
+        metaWrapper.appendChild(sizeText);
+    }
+
+    const colorLabel = typeof variant.color === 'string' ? variant.color.trim() : '';
+    const colorHex = typeof variant.hexa === 'string' ? variant.hexa.trim() : '';
+    if (colorLabel) {
+        const colorRow = document.createElement('p');
+        colorRow.className = 'product-item__color';
+
+        const colorText = document.createElement('span');
+        colorText.className = 'product-item__color-label';
+        colorText.textContent = colorLabel;
+
+        if (colorHex) {
+            const colorDot = document.createElement('span');
+            colorDot.className = 'product-item__color-dot';
+            colorDot.style.backgroundColor = colorHex;
+            colorDot.setAttribute('aria-hidden', 'true');
+            colorRow.appendChild(colorDot);
+        }
+        colorRow.appendChild(colorText);
+        colorRow.setAttribute('title', colorLabel);
+        metaWrapper.appendChild(colorRow);
+    }
+
+    if (metaWrapper.childElementCount > 0) {
+        item.appendChild(metaWrapper);
     }
 
     item.addEventListener('click', () => {
@@ -444,6 +474,11 @@ function updateSelectedInfo(variant) {
     }
     if (variant.size) {
         parts.push(variant.size);
+    }
+
+    const colorLabel = typeof variant.color === 'string' ? variant.color.trim() : '';
+    if (colorLabel) {
+        parts.push(colorLabel);
     }
 
     const label = parts.join(' · ') || 'Sélectionnez un format';
