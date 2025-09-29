@@ -14,7 +14,7 @@
                         </div>
                 </div>
 
-                <div id="product-groups-container" class="product-groups is-hidden" role="list">
+                <div id="product-groups-container" class="product-groups is-hidden" role="list" data-variant-container aria-busy="false">
                         <!-- Groupes de formats injectés en JS -->
                 </div>
 
