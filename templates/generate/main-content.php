@@ -10,6 +10,8 @@
 -->
 
 <div class="content-images" id="content-images">
+        <div id="generation-progress-inline-wrapper" class="generation-progress-inline-wrapper" role="region" aria-live="polite" aria-hidden="true"></div>
+
         <div class="grid-wrapper">
                 <div id="image-grid" class="image-grid">
                         <div class="image-container top">

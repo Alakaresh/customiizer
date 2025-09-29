@@ -94,6 +94,46 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     min-height: 0;
 }
 
+#customize-main.customize-layout:not(.hub-layout) #generation-progress-inline-wrapper {
+    display: none;
+    width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #generation-progress-inline-wrapper.is-active {
+    display: flex;
+    justify-content: center;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    #generation-progress-inline-wrapper
+    .generation-progress-modal.inline-mode {
+    position: static;
+    right: auto;
+    bottom: auto;
+    max-width: min(520px, 100%);
+    width: 100%;
+    pointer-events: auto;
+    z-index: auto;
+    align-items: stretch;
+    justify-content: center;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    #generation-progress-inline-wrapper
+    .generation-progress-dialog.inline-mode {
+    width: 100%;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    #generation-progress-inline-wrapper
+    .generation-progress-dialog.inline-mode
+    .loading-container {
+    box-shadow: none;
+    background: rgba(18, 18, 18, 0.88);
+}
+
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .grid-wrapper {
     flex: 1 1 auto;
     min-height: 0;
