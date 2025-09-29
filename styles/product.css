@@ -8,6 +8,13 @@ body {
     overflow: hidden; /* Empêche le scroll sur la page produit */
 }
 
+body.configurator-page #site-content,
+body.configurator-page .site-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
 
 .product-section-label {
     margin: 0 0 6px;
