@@ -84,7 +84,7 @@ jQuery(function($) {
                         gridContainer.innerHTML = '';
                         for (let i = 0; i < 4; i++) {
                                 const wrapper = document.createElement('div');
-                                wrapper.className = `image-container ${i < 2 ? 'top' : 'bottom'}`;
+                                wrapper.className = `customize-image-slot ${i < 2 ? 'top' : 'bottom'}`;
 
                                 const image = document.createElement('img');
                                 image.className = i < 2 ? 'top' : 'bottom';

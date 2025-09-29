@@ -50,7 +50,7 @@ function displayImages() {
                                         .addClass(i < 2 ? 'top' : 'bottom');
 
                                 var imgContainer = jQuery('<div>')
-                                        .addClass('image-container ' + (i < 2 ? 'top' : 'bottom'))
+                                        .addClass('customize-image-slot ' + (i < 2 ? 'top' : 'bottom'))
                                         .append(imgElement);
 
                                 gridContainer.append(imgContainer);
@@ -75,7 +75,7 @@ function displayImages() {
                                         .addClass(index < 2 ? 'top' : 'bottom');
 
                                 var imgContainer = jQuery('<div>')
-                                        .addClass('image-container ' + (index < 2 ? 'top' : 'bottom'))
+                                        .addClass('customize-image-slot ' + (index < 2 ? 'top' : 'bottom'))
                                         .append(imgElement);
 
                                 gridContainer.append(imgContainer);

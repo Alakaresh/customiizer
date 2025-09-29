@@ -12,16 +12,16 @@
 <div class="content-images" id="content-images">
         <div class="grid-wrapper">
                 <div id="image-grid" class="image-grid">
-                        <div class="image-container top">
+                        <div class="customize-image-slot top">
                                 <img class="top" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 0" />
                         </div>
-                        <div class="image-container top">
+                        <div class="customize-image-slot top">
                                 <img class="top" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 1" />
                         </div>
-                        <div class="image-container bottom">
+                        <div class="customize-image-slot bottom">
                                 <img class="bottom" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 2" />
                         </div>
-                        <div class="image-container bottom">
+                        <div class="customize-image-slot bottom">
                                 <img class="bottom" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 3" />
                         </div>
                 </div>
