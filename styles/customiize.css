@@ -811,7 +811,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-preview {
     display: none;
-    width: 100%;
+    width: min(100%, calc(100dvh - var(--header-height, 88px) - 120px));
+    max-width: min(100%, 1080px);
     aspect-ratio: 1 / 1;
     align-items: center;
     justify-content: center;
@@ -820,6 +821,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.04);
+    margin: 0 auto;
+    flex: 0 0 auto;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
