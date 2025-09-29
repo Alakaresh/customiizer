@@ -3,7 +3,7 @@ if (typeof baseUrl === 'undefined') {
 }
 
 const LOG_PREFIX = '[Customiizer][Generate]';
-const SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
+const GENERATE_SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
@@ -508,12 +508,15 @@ jQuery(function($) {
                                                 productName: activeVariant.product_name || '',
                                                 ratio: activeVariant.ratio_image || '',
                                         };
-                                        localStorage.setItem(SAVED_VARIANT_STORAGE_KEY, JSON.stringify(payload));
+                                        localStorage.setItem(
+                                                GENERATE_SAVED_VARIANT_STORAGE_KEY,
+                                                JSON.stringify(payload)
+                                        );
                                 } catch (storageError) {
                                         console.warn(`${LOG_PREFIX} Impossible d'enregistrer la variante sélectionnée`, storageError);
                                 }
                         } else {
-                                localStorage.removeItem(SAVED_VARIANT_STORAGE_KEY);
+                                localStorage.removeItem(GENERATE_SAVED_VARIANT_STORAGE_KEY);
                         }
 
                         showAlert('Vous devez être connecté pour générer des images.');
