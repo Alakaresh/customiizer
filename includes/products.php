@@ -17,12 +17,14 @@ function get_product_ratios() {
     global $wpdb;
 
     $results = $wpdb->get_results("
-        SELECT 
+        SELECT
             p.product_id,
             p.name AS product_name,
             v.variant_id,
             v.size,
             v.ratio_image,
+            v.color,
+            v.hexa,
             m.image
         FROM WPC_products p
         INNER JOIN WPC_variants v ON p.product_id = v.product_id
