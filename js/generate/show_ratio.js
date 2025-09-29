@@ -2,10 +2,20 @@
 
 const DEFAULT_RATIO = '1:1';
 const DEFAULT_SUMMARY_IMAGE = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
+const PRODUCT_CATEGORY_KEYWORDS = [
+    { key: 'cases', label: 'Coques', keywords: ['coque', 'case'] },
+    { key: 'mugs', label: 'Mugs', keywords: ['mug', 'tasse'] },
+    { key: 'posters', label: 'Posters', keywords: ['poster', 'affiche'] },
+    { key: 'textile', label: 'Textile', keywords: ['t-shirt', 'tee', 'hoodie', 'sweat', 'textile'] },
+    { key: 'bags', label: 'Sacs', keywords: ['sac', 'tote', 'bag'] }
+];
+const DEFAULT_CATEGORY = { key: 'others', label: 'Autres' };
 let selectedRatio = DEFAULT_RATIO;
 let selectedProductKey = '';
 let globalProducts = [];
+let globalProductEntries = [];
 let ratioFromQuery = '';
+let activeProductCategory = 'all';
 
 document.addEventListener('DOMContentLoaded', function () {
     ratioFromQuery = getRatioFromQueryParam();
@@ -158,6 +168,37 @@ function normalizeProductName(name) {
     return trimmed;
 }
 
+function deriveCategoryFromProductName(name) {
+    const normalized = typeof name === 'string' ? name.toLowerCase() : '';
+
+    const match = PRODUCT_CATEGORY_KEYWORDS.find(category =>
+        category.keywords.some(keyword => normalized.includes(keyword))
+    );
+
+    return match || DEFAULT_CATEGORY;
+}
+
+function buildCategoryCollection(entries) {
+    const map = new Map();
+
+    entries.forEach(entry => {
+        if (!entry || !entry.categoryKey) {
+            return;
+        }
+
+        if (!map.has(entry.categoryKey)) {
+            map.set(entry.categoryKey, {
+                key: entry.categoryKey,
+                label: entry.categoryLabel
+            });
+        }
+    });
+
+    return Array.from(map.values()).sort((a, b) =>
+        a.label.localeCompare(b.label, 'fr', { sensitivity: 'base', numeric: true })
+    );
+}
+
 function buildProductEntries(products) {
     const entries = new Map();
 
@@ -167,11 +208,15 @@ function buildProductEntries(products) {
             return;
         }
 
+        const category = deriveCategoryFromProductName(product.product_name);
+
         if (!entries.has(normalized)) {
             entries.set(normalized, {
                 key: normalized,
                 displayName: normalized,
-                productId: product.product_id
+                productId: product.product_id,
+                categoryKey: category.key,
+                categoryLabel: category.label
             });
         }
     });
@@ -185,7 +230,7 @@ function addProductButtons(products) {
     const productList = document.getElementById('product-list');
     const groupsContainer = document.getElementById('product-groups-container');
 
-    if (!productList) {
+    if (!productList || !groupsContainer) {
         return;
     }
 
@@ -194,13 +239,10 @@ function addProductButtons(products) {
 
     resetVariantSelection();
 
-    const productEntries = buildProductEntries(products);
+    globalProductEntries = buildProductEntries(products);
+    activeProductCategory = 'all';
 
-    if (!groupsContainer) {
-        return;
-    }
-
-    if (productEntries.length === 0) {
+    if (globalProductEntries.length === 0) {
         productList.classList.add('is-empty');
 
         const emptyState = createEmptyState('Aucun produit actif pour le moment.');
@@ -213,14 +255,154 @@ function addProductButtons(products) {
         return;
     }
 
-    productEntries.forEach(entry => {
+    renderProductFilters(globalProductEntries);
+
+    const visibleEntries = renderProductList(globalProductEntries);
+
+    hideVariantList();
+
+    let initialKey = findInitialProductKey(globalProductEntries);
+    const hasInitialInVisible = visibleEntries.some(entry => entry.key === initialKey);
+
+    if (!initialKey || !hasInitialInVisible) {
+        initialKey = visibleEntries[0]?.key || '';
+    }
+
+    if (initialKey) {
+        selectProduct(initialKey);
+    } else {
+        setActiveProductButton('');
+    }
+}
+
+function renderProductFilters(entries) {
+    const filterBar = document.getElementById('product-filter-bar');
+    const filterList = document.getElementById('product-filters');
+
+    if (!filterBar || !filterList) {
+        return;
+    }
+
+    const categories = buildCategoryCollection(entries);
+    filterList.innerHTML = '';
+
+    const shouldDisplayFilters = categories.length > 1;
+    filterBar.classList.toggle('is-hidden', !shouldDisplayFilters);
+    filterBar.setAttribute('aria-hidden', shouldDisplayFilters ? 'false' : 'true');
+
+    if (!shouldDisplayFilters) {
+        activeProductCategory = 'all';
+        return;
+    }
+
+    const filters = [{ key: 'all', label: 'Tous' }, ...categories];
+
+    filters.forEach(filter => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'filter-chip';
+        button.dataset.filterKey = filter.key;
+        button.textContent = filter.label;
+        button.setAttribute('aria-pressed', activeProductCategory === filter.key ? 'true' : 'false');
+
+        if (activeProductCategory === filter.key) {
+            button.classList.add('is-active');
+        }
+
+        button.addEventListener('click', () => {
+            handleFilterSelection(filter.key);
+        });
+
+        filterList.appendChild(button);
+    });
+}
+
+function handleFilterSelection(categoryKey) {
+    if (activeProductCategory === categoryKey) {
+        return;
+    }
+
+    activeProductCategory = categoryKey;
+    setActiveFilterChip(categoryKey);
+
+    const visibleEntries = renderProductList(globalProductEntries);
+
+    if (visibleEntries.length === 0) {
+        selectedProductKey = '';
+        setActiveProductButton('');
+        clearSelectedVariantState();
+        return;
+    }
+
+    if (visibleEntries.some(entry => entry.key === selectedProductKey)) {
+        return;
+    }
+
+    const preferredKey = findInitialProductKey(globalProductEntries);
+    const fallback = visibleEntries.find(entry => entry.key === preferredKey)?.key
+        || visibleEntries[0]?.key
+        || '';
+
+    if (fallback) {
+        selectProduct(fallback);
+    } else {
+        setActiveProductButton('');
+        clearSelectedVariantState();
+    }
+}
+
+function setActiveFilterChip(categoryKey) {
+    document.querySelectorAll('#product-filters .filter-chip').forEach(button => {
+        const isActive = button.dataset.filterKey === categoryKey;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+}
+
+function renderProductList(entries) {
+    const productList = document.getElementById('product-list');
+    const groupsContainer = document.getElementById('product-groups-container');
+
+    if (!productList || !groupsContainer) {
+        return [];
+    }
+
+    productList.innerHTML = '';
+    productList.classList.remove('is-empty');
+
+    const filteredEntries = entries.filter(entry =>
+        activeProductCategory === 'all' || entry.categoryKey === activeProductCategory
+    );
+
+    if (filteredEntries.length === 0) {
+        productList.classList.add('is-empty');
+
+        const emptyState = createEmptyState('Aucun produit dans cette catégorie.');
+        emptyState.classList.add('product-list-empty');
+        productList.appendChild(emptyState);
+
+        groupsContainer.classList.remove('is-hidden');
+        groupsContainer.innerHTML = '';
+        groupsContainer.appendChild(createEmptyState('Sélectionnez une autre catégorie pour afficher les variantes.'));
+
+        return [];
+    }
+
+    groupsContainer.classList.add('is-hidden');
+    groupsContainer.innerHTML = '';
+
+    filteredEntries.forEach(entry => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'product-option';
         button.dataset.productKey = entry.key;
         button.textContent = entry.displayName;
         button.setAttribute('role', 'listitem');
-        button.setAttribute('aria-pressed', 'false');
+        button.setAttribute('aria-pressed', selectedProductKey === entry.key ? 'true' : 'false');
+
+        if (selectedProductKey === entry.key) {
+            button.classList.add('is-active');
+        }
 
         button.addEventListener('click', () => {
             if (selectedProductKey === entry.key) {
@@ -234,14 +416,7 @@ function addProductButtons(products) {
         productList.appendChild(button);
     });
 
-    hideVariantList();
-
-    const initialKey = findInitialProductKey(productEntries);
-    if (initialKey) {
-        selectProduct(initialKey);
-    } else {
-        setActiveProductButton('');
-    }
+    return filteredEntries;
 }
 
 function setActiveProductButton(productKey) {
@@ -342,8 +517,8 @@ function buildVariantSection(variants, options = {}) {
     let firstSelectable = null;
     let ratioMatch = null;
 
-    variants.forEach(variant => {
-        const item = buildVariantItem(variant);
+    variants.forEach((variant, index) => {
+        const item = buildVariantItem(variant, index);
         list.appendChild(item);
 
         if (!firstSelectable) {
@@ -362,24 +537,51 @@ function buildVariantSection(variants, options = {}) {
     };
 }
 
-function buildVariantItem(variant) {
+function buildVariantItem(variant, index = 0) {
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'product-item';
     item.dataset.variantId = variant.variant_id;
     item.setAttribute('role', 'listitem');
     item.setAttribute('aria-pressed', 'false');
+    item.style.setProperty('--card-index', String(index));
+
+    const visualWrapper = document.createElement('div');
+    visualWrapper.className = 'product-item__visual';
 
     const image = document.createElement('img');
+    image.className = 'product-item__image';
     image.src = variant.image;
-    image.alt = variant.product_name.includes('Clear Case') ? '' : (variant.size || 'Format');
-    item.appendChild(image);
+    image.loading = 'lazy';
 
-    if (!variant.product_name.includes('Clear Case')) {
-        const sizeText = document.createElement('p');
-        sizeText.textContent = variant.size;
-        item.appendChild(sizeText);
+    const normalizedName = normalizeProductName(variant.product_name);
+    const productTitle = normalizedName && normalizedName !== 'Clear Case'
+        ? normalizedName
+        : (variant.variant_name || variant.size || 'Variante');
+
+    image.alt = productTitle ? `Visuel ${productTitle}` : (variant.size || 'Format');
+
+    visualWrapper.appendChild(image);
+    item.appendChild(visualWrapper);
+
+    const label = document.createElement('div');
+    label.className = 'product-item__label';
+
+    if (productTitle) {
+        const titleElement = document.createElement('p');
+        titleElement.className = 'product-item__name';
+        titleElement.textContent = productTitle;
+        label.appendChild(titleElement);
     }
+
+    if (variant.size) {
+        const sizeText = document.createElement('p');
+        sizeText.className = 'product-item__variant';
+        sizeText.textContent = variant.size;
+        label.appendChild(sizeText);
+    }
+
+    item.appendChild(label);
 
     item.addEventListener('click', () => {
         handleVariantSelection(item, variant);

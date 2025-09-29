@@ -45,6 +45,14 @@
                                         <p class="variant-panel__sidebar-description">
                                                 Explorez les formats recommandés pour chaque produit en un clin d'œil.
                                         </p>
+                                        <div
+                                                id="product-filter-bar"
+                                                class="variant-panel__filters is-hidden"
+                                                role="group"
+                                                aria-label="Filtrer les produits par catégorie"
+                                        >
+                                                <div id="product-filters" class="variant-panel__filter-list"></div>
+                                        </div>
                                         <div id="product-container" class="variant-panel__product-list-wrapper">
                                                 <div id="product-list" class="variant-panel__product-list" role="list" aria-labelledby="product-list-label"></div>
                                         </div>
