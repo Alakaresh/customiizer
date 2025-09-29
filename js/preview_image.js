@@ -1,5 +1,4 @@
 let knownDbRatios = new Set();
-const STANDARD_RATIOS = new Set(['1:1', '3:4', '4:3', '16:9', '9:16']);
 
 function buildVariantLabel(variant) {
         if (!variant || typeof variant !== 'object') {
@@ -23,22 +22,12 @@ function buildVariantLabel(variant) {
         return parts.join(' – ');
 }
 
-function renderFormatProductList(container, grouped, productIds, defaultFormatLabel, targetFormat) {
+function renderFormatProductList(container, grouped, productIds) {
         if (!container) {
                 return;
         }
 
         container.innerHTML = '';
-
-        const normalizedFormat = normalizeFormatValue(targetFormat);
-        const shouldDisplayRatioLabel = Boolean(defaultFormatLabel) && (!normalizedFormat || STANDARD_RATIOS.has(normalizedFormat));
-
-        if (shouldDisplayRatioLabel) {
-                const ratioLabel = document.createElement('div');
-                ratioLabel.classList.add('format-ratio-label');
-                ratioLabel.textContent = defaultFormatLabel;
-                container.appendChild(ratioLabel);
-        }
 
         if (!Array.isArray(productIds) || productIds.length === 0) {
                 return;
@@ -49,7 +38,7 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
 
         productIds.forEach((productId) => {
                 const product = grouped[productId];
-                if (!product) {
+                if (!product || !product.name) {
                         return;
                 }
 
@@ -58,7 +47,7 @@ function renderFormatProductList(container, grouped, productIds, defaultFormatLa
 
                 const productNameEl = document.createElement('div');
                 productNameEl.classList.add('format-product-name');
-                productNameEl.textContent = product.name || defaultFormatLabel || 'Produit disponible';
+                productNameEl.textContent = product.name;
                 productBlock.appendChild(productNameEl);
 
                 const variants = Array.isArray(product.variants) ? product.variants : [];
@@ -236,7 +225,6 @@ function handleImageClick(event) {
 
 function openImageOverlay(src, userId, username, formatImage, prompt) {
         const targetFormat = normalizeFormatValue(formatImage);
-        const defaultFormatLabel = targetFormat || 'Format non communiqué';
         const dbRatios = refreshKnownDbRatios();
         const cacheInstance = window.formatProductsCache || null;
         const initialCachedEntry = cacheInstance && targetFormat ? cacheInstance.get(targetFormat) : undefined;
@@ -423,25 +411,47 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 }
 
                 const grouped = {};
-                data.choices.forEach(choice => {
+                data.choices.forEach((choice) => {
+                        if (!choice || !choice.product_id || !choice.product_name) {
+                                return;
+                        }
+
                         if (!grouped[choice.product_id]) {
                                 grouped[choice.product_id] = {
                                         name: choice.product_name,
                                         variants: []
                                 };
                         }
+
                         grouped[choice.product_id].variants.push(choice);
                 });
 
-                const productIds = Object.keys(grouped);
-                console.log('[preview] affichage ratio via cache', {
+                const productIds = Object.keys(grouped).filter((id) => {
+                        const product = grouped[id];
+                        if (!product || !product.name) {
+                                delete grouped[id];
+                                return false;
+                        }
+
+                        product.variants = (Array.isArray(product.variants) ? product.variants : []).filter(Boolean);
+                        return product.variants.length > 0;
+                });
+
+                console.log('[preview] affichage formats via cache', {
                         format: targetFormat || null,
                         products: productIds.length,
                         variants: data.choices.length,
-                        productNames: productIds.map((id) => grouped[id].name).filter(Boolean)
+                        productNames: productIds.map((id) => grouped[id].name)
                 });
 
-                renderFormatProductList(formatTextElement, grouped, productIds, defaultFormatLabel, targetFormat);
+                if (productIds.length === 0) {
+                        formatTextElement.textContent = 'Aucun produit trouvé.';
+                        updateUseImageButtonHandler(null);
+                        useImageButton.disabled = true;
+                        return;
+                }
+
+                renderFormatProductList(formatTextElement, grouped, productIds);
 
                 useImageButton.disabled = false;
 
@@ -457,7 +467,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         });
                 } else {
                         updateUseImageButtonHandler(() => {
-                                const allVariants = Object.values(grouped).flatMap(p => p.variants);
+                                const allVariants = productIds.flatMap((id) => grouped[id].variants);
                                 showProductChooserOverlay(allVariants, src, prompt, targetFormat);
                         });
                 }
@@ -495,7 +505,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                         });
                         updateUseImageButtonHandler(null);
                         useImageButton.disabled = true;
-                        formatTextElement.textContent = defaultFormatLabel;
+                        formatTextElement.textContent = '';
                         return;
                 }
 
@@ -506,7 +516,7 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 }
         };
 
-        formatTextElement.textContent = defaultFormatLabel;
+        formatTextElement.textContent = '';
         updateUseImageButtonHandler(null);
         useImageButton.disabled = true;
 
@@ -533,7 +543,7 @@ function redirectToConfigurator(name, id, src, prompt, format, variantId) {
 }
 
 function showProductChooserOverlay(choices, src, prompt, format, productNameOverride = null) {
-        const safeChoices = Array.isArray(choices) ? choices.filter(Boolean) : [];
+        const safeChoices = Array.isArray(choices) ? choices.filter(choice => choice && choice.product_name) : [];
         if (safeChoices.length === 0) {
                 return;
         }
@@ -590,15 +600,19 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
                         ? productNameOverride
                         : choice.product_name;
 
+                if (!baseName) {
+                        return;
+                }
+
                 if (!group.name) {
-                        group.name = baseName || 'Produit disponible';
+                        group.name = baseName;
                 }
 
                 group.variants.push(choice);
         });
 
         productGroups.forEach((group) => {
-                if (!group || group.variants.length === 0) {
+                if (!group || !group.name || group.variants.length === 0) {
                         return;
                 }
 
@@ -610,7 +624,7 @@ function showProductChooserOverlay(choices, src, prompt, format, productNameOver
 
                 const nameEl = document.createElement('span');
                 nameEl.classList.add('product-choice-group-name');
-                nameEl.textContent = group.name || 'Produit disponible';
+                nameEl.textContent = group.name;
                 headerEl.appendChild(nameEl);
 
                 if (group.variants.length > 1) {

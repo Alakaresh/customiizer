@@ -117,11 +117,6 @@
     word-wrap: break-word;
 }
 
-.format-ratio-label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #f1f1f1;
-}
 
 .format-product-list {
     display: flex;
