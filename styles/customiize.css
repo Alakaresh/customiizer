@@ -78,7 +78,6 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .grid-wrapper {
     flex: 1 1 auto;
     min-height: 0;
-    display: flex;
     width: 100%;
 }
 
@@ -87,8 +86,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
     width: 100%;
-    height: 100%;
     min-height: 0;
+    align-content: start;
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid.is-hidden {
