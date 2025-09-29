@@ -11,6 +11,18 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     margin: 0;
 }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 #customize-main.customize-layout:not(.hub-layout) {
     display: flex;
     gap: 24px;
@@ -405,41 +417,84 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     line-height: 1.5;
 }
 
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown-wrapper {
-    position: relative;
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown {
-    width: 100%;
-    padding: 12px 42px 12px 16px;
-    border-radius: 14px;
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    align-items: stretch;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-list.is-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 92px;
+    padding: 16px;
+    background: rgba(12, 12, 12, 0.65);
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(22, 22, 22, 0.9);
-    color: rgba(244, 248, 247, 0.92);
-    font-size: 0.95rem;
-    appearance: none;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown:focus,
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown:hover {
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-list-empty {
+    margin: 0;
+    text-align: center;
+    color: rgba(214, 224, 223, 0.78);
+    font-size: 0.9rem;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(150deg, rgba(22, 22, 22, 0.85), rgba(16, 16, 16, 0.88));
+    color: rgba(244, 248, 247, 0.9);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-option::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid rgba(244, 248, 247, 0.6);
+    border-bottom: 2px solid rgba(244, 248, 247, 0.6);
+    transform: rotate(-45deg);
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-option:hover,
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-option:focus-visible {
     border-color: rgba(31, 184, 108, 0.45);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.45);
+    transform: translateY(-1px);
     outline: none;
 }
 
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-dropdown-wrapper::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 16px;
-    transform: translateY(-50%) rotate(45deg);
-    width: 10px;
-    height: 10px;
-    border-right: 2px solid rgba(244, 248, 247, 0.7);
-    border-bottom: 2px solid rgba(244, 248, 247, 0.7);
-    pointer-events: none;
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-option.is-active {
+    border-color: rgba(31, 184, 108, 0.65);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.55);
+    background: linear-gradient(150deg, rgba(28, 74, 55, 0.6), rgba(19, 102, 67, 0.9));
+}
+
+#customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-option.is-active::after {
+    opacity: 1;
+    border-right-color: rgba(244, 248, 247, 0.82);
+    border-bottom-color: rgba(244, 248, 247, 0.82);
 }
 
 #customize-main.customize-layout:not(.hub-layout) #left-sidebar #product-groups-container {

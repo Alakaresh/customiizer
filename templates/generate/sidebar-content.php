@@ -8,11 +8,9 @@
                 <div class="product-selection">
                         <h3 class="product-selection-title">Produits</h3>
                         <p class="product-selection-description">Explorez les formats recommandés pour chaque produit en un clin d'œil.</p>
-                        <div id="product-container" class="product-dropdown-wrapper">
-                                <label for="product-select" class="sr-only">Sélectionnez un produit</label>
-                                <select id="product-select" class="product-dropdown" aria-label="Sélectionnez un produit">
-                                        <option value="" selected disabled>Sélectionnez un produit</option>
-                                </select>
+                        <div id="product-container" class="product-list-wrapper">
+                                <span id="product-list-label" class="sr-only">Sélectionnez un produit</span>
+                                <div id="product-list" class="product-list" role="list" aria-labelledby="product-list-label"></div>
                         </div>
                 </div>
 

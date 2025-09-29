@@ -125,21 +125,15 @@ function buildProductEntries(products) {
 }
 
 function addProductButtons(products) {
-    const dropdown = document.getElementById('product-select');
+    const productList = document.getElementById('product-list');
     const groupsContainer = document.getElementById('product-groups-container');
 
-    if (!dropdown) {
+    if (!productList) {
         return;
     }
 
-    dropdown.innerHTML = '';
-
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = 'Sélectionnez un produit';
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    dropdown.appendChild(placeholder);
+    productList.innerHTML = '';
+    productList.classList.remove('is-empty');
 
     resetVariantSelection();
 
@@ -150,37 +144,55 @@ function addProductButtons(products) {
     }
 
     if (productEntries.length === 0) {
-        dropdown.disabled = true;
+        productList.classList.add('is-empty');
+
+        const emptyState = createEmptyState('Aucun produit actif pour le moment.');
+        emptyState.classList.add('product-list-empty');
+        productList.appendChild(emptyState);
+
         groupsContainer.classList.remove('is-hidden');
         groupsContainer.innerHTML = '';
         groupsContainer.appendChild(createEmptyState('Aucun produit actif pour le moment.'));
         return;
     }
 
-    dropdown.disabled = false;
-
     productEntries.forEach(entry => {
-        const option = document.createElement('option');
-        option.value = entry.key;
-        option.textContent = entry.displayName;
-        dropdown.appendChild(option);
-    });
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'product-option';
+        button.dataset.productKey = entry.key;
+        button.textContent = entry.displayName;
+        button.setAttribute('role', 'listitem');
+        button.setAttribute('aria-pressed', 'false');
 
-    dropdown.onchange = (event) => {
-        const productKey = event.target.value;
-        if (productKey) {
+        button.addEventListener('click', () => {
+            if (selectedProductKey === entry.key) {
+                return;
+            }
+
             ratioFromQuery = '';
-            selectProduct(productKey);
-        }
-    };
+            selectProduct(entry.key);
+        });
+
+        productList.appendChild(button);
+    });
 
     hideVariantList();
 
     const initialKey = findInitialProductKey(productEntries);
     if (initialKey) {
-        dropdown.value = initialKey;
         selectProduct(initialKey);
+    } else {
+        setActiveProductButton('');
     }
+}
+
+function setActiveProductButton(productKey) {
+    document.querySelectorAll('#product-list .product-option').forEach(button => {
+        const isActive = Boolean(productKey) && button.dataset.productKey === productKey;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
 }
 
 function findInitialProductKey(productEntries) {
@@ -204,6 +216,7 @@ function findInitialProductKey(productEntries) {
 
 function selectProduct(productKey) {
     selectedProductKey = productKey;
+    setActiveProductButton(productKey);
     displayVariantsForProduct(productKey);
 }
 
@@ -317,6 +330,8 @@ function handleVariantSelection(element, variant, options = {}) {
         selectedVariant = variant;
     }
     window.selectedVariant = variant;
+
+    setActiveProductButton(selectedProductKey);
 
     updateSelectedInfo(variant);
 
