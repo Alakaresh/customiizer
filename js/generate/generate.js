@@ -25,6 +25,7 @@ jQuery(function($) {
         const customTextInput = document.getElementById('custom-text');
         const alertBox = document.getElementById('alert-box');
         const placeholderDiv = document.getElementById('placeholder');
+        const inlineProgressWrapper = document.getElementById('generation-progress-inline-wrapper');
         const savedPromptText = localStorage.getItem('savedPromptText');
         const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 
@@ -152,6 +153,8 @@ jQuery(function($) {
         if (document.body) {
                 document.body.dataset.generationPage = '1';
         }
+
+        setupInlineProgressDisplay();
 
         if (savedPromptText) {
                 customTextInput.textContent = savedPromptText;
@@ -626,6 +629,7 @@ jQuery(function($) {
 
                 modal.classList.remove('hide');
                 modal.setAttribute('aria-hidden', 'false');
+                updateInlineProgressVisibility(modal, true);
                 loadingToggled = true;
         }
 
@@ -637,7 +641,44 @@ jQuery(function($) {
 
                 modal.classList.add('hide');
                 modal.setAttribute('aria-hidden', 'true');
+                updateInlineProgressVisibility(modal, false);
                 loadingToggled = false;
+        }
+
+        function setupInlineProgressDisplay() {
+                if (!inlineProgressWrapper) {
+                        return;
+                }
+
+                const modal = document.getElementById('generation-progress-modal');
+                if (!modal) {
+                        return;
+                }
+
+                inlineProgressWrapper.appendChild(modal);
+                inlineProgressWrapper.setAttribute('aria-hidden', modal.classList.contains('hide') ? 'true' : 'false');
+
+                modal.classList.add('inline-mode');
+                modal.setAttribute('role', 'region');
+                modal.setAttribute('aria-modal', 'false');
+                modal.setAttribute('aria-hidden', modal.classList.contains('hide') ? 'true' : 'false');
+
+                const dialog = modal.querySelector('.generation-progress-dialog');
+                if (dialog) {
+                        dialog.classList.add('inline-mode');
+                        dialog.setAttribute('role', 'presentation');
+                }
+
+                updateInlineProgressVisibility(modal, !modal.classList.contains('hide'));
+        }
+
+        function updateInlineProgressVisibility(modal, isVisible) {
+                if (!inlineProgressWrapper || !modal || !inlineProgressWrapper.contains(modal)) {
+                        return;
+                }
+
+                inlineProgressWrapper.classList.toggle('is-active', Boolean(isVisible));
+                inlineProgressWrapper.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
         }
 
         function getStoredProgressState() {
