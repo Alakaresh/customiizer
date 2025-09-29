@@ -2,6 +2,7 @@
 
 const DEFAULT_RATIO = '1:1';
 const DEFAULT_SUMMARY_IMAGE = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
+const SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
 let selectedRatio = DEFAULT_RATIO;
 let selectedProductKey = '';
 let globalProducts = [];
@@ -12,6 +13,76 @@ document.addEventListener('DOMContentLoaded', function () {
     setDefaultSelectedInfo();
     loadProductData();
 });
+
+function getSavedVariantSelection() {
+    try {
+        const raw = localStorage.getItem(SAVED_VARIANT_STORAGE_KEY);
+        if (!raw) {
+            return null;
+        }
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') {
+            return null;
+        }
+
+        const variantId = parsed.variantId != null ? String(parsed.variantId) : '';
+        if (!variantId) {
+            return null;
+        }
+
+        return {
+            variantId,
+            productName: typeof parsed.productName === 'string' ? parsed.productName : '',
+            ratio: typeof parsed.ratio === 'string' ? parsed.ratio : ''
+        };
+    } catch (error) {
+        console.warn('[Ratio] Impossible de lire la variante enregistrée', error);
+        return null;
+    }
+}
+
+function clearSavedVariantSelection() {
+    try {
+        localStorage.removeItem(SAVED_VARIANT_STORAGE_KEY);
+    } catch (error) {
+        console.warn('[Ratio] Impossible de nettoyer la variante enregistrée', error);
+    }
+}
+
+function tryRestoreVariantSelection(savedSelection, productEntries) {
+    if (!savedSelection) {
+        return false;
+    }
+
+    const variantId = savedSelection.variantId;
+    if (!variantId) {
+        clearSavedVariantSelection();
+        return false;
+    }
+
+    const matchedVariant = globalProducts.find(variant => String(variant.variant_id) === variantId);
+    if (!matchedVariant) {
+        clearSavedVariantSelection();
+        return false;
+    }
+
+    const normalizedProduct = normalizeProductName(matchedVariant.product_name);
+    if (!normalizedProduct) {
+        clearSavedVariantSelection();
+        return false;
+    }
+
+    const productExists = productEntries.some(entry => entry.key === normalizedProduct);
+    if (!productExists) {
+        clearSavedVariantSelection();
+        return false;
+    }
+
+    selectProduct(normalizedProduct, { variantIdToSelect: variantId });
+    clearSavedVariantSelection();
+    return true;
+}
 
 function getRatioFromQueryParam() {
     try {
@@ -236,6 +307,11 @@ function addProductButtons(products) {
 
     hideVariantList();
 
+    const savedVariant = getSavedVariantSelection();
+    if (tryRestoreVariantSelection(savedVariant, productEntries)) {
+        return;
+    }
+
     const initialKey = findInitialProductKey(productEntries);
     if (initialKey) {
         selectProduct(initialKey);
@@ -271,14 +347,14 @@ function findInitialProductKey(productEntries) {
     return '';
 }
 
-function selectProduct(productKey) {
+function selectProduct(productKey, options = {}) {
     selectedProductKey = productKey;
     setActiveProductButton(productKey);
     clearSelectedVariantState();
-    displayVariantsForProduct(productKey);
+    displayVariantsForProduct(productKey, options);
 }
 
-function displayVariantsForProduct(normalizedName) {
+function displayVariantsForProduct(normalizedName, options = {}) {
     const containers = getVariantContainers();
 
     if (containers.length === 0) {
@@ -322,7 +398,26 @@ function displayVariantsForProduct(normalizedName) {
         container.setAttribute('aria-busy', 'false');
     });
 
+    const variantMap = new Map(uniqueVariants.map(variant => [String(variant.variant_id), variant]));
+    const requestedVariantId = options.variantIdToSelect != null ? String(options.variantIdToSelect) : '';
+
+    let autoSelection = null;
+
+    if (requestedVariantId && variantMap.has(requestedVariantId)) {
+        const matchingElement = document.querySelector(`.product-item[data-variant-id="${requestedVariantId}"]`);
+        if (matchingElement) {
+            autoSelection = {
+                element: matchingElement,
+                variant: variantMap.get(requestedVariantId)
+            };
+        }
+    }
+
     ratioFromQuery = '';
+
+    if (autoSelection && autoSelection.element && autoSelection.variant) {
+        handleVariantSelection(autoSelection.element, autoSelection.variant, { fromAutoSelection: true });
+    }
 }
 
 function buildVariantSection(variants, options = {}) {
