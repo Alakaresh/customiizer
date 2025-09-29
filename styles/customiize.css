@@ -85,10 +85,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 1fr;
     gap: 16px;
     width: 100%;
-    height: 100%;
     min-height: 0;
 }
 
@@ -117,15 +115,20 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.04);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid .image-container::before {
+    content: "";
+    display: block;
+    padding-top: 100%;
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid .image-container img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images::-webkit-scrollbar {
