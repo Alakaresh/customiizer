@@ -175,6 +175,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     margin: 0 auto;
     padding: 12px 12px 0;
     box-sizing: border-box;
+    max-height: 100%;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -184,6 +185,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -345,6 +348,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     background: linear-gradient(160deg, rgba(20, 20, 20, 0.94), rgba(12, 12, 12, 0.92));
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 24px 42px rgba(0, 0, 0, 0.55);
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -443,9 +448,19 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     .variant-display
     .variant-panel__content {
     display: grid;
-    grid-template-columns: minmax(240px, 300px) 1fr;
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
     gap: 28px;
     align-items: start;
+    min-height: 0;
+    height: 100%;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .variant-display
+    .variant-panel__content > * {
+    min-height: 0;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -629,6 +644,27 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     display: flex;
     flex-direction: column;
     gap: 28px;
+    flex: 1 1 auto;
+    max-height: 100%;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .variant-display
+    .variant-panel__content .product-groups::-webkit-scrollbar {
+    width: 6px;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .variant-display
+    .variant-panel__content .product-groups::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--color-brand-600, #148556), var(--color-brand-400, #2bd879));
+    border-radius: 9999px;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
