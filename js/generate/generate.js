@@ -18,6 +18,7 @@ let loadingToggled = false;
 let lastKnownProgress = null;
 let lastKnownMessage = '';
 let clearStateTimeoutId = null;
+let previewGalleryImages = [];
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
 
@@ -29,6 +30,25 @@ jQuery(function($) {
         const inlineProgressWrapper = document.getElementById('generation-progress-inline-wrapper');
         const savedPromptText = localStorage.getItem('savedPromptText');
         const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
+
+        const previewThumbnailsContainer = getPreviewThumbnailsContainer();
+        if (previewThumbnailsContainer) {
+                previewThumbnailsContainer.addEventListener('click', event => {
+                        const targetButton = event.target.closest('[data-preview-index]');
+                        if (!targetButton || targetButton.classList.contains('is-placeholder') || targetButton.disabled) {
+                                return;
+                        }
+
+                        const parsedIndex = Number(targetButton.dataset.previewIndex);
+                        if (!Number.isFinite(parsedIndex)) {
+                                return;
+                        }
+
+                        handleThumbnailSelection(parsedIndex);
+                });
+        }
+
+        resetPreviewGallery();
 
         function getPreviewImageElement() {
                 return document.getElementById('generation-preview-image');
@@ -57,6 +77,10 @@ jQuery(function($) {
 
         function getPreviewWrapper() {
                 return document.getElementById('generation-preview');
+        }
+
+        function getPreviewThumbnailsContainer() {
+                return document.getElementById('generation-preview-thumbnails');
         }
 
         function getGridContainer() {
@@ -121,6 +145,7 @@ jQuery(function($) {
                         return;
                 }
 
+                resetPreviewGallery();
                 togglePreviewMode(true);
                 clearPreviewImageDatasets(previewImage);
                 previewImage.src = PLACEHOLDER_IMAGE_SRC;
@@ -144,6 +169,154 @@ jQuery(function($) {
                 if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
                         delete imageElement.dataset.livePreviewUrl;
                 }
+        }
+
+        function resetPreviewGallery() {
+                const thumbnailsContainer = getPreviewThumbnailsContainer();
+                previewGalleryImages = [];
+
+                if (!thumbnailsContainer) {
+                        return;
+                }
+
+                thumbnailsContainer.innerHTML = '';
+
+                for (let i = 0; i < 3; i++) {
+                        const placeholderButton = document.createElement('button');
+                        placeholderButton.type = 'button';
+                        placeholderButton.className = 'generation-preview__thumbnail is-placeholder';
+                        placeholderButton.disabled = true;
+
+                        const placeholderImage = document.createElement('img');
+                        placeholderImage.src = PLACEHOLDER_IMAGE_SRC;
+                        placeholderImage.alt = "Image d'attente";
+
+                        placeholderButton.appendChild(placeholderImage);
+                        thumbnailsContainer.appendChild(placeholderButton);
+                }
+        }
+
+        function applyImageMetaToElement(imageElement, imageData) {
+                if (!imageElement || !imageData || typeof imageData.url !== 'string') {
+                        return;
+                }
+
+                clearPreviewImageDatasets(imageElement);
+
+                imageElement.src = imageData.url;
+                imageElement.alt = imageData.prompt || 'Image générée';
+
+                if (imageElement.dataset) {
+                        imageElement.dataset.jobId = imageData.jobId || '';
+                        imageElement.dataset.taskId = imageData.taskId || '';
+                        imageElement.dataset.formatImage = imageData.formatImage || '';
+                        imageElement.dataset.prompt = imageData.prompt || prompt;
+                }
+
+                imageElement.setAttribute('data-display_name', imageData.display_name || '');
+                imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
+                imageElement.setAttribute('data-user-id', imageData.user_id || '');
+        }
+
+        function renderPreviewGallery() {
+                const thumbnailsContainer = getPreviewThumbnailsContainer();
+                const previewImage = getPreviewImageElement();
+
+                if (!thumbnailsContainer || !previewImage) {
+                        return;
+                }
+
+                if (!Array.isArray(previewGalleryImages) || previewGalleryImages.length === 0) {
+                        resetPreviewGallery();
+                        clearPreviewImageDatasets(previewImage);
+                        previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                        previewImage.alt = "Image d'attente";
+                        previewImage.classList.remove('preview-enlarge');
+                        return;
+                }
+
+                const [mainImage, ...thumbnailImages] = previewGalleryImages;
+                applyImageMetaToElement(previewImage, mainImage);
+                previewImage.classList.remove('preview-enlarge');
+
+                thumbnailsContainer.innerHTML = '';
+                const maxThumbnails = 3;
+                const renderedThumbnails = thumbnailImages.slice(0, maxThumbnails);
+
+                renderedThumbnails.forEach((imageData, index) => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'generation-preview__thumbnail';
+                        button.dataset.previewIndex = String(index + 1);
+                        button.setAttribute('aria-label', `Afficher l'image ${index + 2}`);
+
+                        const thumbImage = document.createElement('img');
+                        thumbImage.src = imageData.url;
+                        thumbImage.alt = imageData.prompt || `Miniature ${index + 2}`;
+
+                        button.appendChild(thumbImage);
+                        thumbnailsContainer.appendChild(button);
+                });
+
+                const placeholdersNeeded = Math.max(0, maxThumbnails - renderedThumbnails.length);
+                for (let i = 0; i < placeholdersNeeded; i++) {
+                        const placeholderButton = document.createElement('button');
+                        placeholderButton.type = 'button';
+                        placeholderButton.className = 'generation-preview__thumbnail is-placeholder';
+                        placeholderButton.disabled = true;
+
+                        const placeholderImage = document.createElement('img');
+                        placeholderImage.src = PLACEHOLDER_IMAGE_SRC;
+                        placeholderImage.alt = "Image d'attente";
+
+                        placeholderButton.appendChild(placeholderImage);
+                        thumbnailsContainer.appendChild(placeholderButton);
+                }
+        }
+
+        function populatePreviewGallery(images) {
+                if (!Array.isArray(images)) {
+                        previewGalleryImages = [];
+                        renderPreviewGallery();
+                        return;
+                }
+
+                const normalizedImages = images
+                        .filter(image => image && typeof image.url === 'string' && image.url.trim() !== '')
+                        .map(image => {
+                                const trimmedUrl = image.url.trim();
+                                return {
+                                        url: trimmedUrl,
+                                        prompt: image.prompt || prompt,
+                                        formatImage: image.format || '',
+                                        jobId: currentJobId || '',
+                                        taskId: currentTaskId || '',
+                                        display_name: image.display_name || '',
+                                        user_logo: image.user_logo || '',
+                                        user_id: image.user_id || '',
+                                };
+                        });
+
+                previewGalleryImages = normalizedImages.slice(0, 4);
+                renderPreviewGallery();
+        }
+
+        function handleThumbnailSelection(thumbnailIndex) {
+                if (!Array.isArray(previewGalleryImages) || previewGalleryImages.length === 0) {
+                        return;
+                }
+
+                if (typeof thumbnailIndex !== 'number' || thumbnailIndex <= 0 || thumbnailIndex >= previewGalleryImages.length) {
+                        return;
+                }
+
+                const [selectedImage] = previewGalleryImages.splice(thumbnailIndex, 1);
+                if (!selectedImage) {
+                        return;
+                }
+
+                previewGalleryImages.unshift(selectedImage);
+                renderPreviewGallery();
         }
 
         if (!validateButton || !customTextInput) {
@@ -398,15 +571,9 @@ jQuery(function($) {
                         return;
                 }
 
-                togglePreviewMode(false);
-
-                const previewImage = getPreviewImageElement();
-                if (previewImage) {
-                        clearPreviewImageDatasets(previewImage);
-                        previewImage.src = PLACEHOLDER_IMAGE_SRC;
-                        previewImage.alt = "Image d'attente";
-                        previewImage.classList.remove('preview-enlarge');
-                }
+                populatePreviewGallery(images);
+                togglePreviewMode(true);
+                closeProgressModal();
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
         }
@@ -603,6 +770,7 @@ jQuery(function($) {
         function resetImageDisplay() {
                 ensureGridPlaceholders();
                 togglePreviewMode(false);
+                resetPreviewGallery();
 
                 const previewImage = getPreviewImageElement();
                 if (!previewImage) {
