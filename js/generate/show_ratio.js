@@ -65,6 +65,22 @@ function setDefaultSelectedInfo() {
     updateVariantSummaryImage(DEFAULT_SUMMARY_IMAGE);
 }
 
+function clearSelectedVariantState() {
+    selectedRatio = '';
+
+    if (typeof selectedVariant !== 'undefined') {
+        selectedVariant = null;
+    }
+    window.selectedVariant = null;
+
+    highlightVariantSelection(null);
+    updateVariantSummaryImage(DEFAULT_SUMMARY_IMAGE);
+
+    if (typeof loadImages === 'function') {
+        loadImages();
+    }
+}
+
 function resetVariantSelection() {
     selectedProductKey = '';
     selectedRatio = DEFAULT_RATIO;
@@ -258,6 +274,7 @@ function findInitialProductKey(productEntries) {
 function selectProduct(productKey) {
     selectedProductKey = productKey;
     setActiveProductButton(productKey);
+    clearSelectedVariantState();
     displayVariantsForProduct(productKey);
 }
 
@@ -280,6 +297,11 @@ function displayVariantsForProduct(normalizedName) {
         normalizeProductName(variant.product_name) === normalizedName
     );
 
+    const productNameForSummary = filtered.length > 0
+        ? normalizeProductName(filtered[0].product_name)
+        : normalizedName;
+    updateProductSelectionInfo(productNameForSummary);
+
     const uniqueVariants = deduplicateVariantsById(filtered).filter(variant => isValidMockupImage(variant.image));
 
     if (uniqueVariants.length === 0) {
@@ -287,6 +309,7 @@ function displayVariantsForProduct(normalizedName) {
             container.appendChild(createEmptyState('Aucun format avec visuel disponible pour ce produit.'));
             container.setAttribute('aria-busy', 'false');
         });
+        ratioFromQuery = '';
         return;
     }
 
@@ -301,38 +324,16 @@ function displayVariantsForProduct(normalizedName) {
             return getVariantOrderValue(a) - getVariantOrderValue(b);
         });
 
-    let firstSelectable = null;
-    let ratioMatch = null;
-
-    containers.forEach((container, index) => {
-        const { section, firstCandidate, ratioCandidate } = buildVariantSection(sortedVariants, {
+    containers.forEach(container => {
+        const sectionData = buildVariantSection(sortedVariants, {
             ratioToMatch: ratioFromQuery
         });
 
-        container.appendChild(section);
+        container.appendChild(sectionData.section);
         container.setAttribute('aria-busy', 'false');
-
-        if (index === 0) {
-            if (ratioCandidate) {
-                ratioMatch = ratioCandidate;
-            }
-            if (firstCandidate) {
-                firstSelectable = firstCandidate;
-            }
-        }
     });
 
-    const targetSelection = ratioMatch || firstSelectable;
-    if (targetSelection) {
-        handleVariantSelection(targetSelection.element, targetSelection.variant, { fromAutoSelection: true });
-        if (ratioMatch) {
-            ratioFromQuery = '';
-        }
-    } else {
-        containers.forEach(container => {
-            container.appendChild(createEmptyState('Aucun format sélectionnable.'));
-        });
-    }
+    ratioFromQuery = '';
 }
 
 function buildVariantSection(variants, options = {}) {
@@ -457,6 +458,19 @@ function updateSelectedInfo(variant) {
     }
 
     const label = parts.join(' · ') || 'Sélectionnez un format';
+    selectedInfo.textContent = label;
+    selectedInfo.setAttribute('title', label);
+}
+
+function updateProductSelectionInfo(productName) {
+    const selectedInfo = document.getElementById('selected-info');
+    if (!selectedInfo) {
+        return;
+    }
+
+    const trimmedName = typeof productName === 'string' ? productName.trim() : '';
+    const label = trimmedName ? `${trimmedName} · Choisissez un format` : 'Sélectionnez un produit';
+
     selectedInfo.textContent = label;
     selectedInfo.setAttribute('title', label);
 }
