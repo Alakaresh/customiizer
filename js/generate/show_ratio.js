@@ -1,6 +1,7 @@
 // Nouveau show_ratio.js - gestion du mode 'ratio' + ajout de la gestion 'produit' et 'variant' + appel loadImages() au clic sur variant avec logs
 
 const DEFAULT_RATIO = '1:1';
+const DEFAULT_SUMMARY_IMAGE = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 let selectedRatio = DEFAULT_RATIO;
 let selectedProductKey = '';
 let globalProducts = [];
@@ -23,16 +24,27 @@ function getRatioFromQueryParam() {
     }
 }
 
-function toggleRatioMenu() {
-    const ratioMenu = document.getElementById('ratio-menu');
-    const arrowIcon = document.getElementById('arrow-icon');
+function toggleRatioMenu(forceState) {
+    setVariantPanelVisibility(forceState);
+}
 
-    const isMenuOpen = ratioMenu && ratioMenu.style.display === 'block';
-    if (ratioMenu) {
-        ratioMenu.style.display = isMenuOpen ? 'none' : 'block';
+function setVariantPanelVisibility(forceState) {
+    const panel = document.getElementById('variant-display');
+    const summary = document.getElementById('variant-summary');
+
+    if (!panel) {
+        return;
     }
-    if (arrowIcon) {
-        arrowIcon.classList.toggle('open', !isMenuOpen);
+
+    const isCurrentlyHidden = panel.classList.contains('is-hidden');
+    const shouldBeVisible =
+        typeof forceState === 'boolean' ? forceState : isCurrentlyHidden;
+
+    panel.classList.toggle('is-hidden', !shouldBeVisible);
+    panel.setAttribute('aria-hidden', shouldBeVisible ? 'false' : 'true');
+
+    if (summary) {
+        summary.setAttribute('aria-expanded', shouldBeVisible ? 'true' : 'false');
     }
 }
 
@@ -42,9 +54,11 @@ function setDefaultSelectedInfo() {
         return;
     }
 
-    const label = `Format ${DEFAULT_RATIO}`;
+    const label = 'Sélectionnez un produit';
     selectedInfo.textContent = label;
     selectedInfo.setAttribute('title', label);
+
+    updateVariantSummaryImage(DEFAULT_SUMMARY_IMAGE);
 }
 
 function resetVariantSelection() {
@@ -57,6 +71,7 @@ function resetVariantSelection() {
     window.selectedVariant = null;
 
     setDefaultSelectedInfo();
+    setVariantPanelVisibility(false);
 }
 
 function getVariantContainers() {
@@ -255,6 +270,8 @@ function displayVariantsForProduct(normalizedName) {
         container.setAttribute('aria-busy', 'true');
     });
 
+    setVariantPanelVisibility(true);
+
     const filtered = globalProducts.filter(variant =>
         normalizeProductName(variant.product_name) === normalizedName
     );
@@ -394,6 +411,7 @@ function handleVariantSelection(element, variant, options = {}) {
     setActiveProductButton(selectedProductKey);
 
     updateSelectedInfo(variant);
+    updateVariantSummaryImage(variant.image, normalizeProductName(variant.product_name));
 
     if (typeof loadImages === 'function') {
         loadImages();
@@ -402,6 +420,9 @@ function handleVariantSelection(element, variant, options = {}) {
     if (!options.fromAutoSelection) {
         ratioFromQuery = '';
     }
+
+    setVariantPanelVisibility(false);
+    toggleImageGrid(false);
 }
 
 function highlightVariantSelection(selectedElement) {
@@ -437,6 +458,17 @@ function updateSelectedInfo(variant) {
     const label = parts.join(' · ') || 'Sélectionnez un format';
     selectedInfo.textContent = label;
     selectedInfo.setAttribute('title', label);
+}
+
+function updateVariantSummaryImage(src, productName = '') {
+    const imageElement = document.getElementById('variant-summary-image');
+    if (!imageElement) {
+        return;
+    }
+
+    const validSource = typeof src === 'string' && src.trim() !== '' ? src : DEFAULT_SUMMARY_IMAGE;
+    imageElement.src = validSource;
+    imageElement.alt = productName ? `Visuel sélectionné : ${productName}` : '';
 }
 
 function parseRatioValue(ratio) {
