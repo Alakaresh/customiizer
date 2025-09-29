@@ -6,26 +6,40 @@
         <div id="resizer"></div>
     </div>
 
-    <!-- Affichage de la sélection du ratio -->
+    <!-- Affichage de la sélection du produit / format -->
     <div id="selected-display">
-        <button id="selected-info" disabled="disabled">Sélectionnez un format</button>
-    </div>
-
-    <!-- Conteneur pour le choix du ratio -->
-    <div id="aspect-ratio-container" class="aspect-ratio-container">
-
-        <!-- Conteneur pour les boutons Ratio et Generate alignés -->
-    <div id="buttons-container">
-        <!-- Bouton pour ouvrir le menu de ratio -->
-        <button id="ratioButton" onclick="toggleRatioMenu()">
-            Formats de produit
-            <span id="arrow-icon" class="arrow-down"></span>
+        <button
+            id="variant-summary"
+            class="variant-summary-card"
+            type="button"
+            aria-expanded="false"
+            aria-controls="variant-display"
+            onclick="toggleRatioMenu()"
+        >
+            <span class="variant-summary-card__media" aria-hidden="true">
+                <img
+                    id="variant-summary-image"
+                    src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
+                    alt=""
+                    loading="lazy"
+                />
+            </span>
+            <span class="variant-summary-card__info">
+                <span class="variant-summary-card__label">Sélection du produit</span>
+                <span id="selected-info" class="variant-summary-card__title">Sélectionnez un produit</span>
+            </span>
+            <span class="variant-summary-card__action" aria-hidden="true">
+                <span class="variant-summary-card__cta">Choisir</span>
+                <span class="variant-summary-card__icon"></span>
+            </span>
         </button>
-
-        <!-- Bouton de génération -->
-        <button type="submit" id="validate-button">Générer</button>
     </div>
 
+    <!-- Conteneur pour le bouton de génération -->
+    <div id="aspect-ratio-container" class="aspect-ratio-container">
+        <div id="buttons-container">
+            <button type="submit" id="validate-button">Générer</button>
+        </div>
     </div>
 
     <!-- Zone d'alerte pour les messages d'erreur ou autres alertes -->
