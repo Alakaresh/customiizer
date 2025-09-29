@@ -20,6 +20,7 @@ let lastKnownMessage = '';
 let clearStateTimeoutId = null;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
+const UPSCALE_WAIT_MESSAGE = 'Finalisation des images en haute définition…';
 
 jQuery(function($) {
         const validateButton = document.getElementById('validate-button');
@@ -76,43 +77,152 @@ jQuery(function($) {
                 }
         }
 
+        const GENERATION_THUMBNAIL_LIMIT = 3;
+
+        function createThumbnailPlaceholder(index) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'image-container generation-thumbnail is-placeholder';
+                button.setAttribute('data-thumbnail-index', String(index));
+                button.setAttribute('aria-label', `Miniature ${index + 1}`);
+
+                const image = document.createElement('img');
+                image.src = PLACEHOLDER_IMAGE_SRC;
+                image.alt = "Image d'attente";
+
+                button.appendChild(image);
+
+                return button;
+        }
+
+        function setThumbnailPlaceholder(button, index) {
+                if (!button) {
+                        return;
+                }
+
+                const img = button.querySelector('img');
+
+                button.classList.add('is-placeholder');
+                button.classList.remove('is-active');
+                button.setAttribute('data-thumbnail-index', String(index));
+                button.setAttribute('aria-label', `Miniature ${index + 1}`);
+
+                if (typeof $.fn.removeData === 'function') {
+                        $(button).removeData('imageData');
+                }
+
+                if (img) {
+                        img.src = PLACEHOLDER_IMAGE_SRC;
+                        img.alt = "Image d'attente";
+                        img.classList.remove('preview-enlarge');
+                }
+
+                ['data-image-url', 'data-image-alt', 'data-job-id', 'data-task-id', 'data-format-image', 'data-prompt', 'data-display_name', 'data-user-logo', 'data-user-id'].forEach(
+                        attribute => {
+                                button.removeAttribute(attribute);
+                        }
+                );
+        }
+
+        function setThumbnailData(button, imageData, index) {
+                if (!button || !imageData || !imageData.url) {
+                        return;
+                }
+
+                const img = button.querySelector('img') || document.createElement('img');
+
+                button.classList.remove('is-placeholder');
+                button.classList.remove('is-active');
+                button.setAttribute('data-thumbnail-index', String(index));
+                button.setAttribute('aria-label', imageData.alt || `Miniature ${index + 1}`);
+
+                if (!button.contains(img)) {
+                        button.appendChild(img);
+                }
+
+                img.src = imageData.url;
+                img.alt = imageData.alt || 'Image générée';
+                img.classList.remove('preview-enlarge');
+
+                if (typeof $.fn.data === 'function') {
+                        $(button).data('imageData', imageData);
+                }
+        }
+
         function ensureGridPlaceholders() {
                 const gridContainer = getGridContainer();
                 if (!gridContainer) {
                         return;
                 }
 
-                if (gridContainer.children.length < 4) {
+                let thumbnails = Array.from(gridContainer.querySelectorAll('.generation-thumbnail'));
+
+                if (thumbnails.length !== GENERATION_THUMBNAIL_LIMIT) {
                         gridContainer.innerHTML = '';
-                        for (let i = 0; i < 4; i++) {
-                                const wrapper = document.createElement('div');
-                                wrapper.className = `image-container ${i < 2 ? 'top' : 'bottom'}`;
-
-                                const image = document.createElement('img');
-                                image.className = i < 2 ? 'top' : 'bottom';
-                                image.alt = `Image ${i}`;
-                                image.src = PLACEHOLDER_IMAGE_SRC;
-
-                                wrapper.appendChild(image);
-                                gridContainer.appendChild(wrapper);
+                        for (let i = 0; i < GENERATION_THUMBNAIL_LIMIT; i++) {
+                                gridContainer.appendChild(createThumbnailPlaceholder(i));
                         }
+                        return;
                 }
 
-                gridContainer.querySelectorAll('img').forEach(image => {
-                        image.src = PLACEHOLDER_IMAGE_SRC;
-                        image.alt = "Image d'attente";
-                        image.classList.remove('preview-enlarge');
-                        if (image.dataset && image.dataset.livePreviewUrl) {
-                                delete image.dataset.livePreviewUrl;
-                        }
-                        image.removeAttribute('data-job-id');
-                        image.removeAttribute('data-task-id');
-                        image.removeAttribute('data-format-image');
-                        image.removeAttribute('data-prompt');
-                        image.removeAttribute('data-display_name');
-                        image.removeAttribute('data-user-logo');
-                        image.removeAttribute('data-user-id');
+                thumbnails.forEach((button, index) => {
+                        setThumbnailPlaceholder(button, index);
                 });
+        }
+
+        function applyPreviewImageData(previewImage, imageData) {
+                if (!previewImage || !imageData || !imageData.url) {
+                        return;
+                }
+
+                clearPreviewImageDatasets(previewImage);
+                previewImage.src = imageData.url;
+                previewImage.alt = imageData.alt || 'Image générée';
+                previewImage.classList.add('preview-enlarge');
+
+                const attributeMap = {
+                        'data-format-image': imageData.format || '',
+                        'data-prompt': imageData.prompt || '',
+                        'data-display_name': imageData.displayName || '',
+                        'data-user-logo': imageData.userLogo || '',
+                        'data-user-id': imageData.userId || '',
+                        'data-job-id': imageData.jobId || '',
+                        'data-task-id': imageData.taskId || '',
+                };
+
+                Object.entries(attributeMap).forEach(([attribute, value]) => {
+                        if (value) {
+                                previewImage.setAttribute(attribute, value);
+                        } else {
+                                previewImage.removeAttribute(attribute);
+                        }
+                });
+        }
+
+        function normalizeRenderedImage(imageData, index) {
+                if (!imageData || typeof imageData.url !== 'string') {
+                        return null;
+                }
+
+                const trimmedUrl = imageData.url.trim();
+                if (!trimmedUrl) {
+                        return null;
+                }
+
+                const promptText = typeof imageData.prompt === 'string' && imageData.prompt.trim() !== '' ? imageData.prompt.trim() : (prompt || '');
+                const altText = promptText || `Image générée ${index + 1}`;
+
+                return {
+                        url: trimmedUrl,
+                        alt: altText,
+                        prompt: promptText,
+                        displayName: imageData.display_name || '',
+                        userLogo: imageData.user_logo || '',
+                        userId: imageData.user_id || '',
+                        format: imageData.format || jobFormat || '',
+                        jobId: currentJobId || '',
+                        taskId: currentTaskId || '',
+                };
         }
 
         function showPreviewPlaceholder() {
@@ -229,6 +339,7 @@ jQuery(function($) {
                 } else {
                         updateLoading(100);
                         lastKnownProgress = 100;
+                        updateLoadingText('');
                 }
 
                 persistProgressState({
@@ -315,15 +426,30 @@ jQuery(function($) {
                         updateLoading(progressValue);
                 }
 
-                const derivedStatus = progressValue >= 100 ? 'done' : 'processing';
+                const jobStatus = typeof job.status === 'string' ? job.status.toLowerCase() : '';
+                const jobImages = Array.isArray(job.images) ? job.images : [];
+                let derivedStatus;
+
+                if (jobStatus === 'error') {
+                        derivedStatus = 'error';
+                } else if (jobStatus === 'done' && jobImages.length > 0) {
+                        derivedStatus = 'done';
+                } else if (jobStatus === 'done') {
+                        derivedStatus = 'waiting-upscale';
+                } else if (progressValue !== null && progressValue >= 100) {
+                        derivedStatus = 'waiting-upscale';
+                } else {
+                        derivedStatus = 'processing';
+                }
+
                 lastKnownStatus = derivedStatus;
-                lastKnownMessage = '';
+
                 persistProgressState({
                         status: derivedStatus,
                         jobId: currentJobId,
                         taskId: currentTaskId,
                         progress: lastKnownProgress,
-                        message: '',
+                        message: derivedStatus === 'waiting-upscale' ? UPSCALE_WAIT_MESSAGE : '',
                 });
 
                 const livePreviewUrl = typeof job.imageUrl === 'string' ? job.imageUrl : '';
@@ -332,8 +458,21 @@ jQuery(function($) {
                         persistProgressState({ imageUrl: livePreviewUrl });
                 }
 
-                if (progressValue >= 100) {
-                        renderGeneratedImages(job.images || []);
+                if (derivedStatus === 'error') {
+                        finalizeGeneration(true);
+                        return;
+                }
+
+                if (derivedStatus === 'waiting-upscale') {
+                        updateLoadingText(UPSCALE_WAIT_MESSAGE);
+                        scheduleNextPoll();
+                        return;
+                }
+
+                lastKnownMessage = '';
+
+                if (derivedStatus === 'done') {
+                        renderGeneratedImages(jobImages);
                         finalizeGeneration(false);
                         return;
                 }
@@ -342,70 +481,49 @@ jQuery(function($) {
         }
 
         function renderGeneratedImages(images) {
-                const gridContainer = getGridContainer();
                 persistProgressState({ imageUrl: '' });
 
-                const hasRenderableImages = Array.isArray(images) && images.some(function(image) {
-                        return image && typeof image.url === 'string' && image.url.trim() !== '';
-                });
+                const normalizedImages = Array.isArray(images)
+                        ? images
+                                        .map((imageData, index) => normalizeRenderedImage(imageData, index))
+                                        .filter(Boolean)
+                        : [];
 
-                if (!hasRenderableImages) {
+                if (normalizedImages.length === 0) {
                         console.warn(`${LOG_PREFIX} Aucune image valide à afficher`, { images });
                         return;
                 }
 
-                let hasUpdatedImage = false;
-
-                if (gridContainer) {
-                        let gridImages = gridContainer.querySelectorAll('img');
-
-                        if (gridImages.length < 4) {
-                                ensureGridPlaceholders();
-                                gridImages = gridContainer.querySelectorAll('img');
-                        }
-
-                        gridImages.forEach((imageElement, index) => {
-                                const imageData = Array.isArray(images) ? images[index] : null;
-                                const hasValidUrl = imageData && typeof imageData.url === 'string' && imageData.url.trim() !== '';
-
-                                if (!hasValidUrl) {
-                                        return;
-                                }
-
-                                const trimmedUrl = imageData.url.trim();
-
-                                if (imageElement.dataset && imageElement.dataset.livePreviewUrl) {
-                                        delete imageElement.dataset.livePreviewUrl;
-                                }
-
-                                imageElement.classList.remove('preview-enlarge');
-                                imageElement.src = trimmedUrl;
-                                imageElement.alt = imageData.prompt || 'Image générée';
-                                imageElement.dataset.jobId = currentJobId || '';
-                                imageElement.dataset.taskId = currentTaskId || '';
-                                imageElement.dataset.formatImage = imageData.format || '';
-                                imageElement.dataset.prompt = imageData.prompt || prompt;
-                                imageElement.setAttribute('data-display_name', imageData.display_name || '');
-                                imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
-                                imageElement.setAttribute('data-user-id', imageData.user_id || '');
-                                imageElement.classList.add('preview-enlarge');
-                                hasUpdatedImage = true;
-                        });
+                const previewImage = getPreviewImageElement();
+                if (previewImage) {
+                        applyPreviewImageData(previewImage, normalizedImages[0]);
                 }
 
-                if (!hasUpdatedImage) {
-                        console.warn(`${LOG_PREFIX} Les images renvoyées sont vides, aucune mise à jour effectuée.`);
-                        return;
+                const gridContainer = getGridContainer();
+                if (gridContainer) {
+                        ensureGridPlaceholders();
+
+                        const thumbnails = Array.from(gridContainer.querySelectorAll('.generation-thumbnail'));
+                        const thumbnailImages = normalizedImages.slice(1, GENERATION_THUMBNAIL_LIMIT + 1);
+
+                        thumbnails.forEach((button, index) => {
+                                const imageData = thumbnailImages[index];
+                                if (imageData) {
+                                        setThumbnailData(button, imageData, index);
+                                } else {
+                                        setThumbnailPlaceholder(button, index);
+                                }
+                        });
                 }
 
                 togglePreviewMode(false);
 
-                const previewImage = getPreviewImageElement();
-                if (previewImage) {
-                        clearPreviewImageDatasets(previewImage);
-                        previewImage.src = PLACEHOLDER_IMAGE_SRC;
-                        previewImage.alt = "Image d'attente";
-                        previewImage.classList.remove('preview-enlarge');
+                if (typeof adjustImageHeight === 'function') {
+                        adjustImageHeight();
+                }
+
+                if (typeof enableImageEnlargement === 'function') {
+                        enableImageEnlargement();
                 }
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });

@@ -61,29 +61,26 @@
                 </div>
         </section>
 
-        <div class="grid-wrapper" id="image-grid-wrapper">
-                <div id="image-grid" class="image-grid">
-                        <div class="image-container top">
-                                <img class="top" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 0" />
-                        </div>
-                        <div class="image-container top">
-                                <img class="top" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 1" />
-                        </div>
-                        <div class="image-container bottom">
-                                <img class="bottom" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 2" />
-                        </div>
-                        <div class="image-container bottom">
-                                <img class="bottom" src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image 3" />
-                        </div>
-                </div>
-        </div>
+       <div class="grid-wrapper generation-display" id="image-grid-wrapper">
+               <div id="generation-preview" class="generation-preview">
+                       <img
+                               id="generation-preview-image"
+                               class="centered-image"
+                               src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
+                               alt="Image d'attente"
+                       />
+               </div>
 
-        <div id="generation-preview" class="generation-preview">
-                <img
-                        id="generation-preview-image"
-                        class="centered-image"
-                        src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
-                        alt="Image d'attente"
-                />
-        </div>
+               <div id="image-grid" class="image-grid generation-thumbnails" role="list">
+                       <button type="button" class="image-container generation-thumbnail is-placeholder" data-thumbnail-index="0" aria-label="Miniature 1">
+                               <img src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image d'attente" />
+                       </button>
+                       <button type="button" class="image-container generation-thumbnail is-placeholder" data-thumbnail-index="1" aria-label="Miniature 2">
+                               <img src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image d'attente" />
+                       </button>
+                       <button type="button" class="image-container generation-thumbnail is-placeholder" data-thumbnail-index="2" aria-label="Miniature 3">
+                               <img src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png" alt="Image d'attente" />
+                       </button>
+               </div>
+       </div>
 </div>
