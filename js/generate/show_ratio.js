@@ -170,15 +170,30 @@ function getVariantContainers() {
 }
 
 function toggleImageGrid(isHidden) {
-    const grid = document.getElementById('image-grid');
     const wrapper = document.getElementById('image-grid-wrapper');
+    const placeholderGrid = document.getElementById('generation-placeholder-grid');
+    const gallery = document.getElementById('generation-gallery');
 
-    [grid, wrapper].forEach(element => {
-        if (element) {
-            element.classList.toggle('is-hidden', Boolean(isHidden));
-            element.setAttribute('aria-hidden', Boolean(isHidden).toString());
-        }
-    });
+    const hidden = Boolean(isHidden);
+
+    if (wrapper) {
+        wrapper.classList.toggle('is-hidden', hidden);
+        wrapper.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+    }
+
+    if (placeholderGrid) {
+        placeholderGrid.setAttribute(
+            'aria-hidden',
+            hidden ? 'true' : (placeholderGrid.classList.contains('is-hidden') ? 'true' : 'false')
+        );
+    }
+
+    if (gallery) {
+        gallery.setAttribute(
+            'aria-hidden',
+            hidden ? 'true' : (gallery.classList.contains('is-hidden') ? 'true' : 'false')
+        );
+    }
 }
 
 function hideVariantList() {

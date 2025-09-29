@@ -141,27 +141,74 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 24px;
     padding: 0 8px;
     box-sizing: border-box;
+    position: relative;
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .grid-wrapper.is-hidden {
     display: none;
 }
 
-#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid {
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-gallery {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    width: 100%;
+    gap: 24px;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-gallery.is-hidden {
+    display: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-placeholder-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 16px;
-    width: min(100%, calc(100dvh - var(--header-height, 88px) - 120px));
-    max-width: 100%;
+    width: min(460px, 100%);
+    margin: 0 auto;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-placeholder-grid.is-hidden {
+    display: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-placeholder-grid .image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
     min-height: 0;
     aspect-ratio: 1 / 1;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-placeholder-grid
+    .image-container
+    img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(180px, 100%);
+    max-width: 100%;
+    min-height: 0;
     height: auto;
-    max-height: 100%;
-    margin: 0 auto;
-    align-content: stretch;
+    margin: 0;
     align-items: stretch;
 }
 
@@ -809,8 +856,34 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     }
 }
 
+@media (max-width: 768px) {
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-thumbnails {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-placeholder-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-placeholder-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-preview {
-    display: none;
+    display: flex;
     width: min(100%, calc(100dvh - var(--header-height, 88px) - 120px));
     max-width: min(100%, 1080px);
     aspect-ratio: 1 / 1;
@@ -829,7 +902,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > #content
     > .content-images
     .generation-preview.is-active {
-    display: flex;
+    box-shadow: 0 0 0 2px rgba(43, 216, 121, 0.4);
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -842,7 +915,11 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     object-fit: contain;
 }
 
-#customize-main.customize-layout:not(.hub-layout) > #content > .content-images .image-grid .image-container {
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .image-grid
+    .image-container {
     position: relative;
     overflow: hidden;
     border-radius: 16px;
@@ -860,6 +937,81 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-thumbnails {
+    flex: 0 0 auto;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-thumbnail {
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-thumbnail.is-placeholder {
+    cursor: default;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-thumbnail.is-active {
+    box-shadow: 0 0 0 2px rgba(43, 216, 121, 0.6);
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-thumbnail:focus-visible {
+    outline: 2px solid var(--color-brand-400, #2bd879);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .grid-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-gallery {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-thumbnails {
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+    }
+
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-placeholder-grid {
+        width: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
 }
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images::-webkit-scrollbar {
