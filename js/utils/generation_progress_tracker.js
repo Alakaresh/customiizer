@@ -5,12 +5,10 @@
     const AJAX_URL = typeof window.ajaxurl === 'string' ? window.ajaxurl : '/wp-admin/admin-ajax.php';
     const FINAL_STATUSES = new Set(['done', 'error']);
     const POLL_INTERVAL_MS = 1000;
-    const DEFAULT_TITLE = 'Génération en cours';
     const INIT_RETRY_DELAY_MS = 75;
     const MAX_INIT_RETRIES = 20;
 
     let modal = null;
-    let title = null;
     let loadingBar = null;
     let loadingText = null;
     let loadingPercentage = null;
@@ -92,17 +90,16 @@
     }
 
     function ensureElements() {
-        if (modal && loadingBar && loadingText && loadingPercentage && title) {
+        if (modal && loadingBar && loadingText && loadingPercentage) {
             return true;
         }
 
         modal = document.getElementById('generation-progress-modal');
         loadingBar = document.getElementById('loading-bar');
         loadingText = document.getElementById('loading-text');
-        title = document.getElementById('generation-progress-title');
         loadingPercentage = document.getElementById('loading-percentage');
 
-        return Boolean(modal && loadingBar && loadingText && loadingPercentage && title);
+        return Boolean(modal && loadingBar && loadingText && loadingPercentage);
     }
 
     function setCurrentState(state) {
@@ -182,12 +179,6 @@
             loadingText.textContent = message;
         }
 
-        if (title) {
-            const normalizedTitle = typeof state.title === 'string' && state.title.trim()
-                ? state.title.trim()
-                : DEFAULT_TITLE;
-            title.textContent = normalizedTitle;
-        }
     }
 
     function shouldAutoHide(state) {

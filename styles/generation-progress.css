@@ -19,12 +19,6 @@
     width: min(360px, 90vw);
 }
 
-.generation-progress-title {
-    margin: 0 0 12px;
-    color: rgba(255, 255, 255, 0.86);
-    font-size: clamp(1rem, 1.8vw, 1.25rem);
-}
-
 .loading-container {
     width: 100%;
     display: flex;
