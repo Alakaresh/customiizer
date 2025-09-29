@@ -72,10 +72,6 @@ if ( $user_logged_in ) {
                                                         <span class="loyalty-header-points-value"><?php echo esc_html( number_format_i18n( $loyalty_points ) ); ?></span>
                                                         <span class="loyalty-header-points-label"><?php echo esc_html__( 'pts', 'customiizer' ); ?></span>
                                                 </div>
-                                                <?php else : ?>
-                                                <div class="loyalty-header-points loyalty-header-points--guest">
-                                                        <span class="loyalty-header-points-label"><?php echo esc_html__( 'Découvrir', 'customiizer' ); ?></span>
-                                                </div>
                                                 <?php endif; ?>
                                                 <?php customiizer_loyalty_widget(); ?>
                                         </div>
@@ -115,9 +111,8 @@ if ( $user_logged_in ) {
         </div>
         <?php endif; ?>
         <div class="login-register-container">
-                <a id="loginRegisterButton" class="icon-button">
-                        <i class="fas fa-user"></i>
-                        <span class="login-text">Se connecter</span>
+                <a id="loginRegisterButton" class="icon-button" aria-label="<?php echo esc_attr__( 'Se connecter', 'customiizer' ); ?>">
+                        <i class="fas fa-user" aria-hidden="true"></i>
                 </a>
         </div>
         <?php endif; ?>
