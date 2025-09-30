@@ -20,6 +20,7 @@ let lastKnownProgress = null;
 let lastKnownMessage = '';
 let clearStateTimeoutId = null;
 let previewGalleryImages = [];
+let selectedPreviewIndex = 0;
 let previewThumbnailsVisible = false;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
@@ -190,6 +191,7 @@ jQuery(function($) {
         function resetPreviewGallery() {
                 const thumbnailsContainer = getPreviewThumbnailsContainer();
                 previewGalleryImages = [];
+                selectedPreviewIndex = 0;
 
                 if (!thumbnailsContainer) {
                         return;
@@ -197,7 +199,7 @@ jQuery(function($) {
 
                 thumbnailsContainer.innerHTML = '';
 
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 4; i++) {
                         const placeholderButton = document.createElement('button');
                         placeholderButton.type = 'button';
                         placeholderButton.className = 'generation-preview__thumbnail is-placeholder';
@@ -251,24 +253,41 @@ jQuery(function($) {
                         return;
                 }
 
-                const [mainImage, ...thumbnailImages] = previewGalleryImages;
+                if (selectedPreviewIndex >= previewGalleryImages.length) {
+                        selectedPreviewIndex = 0;
+                }
+
+                const mainImage = previewGalleryImages[selectedPreviewIndex];
+                if (!mainImage) {
+                        resetPreviewGallery();
+                        clearPreviewImageDatasets(previewImage);
+                        previewImage.src = PLACEHOLDER_IMAGE_SRC;
+                        previewImage.alt = "Image d'attente";
+                        previewImage.classList.remove('preview-enlarge');
+                        return;
+                }
+
                 applyImageMetaToElement(previewImage, mainImage);
                 previewImage.classList.remove('preview-enlarge');
 
                 thumbnailsContainer.innerHTML = '';
-                const maxThumbnails = 3;
-                const renderedThumbnails = thumbnailImages.slice(0, maxThumbnails);
+                const maxThumbnails = 4;
+                const renderedThumbnails = previewGalleryImages.slice(0, maxThumbnails);
 
                 renderedThumbnails.forEach((imageData, index) => {
                         const button = document.createElement('button');
                         button.type = 'button';
                         button.className = 'generation-preview__thumbnail';
-                        button.dataset.previewIndex = String(index + 1);
-                        button.setAttribute('aria-label', `Afficher l'image ${index + 2}`);
+                        button.dataset.previewIndex = String(index);
+                        button.setAttribute('aria-label', `Afficher l'image ${index + 1}`);
+                        button.setAttribute('aria-pressed', index === selectedPreviewIndex ? 'true' : 'false');
+                        if (index === selectedPreviewIndex) {
+                                button.classList.add('is-selected');
+                        }
 
                         const thumbImage = document.createElement('img');
                         thumbImage.src = imageData.url;
-                        thumbImage.alt = imageData.prompt || `Miniature ${index + 2}`;
+                        thumbImage.alt = imageData.prompt || `Miniature ${index + 1}`;
 
                         button.appendChild(thumbImage);
                         thumbnailsContainer.appendChild(button);
@@ -293,6 +312,7 @@ jQuery(function($) {
         function populatePreviewGallery(images) {
                 if (!Array.isArray(images)) {
                         previewGalleryImages = [];
+                        selectedPreviewIndex = 0;
                         renderPreviewGallery();
                         return;
                 }
@@ -314,6 +334,7 @@ jQuery(function($) {
                         });
 
                 previewGalleryImages = normalizedImages.slice(0, 4);
+                selectedPreviewIndex = 0;
                 renderPreviewGallery();
         }
 
@@ -322,16 +343,15 @@ jQuery(function($) {
                         return;
                 }
 
-                if (typeof thumbnailIndex !== 'number' || thumbnailIndex <= 0 || thumbnailIndex >= previewGalleryImages.length) {
+                if (typeof thumbnailIndex !== 'number' || thumbnailIndex < 0 || thumbnailIndex >= previewGalleryImages.length) {
                         return;
                 }
 
-                const [selectedImage] = previewGalleryImages.splice(thumbnailIndex, 1);
-                if (!selectedImage) {
+                if (thumbnailIndex === selectedPreviewIndex) {
                         return;
                 }
 
-                previewGalleryImages.unshift(selectedImage);
+                selectedPreviewIndex = thumbnailIndex;
                 renderPreviewGallery();
         }
 
