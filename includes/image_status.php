@@ -80,18 +80,23 @@ function check_image_status() {
     ];
 
     if ($job['status'] === 'done') {
-        $rows = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT image_number, image_url, format_image, prompt, settings, image_prefix FROM {$imagesTable} WHERE job_id = %d ORDER BY image_number ASC",
-                $job['id']
-            ),
-            ARRAY_A
-        );
+        $jobId = isset($job['id']) ? (int) $job['id'] : 0;
+        $rows = [];
 
-        $response['images'] = array_map(
+        if ($jobId > 0) {
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT id, image_url, format_image, prompt, settings, image_prefix FROM {$imagesTable} WHERE job_id = %d ORDER BY id ASC",
+                    $jobId
+                ),
+                ARRAY_A
+            );
+        }
+
+        $images = array_map(
             static function ($row) {
                 return [
-                    'id' => isset($row['image_number']) ? (int) $row['image_number'] : null,
+                    'id' => isset($row['id']) ? (int) $row['id'] : null,
                     'url' => $row['image_url'] ?? '',
                     'format' => $row['format_image'] ?? '',
                     'prompt' => $row['prompt'] ?? '',
@@ -101,6 +106,22 @@ function check_image_status() {
             },
             $rows ?: []
         );
+
+        $response['images'] = $images;
+
+        if (empty($response['imageUrl'])) {
+            foreach ($images as $image) {
+                if (!isset($image['url'])) {
+                    continue;
+                }
+
+                $candidateUrl = trim((string) $image['url']);
+                if ($candidateUrl !== '') {
+                    $response['imageUrl'] = $candidateUrl;
+                    break;
+                }
+            }
+        }
     }
 
     wp_send_json_success($response);
