@@ -8,6 +8,11 @@
     const POLL_INTERVAL_MS = 1000;
     const INIT_RETRY_DELAY_MS = 75;
     const MAX_INIT_RETRIES = 20;
+    const SOCKET_CONFIG = sanitizeSocketConfig(window.customiizerWorkerSocket);
+    const SOCKET_RETRY_INITIAL_MS = 2000;
+    const SOCKET_RETRY_MAX_MS = 30000;
+    const SOCKET_BACKGROUND_THRESHOLD_MS = 60000;
+    const SOCKET_BACKGROUND_SUSPEND_MS = 120000;
 
     let modal = null;
     let loadingBar = null;
@@ -19,6 +24,13 @@
     let ignoreNextEvent = false;
     let isInitialized = false;
     let initRetryCount = 0;
+    let socket = null;
+    let socketShouldReconnect = false;
+    let socketReconnectDelay = SOCKET_RETRY_INITIAL_MS;
+    let socketReconnectTimer = null;
+    let socketSuspendedUntil = 0;
+    let lastVisibilityHiddenAt = null;
+    let realtimeAvailable = Boolean(SOCKET_CONFIG.enabled && SOCKET_CONFIG.url);
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => tryInitialize(false));
@@ -29,7 +41,9 @@
     window.addEventListener('pageshow', () => tryInitialize(true));
     window.addEventListener('focus', handleVisibilityGain);
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
+        if (document.hidden) {
+            handleVisibilityLoss();
+        } else {
             handleVisibilityGain();
         }
     });
@@ -83,11 +97,27 @@
     }
 
     function handleVisibilityGain() {
+        if (lastVisibilityHiddenAt !== null) {
+            const hiddenDuration = Date.now() - lastVisibilityHiddenAt;
+            lastVisibilityHiddenAt = null;
+            if (hiddenDuration > SOCKET_BACKGROUND_THRESHOLD_MS) {
+                socketSuspendedUntil = Date.now() + SOCKET_BACKGROUND_SUSPEND_MS;
+            }
+        }
+
         if (!ensureElements()) {
             tryInitialize(false);
             return;
         }
         setCurrentState(readStoredState());
+    }
+
+    function handleVisibilityLoss() {
+        lastVisibilityHiddenAt = Date.now();
+        stopSocket();
+        if (!isGenerationPage()) {
+            startPolling();
+        }
     }
 
     function ensureElements() {
@@ -110,6 +140,7 @@
         if (!currentState) {
             hideModal();
             stopPolling();
+            stopSocket();
             return;
         }
 
@@ -119,7 +150,19 @@
         if (shouldAutoHide(currentState)) {
             scheduleAutoHide();
             stopPolling();
-        } else if (!isGenerationPage()) {
+            stopSocket();
+            return;
+        }
+
+        if (shouldUseRealtime(currentState)) {
+            stopPolling();
+            ensureSocketConnection();
+            return;
+        }
+
+        stopSocket();
+
+        if (!isGenerationPage()) {
             startPolling();
         }
     }
@@ -204,6 +247,380 @@
             clearStoredState();
             hideModal();
         }, 4000);
+    }
+
+    function shouldUseRealtime(state) {
+        if (!realtimeAvailable) {
+            return false;
+        }
+
+        if (!state || typeof state !== 'object') {
+            return false;
+        }
+
+        if (!state.taskId) {
+            return false;
+        }
+
+        if (shouldAutoHide(state)) {
+            return false;
+        }
+
+        if (typeof window.WebSocket !== 'function') {
+            realtimeAvailable = false;
+            return false;
+        }
+
+        if (!SOCKET_CONFIG.enabled || !SOCKET_CONFIG.url) {
+            realtimeAvailable = false;
+            return false;
+        }
+
+        if (Date.now() < socketSuspendedUntil) {
+            return false;
+        }
+
+        if (document.hidden) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function ensureSocketConnection() {
+        if (!shouldUseRealtime(currentState)) {
+            return;
+        }
+
+        socketShouldReconnect = true;
+
+        if (socket || socketReconnectTimer) {
+            return;
+        }
+
+        openSocketConnection();
+    }
+
+    function openSocketConnection() {
+        if (!shouldUseRealtime(currentState)) {
+            return;
+        }
+
+        if (typeof window.WebSocket !== 'function') {
+            realtimeAvailable = false;
+            return;
+        }
+
+        const socketUrl = buildSocketUrl();
+
+        if (!socketUrl) {
+            realtimeAvailable = false;
+            return;
+        }
+
+        try {
+            socket = new WebSocket(socketUrl);
+        } catch (error) {
+            console.warn(`${LOG_PREFIX} Impossible d'ouvrir la connexion WebSocket`, error);
+            handleSocketFailure();
+            return;
+        }
+
+        socket.addEventListener('open', handleSocketOpen);
+        socket.addEventListener('message', handleSocketMessage);
+        socket.addEventListener('error', handleSocketError);
+        socket.addEventListener('close', handleSocketClose);
+    }
+
+    function handleSocketOpen() {
+        socketReconnectDelay = SOCKET_RETRY_INITIAL_MS;
+    }
+
+    function handleSocketError(event) {
+        console.warn(`${LOG_PREFIX} Erreur de connexion WebSocket`, event);
+    }
+
+    function handleSocketClose() {
+        socket = null;
+
+        if (!socketShouldReconnect) {
+            return;
+        }
+
+        handleSocketFailure();
+    }
+
+    function handleSocketFailure() {
+        if (!socketShouldReconnect) {
+            return;
+        }
+
+        stopSocket(false);
+
+        if (!socketReconnectTimer) {
+            socketReconnectTimer = window.setTimeout(() => {
+                socketReconnectTimer = null;
+                if (shouldUseRealtime(currentState)) {
+                    openSocketConnection();
+                }
+            }, socketReconnectDelay);
+
+            socketReconnectDelay = Math.min(socketReconnectDelay * 2, SOCKET_RETRY_MAX_MS);
+        }
+
+        if (!isGenerationPage()) {
+            startPolling();
+        }
+    }
+
+    function stopSocket(shouldDisableReconnect = true) {
+        if (shouldDisableReconnect) {
+            socketShouldReconnect = false;
+        }
+
+        if (socketReconnectTimer) {
+            clearTimeout(socketReconnectTimer);
+            socketReconnectTimer = null;
+        }
+
+        if (socket) {
+            try {
+                socket.close();
+            } catch (error) {
+                console.warn(`${LOG_PREFIX} Erreur lors de la fermeture du WebSocket`, error);
+            }
+
+            socket.removeEventListener('open', handleSocketOpen);
+            socket.removeEventListener('message', handleSocketMessage);
+            socket.removeEventListener('error', handleSocketError);
+            socket.removeEventListener('close', handleSocketClose);
+            socket = null;
+        }
+    }
+
+    function handleSocketMessage(event) {
+        if (!event || typeof event.data !== 'string') {
+            return;
+        }
+
+        let payload;
+        try {
+            payload = JSON.parse(event.data);
+        } catch (error) {
+            console.warn(`${LOG_PREFIX} Message WebSocket invalide`, error);
+            return;
+        }
+
+        if (!payload || typeof payload !== 'object') {
+            return;
+        }
+
+        const jobPayload = normalizeSocketPayload(payload);
+
+        if (!jobPayload) {
+            return;
+        }
+
+        if (!matchesActiveJob(jobPayload)) {
+            return;
+        }
+
+        const nextState = deriveStateFromSocketPayload(jobPayload);
+        if (!nextState) {
+            return;
+        }
+
+        setCurrentState(nextState);
+        writeState(nextState);
+    }
+
+    function matchesActiveJob(payload) {
+        if (!currentState) {
+            return false;
+        }
+
+        const activeTaskId = extractString(currentState.taskId);
+        const activeJobId = extractString(currentState.jobId);
+        const payloadTaskId = extractString(payload.taskId ?? payload.task_id ?? payload.TaskId);
+        const payloadJobId = extractString(payload.jobId ?? payload.job_id ?? payload.JobId);
+
+        if (activeTaskId && payloadTaskId && payloadTaskId !== activeTaskId) {
+            return false;
+        }
+
+        if (activeJobId && payloadJobId && payloadJobId !== activeJobId) {
+            return false;
+        }
+
+        if (activeTaskId) {
+            return !payloadTaskId || payloadTaskId === activeTaskId;
+        }
+
+        if (activeJobId) {
+            return Boolean(payloadJobId) && payloadJobId === activeJobId;
+        }
+
+        return false;
+    }
+
+    function deriveStateFromSocketPayload(payload) {
+        if (!currentState) {
+            return null;
+        }
+
+        const nextState = { ...currentState };
+
+        const payloadTaskId = extractString(payload.taskId ?? payload.task_id ?? payload.TaskId);
+        if (payloadTaskId) {
+            nextState.taskId = payloadTaskId;
+        }
+
+        const payloadJobId = extractString(payload.jobId ?? payload.job_id ?? payload.JobId);
+        if (payloadJobId) {
+            nextState.jobId = payloadJobId;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(payload, 'progress')) {
+            const parsedProgress = Number(payload.progress);
+            if (Number.isFinite(parsedProgress)) {
+                nextState.progress = clamp(parsedProgress);
+            }
+        }
+
+        const rawStatus = payload.status ?? payload.Status;
+        let remoteStatus = normalizeStatus(rawStatus ?? nextState.status);
+        const upscaleDone = parseUpscaleDone(payload);
+        const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
+        const isErrorStatus = remoteStatus === 'error';
+
+        if (hasCompleted && Number.isFinite(nextState.progress) && nextState.progress < 100) {
+            nextState.progress = 100;
+        }
+
+        if (isErrorStatus) {
+            nextState.status = 'error';
+        } else if (hasCompleted) {
+            nextState.status = 'done';
+        } else if (remoteStatus) {
+            nextState.status = remoteStatus;
+        } else {
+            nextState.status = 'processing';
+        }
+
+        if (Number.isFinite(upscaleDone)) {
+            nextState.upscaleDone = upscaleDone;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(payload, 'message')) {
+            nextState.message = typeof payload.message === 'string' ? payload.message : '';
+        }
+
+        const livePreviewUrl = extractString(payload.imageUrl ?? payload.image_url ?? payload.preview_url);
+        if (livePreviewUrl) {
+            nextState.imageUrl = livePreviewUrl;
+        }
+
+        if (payload.completed === true) {
+            nextState.completed = true;
+        }
+
+        const shouldShowFinalMessage = !hasCompleted && !isErrorStatus && Number.isFinite(nextState.progress) && nextState.progress >= 100;
+        if (shouldShowFinalMessage) {
+            nextState.message = 'Finalisation des variantes HD…';
+        }
+
+        if (hasCompleted || isErrorStatus) {
+            nextState.message = '';
+        }
+
+        if (shouldAutoHide(nextState)) {
+            nextState.completed = true;
+        }
+
+        return nextState;
+    }
+
+    function buildSocketUrl() {
+        if (!SOCKET_CONFIG || !SOCKET_CONFIG.enabled || !SOCKET_CONFIG.url) {
+            return '';
+        }
+
+        let baseUrl = extractString(SOCKET_CONFIG.url);
+        if (!baseUrl) {
+            return '';
+        }
+
+        if (/^https?:\/\//i.test(baseUrl)) {
+            baseUrl = baseUrl.replace(/^http/i, 'ws');
+        } else if (!/^wss?:\/\//i.test(baseUrl)) {
+            const { protocol, host } = window.location;
+            const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
+            const normalizedPath = baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`;
+            baseUrl = `${wsProtocol}//${host}${normalizedPath}`;
+        }
+
+        if (SOCKET_CONFIG.token) {
+            const separator = baseUrl.includes('?') ? '&' : '?';
+            baseUrl += `${separator}token=${encodeURIComponent(SOCKET_CONFIG.token)}`;
+        }
+
+        return baseUrl;
+    }
+
+    function extractString(value) {
+        if (typeof value === 'string') {
+            return value.trim();
+        }
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return String(value);
+        }
+        return '';
+    }
+
+    function sanitizeSocketConfig(rawConfig) {
+        const safeConfig = rawConfig && typeof rawConfig === 'object' ? rawConfig : {};
+        const enabledValue = safeConfig.enabled ?? safeConfig.active ?? safeConfig.isEnabled ?? safeConfig.is_active ?? false;
+        const urlValue = safeConfig.url ?? safeConfig.endpoint ?? '';
+        const tokenValue = safeConfig.token ?? safeConfig.authToken ?? safeConfig.secret ?? '';
+
+        return {
+            enabled: normalizeBoolean(enabledValue),
+            url: extractString(urlValue),
+            token: typeof tokenValue === 'string' ? tokenValue : '',
+        };
+    }
+
+    function normalizeSocketPayload(payload) {
+        if (!payload || typeof payload !== 'object') {
+            return null;
+        }
+
+        if (payload.data && typeof payload.data === 'object') {
+            return payload.data;
+        }
+
+        if (payload.payload && typeof payload.payload === 'object') {
+            return payload.payload;
+        }
+
+        return payload;
+    }
+
+    function normalizeBoolean(value) {
+        if (typeof value === 'boolean') {
+            return value;
+        }
+        if (typeof value === 'number') {
+            return value === 1;
+        }
+        if (typeof value === 'string') {
+            const lowered = value.trim().toLowerCase();
+            if (!lowered) {
+                return false;
+            }
+            return ['1', 'true', 'yes', 'on', 'enabled'].includes(lowered);
+        }
+        return Boolean(value);
     }
 
     function startPolling() {
