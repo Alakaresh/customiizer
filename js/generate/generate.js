@@ -847,6 +847,15 @@ jQuery(function($) {
                                 return;
                         }
 
+                        if (validImageCount < UPSCALE_TARGET_COUNT) {
+                                console.warn(`${LOG_PREFIX} Toutes les images ne sont pas encore disponibles, nouvelle vérification programmée.`, {
+                                        validImageCount,
+                                        targetCount: UPSCALE_TARGET_COUNT,
+                                });
+                                scheduleNextPoll();
+                                return;
+                        }
+
                         console.log(`${LOG_PREFIX} Rendu final confirmé, finalisation UI.`, {
                                 taskId: currentTaskId,
                                 jobId: currentJobId,
