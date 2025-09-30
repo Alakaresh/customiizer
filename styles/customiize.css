@@ -907,7 +907,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     min-height: 0;
     aspect-ratio: 1 / 1;
 }
@@ -924,8 +924,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > #content
     > .content-images
     .generation-preview__thumbnail:hover {
-    transform: scale(1.02);
     border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -940,6 +940,15 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout)
     > #content
     > .content-images
+    .generation-preview__thumbnail.is-selected {
+    border-color: var(--color-brand-400, #2bd879);
+    box-shadow: 0 0 0 2px rgba(43, 216, 121, 0.35);
+    background: rgba(43, 216, 121, 0.08);
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
     .generation-preview__thumbnail.is-placeholder {
     cursor: default;
     opacity: 0.4;
@@ -949,8 +958,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > #content
     > .content-images
     .generation-preview__thumbnail.is-placeholder:hover {
-    transform: none;
     border-color: rgba(255, 255, 255, 0.04);
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.02);
 }
 
 @media (max-width: 1200px) {
