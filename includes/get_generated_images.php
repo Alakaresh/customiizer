@@ -1,5 +1,9 @@
 <?php
-function get_generated_images2() {
+/**
+ * AJAX callback used to retrieve the list of generated images stored in the
+ * database.
+ */
+function get_generated_images_ajax() {
     global $wpdb;
     $table_name = 'WPC_generated_image';
 
@@ -24,5 +28,5 @@ function get_generated_images2() {
     wp_die();
 }
 
-add_action('wp_ajax_nopriv_get_generated_images', 'get_generated_images');
-add_action('wp_ajax_get_generated_images', 'get_generated_images');
+add_action('wp_ajax_nopriv_get_generated_images', 'get_generated_images_ajax');
+add_action('wp_ajax_get_generated_images', 'get_generated_images_ajax');
