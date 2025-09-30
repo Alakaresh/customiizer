@@ -12,8 +12,12 @@ function loadImages() {
 			.then(response => response.json())
 			.then(data => { // ← ICI
 
-			if (data.success && data.images) {
-				allImages = data.images;
+                if (data.success && data.images) {
+                                console.log('[Customiizer][ShowImages] Images récupérées', {
+                                        total: Array.isArray(data.images) ? data.images.length : 0,
+                                        images: data.images,
+                                });
+                                allImages = data.images;
 				displayImages();
 				displayImagesForCurrentUser();
 				enableImageEnlargement();

@@ -812,6 +812,12 @@ jQuery(function($) {
 
                         try {
                                 images = await fetchJobImages(currentJobId || job.jobId);
+                                console.log(`${LOG_PREFIX} Images récupérées après statut done`, {
+                                        taskId: currentTaskId,
+                                        jobId: currentJobId,
+                                        images,
+                                        imagesSummary: buildImagesDebugSummary(images),
+                                });
                         } catch (error) {
                                 images = Array.isArray(job.images) ? job.images : [];
                                 if (!Array.isArray(job.images) || job.images.length === 0) {
