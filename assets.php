@@ -143,20 +143,15 @@ function customiizer_enqueue_customize_assets() {
                 wp_enqueue_script('home-scroll-top', get_stylesheet_directory_uri() . '/js/home/scroll-to-top.js', ['jquery'], $ver, true);
         } elseif (strpos($request_uri, '/customiize') !== false) {
                 // --- CSS ---
-                wp_enqueue_style('driver-style', 'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css', [], $ver);
                 wp_enqueue_style('customiize-page-style', get_stylesheet_directory_uri() . '/styles/customiize.css', ['customiizer-style'], $ver);
 
-                // --- JS externes ---
-                wp_enqueue_script('driver-js', 'https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js', [], $ver, true);
-
-		// --- JS internes ---
+                // --- JS internes ---
                 wp_enqueue_script('generate-ratio', get_stylesheet_directory_uri() . '/js/generate/show_ratio.js', ['jquery'], $ver, true);
                 wp_enqueue_script('generate-images', get_stylesheet_directory_uri() . '/js/generate/show_images.js', ['jquery'], $ver, true);
                 wp_enqueue_script('generate-main', get_stylesheet_directory_uri() . '/js/generate/generate.js', ['jquery'], $ver, true);
                 wp_enqueue_script('generate-screen', get_stylesheet_directory_uri() . '/js/generate/screen.js', ['jquery'], $ver, true);
-                wp_enqueue_script('generate-tutorial', get_stylesheet_directory_uri() . '/js/generate/tutorial.js', ['jquery'], $ver, true);
 
-		// Page /shop
+                // Page /shop
 	} elseif (strpos($request_uri, '/boutique') !== false) {
 		// --- CSS ---
                 wp_enqueue_style('shop-style', get_stylesheet_directory_uri() . '/styles/shop.css', [], $ver);

@@ -1,10 +1,6 @@
 <?php
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
-
 require_once dirname(__DIR__, 5) . '/wp-load.php';
-require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 require_once dirname(__DIR__, 2) . '/utilities.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -72,7 +68,6 @@ if ($formatImage === '') {
 
 $userId = get_current_user_id();
 $taskId = uniqid('task_', true);
-$now = current_time('mysql');
 
 $promptLength = strlen($prompt);
 $promptPreview = function_exists('mb_substr') ? mb_substr($prompt, 0, 120, 'UTF-8') : substr($prompt, 0, 120);
@@ -88,96 +83,13 @@ $logContextData = [
     'formatImage' => $formatImage,
 ];
 
-customiizer_log('generate_image', 'Requête validée : ' . wp_json_encode($logContextData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-
-global $wpdb;
-$customPrefix = 'WPC_';
-$jobsTable = $customPrefix . 'generation_jobs';
-
-$inserted = $wpdb->insert(
-    $jobsTable,
-    [
-        'task_id' => $taskId,
-        'user_id' => $userId,
-        'prompt' => $prompt,
-        'format_image' => $formatImage,
-        'status' => 'pending',
-        'created_at' => $now,
-        'updated_at' => $now,
-    ],
-    ['%s', '%d', '%s', '%s', '%s', '%s', '%s']
-);
-
-if ($inserted === false) {
-    customiizer_log('generate_image', 'Échec insertion job : ' . $wpdb->last_error);
-    http_response_code(500);
-    echo wp_json_encode([
-        'success' => false,
-        'message' => "Impossible d'enregistrer la génération."
-    ]);
-    exit;
-}
-
-$jobId = (int) $wpdb->insert_id;
-customiizer_log('generate_image', sprintf('Job inséré (ID %d) pour la tâche %s', $jobId, $taskId));
-
-$queueName = defined('RABBIT_IMAGE_QUEUE') ? RABBIT_IMAGE_QUEUE : 'image_jobs_dev';
-
-try {
-    $connection = new AMQPStreamConnection(
-        RABBIT_HOST,
-        RABBIT_PORT,
-        RABBIT_USER,
-        RABBIT_PASS
-    );
-
-    $channel = $connection->channel();
-    $channel->queue_declare($queueName, false, true, false, false);
-
-    $messageBody = wp_json_encode([
-        'taskId' => $taskId,
-        'jobId' => $jobId,
-        'userId' => $userId,
-        'prompt' => $prompt,
-        'formatImage' => $formatImage,
-        'format_image' => $formatImage,
-    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-    $message = new AMQPMessage(
-        $messageBody,
-        ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]
-    );
-
-    $channel->basic_publish($message, '', $queueName);
-    $channel->close();
-    $connection->close();
-    customiizer_log('generate_image', sprintf('Message RabbitMQ publié sur %s pour job %d', $queueName, $jobId));
-} catch (Throwable $exception) {
-    customiizer_log('generate_image', 'Erreur RabbitMQ : ' . $exception->getMessage());
-    $wpdb->update(
-        $jobsTable,
-        [
-            'status' => 'error',
-            'updated_at' => current_time('mysql'),
-        ],
-        ['id' => $jobId],
-        ['%s', '%s'],
-        ['%d']
-    );
-
-    http_response_code(500);
-    echo wp_json_encode([
-        'success' => false,
-        'message' => 'Impossible de programmer la génération pour le moment.'
-    ]);
-    exit;
-}
-
-customiizer_log('generate_image', sprintf('Job %s (%d) créé pour utilisateur %d', $taskId, $jobId, $userId));
+customiizer_log('generate_image', 'Requête reçue (génération désactivée) : ' . wp_json_encode($logContextData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+customiizer_log('generate_image', sprintf('Aucune insertion en base ni envoi RabbitMQ pour la tâche %s', $taskId));
 
 echo wp_json_encode([
     'success' => true,
     'taskId' => $taskId,
-    'status' => 'pending'
+    'status' => 'disabled',
+    'message' => 'La génération automatique est temporairement désactivée.'
 ]);
 exit;

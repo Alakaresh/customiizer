@@ -25,7 +25,6 @@ const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
 
 jQuery(function($) {
-        const validateButton = document.getElementById('validate-button');
         const customTextInput = document.getElementById('custom-text');
         const alertBox = document.getElementById('alert-box');
         const inlineProgressWrapper = document.getElementById('generation-progress-inline-wrapper');
@@ -555,7 +554,7 @@ jQuery(function($) {
                 renderPreviewGallery();
         }
 
-        if (!validateButton || !customTextInput) {
+        if (!customTextInput) {
                 console.warn(`${LOG_PREFIX} Éléments requis introuvables, annulation du script`);
                 return;
         }
@@ -689,13 +688,16 @@ jQuery(function($) {
                 if (hasError) {
                         resetImageDisplay();
                 }
-
-                validateButton.disabled = false;
         }
 
         function scheduleNextPoll() {
                 stopPolling();
-                pollTimeoutId = setTimeout(() => pollJobStatus(), POLL_INTERVAL_MS);
+
+                if (currentTaskId) {
+                        console.log(`${LOG_PREFIX} Suivi de statut désactivé, aucune nouvelle vérification planifiée.`, {
+                                taskId: currentTaskId,
+                        });
+                }
         }
 
         async function pollJobStatus() {
@@ -703,39 +705,9 @@ jQuery(function($) {
                         return;
                 }
 
-                try {
-                        const response = await fetch(ajaxurl, {
-                                method: 'POST',
-                                headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                                },
-                                body: new URLSearchParams({
-                                        action: 'check_image_status',
-                                        taskId: currentTaskId,
-                                }),
-                        });
-
-                        if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}`);
-                        }
-
-                        const payload = await response.json();
-                        if (!payload.success) {
-                                const statusMessage = payload.data && payload.data.message ? payload.data.message : 'Statut indisponible';
-                                throw new Error(statusMessage);
-                        }
-
-                        const job = payload.data;
-                        if (!job) {
-                                throw new Error('Réponse vide du serveur');
-                        }
-
-                        await handleJobStatus(job);
-                } catch (error) {
-                        console.error(`${LOG_PREFIX} Erreur lors du suivi du job`, error);
-                        showAlert("Une erreur est survenue pendant le suivi de la génération.");
-                        finalizeGeneration(true);
-                }
+                console.log(`${LOG_PREFIX} Suivi de statut désactivé, aucune requête check_image_status effectuée.`, {
+                        taskId: currentTaskId,
+                });
         }
 
         async function handleJobStatus(job) {
@@ -868,13 +840,12 @@ jQuery(function($) {
                         return;
                 }
 
-                console.log(`${LOG_PREFIX} Job non finalisé, nouvelle vérification programmée.`, {
+                console.log(`${LOG_PREFIX} Job non finalisé, suivi désactivé.`, {
                         taskId: currentTaskId,
                         jobId: currentJobId,
                         remoteStatus,
                         upscaleDone,
                 });
-                scheduleNextPoll();
         }
 
         function renderGeneratedImages(images) {
@@ -1046,122 +1017,6 @@ jQuery(function($) {
                 previewImage.src = imageUrl;
                 previewImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
         }
-
-        validateButton.addEventListener('click', async function(event) {
-                event.preventDefault();
-
-                resetGenerationState();
-                resetLoadingState();
-
-                const ratioSetting = selectedRatio;
-                jobFormat = ratioSetting;
-                prompt = customTextInput.textContent.trim();
-
-                console.log(`${LOG_PREFIX} Demande de génération`, {
-                        prompt,
-                        format_image: jobFormat,
-                        userId: currentUser && currentUser.ID,
-                });
-
-                if (!prompt) {
-                        showAlert('Veuillez entrer du texte avant de générer des images.');
-                        return;
-                }
-
-                if (!ratioSetting) {
-                        showAlert("Veuillez choisir une taille d'image avant de générer des images.");
-                        return;
-                }
-
-                hideAlert();
-                validateButton.disabled = true;
-                startLoadingUI();
-                showPreviewPlaceholder();
-
-                try {
-                        const requestPayload = {
-                                prompt,
-                                format_image: jobFormat,
-                        };
-
-                        console.log(`${LOG_PREFIX} Envoi de la requête backend`, {
-                                endpoint: '/wp-content/themes/customiizer/includes/proxy/generate_image.php',
-                                payload: requestPayload,
-                        });
-
-                        const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
-                                method: 'POST',
-                                headers: {
-                                        'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(requestPayload),
-                        });
-
-                        console.log(`${LOG_PREFIX} Réponse HTTP reçue`, {
-                                ok: response.ok,
-                                status: response.status,
-                                statusText: response.statusText,
-                                contentType: response.headers.get('content-type'),
-                        });
-
-                        let data = null;
-                        try {
-                                data = await response.json();
-                        } catch (parseError) {
-                                console.warn(`${LOG_PREFIX} Réponse JSON invalide`, parseError);
-                        }
-
-                        if (!response.ok) {
-                                console.error(`${LOG_PREFIX} Réponse backend non OK`, {
-                                        status: response.status,
-                                        statusText: response.statusText,
-                                        body: data,
-                                });
-                                const backendMessage =
-                                        data && typeof data.message === 'string' && data.message.trim() !== ''
-                                                ? data.message.trim()
-                                                : `HTTP ${response.status}`;
-                                throw new Error(backendMessage);
-                        }
-
-                        if (!data || !data.success || !data.taskId) {
-                                console.error(`${LOG_PREFIX} Réponse backend invalide`, { data });
-                                const backendMessage =
-                                        data && typeof data.message === 'string' && data.message.trim() !== ''
-                                                ? data.message.trim()
-                                                : 'Réponse invalide du backend';
-                                throw new Error(backendMessage);
-                        }
-
-                        console.log(`${LOG_PREFIX} Réponse du backend`, data);
-
-                        currentTaskId = data.taskId;
-                        lastKnownStatus = 'pending';
-                        updateLoading(0);
-                        updateLoadingText('');
-                        persistProgressState({
-                                taskId: currentTaskId,
-                                status: lastKnownStatus,
-                                message: '',
-                        });
-
-                        scheduleNextPoll();
-                } catch (error) {
-                        console.error(`${LOG_PREFIX} Erreur lors de la création du job`, {
-                                error,
-                                prompt,
-                                format_image: jobFormat,
-                                userId: currentUser && currentUser.ID,
-                        });
-                        const fallbackMessage = "Une erreur est survenue pendant la génération. Veuillez réessayer.";
-                        const displayMessage =
-                                error && typeof error.message === 'string' && error.message.trim() !== ''
-                                        ? error.message.trim()
-                                        : fallbackMessage;
-                        showAlert(displayMessage);
-                        finalizeGeneration(true);
-                }
-        });
 
         function resetImageDisplay() {
                 ensureGridPlaceholders();
@@ -1348,11 +1203,11 @@ jQuery(function($) {
                         updateLivePreview(storedState.imageUrl);
                 }
 
-                if (!isFinal) {
-                        validateButton.disabled = true;
-                        scheduleNextPoll();
-                } else {
-                        pollJobStatus();
+                if (currentTaskId) {
+                        console.log(`${LOG_PREFIX} Reprise de l'état stocké sans suivi automatique.`, {
+                                taskId: currentTaskId,
+                                status: storedState.status,
+                        });
                 }
         }
 

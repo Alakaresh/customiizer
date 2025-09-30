@@ -35,13 +35,6 @@
         </button>
     </div>
 
-    <!-- Conteneur pour le bouton de génération -->
-    <div id="aspect-ratio-container" class="aspect-ratio-container">
-        <div id="buttons-container">
-            <button type="submit" id="validate-button">Générer</button>
-        </div>
-    </div>
-
     <!-- Zone d'alerte pour les messages d'erreur ou autres alertes -->
     <div id="alert-box" style="display: none; color: red; margin-bottom: 10px;"></div>
 

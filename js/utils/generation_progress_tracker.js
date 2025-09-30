@@ -222,14 +222,10 @@
             return;
         }
 
-        if (pollTimeoutId) {
-            return;
-        }
-
-        pollTimeoutId = window.setTimeout(async () => {
-            pollTimeoutId = null;
-            await pollJobStatus();
-        }, POLL_INTERVAL_MS);
+        stopPolling();
+        console.log(`${LOG_PREFIX} Suivi de statut désactivé, aucune vérification planifiée.`, {
+            taskId: currentState.taskId,
+        });
     }
 
     async function pollJobStatus() {
@@ -237,75 +233,9 @@
             return;
         }
 
-        try {
-            const response = await fetch(AJAX_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                },
-                body: new URLSearchParams({
-                    action: 'check_image_status',
-                    taskId: currentState.taskId,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const payload = await response.json();
-            if (!payload.success || !payload.data) {
-                throw new Error('Réponse invalide');
-            }
-
-            const job = payload.data;
-            const remoteStatus = normalizeStatus(job.status);
-            const upscaleDone = parseUpscaleDone(job);
-            let progress = clamp(job.progress);
-            const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
-            const isErrorStatus = remoteStatus === 'error';
-
-            if (hasCompleted && progress < 100) {
-                progress = 100;
-            }
-
-            let status = 'processing';
-            if (isErrorStatus) {
-                status = 'error';
-            } else if (hasCompleted) {
-                status = 'done';
-            }
-
-            let nextMessage = currentState && typeof currentState.message === 'string' ? currentState.message : '';
-            if (!hasCompleted && !isErrorStatus && progress >= 100) {
-                nextMessage = 'Finalisation des variantes HD…';
-            } else if (hasCompleted || isErrorStatus) {
-                nextMessage = '';
-            }
-
-            const nextState = {
-                ...currentState,
-                jobId: job.jobId ?? currentState.jobId ?? null,
-                status,
-                progress,
-                message: nextMessage,
-                upscaleDone,
-            };
-
-            if (typeof job.imageUrl === 'string' && job.imageUrl) {
-                nextState.imageUrl = job.imageUrl;
-            }
-
-            if (shouldAutoHide(nextState)) {
-                nextState.completed = true;
-            }
-
-            setCurrentState(nextState);
-            writeState(nextState);
-        } catch (error) {
-            console.warn(`${LOG_PREFIX} Impossible de récupérer le statut`, error);
-            startPolling();
-        }
+        console.log(`${LOG_PREFIX} Suivi de statut désactivé, aucune requête check_image_status effectuée.`, {
+            taskId: currentState.taskId,
+        });
     }
 
     function stopPolling() {
