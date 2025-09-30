@@ -1,31 +1,38 @@
 <?php
 function get_all_generated_images() {
-    global $wpdb;
-    $table_name = 'WPC_generated_image';
+    $onlyCurrentUser = false;
 
-    // Vérifier si un ID utilisateur est passé dans la requête
-    $user = isset($_POST['user']) ? $_POST['user'] : false;
-	
-    if ($user) {
-		$current_user_id = get_current_user_id();
-        // Requête pour obtenir les images de l'utilisateur spécifique
-        $results = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE user_id = %d",
-            $current_user_id
-        ));
-    } else {
-        // Requête pour obtenir toutes les images
-        $results = $wpdb->get_results("SELECT * FROM $table_name");
+    if (isset($_POST['user'])) {
+        $rawUser = wp_unslash($_POST['user']);
+        if (is_string($rawUser)) {
+            $normalized = strtolower($rawUser);
+            $onlyCurrentUser = in_array($normalized, ['1', 'true', 'yes'], true);
+        } else {
+            $onlyCurrentUser = !empty($rawUser);
+        }
     }
-	
-    // Envoyer les résultats sous forme de JSON
-    if (!empty($results)) {
-        wp_send_json($results);
-    } else {
-        wp_send_json_error('No images found');
+
+    $queryArgs = [
+        'order_by' => 'image_date',
+        'order'    => 'DESC',
+    ];
+
+    if ($onlyCurrentUser) {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => 'Authentification requise'], 401);
+        }
+
+        $queryArgs['user_id'] = get_current_user_id();
     }
-	
-	// Just in case, ensure nothing else is output
+
+    $images = customiizer_fetch_generated_images($queryArgs);
+
+    if (!empty($images)) {
+        wp_send_json($images);
+    } else {
+        wp_send_json_error(['message' => 'No images found'], 404);
+    }
+
     wp_die();
 }
 

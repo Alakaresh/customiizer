@@ -9,6 +9,14 @@ register_rest_route('api/v1/images', '/save', [
 function save_generated_image(WP_REST_Request $request) {
         global $wpdb;
 
+        if (!function_exists('customiizer_get_generation_tables')) {
+                require_once get_stylesheet_directory() . '/includes/image_generation.php';
+        }
+
+        $tables = customiizer_get_generation_tables();
+        $jobsTable = $tables['jobs'];
+        $imagesTable = $tables['images'];
+
         $jobId = intval($request->get_param('job_id'));
         $taskId = sanitize_text_field($request->get_param('task_id'));
 
@@ -18,9 +26,6 @@ function save_generated_image(WP_REST_Request $request) {
                         'message' => 'job_id ou task_id requis'
                 ], 400);
         }
-
-        $customPrefix = 'WPC_';
-        $jobsTable = $customPrefix . 'generation_jobs';
 
         if ($jobId) {
                 $job = $wpdb->get_row(
@@ -41,7 +46,6 @@ function save_generated_image(WP_REST_Request $request) {
                 ], 404);
         }
 
-        $imagesTable = $customPrefix . 'generated_image';
         $imageUrl = esc_url_raw($request->get_param('image_url'));
 
         if (empty($imageUrl)) {

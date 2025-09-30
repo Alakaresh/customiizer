@@ -1,29 +1,5 @@
 <?php
 
-function customiizer_decode_settings($value) {
-    if ($value === '' || $value === null) {
-        return [];
-    }
-
-    $decoded = json_decode($value, true);
-    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-        return $decoded;
-    }
-
-    return $value;
-}
-
-function customiizer_normalize_generated_image_row($row) {
-    return [
-        'id' => isset($row['image_number']) ? (int) $row['image_number'] : null,
-        'url' => $row['image_url'] ?? '',
-        'format' => $row['format_image'] ?? '',
-        'prompt' => $row['prompt'] ?? '',
-        'prefix' => $row['image_prefix'] ?? '',
-        'settings' => customiizer_decode_settings($row['settings'] ?? ''),
-    ];
-}
-
 function check_image_status() {
     global $wpdb;
 
@@ -32,12 +8,12 @@ function check_image_status() {
 
     if ($taskId === '') {
         customiizer_log('image_status', 'taskId manquant pour check_image_status');
-        wp_send_json_error(['message' => 'taskId manquant']);
+        wp_send_json_error(['message' => 'taskId manquant'], 400);
     }
 
-    $customPrefix = 'WPC_';
-    $jobsTable = $customPrefix . 'generation_jobs';
-    $imagesTable = $customPrefix . 'generated_image';
+    $tables = customiizer_get_generation_tables();
+    $jobsTable = $tables['jobs'];
+    $imagesTable = $tables['images'];
 
     $job = $wpdb->get_row(
         $wpdb->prepare(
@@ -52,40 +28,8 @@ function check_image_status() {
         wp_send_json_error(['message' => 'Aucun job trouvé']);
     }
 
-    $rawProgress = $job['progress'] ?? null;
-    if (is_string($rawProgress)) {
-        $rawProgress = trim(str_replace('%', '', $rawProgress));
-    }
-
-    $progressValue = is_numeric($rawProgress) ? (float) $rawProgress : null;
-
-    $upscaleCount = 0;
-    $upscaleColumnFilled = array_key_exists('upscale_done', $job) && $job['upscale_done'] !== null;
-
-    if ($upscaleColumnFilled) {
-        $upscaleCount = (int) $job['upscale_done'];
-    } else {
-        $choicePrefix = $wpdb->esc_like('choice_') . '%';
-        $upscaleQuery = $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$imagesTable} WHERE job_id = %d AND image_prefix LIKE %s",
-            (int) $job['id'],
-            $choicePrefix
-        );
-
-        $upscaleResult = $wpdb->get_var($upscaleQuery);
-        if ($upscaleResult !== null) {
-            $upscaleCount = (int) $upscaleResult;
-            if ($upscaleCount > 0) {
-                $wpdb->update(
-                    $jobsTable,
-                    ['upscale_done' => $upscaleCount],
-                    ['id' => (int) $job['id']],
-                    ['%d'],
-                    ['%d']
-                );
-            }
-        }
-    }
+    $progressValue = customiizer_normalize_progress_value($job['progress'] ?? null);
+    $upscaleCount = customiizer_calculate_job_upscale_count($job, $tables);
 
     $response = [
         'taskId' => $taskId,
@@ -101,15 +45,21 @@ function check_image_status() {
     ];
 
     if ($job['status'] === 'done') {
-        $rows = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT image_number, image_url, format_image, prompt, settings, image_prefix FROM {$imagesTable} WHERE job_id = %d ORDER BY image_number ASC",
-                $job['id']
-            ),
-            ARRAY_A
-        );
-
-        $response['images'] = array_map('customiizer_normalize_generated_image_row', $rows ?: []);
+        $response['images'] = customiizer_fetch_generated_images([
+            'job_id'    => (int) $job['id'],
+            'order_by'  => 'image_number',
+            'order'     => 'ASC',
+            'normalize' => true,
+            'fields'    => [
+                'image_number',
+                'image_url',
+                'format_image',
+                'prompt',
+                'settings',
+                'image_prefix',
+                'job_id',
+            ],
+        ]);
     }
 
     wp_send_json_success($response);
@@ -121,21 +71,24 @@ function customiizer_get_job_images() {
     $jobId = isset($_POST['jobId']) ? intval(wp_unslash($_POST['jobId'])) : 0;
 
     if ($jobId <= 0) {
-        wp_send_json_error(['message' => 'jobId manquant']);
+        wp_send_json_error(['message' => 'jobId manquant'], 400);
     }
 
-    $customPrefix = 'WPC_';
-    $imagesTable = $customPrefix . 'generated_image';
-
-    $rows = $wpdb->get_results(
-        $wpdb->prepare(
-            "SELECT image_number, image_url, format_image, prompt, settings, image_prefix FROM {$imagesTable} WHERE job_id = %d ORDER BY image_number ASC",
-            $jobId
-        ),
-        ARRAY_A
-    );
-
-    $images = array_map('customiizer_normalize_generated_image_row', $rows ?: []);
+    $images = customiizer_fetch_generated_images([
+        'job_id'    => $jobId,
+        'order_by'  => 'image_number',
+        'order'     => 'ASC',
+        'normalize' => true,
+        'fields'    => [
+            'image_number',
+            'image_url',
+            'format_image',
+            'prompt',
+            'settings',
+            'image_prefix',
+            'job_id',
+        ],
+    ]);
 
     wp_send_json_success([
         'jobId' => $jobId,
@@ -147,3 +100,46 @@ add_action('wp_ajax_check_image_status', 'check_image_status');
 add_action('wp_ajax_nopriv_check_image_status', 'check_image_status');
 add_action('wp_ajax_get_job_images', 'customiizer_get_job_images');
 add_action('wp_ajax_nopriv_get_job_images', 'customiizer_get_job_images');
+
+function customiizer_normalize_progress_value($rawProgress) {
+    if ($rawProgress === null || $rawProgress === '') {
+        return null;
+    }
+
+    if (is_string($rawProgress)) {
+        $rawProgress = trim(str_replace('%', '', $rawProgress));
+    }
+
+    return is_numeric($rawProgress) ? (float) $rawProgress : null;
+}
+
+function customiizer_calculate_job_upscale_count(array $job, array $tables) {
+    global $wpdb;
+
+    if (array_key_exists('upscale_done', $job) && $job['upscale_done'] !== null) {
+        return (int) $job['upscale_done'];
+    }
+
+    $choicePrefix = $wpdb->esc_like('choice_') . '%';
+    $upscaleResult = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$tables['images']} WHERE job_id = %d AND image_prefix LIKE %s",
+            (int) $job['id'],
+            $choicePrefix
+        )
+    );
+
+    $upscaleCount = ($upscaleResult !== null) ? (int) $upscaleResult : 0;
+
+    if ($upscaleCount > 0) {
+        $wpdb->update(
+            $tables['jobs'],
+            ['upscale_done' => $upscaleCount],
+            ['id' => (int) $job['id']],
+            ['%d'],
+            ['%d']
+        );
+    }
+
+    return $upscaleCount;
+}

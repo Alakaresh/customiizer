@@ -1,57 +1,96 @@
 <?php
 add_action('rest_api_init', function() {
-    // Endpoint pour récupérer toutes les images générées
-    register_rest_route('custom-api/v1', '/generated-images/', array(
-        'methods' => 'GET',
-        'callback' => 'get_generated_images',
-        'permission_callback' => '__return_true' // API ouverte à tous, peut être restreinte
-    ));
+    register_rest_route('custom-api/v1', '/generated-images/', [
+        'methods'             => 'GET',
+        'callback'            => 'customiizer_rest_get_generated_images',
+        'permission_callback' => '__return_true',
+    ]);
 });
 
 /**
- * Récupérer toutes les images générées avec pagination et filtres
+ * Récupère toutes les images générées avec pagination et filtres.
  */
-function get_generated_images($request) {
-    global $wpdb;
-    $prefix = 'WPC_'; // Préfixe de la base de données
+function customiizer_rest_get_generated_images(WP_REST_Request $request) {
+    $userIdParam    = $request->get_param('user_id');
+    $formatParam    = $request->get_param('format_image');
+    $dateFromParam  = $request->get_param('date_from');
+    $dateToParam    = $request->get_param('date_to');
+    $limitParam     = $request->get_param('limit');
 
-    // Filtres dynamiques
-    $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
-    $format_image = isset($_GET['format_image']) ? sanitize_text_field($_GET['format_image']) : null;
-    $date_from = isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : null;
-    $date_to = isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : null;
-	$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 100;
+    $limit = is_scalar($limitParam) ? (int) $limitParam : 100;
+    if ($limit <= 0) {
+        $limit = 100;
+    }
+    $limit = min($limit, 500);
 
-    // Construction de la requête SQL
-    $query = "SELECT image_number, user_id, user_login, upscaled_id, source_id, image_date,
-                     image_prefix, image_url, picture_likes_nb, format_image, prompt, settings
-              FROM {$prefix}generated_image
-              WHERE 1=1";
+    $queryArgs = [
+        'order_by' => 'image_date',
+        'order'    => 'DESC',
+        'limit'    => $limit,
+        'fields'   => [
+            'image_number',
+            'user_id',
+            'user_login',
+            'upscaled_id',
+            'source_id',
+            'image_date',
+            'image_prefix',
+            'image_url',
+            'picture_likes_nb',
+            'format_image',
+            'prompt',
+            'settings',
+            'job_id',
+        ],
+    ];
 
-    // Ajout des filtres dynamiques
-    if ($user_id) {
-        $query .= " AND user_id = $user_id";
-    }
-    if ($format_image) {
-        $query .= $wpdb->prepare(" AND format_image = %s", $format_image);
-    }
-    if ($date_from && $date_to) {
-        $query .= $wpdb->prepare(" AND image_date BETWEEN %s AND %s", $date_from, $date_to);
-    }
-	
-        if ($user_id) {
-        $query .= " ORDER BY image_date DESC"; // Récupérer les plus récentes d'abord
+    $userId = is_scalar($userIdParam) ? (int) $userIdParam : null;
+    if ($userId) {
+        $queryArgs['user_id'] = $userId;
     } else {
-        $query .= " ORDER BY RAND() LIMIT $limit"; // 100 images aléatoires si pas de `user_id`
+        $queryArgs['random'] = true;
     }
-	
-    // Exécution de la requête
-    $results = $wpdb->get_results($query, ARRAY_A);
 
-    // Si aucune image n'est trouvée
-    if (empty($results)) {
+    if (is_string($formatParam) && $formatParam !== '') {
+        $queryArgs['format'] = sanitize_text_field(wp_unslash($formatParam));
+    }
+
+    $dateFrom = customiizer_rest_sanitize_date_param($dateFromParam);
+    if ($dateFrom) {
+        $queryArgs['date_from'] = $dateFrom;
+    }
+
+    $dateTo = customiizer_rest_sanitize_date_param($dateToParam);
+    if ($dateTo) {
+        $queryArgs['date_to'] = $dateTo;
+    }
+
+    $images = customiizer_fetch_generated_images($queryArgs);
+
+    if (empty($images)) {
         return new WP_REST_Response(['error' => 'Aucune image trouvée'], 404);
     }
 
-    return new WP_REST_Response(['success' => true, 'images' => $results], 200);
+    return new WP_REST_Response([
+        'success' => true,
+        'images'  => $images,
+    ], 200);
+}
+
+function customiizer_rest_sanitize_date_param($value) {
+    if (!is_string($value)) {
+        return null;
+    }
+
+    $sanitized = trim(sanitize_text_field(wp_unslash($value)));
+
+    if ($sanitized === '') {
+        return null;
+    }
+
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2}:\d{2})?$/', $sanitized)) {
+        return null;
+    }
+
+    return $sanitized;
 }

@@ -121,6 +121,7 @@ add_action( 'init', function() {
 
         $includes = [
                 '/utilities.php',
+                '/includes/image_generation.php',
                 '/assets.php',
                 '/includes/azure.php',
 
