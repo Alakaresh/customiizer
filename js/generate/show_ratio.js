@@ -11,6 +11,7 @@ let ratioFromQuery = '';
 document.addEventListener('DOMContentLoaded', function () {
     ratioFromQuery = getRatioFromQueryParam();
     setDefaultSelectedInfo();
+    syncSelectedRatio();
     loadProductData();
 });
 
@@ -136,8 +137,13 @@ function setDefaultSelectedInfo() {
     updateVariantSummaryImage(DEFAULT_SUMMARY_IMAGE);
 }
 
+function syncSelectedRatio() {
+    window.selectedRatio = selectedRatio;
+}
+
 function clearSelectedVariantState() {
     selectedRatio = '';
+    syncSelectedRatio();
 
     if (typeof selectedVariant !== 'undefined') {
         selectedVariant = null;
@@ -155,6 +161,7 @@ function clearSelectedVariantState() {
 function resetVariantSelection() {
     selectedProductKey = '';
     selectedRatio = DEFAULT_RATIO;
+    syncSelectedRatio();
 
     if (typeof selectedVariant !== 'undefined') {
         selectedVariant = null;
@@ -518,6 +525,7 @@ function handleVariantSelection(element, variant, options = {}) {
 
     const ratioValue = (variant.ratio_image || '').trim();
     selectedRatio = ratioValue;
+    syncSelectedRatio();
     selectedProductKey = normalizeProductName(variant.product_name);
 
     if (typeof selectedVariant !== 'undefined') {
