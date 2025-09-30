@@ -7,7 +7,6 @@ const GENERATE_SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
-const UPSCALE_TARGET_COUNT = 4;
 
 let currentTaskId = null;
 let currentJobId = null;
@@ -393,6 +392,51 @@ jQuery(function($) {
                 return '';
         }
 
+        async function fetchJobImages(jobId) {
+                const numericJobId = Number(jobId);
+                if (!Number.isFinite(numericJobId) || numericJobId <= 0) {
+                        return [];
+                }
+
+                try {
+                        const response = await fetch(ajaxurl, {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                },
+                                body: new URLSearchParams({
+                                        action: 'get_job_images',
+                                        jobId: String(numericJobId),
+                                }),
+                        });
+
+                        if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                        }
+
+                        const payload = await response.json();
+                        if (!payload.success) {
+                                const message = payload.data && payload.data.message ? payload.data.message : 'Réponse invalide';
+                                throw new Error(message);
+                        }
+
+                        const responseData = payload.data || {};
+                        const images = Array.isArray(responseData.images) ? responseData.images : [];
+                        console.log(`${LOG_PREFIX} Images récupérées pour le job terminé`, {
+                                jobId: numericJobId,
+                                imagesCount: images.length,
+                                imagesSummary: buildImagesDebugSummary(images),
+                        });
+                        return images;
+                } catch (error) {
+                        console.error(`${LOG_PREFIX} Impossible de récupérer les images du job`, {
+                                jobId: numericJobId,
+                                error,
+                        });
+                        throw error;
+                }
+        }
+
         function normalizeImageDataForPreview(imageData) {
                 const imageUrl = extractImageUrlFromData(imageData);
                 if (!imageUrl) {
@@ -618,86 +662,6 @@ jQuery(function($) {
                 return Number.isFinite(numericValue) ? numericValue : 0;
         }
 
-        function hasCompletedUpscales(status, upscaleDone) {
-                if (typeof upscaleDone !== 'number') {
-                        const parsed = Number(upscaleDone);
-                        upscaleDone = Number.isFinite(parsed) ? parsed : 0;
-                }
-
-                return status === 'done' && upscaleDone >= UPSCALE_TARGET_COUNT;
-        }
-
-        function extractJobImageUrl(job) {
-                if (!job || typeof job !== 'object') {
-                        return '';
-                }
-
-                const candidates = [job.imageUrl, job.image_url];
-
-                for (const candidate of candidates) {
-                        if (typeof candidate === 'string' && candidate.trim() !== '') {
-                                return candidate.trim();
-                        }
-                }
-
-                return '';
-        }
-
-        function hasValidRenderableImage(images) {
-                if (!Array.isArray(images)) {
-                        return false;
-                }
-
-                return images.some(image => {
-                        const candidateUrl = extractImageUrlFromData(image);
-                        return typeof candidateUrl === 'string' && candidateUrl.trim() !== '';
-                });
-        }
-
-        function countRenderableImages(images) {
-                if (!Array.isArray(images)) {
-                        return 0;
-                }
-
-                return images.reduce((count, image) => {
-                        const candidateUrl = extractImageUrlFromData(image);
-                        return typeof candidateUrl === 'string' && candidateUrl.trim() !== '' ? count + 1 : count;
-                }, 0);
-        }
-
-        function buildFallbackImages(job) {
-                const fallbackUrl = extractJobImageUrl(job);
-                if (!fallbackUrl) {
-                        return [];
-                }
-
-                const jobPrompt = job && typeof job.prompt === 'string' ? job.prompt : '';
-                const jobFormatValue =
-                        job && typeof job.format === 'string'
-                                ? job.format
-                                : job && typeof job.format_image === 'string'
-                                        ? job.format_image
-                                        : job && typeof job.formatImage === 'string'
-                                                ? job.formatImage
-                                                : '';
-
-                const displayName =
-                        job && job.display_name != null ? String(job.display_name) : '';
-                const userLogo = job && job.user_logo != null ? String(job.user_logo) : '';
-                const userIdValue = job && job.user_id != null ? String(job.user_id) : '';
-
-                return [
-                        {
-                                url: fallbackUrl,
-                                prompt: jobPrompt || prompt,
-                                format: jobFormatValue || jobFormat,
-                                display_name: displayName,
-                                user_logo: userLogo,
-                                user_id: userIdValue,
-                        },
-                ];
-        }
-
         function finalizeGeneration(hasError = false) {
                 stopPolling();
 
@@ -776,7 +740,7 @@ jQuery(function($) {
                                 throw new Error('Réponse vide du serveur');
                         }
 
-                        handleJobStatus(job);
+                        await handleJobStatus(job);
                 } catch (error) {
                         console.error(`${LOG_PREFIX} Erreur lors du suivi du job`, error);
                         showAlert("Une erreur est survenue pendant le suivi de la génération.");
@@ -784,8 +748,8 @@ jQuery(function($) {
                 }
         }
 
-        function handleJobStatus(job) {
-                currentJobId = job.jobId || null;
+        async function handleJobStatus(job) {
+                currentJobId = job.jobId || job.job_id || null;
 
                 const previousMessage = lastKnownMessage;
                 const progressValue = clampProgress(job.progress);
@@ -796,7 +760,7 @@ jQuery(function($) {
 
                 const remoteStatus = normalizeJobStatus(job.status);
                 const upscaleDone = extractUpscaleDone(job);
-                const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
+                const hasCompleted = remoteStatus === 'done';
                 const rawImages = Array.isArray(job.images) ? job.images : [];
                 console.log(`${LOG_PREFIX} Statut pollé`, {
                         taskId: currentTaskId,
@@ -854,22 +818,31 @@ jQuery(function($) {
                 }
 
                 if (hasCompleted) {
-                        const rawImages = Array.isArray(job.images) ? job.images : [];
-                        const images = hasValidRenderableImage(rawImages) ? rawImages : buildFallbackImages(job);
-                        const validImageCount = countRenderableImages(images);
+                        let images = [];
+
+                        try {
+                                images = await fetchJobImages(currentJobId || job.jobId);
+                        } catch (error) {
+                                images = Array.isArray(job.images) ? job.images : [];
+                                if (!Array.isArray(job.images) || job.images.length === 0) {
+                                        console.warn(`${LOG_PREFIX} Job terminé mais aucune image n'a été renvoyée, nouvelle vérification programmée.`);
+                                        scheduleNextPoll();
+                                        return;
+                                }
+                        }
+
                         console.log(`${LOG_PREFIX} Tentative de rendu des images finalisées`, {
                                 taskId: currentTaskId,
                                 jobId: currentJobId,
                                 imagesCount: images.length,
                                 upscaleDone,
-                                validImageCount,
-                                targetCount: UPSCALE_TARGET_COUNT,
                                 imagesSummary: buildImagesDebugSummary(images),
                         });
+
                         const didRenderImages = renderGeneratedImages(images);
 
                         if (!didRenderImages) {
-                                console.warn(`${LOG_PREFIX} Job signalé comme terminé mais images indisponibles, nouvelle vérification programmée.`, job);
+                                console.warn(`${LOG_PREFIX} Job signalé comme terminé mais images indisponibles, nouvelle vérification programmée.`);
                                 scheduleNextPoll();
                                 return;
                         }
