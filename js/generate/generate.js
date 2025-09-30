@@ -212,6 +212,69 @@ jQuery(function($) {
                 }
         }
 
+        function extractImageUrl(imageData) {
+                if (!imageData || typeof imageData !== 'object') {
+                        return '';
+                }
+
+                const candidates = [imageData.url, imageData.image_url, imageData.imageUrl];
+                for (const candidate of candidates) {
+                        if (typeof candidate === 'string' && candidate.trim() !== '') {
+                                return candidate.trim();
+                        }
+                }
+
+                return '';
+        }
+
+        function normalizePromptValue(rawPrompt) {
+                if (!rawPrompt) {
+                        return '';
+                }
+
+                if (typeof rawPrompt === 'object') {
+                        return rawPrompt.text || rawPrompt.prompt || JSON.stringify(rawPrompt);
+                }
+
+                return typeof rawPrompt === 'string' ? rawPrompt : '';
+        }
+
+        function normalizeImagePayload(images) {
+                if (!Array.isArray(images)) {
+                        return [];
+                }
+
+                return images
+                        .map(image => {
+                                if (image && image.__normalized && typeof image.url === 'string') {
+                                        return {
+                                                ...image,
+                                                jobId: image.jobId || currentJobId || '',
+                                                taskId: image.taskId || currentTaskId || '',
+                                        };
+                                }
+
+                                const url = extractImageUrl(image);
+                                if (!url) {
+                                        return null;
+                                }
+
+                                return {
+                                        url,
+                                        prompt: normalizePromptValue(image && image.prompt) || prompt,
+                                        formatImage:
+                                                (image && (image.format_image || image.format || image.formatImage)) || '',
+                                        jobId: currentJobId || '',
+                                        taskId: currentTaskId || '',
+                                        display_name: (image && image.display_name) || '',
+                                        user_logo: (image && image.user_logo) || '',
+                                        user_id: (image && image.user_id) || '',
+                                        __normalized: true,
+                                };
+                        })
+                        .filter(Boolean);
+        }
+
         function applyImageMetaToElement(imageElement, imageData) {
                 if (!imageElement || !imageData || typeof imageData.url !== 'string') {
                         return;
@@ -291,27 +354,7 @@ jQuery(function($) {
         }
 
         function populatePreviewGallery(images) {
-                if (!Array.isArray(images)) {
-                        previewGalleryImages = [];
-                        renderPreviewGallery();
-                        return;
-                }
-
-                const normalizedImages = images
-                        .filter(image => image && typeof image.url === 'string' && image.url.trim() !== '')
-                        .map(image => {
-                                const trimmedUrl = image.url.trim();
-                                return {
-                                        url: trimmedUrl,
-                                        prompt: image.prompt || prompt,
-                                        formatImage: image.format || '',
-                                        jobId: currentJobId || '',
-                                        taskId: currentTaskId || '',
-                                        display_name: image.display_name || '',
-                                        user_logo: image.user_logo || '',
-                                        user_id: image.user_id || '',
-                                };
-                        });
+                const normalizedImages = normalizeImagePayload(images);
 
                 previewGalleryImages = normalizedImages.slice(0, 4);
                 renderPreviewGallery();
@@ -613,11 +656,9 @@ jQuery(function($) {
                 const gridContainer = getGridContainer();
                 persistProgressState({ imageUrl: '' });
 
-                const hasRenderableImages = Array.isArray(images) && images.some(function(image) {
-                        return image && typeof image.url === 'string' && image.url.trim() !== '';
-                });
+                const normalizedImages = normalizeImagePayload(images);
 
-                if (!hasRenderableImages) {
+                if (normalizedImages.length === 0) {
                         console.warn(`${LOG_PREFIX} Aucune image valide à afficher`, { images });
                         return false;
                 }
@@ -633,7 +674,7 @@ jQuery(function($) {
                         }
 
                         gridImages.forEach((imageElement, index) => {
-                                const imageData = Array.isArray(images) ? images[index] : null;
+                                const imageData = normalizedImages[index];
                                 const hasValidUrl = imageData && typeof imageData.url === 'string' && imageData.url.trim() !== '';
 
                                 if (!hasValidUrl) {
@@ -649,9 +690,9 @@ jQuery(function($) {
                                 imageElement.classList.remove('preview-enlarge');
                                 imageElement.src = trimmedUrl;
                                 imageElement.alt = imageData.prompt || 'Image générée';
-                                imageElement.dataset.jobId = currentJobId || '';
-                                imageElement.dataset.taskId = currentTaskId || '';
-                                imageElement.dataset.formatImage = imageData.format || '';
+                                imageElement.dataset.jobId = imageData.jobId || currentJobId || '';
+                                imageElement.dataset.taskId = imageData.taskId || currentTaskId || '';
+                                imageElement.dataset.formatImage = imageData.formatImage || '';
                                 imageElement.dataset.prompt = imageData.prompt || prompt;
                                 imageElement.setAttribute('data-display_name', imageData.display_name || '');
                                 imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
@@ -659,6 +700,8 @@ jQuery(function($) {
                                 imageElement.classList.add('preview-enlarge');
                                 hasUpdatedImage = true;
                         });
+                } else {
+                        hasUpdatedImage = normalizedImages.length > 0;
                 }
 
                 if (!hasUpdatedImage) {
@@ -666,8 +709,8 @@ jQuery(function($) {
                         return false;
                 }
 
-                setPreviewThumbnailsVisibility(true);
-                populatePreviewGallery(images);
+                setPreviewThumbnailsVisibility(normalizedImages.length > 1);
+                populatePreviewGallery(normalizedImages);
                 togglePreviewMode(true);
                 closeProgressModal();
 
