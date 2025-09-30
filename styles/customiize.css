@@ -829,6 +829,10 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     flex: 1 1 auto;
     max-height: min(100%, max(280px, calc(100dvh - var(--header-height, 88px) - 120px)));
     min-height: 0;
+    --generation-preview-max-size: max(
+        280px,
+        calc(100dvh - var(--header-height, 88px) - 120px)
+    );
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -842,7 +846,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > #content
     > .content-images
     .generation-preview__main {
-    flex: 1 1 0;
+    flex: 0 1 var(--generation-preview-max-size);
     position: relative;
     overflow: hidden;
     border-radius: 16px;
@@ -853,8 +857,10 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     justify-content: center;
     min-height: 0;
     aspect-ratio: 1 / 1;
-    max-height: 100%;
-    height: 100%;
+    width: min(100%, var(--generation-preview-max-size));
+    max-width: 100%;
+    max-height: min(100%, var(--generation-preview-max-size));
+    height: auto;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -968,8 +974,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         > #content
         > .content-images
         .generation-preview__main {
-        width: 100%;
-        max-height: none;
+        width: min(100%, var(--generation-preview-max-size));
+        max-height: min(100%, var(--generation-preview-max-size));
         aspect-ratio: 1 / 1;
         height: auto;
     }
