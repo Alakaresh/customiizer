@@ -30,7 +30,7 @@ function check_image_status() {
 
     $job = $wpdb->get_row(
         $wpdb->prepare(
-            "SELECT id, status, prompt, format_image, progress, image_url, created_at, updated_at FROM {$jobsTable} WHERE task_id = %s",
+            "SELECT id, status, prompt, format_image, progress, image_url, created_at, updated_at, upscale_done FROM {$jobsTable} WHERE task_id = %s",
             $taskId
         ),
         ARRAY_A
@@ -48,17 +48,22 @@ function check_image_status() {
 
     $progressValue = is_numeric($rawProgress) ? (float) $rawProgress : null;
 
-    $choicePrefix = $wpdb->esc_like('choice_') . '%';
     $upscaleCount = 0;
-    $upscaleQuery = $wpdb->prepare(
-        "SELECT COUNT(*) FROM {$imagesTable} WHERE job_id = %d AND image_prefix LIKE %s",
-        (int) $job['id'],
-        $choicePrefix
-    );
 
-    $upscaleResult = $wpdb->get_var($upscaleQuery);
-    if ($upscaleResult !== null) {
-        $upscaleCount = (int) $upscaleResult;
+    if (array_key_exists('upscale_done', $job) && $job['upscale_done'] !== null) {
+        $upscaleCount = (int) $job['upscale_done'];
+    } else {
+        $choicePrefix = $wpdb->esc_like('choice_') . '%';
+        $upscaleQuery = $wpdb->prepare(
+            "SELECT COUNT(*) FROM {$imagesTable} WHERE job_id = %d AND image_prefix LIKE %s",
+            (int) $job['id'],
+            $choicePrefix
+        );
+
+        $upscaleResult = $wpdb->get_var($upscaleQuery);
+        if ($upscaleResult !== null) {
+            $upscaleCount = (int) $upscaleResult;
+        }
     }
 
     $response = [
