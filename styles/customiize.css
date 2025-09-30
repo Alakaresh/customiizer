@@ -1126,44 +1126,6 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     display: flex;
 }
 
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container {
-    display: flex;
-    align-items: stretch;
-    gap: 14px;
-}
-
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button {
-    flex: 1 1 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 14px 18px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(26, 26, 26, 0.88);
-    color: rgba(244, 248, 247, 0.92);
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    font-size: 0.82rem;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
-
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button:hover,
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #buttons-container button:focus-visible {
-    border-color: rgba(31, 184, 108, 0.45);
-    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.55);
-    transform: translateY(-1px);
-}
-
 #customize-main.customize-layout:not(.hub-layout) #left-sidebar #selected-display {
     width: 100%;
 }
@@ -1254,29 +1216,6 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     border-right: 2px solid rgba(214, 224, 223, 0.68);
     border-bottom: 2px solid rgba(214, 224, 223, 0.68);
     transform: rotate(-45deg);
-}
-
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button {
-    flex: 0 0 auto;
-    padding-inline: 26px;
-    background: linear-gradient(135deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
-    border-color: rgba(43, 216, 121, 0.65);
-    box-shadow: 0 20px 36px rgba(27, 90, 70, 0.45);
-    color: #07120c;
-}
-
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button:hover,
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button:focus-visible {
-    box-shadow: 0 24px 40px rgba(27, 90, 70, 0.55);
-}
-
-#customize-main.customize-layout:not(.hub-layout) #left-sidebar #validate-button {
-    flex: 0 0 auto;
-    padding-inline: 26px;
-    background: linear-gradient(135deg, var(--color-brand-600, #148556) 0%, var(--color-brand-400, #2bd879) 100%);
-    border-color: rgba(43, 216, 121, 0.65);
-    box-shadow: 0 20px 36px rgba(27, 90, 70, 0.45);
-    color: #07120c;
 }
 
 #customize-main.customize-layout:not(.hub-layout) #left-sidebar .product-variants-grid {
