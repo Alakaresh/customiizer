@@ -94,15 +94,38 @@ jQuery(function($) {
         function togglePreviewMode(isActive) {
                 const previewWrapper = getPreviewWrapper();
                 const gridContainer = getGridContainer();
+                const gridWrapper = document.getElementById('image-grid-wrapper');
+                const variantPanel = document.getElementById('variant-display');
+                const variantSummary = document.getElementById('variant-summary');
+                const active = Boolean(isActive);
 
                 if (previewWrapper) {
-                        previewWrapper.classList.toggle('is-active', Boolean(isActive));
+                        previewWrapper.classList.toggle('is-active', active);
+                        previewWrapper.setAttribute('aria-hidden', active ? 'false' : 'true');
                 }
 
-                if (gridContainer) {
-                        gridContainer.classList.toggle('is-hidden', Boolean(isActive));
+                [gridContainer, gridWrapper].forEach(element => {
+                        if (!element) {
+                                return;
+                        }
+
+                        element.classList.toggle('is-hidden', active);
+                        element.setAttribute('aria-hidden', active ? 'true' : 'false');
+                });
+
+                if (variantPanel && active) {
+                        variantPanel.classList.add('is-hidden');
+                        variantPanel.setAttribute('aria-hidden', 'true');
                 }
+
+                if (variantSummary && active) {
+                        variantSummary.setAttribute('aria-expanded', 'false');
+                }
+
+                return active;
         }
+
+        window.customiizerTogglePreviewMode = togglePreviewMode;
 
         function ensureGridPlaceholders() {
                 const gridContainer = getGridContainer();
