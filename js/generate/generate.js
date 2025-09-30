@@ -20,6 +20,7 @@ let lastKnownProgress = null;
 let lastKnownMessage = '';
 let clearStateTimeoutId = null;
 let previewGalleryImages = [];
+let selectedPreviewIndex = 0;
 let previewThumbnailsVisible = false;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
@@ -190,6 +191,7 @@ jQuery(function($) {
         function resetPreviewGallery() {
                 const thumbnailsContainer = getPreviewThumbnailsContainer();
                 previewGalleryImages = [];
+                selectedPreviewIndex = 0;
 
                 if (!thumbnailsContainer) {
                         return;
@@ -251,48 +253,48 @@ jQuery(function($) {
                         return;
                 }
 
-                const [mainImage, ...thumbnailImages] = previewGalleryImages;
+                const boundedIndex = Math.max(
+                        0,
+                        Math.min(selectedPreviewIndex, previewGalleryImages.length - 1),
+                );
+
+                if (boundedIndex !== selectedPreviewIndex) {
+                        selectedPreviewIndex = boundedIndex;
+                }
+
+                const mainImage = previewGalleryImages[selectedPreviewIndex];
                 applyImageMetaToElement(previewImage, mainImage);
                 previewImage.classList.remove('preview-enlarge');
 
                 thumbnailsContainer.innerHTML = '';
-                const maxThumbnails = 3;
-                const renderedThumbnails = thumbnailImages.slice(0, maxThumbnails);
-
-                renderedThumbnails.forEach((imageData, index) => {
+                previewGalleryImages.forEach((imageData, index) => {
                         const button = document.createElement('button');
                         button.type = 'button';
                         button.className = 'generation-preview__thumbnail';
-                        button.dataset.previewIndex = String(index + 1);
-                        button.setAttribute('aria-label', `Afficher l'image ${index + 2}`);
+                        button.dataset.previewIndex = String(index);
+                        button.setAttribute('aria-label', `Afficher l'image ${index + 1}`);
+                        button.setAttribute('aria-pressed', index === selectedPreviewIndex ? 'true' : 'false');
+
+                        if (index === selectedPreviewIndex) {
+                                button.classList.add('is-selected');
+                                button.setAttribute('aria-current', 'true');
+                        } else {
+                                button.removeAttribute('aria-current');
+                        }
 
                         const thumbImage = document.createElement('img');
                         thumbImage.src = imageData.url;
-                        thumbImage.alt = imageData.prompt || `Miniature ${index + 2}`;
+                        thumbImage.alt = imageData.prompt || `Miniature ${index + 1}`;
 
                         button.appendChild(thumbImage);
                         thumbnailsContainer.appendChild(button);
                 });
-
-                const placeholdersNeeded = Math.max(0, maxThumbnails - renderedThumbnails.length);
-                for (let i = 0; i < placeholdersNeeded; i++) {
-                        const placeholderButton = document.createElement('button');
-                        placeholderButton.type = 'button';
-                        placeholderButton.className = 'generation-preview__thumbnail is-placeholder';
-                        placeholderButton.disabled = true;
-
-                        const placeholderImage = document.createElement('img');
-                        placeholderImage.src = PLACEHOLDER_IMAGE_SRC;
-                        placeholderImage.alt = "Image d'attente";
-
-                        placeholderButton.appendChild(placeholderImage);
-                        thumbnailsContainer.appendChild(placeholderButton);
-                }
         }
 
         function populatePreviewGallery(images) {
                 if (!Array.isArray(images)) {
                         previewGalleryImages = [];
+                        selectedPreviewIndex = 0;
                         renderPreviewGallery();
                         return;
                 }
@@ -313,7 +315,8 @@ jQuery(function($) {
                                 };
                         });
 
-                previewGalleryImages = normalizedImages.slice(0, 4);
+                previewGalleryImages = normalizedImages;
+                selectedPreviewIndex = 0;
                 renderPreviewGallery();
         }
 
@@ -322,16 +325,19 @@ jQuery(function($) {
                         return;
                 }
 
-                if (typeof thumbnailIndex !== 'number' || thumbnailIndex <= 0 || thumbnailIndex >= previewGalleryImages.length) {
+                if (typeof thumbnailIndex !== 'number' || !Number.isFinite(thumbnailIndex)) {
                         return;
                 }
 
-                const [selectedImage] = previewGalleryImages.splice(thumbnailIndex, 1);
-                if (!selectedImage) {
+                if (thumbnailIndex < 0 || thumbnailIndex >= previewGalleryImages.length) {
                         return;
                 }
 
-                previewGalleryImages.unshift(selectedImage);
+                if (selectedPreviewIndex === thumbnailIndex) {
+                        return;
+                }
+
+                selectedPreviewIndex = thumbnailIndex;
                 renderPreviewGallery();
         }
 
