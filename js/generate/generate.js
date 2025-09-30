@@ -3,7 +3,6 @@ if (typeof baseUrl === 'undefined') {
 }
 
 const LOG_PREFIX = '[Customiizer][Generate]';
-const GENERATE_SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
@@ -28,9 +27,7 @@ jQuery(function($) {
         const validateButton = document.getElementById('validate-button');
         const customTextInput = document.getElementById('custom-text');
         const alertBox = document.getElementById('alert-box');
-        const placeholderDiv = document.getElementById('placeholder');
         const inlineProgressWrapper = document.getElementById('generation-progress-inline-wrapper');
-        const savedPromptText = localStorage.getItem('savedPromptText');
         const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 
         const previewThumbnailsContainer = getPreviewThumbnailsContainer();
@@ -568,14 +565,6 @@ jQuery(function($) {
 
         setupInlineProgressDisplay();
 
-        if (savedPromptText) {
-                customTextInput.textContent = savedPromptText;
-                if (placeholderDiv) {
-                        placeholderDiv.style.display = 'none';
-                }
-                localStorage.removeItem('savedPromptText');
-        }
-
         restoreGenerationProgress();
 
         function showAlert(message) {
@@ -1040,40 +1029,6 @@ jQuery(function($) {
                 previewImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
         }
 
-        async function consumeCredit() {
-                const creditsEl = document.getElementById('userCredits');
-                if (!creditsEl) {
-                        return;
-                }
-
-                let currentCredits = parseInt(creditsEl.textContent || '0', 10);
-                if (Number.isNaN(currentCredits) || currentCredits <= 0) {
-                        return;
-                }
-
-                currentCredits -= 1;
-                creditsEl.textContent = currentCredits;
-
-                const cached = sessionStorage.getItem('USER_ESSENTIALS');
-                if (cached) {
-                        try {
-                                const cacheData = JSON.parse(cached);
-                                if (cacheData.user_id === currentUser.ID) {
-                                        cacheData.image_credits = currentCredits;
-                                        sessionStorage.setItem('USER_ESSENTIALS', JSON.stringify(cacheData));
-                                }
-                        } catch (error) {
-                                console.warn(`${LOG_PREFIX} Impossible de mettre à jour le cache des crédits`, error);
-                        }
-                }
-
-                try {
-                        await updateCreditsInDB(currentUser.ID);
-                } catch (error) {
-                        console.warn(`${LOG_PREFIX} Échec de la synchro des crédits`, error);
-                }
-        }
-
         validateButton.addEventListener('click', async function(event) {
                 event.preventDefault();
 
@@ -1100,43 +1055,6 @@ jQuery(function($) {
                         return;
                 }
 
-                if (!currentUser || !currentUser.ID) {
-                        localStorage.setItem('savedPromptText', prompt);
-
-                        const activeVariant = typeof window !== 'undefined' ? window.selectedVariant : null;
-                        if (activeVariant && typeof activeVariant === 'object' && activeVariant.variant_id != null) {
-                                try {
-                                        const payload = {
-                                                variantId: activeVariant.variant_id,
-                                                productName: activeVariant.product_name || '',
-                                                ratio: activeVariant.ratio_image || '',
-                                        };
-                                        localStorage.setItem(
-                                                GENERATE_SAVED_VARIANT_STORAGE_KEY,
-                                                JSON.stringify(payload)
-                                        );
-                                } catch (storageError) {
-                                        console.warn(`${LOG_PREFIX} Impossible d'enregistrer la variante sélectionnée`, storageError);
-                                }
-                        } else {
-                                localStorage.removeItem(GENERATE_SAVED_VARIANT_STORAGE_KEY);
-                        }
-
-                        showAlert('Vous devez être connecté pour générer des images.');
-                        if (typeof openLoginModal === 'function') {
-                                openLoginModal();
-                        }
-                        return;
-                }
-
-                const creditsEl = document.getElementById('userCredits');
-                const credits = creditsEl ? parseInt(creditsEl.textContent || '0', 10) : 0;
-
-                if (!credits || credits <= 0) {
-                        showAlert("Vous n'avez pas assez de crédits pour générer des images.");
-                        return;
-                }
-
                 hideAlert();
                 validateButton.disabled = true;
                 startLoadingUI();
@@ -1154,16 +1072,30 @@ jQuery(function($) {
                                 }),
                         });
 
+                        let data = null;
+                        try {
+                                data = await response.json();
+                        } catch (parseError) {
+                                console.warn(`${LOG_PREFIX} Réponse JSON invalide`, parseError);
+                        }
+
                         if (!response.ok) {
-                                throw new Error(`HTTP ${response.status}`);
+                                const backendMessage =
+                                        data && typeof data.message === 'string' && data.message.trim() !== ''
+                                                ? data.message.trim()
+                                                : `HTTP ${response.status}`;
+                                throw new Error(backendMessage);
                         }
 
-                        const data = await response.json();
+                        if (!data || !data.success || !data.taskId) {
+                                const backendMessage =
+                                        data && typeof data.message === 'string' && data.message.trim() !== ''
+                                                ? data.message.trim()
+                                                : 'Réponse invalide du backend';
+                                throw new Error(backendMessage);
+                        }
+
                         console.log(`${LOG_PREFIX} Réponse du backend`, data);
-
-                        if (!data.success || !data.taskId) {
-                                throw new Error(data.message || 'Réponse invalide du backend');
-                        }
 
                         currentTaskId = data.taskId;
                         lastKnownStatus = 'pending';
@@ -1175,33 +1107,18 @@ jQuery(function($) {
                                 message: '',
                         });
 
-                        consumeCredit();
                         scheduleNextPoll();
                 } catch (error) {
                         console.error(`${LOG_PREFIX} Erreur lors de la création du job`, error);
-                        showAlert("Une erreur est survenue pendant la génération. Veuillez réessayer.");
+                        const fallbackMessage = "Une erreur est survenue pendant la génération. Veuillez réessayer.";
+                        const displayMessage =
+                                error && typeof error.message === 'string' && error.message.trim() !== ''
+                                        ? error.message.trim()
+                                        : fallbackMessage;
+                        showAlert(displayMessage);
                         finalizeGeneration(true);
                 }
         });
-
-        async function updateCreditsInDB(userId) {
-                const response = await fetch(ajaxurl, {
-                        method: 'POST',
-                        headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        },
-                        body: new URLSearchParams({
-                                action: 'decrement_credits',
-                                user_id: userId,
-                        }),
-                });
-
-                if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                }
-
-                await response.json();
-        }
 
         function resetImageDisplay() {
                 ensureGridPlaceholders();
