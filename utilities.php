@@ -56,6 +56,157 @@ if (!defined('REMOTE_IMAGE_MAX_BYTES')) {
     define('REMOTE_IMAGE_MAX_BYTES', 5 * 1024 * 1024);
 }
 
+/**
+ * Retrieve the worker socket configuration from WordPress options or constants.
+ *
+ * @return array{enabled:bool,url:string,token:string}
+ */
+function customiizer_get_worker_socket_settings() {
+    static $cached = null;
+
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $defaults = [
+        'enabled' => false,
+        'url' => '',
+        'token' => '',
+    ];
+
+    $normalize_bool = static function ($value, $fallback = false) {
+        if ($value === null) {
+            return $fallback;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value === 1;
+        }
+
+        if (is_string($value)) {
+            $lower = strtolower(trim($value));
+            return in_array($lower, ['1', 'true', 'yes', 'on'], true);
+        }
+
+        return $fallback;
+    };
+
+    $normalize_string = static function ($value) {
+        if (is_string($value)) {
+            return trim($value);
+        }
+
+        if (is_scalar($value)) {
+            return trim((string) $value);
+        }
+
+        return '';
+    };
+
+    $config = $defaults;
+
+    if (function_exists('get_option')) {
+        $option_candidates = [
+            get_option('customiizer_worker_socket_settings'),
+            get_option('customiizer_worker_socket'),
+        ];
+
+        foreach ($option_candidates as $candidate) {
+            if (is_array($candidate)) {
+                $config['enabled'] = $normalize_bool(
+                    $candidate['enabled'] ?? $candidate['active'] ?? $candidate['is_enabled'] ?? $config['enabled'],
+                    $config['enabled']
+                );
+                $config['url'] = $normalize_string($candidate['url'] ?? $candidate['endpoint'] ?? $config['url']);
+                $config['token'] = $normalize_string($candidate['token'] ?? $candidate['secret'] ?? $config['token']);
+            }
+        }
+
+        $single_option_map = [
+            'enabled' => [
+                'customiizer_worker_socket_enabled',
+                'customiizer_worker_socket_active',
+            ],
+            'url' => [
+                'customiizer_worker_socket_url',
+                'customiizer_worker_url',
+            ],
+            'token' => [
+                'customiizer_worker_socket_token',
+                'customiizer_worker_token',
+            ],
+        ];
+
+        foreach ($single_option_map as $key => $option_names) {
+            foreach ($option_names as $option_name) {
+                $value = get_option($option_name);
+                if ($value === false || $value === null || $value === '') {
+                    continue;
+                }
+
+                if ($key === 'enabled') {
+                    $config['enabled'] = $normalize_bool($value, $config['enabled']);
+                } elseif ($key === 'url') {
+                    $config['url'] = $normalize_string($value);
+                } elseif ($key === 'token') {
+                    $config['token'] = $normalize_string($value);
+                }
+                break;
+            }
+        }
+    }
+
+    $constant_map = [
+        'enabled' => [
+            'CUSTOMIIZER_WORKER_SOCKET_ENABLED',
+            'CUSTOMIIZER_WORKER_SOCKET_ACTIVE',
+            'CUSTOMIIZER_WORKER_ENABLED',
+        ],
+        'url' => [
+            'CUSTOMIIZER_WORKER_SOCKET_URL',
+            'CUSTOMIIZER_WORKER_URL',
+        ],
+        'token' => [
+            'CUSTOMIIZER_WORKER_SOCKET_TOKEN',
+            'CUSTOMIIZER_WORKER_TOKEN',
+        ],
+    ];
+
+    foreach ($constant_map as $key => $constants) {
+        foreach ($constants as $constant) {
+            if (!defined($constant)) {
+                continue;
+            }
+
+            $value = constant($constant);
+            if ($key === 'enabled') {
+                $config['enabled'] = $normalize_bool($value, $config['enabled']);
+            } elseif ($key === 'url') {
+                $config['url'] = $normalize_string($value);
+            } elseif ($key === 'token') {
+                $config['token'] = $normalize_string($value);
+            }
+            break;
+        }
+    }
+
+    if (function_exists('esc_url_raw') && $config['url']) {
+        $config['url'] = esc_url_raw($config['url']);
+    }
+
+    $cached = [
+        'enabled' => (bool) $config['enabled'],
+        'url' => $config['url'],
+        'token' => $config['token'],
+    ];
+
+    return $cached;
+}
+
 function customiizer_log($context, $message = '') {
     $log_file = __DIR__ . '/customiizer.log';
     $date = date('Y-m-d H:i:s');

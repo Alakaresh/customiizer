@@ -97,7 +97,15 @@ function customiizer_enqueue_customize_assets() {
        wp_enqueue_script('loyalty-widget', get_stylesheet_directory_uri() . '/js/loyalty/widget.js', ['jquery'], $ver, true);
        wp_enqueue_script('referral-script', get_stylesheet_directory_uri() . '/js/referral/referral.js', [], $ver, true);
        wp_enqueue_script('mission-indicator', get_stylesheet_directory_uri() . '/js/mission_indicator.js', ['jquery'], $ver, true);
-       wp_enqueue_script('generation-progress-tracker', get_stylesheet_directory_uri() . '/js/utils/generation_progress_tracker.js', [], $ver, true);
+       $generation_progress_handle = 'generation-progress-tracker';
+       $generation_progress_src = get_stylesheet_directory_uri() . '/js/utils/generation_progress_tracker.js';
+       wp_register_script($generation_progress_handle, $generation_progress_src, [], $ver, true);
+
+       $worker_socket_settings = customiizer_get_worker_socket_settings();
+       $socket_inline = 'window.customiizerWorkerSocket = ' . wp_json_encode($worker_socket_settings) . ';';
+       wp_add_inline_script($generation_progress_handle, $socket_inline, 'before');
+
+       wp_enqueue_script($generation_progress_handle);
 
         // Mark the preload-products script as async on all pages except the shop
         add_filter('script_loader_tag', function($tag, $handle) {
