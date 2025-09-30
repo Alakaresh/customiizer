@@ -6,6 +6,7 @@ const LOG_PREFIX = '[Customiizer][Generate]';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
+const UPSCALE_TARGET_COUNT = 4;
 
 let currentTaskId = null;
 let currentJobId = null;
@@ -828,7 +829,15 @@ jQuery(function($) {
                                 imagesSummary: buildImagesDebugSummary(images),
                         });
 
-                        const didRenderImages = renderGeneratedImages(images);
+                        const renderResult = renderGeneratedImages(images);
+                        const didRenderImages =
+                                renderResult && typeof renderResult === 'object'
+                                        ? Boolean(renderResult.didRenderImages)
+                                        : false;
+                        const validImageCount =
+                                renderResult && typeof renderResult === 'object' && Number.isFinite(renderResult.validImageCount)
+                                        ? renderResult.validImageCount
+                                        : 0;
 
                         if (!didRenderImages) {
                                 console.warn(`${LOG_PREFIX} Job signalé comme terminé mais images indisponibles, nouvelle vérification programmée.`);
@@ -880,12 +889,13 @@ jQuery(function($) {
 
                 if (!hasRenderableImages) {
                         console.warn(`${LOG_PREFIX} Aucune image valide à afficher`, { images });
-                        return false;
+                        return { didRenderImages: false, validImageCount: 0 };
                 }
 
                 let hasUpdatedImage = false;
 
                 const thumbnailsData = [];
+                let validImageCount = 0;
 
                 if (gridContainer) {
                         let gridImages = gridContainer.querySelectorAll('img');
@@ -981,9 +991,11 @@ jQuery(function($) {
                         });
                 }
 
+                validImageCount = thumbnailsData.filter(data => data && data.url).length;
+
                 if (!hasUpdatedImage) {
                         console.warn(`${LOG_PREFIX} Les images renvoyées sont vides, aucune mise à jour effectuée.`);
-                        return false;
+                        return { didRenderImages: false, validImageCount };
                 }
 
                 console.log(`${LOG_PREFIX} Miniatures normalisées`, {
@@ -1000,7 +1012,7 @@ jQuery(function($) {
                 closeProgressModal();
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
-                return true;
+                return { didRenderImages: true, validImageCount };
         }
 
         function updateLivePreview(imageUrl) {
