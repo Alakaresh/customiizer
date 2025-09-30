@@ -60,8 +60,9 @@ function check_image_status() {
     $progressValue = is_numeric($rawProgress) ? (float) $rawProgress : null;
 
     $upscaleCount = 0;
+    $upscaleColumnFilled = array_key_exists('upscale_done', $job) && $job['upscale_done'] !== null;
 
-    if (array_key_exists('upscale_done', $job) && $job['upscale_done'] !== null) {
+    if ($upscaleColumnFilled) {
         $upscaleCount = (int) $job['upscale_done'];
     } else {
         $choicePrefix = $wpdb->esc_like('choice_') . '%';
@@ -74,6 +75,15 @@ function check_image_status() {
         $upscaleResult = $wpdb->get_var($upscaleQuery);
         if ($upscaleResult !== null) {
             $upscaleCount = (int) $upscaleResult;
+            if ($upscaleCount > 0) {
+                $wpdb->update(
+                    $jobsTable,
+                    ['upscale_done' => $upscaleCount],
+                    ['id' => (int) $job['id']],
+                    ['%d'],
+                    ['%d']
+                );
+            }
         }
     }
 
