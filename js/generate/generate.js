@@ -449,6 +449,63 @@ jQuery(function($) {
                 return status === 'done' && upscaleDone >= UPSCALE_TARGET_COUNT;
         }
 
+        function extractJobImageUrl(job) {
+                if (!job || typeof job !== 'object') {
+                        return '';
+                }
+
+                const candidates = [job.imageUrl, job.image_url];
+
+                for (const candidate of candidates) {
+                        if (typeof candidate === 'string' && candidate.trim() !== '') {
+                                return candidate.trim();
+                        }
+                }
+
+                return '';
+        }
+
+        function hasValidRenderableImage(images) {
+                if (!Array.isArray(images)) {
+                        return false;
+                }
+
+                return images.some(image => image && typeof image.url === 'string' && image.url.trim() !== '');
+        }
+
+        function buildFallbackImages(job) {
+                const fallbackUrl = extractJobImageUrl(job);
+                if (!fallbackUrl) {
+                        return [];
+                }
+
+                const jobPrompt = job && typeof job.prompt === 'string' ? job.prompt : '';
+                const jobFormatValue =
+                        job && typeof job.format === 'string'
+                                ? job.format
+                                : job && typeof job.format_image === 'string'
+                                        ? job.format_image
+                                        : job && typeof job.formatImage === 'string'
+                                                ? job.formatImage
+                                                : '';
+
+                const displayName =
+                        job && job.display_name != null ? String(job.display_name) : '';
+                const userLogo = job && job.user_logo != null ? String(job.user_logo) : '';
+                const userIdValue = job && job.user_id != null ? String(job.user_id) : '';
+
+                return [
+                        {
+                                url: fallbackUrl,
+                                prompt: jobPrompt || prompt,
+                                format: jobFormatValue || jobFormat,
+                                display_name: displayName,
+                                user_logo: userLogo,
+                                user_id: userIdValue,
+                        },
+                ];
+        }
+
         function finalizeGeneration(hasError = false) {
                 stopPolling();
 
@@ -602,7 +659,8 @@ jQuery(function($) {
                 }
 
                 if (hasCompleted) {
-                        const images = Array.isArray(job.images) ? job.images : [];
+                        const rawImages = Array.isArray(job.images) ? job.images : [];
+                        const images = hasValidRenderableImage(rawImages) ? rawImages : buildFallbackImages(job);
                         console.log(`${LOG_PREFIX} Tentative de rendu des images finalisées`, {
                                 taskId: currentTaskId,
                                 jobId: currentJobId,
