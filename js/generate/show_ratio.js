@@ -102,6 +102,9 @@ function toggleRatioMenu(forceState) {
 function setVariantPanelVisibility(forceState) {
     const panel = document.getElementById('variant-display');
     const summary = document.getElementById('variant-summary');
+    const previewWrapper = document.getElementById('generation-preview');
+    const grid = document.getElementById('image-grid');
+    const gridWrapper = document.getElementById('image-grid-wrapper');
 
     if (!panel) {
         return false;
@@ -111,14 +114,75 @@ function setVariantPanelVisibility(forceState) {
     const shouldBeVisible =
         typeof forceState === 'boolean' ? forceState : isCurrentlyHidden;
 
-    panel.classList.toggle('is-hidden', !shouldBeVisible);
-    panel.setAttribute('aria-hidden', shouldBeVisible ? 'false' : 'true');
+    if (shouldBeVisible) {
+        const wasPreviewActive =
+            previewWrapper && previewWrapper.classList.contains('is-active');
 
-    if (summary) {
-        summary.setAttribute('aria-expanded', shouldBeVisible ? 'true' : 'false');
+        panel.classList.remove('is-hidden');
+        panel.setAttribute('aria-hidden', 'false');
+
+        if (summary) {
+            summary.setAttribute('aria-expanded', 'true');
+        }
+
+        panel.dataset.previousContentState = wasPreviewActive ? 'preview' : 'grid';
+
+        if (previewWrapper) {
+            previewWrapper.classList.remove('is-active');
+            previewWrapper.setAttribute('aria-hidden', 'true');
+        }
+
+        [grid, gridWrapper].forEach(element => {
+            if (!element) {
+                return;
+            }
+
+            element.classList.add('is-hidden');
+            element.setAttribute('aria-hidden', 'true');
+        });
+    } else {
+        panel.classList.add('is-hidden');
+        panel.setAttribute('aria-hidden', 'true');
+
+        if (summary) {
+            summary.setAttribute('aria-expanded', 'false');
+        }
+
+        const previousState = panel.dataset.previousContentState || 'grid';
+        delete panel.dataset.previousContentState;
+
+        if (previousState === 'preview') {
+            if (typeof window.customiizerTogglePreviewMode === 'function') {
+                window.customiizerTogglePreviewMode(true);
+            } else if (previewWrapper) {
+                previewWrapper.classList.add('is-active');
+                previewWrapper.setAttribute('aria-hidden', 'false');
+
+                [grid, gridWrapper].forEach(element => {
+                    if (!element) {
+                        return;
+                    }
+
+                    element.classList.add('is-hidden');
+                    element.setAttribute('aria-hidden', 'true');
+                });
+            }
+        } else {
+            [grid, gridWrapper].forEach(element => {
+                if (!element) {
+                    return;
+                }
+
+                element.classList.remove('is-hidden');
+                element.setAttribute('aria-hidden', 'false');
+            });
+
+            if (previewWrapper) {
+                previewWrapper.classList.remove('is-active');
+                previewWrapper.setAttribute('aria-hidden', 'true');
+            }
+        }
     }
-
-    toggleImageGrid(shouldBeVisible);
 
     return shouldBeVisible;
 }
@@ -172,13 +236,20 @@ function getVariantContainers() {
 function toggleImageGrid(isHidden) {
     const grid = document.getElementById('image-grid');
     const wrapper = document.getElementById('image-grid-wrapper');
+    const previewWrapper = document.getElementById('generation-preview');
+    const hidden = Boolean(isHidden);
 
     [grid, wrapper].forEach(element => {
         if (element) {
-            element.classList.toggle('is-hidden', Boolean(isHidden));
-            element.setAttribute('aria-hidden', Boolean(isHidden).toString());
+            element.classList.toggle('is-hidden', hidden);
+            element.setAttribute('aria-hidden', hidden ? 'true' : 'false');
         }
     });
+
+    if (!hidden && previewWrapper) {
+        previewWrapper.classList.remove('is-active');
+        previewWrapper.setAttribute('aria-hidden', 'true');
+    }
 }
 
 function hideVariantList() {
