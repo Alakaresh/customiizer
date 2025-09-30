@@ -823,7 +823,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-preview {
     display: none;
     width: 100%;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
     gap: 16px;
     flex: 1 1 auto;
