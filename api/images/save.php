@@ -66,7 +66,7 @@ function save_generated_image(WP_REST_Request $request) {
                 ], 200);
         }
 
-        $position = intval($request->get_param('position'));
+        $positionRaw = $request->get_param('position');
         $prompt = $request->get_param('prompt');
         $format = $request->get_param('format_image');
         $settingsParam = $request->get_param('settings');
@@ -99,8 +99,24 @@ function save_generated_image(WP_REST_Request $request) {
                 'image_date' => current_time('mysql'),
         ];
 
-        if ($position > 0) {
-                $imageData['image_prefix'] = $position;
+        $normalizedPosition = '';
+
+        if ($positionRaw !== null && $positionRaw !== '') {
+                $sanitizedPosition = sanitize_text_field($positionRaw);
+
+                if (preg_match('/^choice_\d+$/', $sanitizedPosition)) {
+                        $normalizedPosition = $sanitizedPosition;
+                } else {
+                        $position = (int) $sanitizedPosition;
+
+                        if ($position > 0) {
+                                $normalizedPosition = sprintf('choice_%d', $position);
+                        }
+                }
+        }
+
+        if ($normalizedPosition !== '') {
+                $imageData['image_prefix'] = $normalizedPosition;
         }
 
         if ($sourceId !== null) {
