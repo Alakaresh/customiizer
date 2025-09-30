@@ -4,7 +4,7 @@ if (typeof baseUrl === 'undefined') {
 
 const LOG_PREFIX = '[Customiizer][Generate]';
 const POLL_INTERVAL_MS = 1000;
-const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
+const GENERATE_PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 
 let pollTimeoutId = null;
 let currentTaskId = null;
@@ -243,7 +243,7 @@ function renderJobImages(images) {
     if (!validImages.length) {
         fillGridWithPlaceholders(gridContainer);
         if (previewImage) {
-            previewImage.src = PLACEHOLDER_IMAGE_SRC;
+            previewImage.src = GENERATE_PLACEHOLDER_IMAGE_SRC;
             previewImage.alt = "Image d'attente";
         }
         return;
@@ -255,7 +255,7 @@ function renderJobImages(images) {
         wrapper.className = `image-container ${index < 2 ? 'top' : 'bottom'}`;
 
         const image = document.createElement('img');
-        image.src = imageUrl || PLACEHOLDER_IMAGE_SRC;
+        image.src = imageUrl || GENERATE_PLACEHOLDER_IMAGE_SRC;
         image.alt = imageUrl ? `Image ${index + 1}` : "Image d'attente";
         image.className = index < 2 ? 'top' : 'bottom';
 
@@ -269,7 +269,7 @@ function renderJobImages(images) {
         wrapper.className = `image-container ${index < 2 ? 'top' : 'bottom'}`;
 
         const image = document.createElement('img');
-        image.src = PLACEHOLDER_IMAGE_SRC;
+        image.src = GENERATE_PLACEHOLDER_IMAGE_SRC;
         image.alt = "Image d'attente";
         image.className = index < 2 ? 'top' : 'bottom';
 
@@ -279,7 +279,7 @@ function renderJobImages(images) {
 
     if (previewImage) {
         const firstUrl = extractImageUrl(validImages[0]);
-        previewImage.src = firstUrl || PLACEHOLDER_IMAGE_SRC;
+        previewImage.src = firstUrl || GENERATE_PLACEHOLDER_IMAGE_SRC;
         previewImage.alt = firstUrl ? 'Aperçu de la génération' : "Image d'attente";
     }
 }
@@ -298,7 +298,7 @@ function setPreviewPlaceholder() {
     if (!previewImage) {
         return;
     }
-    previewImage.src = PLACEHOLDER_IMAGE_SRC;
+    previewImage.src = GENERATE_PLACEHOLDER_IMAGE_SRC;
     previewImage.alt = "Image d'attente";
 }
 
@@ -308,7 +308,7 @@ function fillGridWithPlaceholders(gridContainer) {
         wrapper.className = `image-container ${index < 2 ? 'top' : 'bottom'}`;
 
         const image = document.createElement('img');
-        image.src = PLACEHOLDER_IMAGE_SRC;
+        image.src = GENERATE_PLACEHOLDER_IMAGE_SRC;
         image.alt = "Image d'attente";
         image.className = index < 2 ? 'top' : 'bottom';
 
