@@ -48,6 +48,19 @@ function check_image_status() {
 
     $progressValue = is_numeric($rawProgress) ? (float) $rawProgress : null;
 
+    $choicePrefix = $wpdb->esc_like('choice_') . '%';
+    $upscaleCount = 0;
+    $upscaleQuery = $wpdb->prepare(
+        "SELECT COUNT(*) FROM {$imagesTable} WHERE job_id = %d AND image_prefix LIKE %s",
+        (int) $job['id'],
+        $choicePrefix
+    );
+
+    $upscaleResult = $wpdb->get_var($upscaleQuery);
+    if ($upscaleResult !== null) {
+        $upscaleCount = (int) $upscaleResult;
+    }
+
     $response = [
         'taskId' => $taskId,
         'jobId' => (int) $job['id'],
@@ -58,12 +71,13 @@ function check_image_status() {
         'createdAt' => $job['created_at'],
         'updatedAt' => $job['updated_at'],
         'imageUrl' => isset($job['image_url']) ? $job['image_url'] : '',
+        'upscale_done' => $upscaleCount,
     ];
 
     if ($job['status'] === 'done') {
         $rows = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT image_number, image_url, format_image, prompt, settings FROM {$imagesTable} WHERE job_id = %d ORDER BY image_number ASC",
+                "SELECT image_number, image_url, format_image, prompt, settings, image_prefix FROM {$imagesTable} WHERE job_id = %d ORDER BY image_number ASC",
                 $job['id']
             ),
             ARRAY_A
@@ -76,6 +90,7 @@ function check_image_status() {
                     'url' => $row['image_url'] ?? '',
                     'format' => $row['format_image'] ?? '',
                     'prompt' => $row['prompt'] ?? '',
+                    'prefix' => $row['image_prefix'] ?? '',
                     'settings' => customiizer_decode_settings($row['settings'] ?? ''),
                 ];
             },

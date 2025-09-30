@@ -7,6 +7,7 @@ const GENERATE_SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
 console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
+const UPSCALE_TARGET_COUNT = 4;
 
 let currentTaskId = null;
 let currentJobId = null;
@@ -408,6 +409,46 @@ jQuery(function($) {
                 });
         }
 
+        function normalizeJobStatus(status) {
+                if (typeof status !== 'string') {
+                        return '';
+                }
+
+                return status.trim().toLowerCase();
+        }
+
+        function extractUpscaleDone(job) {
+                if (!job || typeof job !== 'object') {
+                        return 0;
+                }
+
+                const candidates = [
+                        job.upscaleDone,
+                        job.upscale_done,
+                        job.upscaledDone,
+                        job.upscaled_done,
+                ];
+
+                for (const value of candidates) {
+                        const parsed = parseInt(value, 10);
+                        if (Number.isFinite(parsed)) {
+                                return parsed;
+                        }
+                }
+
+                const numericValue = Number(job.upscaleDone);
+                return Number.isFinite(numericValue) ? numericValue : 0;
+        }
+
+        function hasCompletedUpscales(status, upscaleDone) {
+                if (typeof upscaleDone !== 'number') {
+                        const parsed = Number(upscaleDone);
+                        upscaleDone = Number.isFinite(parsed) ? parsed : 0;
+                }
+
+                return status === 'done' && upscaleDone >= UPSCALE_TARGET_COUNT;
+        }
+
         function finalizeGeneration(hasError = false) {
                 stopPolling();
 
@@ -497,22 +538,47 @@ jQuery(function($) {
         function handleJobStatus(job) {
                 currentJobId = job.jobId || null;
 
+                const previousMessage = lastKnownMessage;
                 const progressValue = clampProgress(job.progress);
                 if (progressValue !== null) {
                         lastKnownProgress = progressValue;
                         updateLoading(progressValue);
                 }
 
-                const derivedStatus = progressValue >= 100 ? 'done' : 'processing';
+                const remoteStatus = normalizeJobStatus(job.status);
+                const upscaleDone = extractUpscaleDone(job);
+                const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
+                const isErrorStatus = remoteStatus === 'error';
+                const progressForPersist = lastKnownProgress === null ? 0 : lastKnownProgress;
+                const progressForMessage = progressValue !== null ? progressValue : progressForPersist;
+
+                let derivedStatus = 'processing';
+                if (isErrorStatus) {
+                        derivedStatus = 'error';
+                } else if (hasCompleted) {
+                        derivedStatus = 'done';
+                }
+
+                let derivedMessage = '';
+                if (!hasCompleted && !isErrorStatus && progressForMessage >= 100) {
+                        derivedMessage = 'Finalisation des variantes HD…';
+                }
+
                 lastKnownStatus = derivedStatus;
-                lastKnownMessage = '';
+                lastKnownMessage = derivedMessage;
+
                 persistProgressState({
                         status: derivedStatus,
                         jobId: currentJobId,
                         taskId: currentTaskId,
-                        progress: lastKnownProgress,
-                        message: '',
+                        progress: progressForPersist,
+                        message: derivedMessage,
+                        upscaleDone,
                 });
+
+                if (derivedMessage !== previousMessage) {
+                        updateLoadingText(derivedMessage);
+                }
 
                 const livePreviewUrl = typeof job.imageUrl === 'string' ? job.imageUrl : '';
                 if (livePreviewUrl) {
@@ -520,8 +586,22 @@ jQuery(function($) {
                         persistProgressState({ imageUrl: livePreviewUrl });
                 }
 
-                if (progressValue >= 100) {
-                        renderGeneratedImages(job.images || []);
+                if (isErrorStatus) {
+                        showAlert('Une erreur est survenue pendant la génération.');
+                        finalizeGeneration(true);
+                        return;
+                }
+
+                if (hasCompleted) {
+                        const images = Array.isArray(job.images) ? job.images : [];
+                        const didRenderImages = renderGeneratedImages(images);
+
+                        if (!didRenderImages) {
+                                console.warn(`${LOG_PREFIX} Job signalé comme terminé mais images indisponibles, nouvelle vérification programmée.`, job);
+                                scheduleNextPoll();
+                                return;
+                        }
+
                         finalizeGeneration(false);
                         return;
                 }
@@ -539,7 +619,7 @@ jQuery(function($) {
 
                 if (!hasRenderableImages) {
                         console.warn(`${LOG_PREFIX} Aucune image valide à afficher`, { images });
-                        return;
+                        return false;
                 }
 
                 let hasUpdatedImage = false;
@@ -583,7 +663,7 @@ jQuery(function($) {
 
                 if (!hasUpdatedImage) {
                         console.warn(`${LOG_PREFIX} Les images renvoyées sont vides, aucune mise à jour effectuée.`);
-                        return;
+                        return false;
                 }
 
                 setPreviewThumbnailsVisibility(true);
@@ -592,6 +672,7 @@ jQuery(function($) {
                 closeProgressModal();
 
                 console.log(`${LOG_PREFIX} Images rendues`, { images });
+                return true;
         }
 
         function updateLivePreview(imageUrl) {

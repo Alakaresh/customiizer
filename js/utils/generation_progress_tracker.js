@@ -4,6 +4,7 @@
     const LOG_PREFIX = '[Customiizer][ProgressTracker]';
     const AJAX_URL = typeof window.ajaxurl === 'string' ? window.ajaxurl : '/wp-admin/admin-ajax.php';
     const FINAL_STATUSES = new Set(['done', 'error']);
+    const UPSCALE_TARGET_COUNT = 4;
     const POLL_INTERVAL_MS = 1000;
     const INIT_RETRY_DELAY_MS = 75;
     const MAX_INIT_RETRIES = 20;
@@ -188,10 +189,14 @@
         if (state.completed === true) {
             return true;
         }
-        if (Number.isFinite(state.progress) && state.progress >= 100) {
+        const normalizedStatus = normalizeStatus(state.status);
+        if (FINAL_STATUSES.has(normalizedStatus)) {
             return true;
         }
-        return FINAL_STATUSES.has(state.status);
+        if (Number.isFinite(state.progress) && state.progress >= 100 && normalizedStatus === 'done') {
+            return true;
+        }
+        return false;
     }
 
     function scheduleAutoHide() {
@@ -244,15 +249,37 @@
             }
 
             const job = payload.data;
-            const progress = clamp(job.progress);
-            const status = Number.isFinite(progress) && progress >= 100 ? 'done' : 'processing';
+            const remoteStatus = normalizeStatus(job.status);
+            const upscaleDone = parseUpscaleDone(job);
+            let progress = clamp(job.progress);
+            const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
+            const isErrorStatus = remoteStatus === 'error';
+
+            if (hasCompleted && progress < 100) {
+                progress = 100;
+            }
+
+            let status = 'processing';
+            if (isErrorStatus) {
+                status = 'error';
+            } else if (hasCompleted) {
+                status = 'done';
+            }
+
+            let nextMessage = currentState && typeof currentState.message === 'string' ? currentState.message : '';
+            if (!hasCompleted && !isErrorStatus && progress >= 100) {
+                nextMessage = 'Finalisation des variantes HD…';
+            } else if (hasCompleted || isErrorStatus) {
+                nextMessage = '';
+            }
 
             const nextState = {
                 ...currentState,
                 jobId: job.jobId ?? currentState.jobId ?? null,
                 status,
                 progress,
-                message: '',
+                message: nextMessage,
+                upscaleDone,
             };
 
             if (typeof job.imageUrl === 'string' && job.imageUrl) {
@@ -322,6 +349,45 @@
         } catch (error) {
             console.warn(`${LOG_PREFIX} Suppression impossible du stockage`, error);
         }
+    }
+
+    function normalizeStatus(status) {
+        if (typeof status !== 'string') {
+            return '';
+        }
+        return status.trim().toLowerCase();
+    }
+
+    function parseUpscaleDone(job) {
+        if (!job || typeof job !== 'object') {
+            return 0;
+        }
+
+        const candidates = [
+            job.upscaleDone,
+            job.upscale_done,
+            job.upscaledDone,
+            job.upscaled_done,
+        ];
+
+        for (const value of candidates) {
+            const parsed = parseInt(value, 10);
+            if (Number.isFinite(parsed)) {
+                return parsed;
+            }
+        }
+
+        const numericValue = Number(job.upscaleDone);
+        return Number.isFinite(numericValue) ? numericValue : 0;
+    }
+
+    function hasCompletedUpscales(status, upscaleDone) {
+        if (typeof upscaleDone !== 'number') {
+            const parsed = Number(upscaleDone);
+            upscaleDone = Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        return status === 'done' && upscaleDone >= UPSCALE_TARGET_COUNT;
     }
 
     function clamp(value) {
