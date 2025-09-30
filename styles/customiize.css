@@ -915,6 +915,14 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout)
     > #content
     > .content-images
+    .generation-preview__thumbnail.is-selected {
+    border-color: var(--color-brand-400, #2bd879);
+    box-shadow: 0 0 0 2px rgba(43, 216, 121, 0.2);
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
     .generation-preview__thumbnail:focus-visible {
     outline: 2px solid var(--color-brand-400, #2bd879);
     outline-offset: 2px;
