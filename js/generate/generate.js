@@ -845,14 +845,35 @@ jQuery(function($) {
                 if (hasCompleted) {
                         const rawImages = Array.isArray(job.images) ? job.images : [];
                         const images = hasValidRenderableImage(rawImages) ? rawImages : buildFallbackImages(job);
+                        const validImageCount = Array.isArray(images)
+                                ? images.reduce((count, imageData) => {
+                                          const candidateUrl = extractImageUrlFromData(imageData);
+                                          return (
+                                                  count +
+                                                  (typeof candidateUrl === 'string' && candidateUrl.trim() !== '' ? 1 : 0)
+                                          );
+                                  }, 0)
+                                : 0;
                         console.log(`${LOG_PREFIX} Tentative de rendu des images finalisées`, {
                                 taskId: currentTaskId,
                                 jobId: currentJobId,
                                 imagesCount: images.length,
                                 upscaleDone,
+                                validImageCount,
                                 imagesSummary: buildImagesDebugSummary(images),
                         });
                         const didRenderImages = renderGeneratedImages(images);
+
+                        if (validImageCount < UPSCALE_TARGET_COUNT) {
+                                console.log(`${LOG_PREFIX} Images finales incomplètes, nouvelle vérification programmée.`, {
+                                        taskId: currentTaskId,
+                                        jobId: currentJobId,
+                                        validImageCount,
+                                        targetCount: UPSCALE_TARGET_COUNT,
+                                });
+                                scheduleNextPoll();
+                                return;
+                        }
 
                         if (!didRenderImages) {
                                 console.warn(`${LOG_PREFIX} Job signalé comme terminé mais images indisponibles, nouvelle vérification programmée.`, job);
@@ -863,6 +884,7 @@ jQuery(function($) {
                         console.log(`${LOG_PREFIX} Rendu final confirmé, finalisation UI.`, {
                                 taskId: currentTaskId,
                                 jobId: currentJobId,
+                                validImageCount,
                         });
                         finalizeGeneration(false);
                         return;
