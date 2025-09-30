@@ -1061,15 +1061,29 @@ jQuery(function($) {
                 showPreviewPlaceholder();
 
                 try {
+                        const requestPayload = {
+                                prompt,
+                                format_image: jobFormat,
+                        };
+
+                        console.log(`${LOG_PREFIX} Envoi de la requête backend`, {
+                                endpoint: '/wp-content/themes/customiizer/includes/proxy/generate_image.php',
+                                payload: requestPayload,
+                        });
+
                         const response = await fetch('/wp-content/themes/customiizer/includes/proxy/generate_image.php', {
                                 method: 'POST',
                                 headers: {
                                         'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({
-                                        prompt,
-                                        format_image: jobFormat,
-                                }),
+                                body: JSON.stringify(requestPayload),
+                        });
+
+                        console.log(`${LOG_PREFIX} Réponse HTTP reçue`, {
+                                ok: response.ok,
+                                status: response.status,
+                                statusText: response.statusText,
+                                contentType: response.headers.get('content-type'),
                         });
 
                         let data = null;
@@ -1080,6 +1094,11 @@ jQuery(function($) {
                         }
 
                         if (!response.ok) {
+                                console.error(`${LOG_PREFIX} Réponse backend non OK`, {
+                                        status: response.status,
+                                        statusText: response.statusText,
+                                        body: data,
+                                });
                                 const backendMessage =
                                         data && typeof data.message === 'string' && data.message.trim() !== ''
                                                 ? data.message.trim()
@@ -1088,6 +1107,7 @@ jQuery(function($) {
                         }
 
                         if (!data || !data.success || !data.taskId) {
+                                console.error(`${LOG_PREFIX} Réponse backend invalide`, { data });
                                 const backendMessage =
                                         data && typeof data.message === 'string' && data.message.trim() !== ''
                                                 ? data.message.trim()
@@ -1109,7 +1129,12 @@ jQuery(function($) {
 
                         scheduleNextPoll();
                 } catch (error) {
-                        console.error(`${LOG_PREFIX} Erreur lors de la création du job`, error);
+                        console.error(`${LOG_PREFIX} Erreur lors de la création du job`, {
+                                error,
+                                prompt,
+                                format_image: jobFormat,
+                                userId: currentUser && currentUser.ID,
+                        });
                         const fallbackMessage = "Une erreur est survenue pendant la génération. Veuillez réessayer.";
                         const displayMessage =
                                 error && typeof error.message === 'string' && error.message.trim() !== ''
