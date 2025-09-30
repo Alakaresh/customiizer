@@ -548,6 +548,15 @@ jQuery(function($) {
                 const remoteStatus = normalizeJobStatus(job.status);
                 const upscaleDone = extractUpscaleDone(job);
                 const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
+                console.log(`${LOG_PREFIX} Statut pollé`, {
+                        taskId: currentTaskId,
+                        jobId: currentJobId,
+                        rawStatus: job.status,
+                        remoteStatus,
+                        progress: progressValue,
+                        upscaleDone,
+                        hasCompleted,
+                });
                 const isErrorStatus = remoteStatus === 'error';
                 const progressForPersist = lastKnownProgress === null ? 0 : lastKnownProgress;
                 const progressForMessage = progressValue !== null ? progressValue : progressForPersist;
@@ -594,6 +603,12 @@ jQuery(function($) {
 
                 if (hasCompleted) {
                         const images = Array.isArray(job.images) ? job.images : [];
+                        console.log(`${LOG_PREFIX} Tentative de rendu des images finalisées`, {
+                                taskId: currentTaskId,
+                                jobId: currentJobId,
+                                imagesCount: images.length,
+                                upscaleDone,
+                        });
                         const didRenderImages = renderGeneratedImages(images);
 
                         if (!didRenderImages) {
@@ -602,10 +617,20 @@ jQuery(function($) {
                                 return;
                         }
 
+                        console.log(`${LOG_PREFIX} Rendu final confirmé, finalisation UI.`, {
+                                taskId: currentTaskId,
+                                jobId: currentJobId,
+                        });
                         finalizeGeneration(false);
                         return;
                 }
 
+                console.log(`${LOG_PREFIX} Job non finalisé, nouvelle vérification programmée.`, {
+                        taskId: currentTaskId,
+                        jobId: currentJobId,
+                        remoteStatus,
+                        upscaleDone,
+                });
                 scheduleNextPoll();
         }
 
