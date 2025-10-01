@@ -1004,7 +1004,10 @@ jQuery(document).ready(function ($) {
                                         container.show();
                                         if (!main3DInitialized) {
                                                 requestAnimationFrame(() => {
-                                                        init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
+                                                        if (typeof window.reset3DScene === 'function') {
+                                                                window.reset3DScene();
+                                                        }
+                                                        init3DScene('productMain3DContainer', variant.url_3d, 'productMain3DCanvas');
                                                 });
                                                 main3DInitialized = true;
                                         }
