@@ -245,7 +245,7 @@ function appendImage(image, columns, columnIndex) {
         const img = $('<img/>', {
                 alt: 'Image générée',
                 class: 'preview-enlarge',
-                'data-user-id': userId || '',
+                'data-user-id': image.user_id || '',
                 'data-display_name': image.display_name || '',
                 'data-format-image': image.format || '',
                 'data-prompt': promptText
