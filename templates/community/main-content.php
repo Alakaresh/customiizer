@@ -32,6 +32,10 @@
                 <div id="load-more-trigger" aria-hidden="true"></div>
         </section>
 
+        <button class="scroll-to-top" type="button" aria-label="Revenir en haut">
+                <i class="fas fa-arrow-up" aria-hidden="true"></i>
+        </button>
+
         <div id="imageModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
                 <img class="modal-content" id="modalImage" alt="">
                 <div id="caption"></div>
