@@ -178,9 +178,20 @@ function enableImageEnlargement() {
 
 // Séparer ta fonction de clic proprement
 function handleImageClick(event) {
+        if (event.target.closest('.like-icon, .star-icon')) {
+                return;
+        }
 
-	const image = event.target.closest('img.preview-enlarge');
-	if (!image) return;
+        let image = event.target.closest('img.preview-enlarge');
+
+        if (!image) {
+                const container = event.target.closest('.imageContainer');
+                if (container) {
+                        image = container.querySelector('img.preview-enlarge');
+                }
+        }
+
+        if (!image) return;
 
 	// Sélection active ➔ charger dans le cropper
 	if (typeof isSelectingImage !== 'undefined' && isSelectingImage) {
