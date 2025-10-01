@@ -287,7 +287,7 @@ jQuery(function($) {
 
                 const mainImage = previewGalleryImages[selectedPreviewIndex];
                 applyImageMetaToElement(previewImage, mainImage);
-                previewImage.classList.remove('preview-enlarge');
+                previewImage.classList.add('preview-enlarge');
 
                 thumbnailsContainer.innerHTML = '';
                 previewGalleryImages.forEach((imageData, index) => {
