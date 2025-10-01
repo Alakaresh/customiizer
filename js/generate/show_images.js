@@ -3,6 +3,7 @@ const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/
 const GENERATION_PREVIEW_IMAGE_ID = 'generation-preview-image';
 const GENERATION_PREVIEW_ACTION_CONTAINER_ID = 'generation-preview-action';
 const GENERATION_PREVIEW_ACTION_BUTTON_ID = 'generation-preview-use-button';
+const GENERATION_PREVIEW_WRAPPER_ID = 'generation-preview';
 
 function normalizeUrlForComparison(value) {
         if (typeof value !== 'string' || value.trim() === '') {
@@ -28,6 +29,10 @@ function getGenerationPreviewActionButton() {
         return document.getElementById(GENERATION_PREVIEW_ACTION_BUTTON_ID);
 }
 
+function getGenerationPreviewWrapper() {
+        return document.getElementById(GENERATION_PREVIEW_WRAPPER_ID);
+}
+
 function resolveGenerationPreviewState() {
         const imageElement = getGenerationPreviewImageElement();
         const placeholderValue = imageElement?.dataset?.placeholder || PLACEHOLDER_IMAGE_SRC;
@@ -35,6 +40,12 @@ function resolveGenerationPreviewState() {
         const normalizedSrc = normalizeUrlForComparison(currentSrc);
         const normalizedPlaceholder = normalizeUrlForComparison(placeholderValue);
         const hasValidImage = Boolean(normalizedSrc && (!normalizedPlaceholder || normalizedSrc !== normalizedPlaceholder));
+
+        const previewWrapper = getGenerationPreviewWrapper();
+        const hasUpscalesReady =
+                previewWrapper && previewWrapper.dataset
+                        ? previewWrapper.dataset.upscalesReady === 'true'
+                        : false;
 
         const variant = typeof window !== 'undefined' ? window.selectedVariant : null;
         const hasVariant = Boolean(
@@ -53,7 +64,8 @@ function resolveGenerationPreviewState() {
                 prompt: imageElement?.dataset?.prompt || '',
                 variant,
                 hasVariant,
-                productName
+                productName,
+                hasUpscalesReady
         };
 }
 
@@ -66,10 +78,11 @@ function updateGenerationPreviewAction() {
         }
 
         const state = resolveGenerationPreviewState();
-        const isEnabled = state.hasValidImage && state.hasVariant;
+        const isEnabled = state.hasValidImage && state.hasVariant && state.hasUpscalesReady;
 
         container.dataset.enabled = isEnabled ? 'true' : 'false';
         container.setAttribute('aria-hidden', isEnabled ? 'false' : 'true');
+        container.dataset.upscalesReady = state.hasUpscalesReady ? 'true' : 'false';
 
         button.disabled = !isEnabled;
         button.setAttribute('aria-disabled', isEnabled ? 'false' : 'true');
