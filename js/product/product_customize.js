@@ -416,6 +416,10 @@ jQuery(document).ready(function ($) {
                 // Démarre le suivi du temps dès le clic sur "Valider la personnalisation"
                 window.mockupTimes.pending = Date.now();
 
+                if (typeof window.destroy3DScene === 'function') {
+                        window.destroy3DScene();
+                }
+
                 jQuery('#customizeModal').hide();
 
                 if (typeof window.showLoadingOverlay === 'function') {
@@ -975,6 +979,11 @@ jQuery(document).ready(function ($) {
                        }
                        CanvasManager.init(template, 'product2DContainer');
                        updateAddImageButtonVisibility();
+                       if (typeof window.destroy3DScene === 'function') {
+                               window.destroy3DScene();
+                       }
+                       threeDInitialized = false;
+
                        if (variant.url_3d) {
                                $('#product3DContainer').show();
                                init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
@@ -1082,6 +1091,11 @@ jQuery(document).ready(function ($) {
                         // La personnalisation est restaurée automatiquement lors d'une ouverture manuelle.
 
                         // 3. Lancer Three.js si disponible
+                        if (typeof window.destroy3DScene === 'function') {
+                                window.destroy3DScene();
+                        }
+                        threeDInitialized = false;
+
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
                                 init3DScene('product3DContainer', selectedVariant.url_3d, 'threeDCanvas');
@@ -1103,6 +1117,10 @@ jQuery(document).ready(function ($) {
                 } catch (err) {
                         console.warn('[Autosave] flush modal-close failed', err);
                 }
+                if (typeof window.destroy3DScene === 'function') {
+                        window.destroy3DScene();
+                }
+                threeDInitialized = false;
                 customizeModal.hide();
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
