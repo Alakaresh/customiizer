@@ -855,6 +855,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         display: flex;
         align-items: center;
         justify-content: center;
+        align-self: center;
         min-height: 0;
         aspect-ratio: 1 / 1;
         width: min(100%, var(--generation-preview-max-size));
