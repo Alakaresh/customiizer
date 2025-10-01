@@ -7,6 +7,7 @@
 let scene, camera, renderer, controls;
 let resizeObserver3D = null;
 let modelRoot = null;
+let containerEl = null;
 
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
@@ -47,6 +48,19 @@ function getZone(zoneName=null){
 }
 
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
+function forceRendererResize(){
+  if(!renderer || !camera || !containerEl) return;
+  const rect = containerEl.getBoundingClientRect();
+  const width  = Math.max(1, rect.width);
+  const height = Math.max(1, rect.height || rect.width);
+  renderer.setSize(width, height, false);
+  camera.aspect = width/height;
+  camera.updateProjectionMatrix();
+  renderOnce();
+}
+
+window.force3DResize = () => requestAnimationFrame(forceRendererResize);
+
 function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const container = document.getElementById(containerId);
   const canvas    = document.getElementById(canvasId);
@@ -54,6 +68,8 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
     setTimeout(()=>init3DScene(containerId, modelUrl, canvasId, opts), 120);
     return;
   }
+
+  containerEl = container;
 
   scene = new THREE.Scene();
 
@@ -114,6 +130,8 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
     camera.aspect = w/h; camera.updateProjectionMatrix(); renderOnce();
   });
   resizeObserver3D.observe(container);
+
+  forceRendererResize();
 
   loadModel(modelUrl);
   animate();
