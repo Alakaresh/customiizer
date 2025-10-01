@@ -116,6 +116,7 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     color: rgba(246, 246, 246, 0.96);
+    white-space: nowrap;
 }
 
 .community-hero__description {
@@ -465,6 +466,43 @@
     color: rgba(240, 240, 240, 0.85);
     text-align: center;
     font-size: 0.95rem;
+}
+
+.scroll-to-top {
+    position: fixed;
+    right: clamp(16px, 3vw, 32px);
+    bottom: clamp(18px, 4vw, 36px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 999px;
+    background: var(--community-accent-strong, #1fb86c);
+    color: #07120c;
+    cursor: pointer;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    z-index: 24;
+}
+
+.scroll-to-top i {
+    font-size: 1.15rem;
+}
+
+.scroll-to-top:focus-visible {
+    outline: 2px solid rgba(43, 216, 121, 0.85);
+    outline-offset: 4px;
+}
+
+.scroll-to-top.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
 }
 
 @media (max-width: 1200px) {

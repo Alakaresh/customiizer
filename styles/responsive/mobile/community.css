@@ -11,6 +11,10 @@
                 border-radius: 24px;
         }
 
+        .community-hero__title {
+                white-space: normal;
+        }
+
         .image-container {
                 gap: 16px;
                 box-sizing: border-box;
@@ -38,5 +42,10 @@
 
         .image-container {
                 flex-direction: column;
+        }
+
+        .scroll-to-top {
+                width: 44px;
+                height: 44px;
         }
 }

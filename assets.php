@@ -267,6 +267,7 @@ function customiizer_enqueue_customize_assets() {
                 wp_enqueue_style('community-style', get_stylesheet_directory_uri() . '/styles/community.css', [], $ver);
 
 		// --- JS internes ---
+		wp_enqueue_script('home-scroll-top', get_stylesheet_directory_uri() . '/js/home/scroll-to-top.js', ['jquery'], $ver, true);
                 wp_enqueue_script('community-images', get_stylesheet_directory_uri() . '/js/community/show_images.js', ['jquery'], $ver, true);
 
 		// Page /mycreation
