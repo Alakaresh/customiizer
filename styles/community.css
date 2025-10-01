@@ -297,7 +297,7 @@
 .image-container {
     display: flex;
     align-items: flex-start;
-    gap: clamp(16px, 3vw, 28px);
+    gap: clamp(8px, 1.5vw, 14px);
     width: 100%;
     box-sizing: border-box;
 }
@@ -311,8 +311,8 @@
 
 .imageContainer {
     position: relative;
-    margin-bottom: clamp(18px, 3vw, 28px);
-    border-radius: 20px;
+    margin-bottom: clamp(9px, 1.5vw, 14px);
+    border-radius: 0;
     overflow: hidden;
     background: rgba(0, 0, 0, 0.45);
     box-shadow: 0 22px 44px rgba(0, 0, 0, 0.55);

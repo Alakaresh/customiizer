@@ -12,7 +12,7 @@
         }
 
         .image-container {
-                gap: 16px;
+                gap: 8px;
                 box-sizing: border-box;
         }
 }
