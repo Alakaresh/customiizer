@@ -62,7 +62,7 @@ if ( $user_logged_in ) {
                                 <div class="account-icons-container">
 <?php if ( function_exists( 'customiizer_loyalty_widget' ) ) : ?>
                                         <div class="loyalty-header-container">
-                                                <button type="button" id="loyalty-widget-button" class="loyalty-header-button icon-button" aria-haspopup="dialog" aria-expanded="false">
+                                                <button type="button" id="loyalty-widget-button" class="loyalty-header-button icon-button" aria-haspopup="dialog" aria-expanded="false" aria-label="<?php echo esc_attr__( 'Mes avantages', 'customiizer' ); ?>">
                                                         <i class="fas fa-gift" aria-hidden="true"></i>
                                                         <span class="loyalty-header-label"><?php echo esc_html__( 'Mes avantages', 'customiizer' ); ?></span>
                                                 </button>

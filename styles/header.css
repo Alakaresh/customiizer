@@ -347,6 +347,17 @@
         color: #ffffff;
 }
 
+@media (max-width: 1100px) {
+       .loyalty-header-button {
+               padding-inline: 14px;
+               gap: 0;
+       }
+
+       .loyalty-header-button .loyalty-header-label {
+               display: none;
+       }
+}
+
 .cart-container {
         position: relative;
 }
