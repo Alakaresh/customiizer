@@ -960,32 +960,46 @@ jQuery(document).ready(function ($) {
 
        }
 
-       async function loadVariantInCustomizer(variant) {
-               try {
-                       let template = window.customizerCache.templates[variant.variant_id];
-                       if (!template) {
-                               const res = await fetch(`/wp-json/custom-api/v1/variant-template/${variant.variant_id}`);
-                               const data = await res.json();
-                               if (!data.success || !data.template) {
-                                       console.error('[UI] template not found for variant', variant.variant_id);
-                                       return;
-                               }
-                               template = data.template;
-                               window.customizerCache.templates[variant.variant_id] = template;
-                       }
-                       CanvasManager.init(template, 'product2DContainer');
-                       updateAddImageButtonVisibility();
-                       if (variant.url_3d) {
-                               $('#product3DContainer').show();
-                               init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
-                               threeDInitialized = true;
-                       } else {
-                               $('#product3DContainer').hide();
-                       }
-               } catch (e) {
-                       console.error('[Sidebar] failed to load variant template', e);
-               }
-       }
+      async function loadVariantInCustomizer(variant) {
+    try {
+        let template = window.customizerCache.templates[variant.variant_id];
+        if (!template) {
+            const res = await fetch(`/wp-json/custom-api/v1/variant-template/${variant.variant_id}`);
+            const data = await res.json();
+            if (!data.success || !data.template) {
+                console.error('[UI] template not found for variant', variant.variant_id);
+                return;
+            }
+            template = data.template;
+            window.customizerCache.templates[variant.variant_id] = template;
+        }
+
+        // ⚡ Fabric.js init
+        CanvasManager.init(template, 'product2DContainer');
+        updateAddImageButtonVisibility();
+
+        // ⚡ Three.js 3D init
+        if (variant.url_3d) {
+            $('#product3DContainer').show();
+
+            if (!threeDInitialized) {
+                // Première fois → init complet
+                init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
+                threeDInitialized = true;
+            } else {
+                // Déjà init → juste refresh
+                setTimeout(() => {
+                    refresh3DModal('product3DContainer');
+                }, 150);
+            }
+        } else {
+            $('#product3DContainer').hide();
+        }
+    } catch (e) {
+        console.error('[Sidebar] failed to load variant template', e);
+    }
+}
+
 
        function updateSidebarSelectedVariant() {
                const selectedColorElement = productSidebar.find('.color-option.selected').first();
