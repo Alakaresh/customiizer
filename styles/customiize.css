@@ -822,7 +822,6 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-preview {
     display: none;
-    width: 100%;
     align-items: center;
     justify-content: center;
     gap: 16px;
@@ -831,10 +830,16 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     min-height: 0;
     padding: 0 8px;
     box-sizing: border-box;
+    margin: 0 auto;
+    width: min(
+        100%,
+        calc(var(--generation-preview-max-size) + var(--generation-preview-thumbnails-width) + 16px)
+    );
     --generation-preview-max-size: max(
         280px,
         calc(100dvh - var(--header-height, 88px) - 120px)
     );
+    --generation-preview-thumbnails-width: 152px;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -879,15 +884,15 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > #content
     > .content-images
     .generation-preview__thumbnails {
-    width: 152px;
+    width: var(--generation-preview-thumbnails-width);
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex: 0 0 152px;
+    flex: 0 0 var(--generation-preview-thumbnails-width);
     max-height: var(--generation-preview-max-size);
-    height: 100%;
+    height: auto;
     overflow: auto;
-    align-self: stretch;
+    align-self: flex-start;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -971,8 +976,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     #customize-main.customize-layout:not(.hub-layout)
         > #content
         > .content-images
-        .generation-preview__thumbnails {
-        width: 132px;
+        .generation-preview {
+        --generation-preview-thumbnails-width: 132px;
     }
 }
 
@@ -993,6 +998,13 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         width: min(100%, var(--generation-preview-max-size));
         aspect-ratio: 1 / 1;
         height: auto;
+    }
+
+    #customize-main.customize-layout:not(.hub-layout)
+        > #content
+        > .content-images
+        .generation-preview {
+        width: min(100%, var(--generation-preview-max-size));
     }
 
     #customize-main.customize-layout:not(.hub-layout)
