@@ -7,9 +7,32 @@
 let scene, camera, renderer, controls;
 let resizeObserver3D = null;
 let modelRoot = null;
+let animationFrameId = null;
 
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
+
+const AUTO_ZONE_KEY = '__auto__';
+const MAX_PENDING_TEXTURE_ATTEMPTS = 10;
+const pendingTextureUpdates = new Map();
+
+function getPendingKey(zoneName){
+  return zoneName ?? AUTO_ZONE_KEY;
+}
+
+function rememberPendingTextureUpdate(canvas, zoneName, attempt){
+  if(!canvas) return;
+  pendingTextureUpdates.set(getPendingKey(zoneName), { canvas, zoneName, attempt });
+}
+
+function flushPendingTextureUpdates(){
+  if(!pendingTextureUpdates.size) return;
+  const entries = Array.from(pendingTextureUpdates.values());
+  pendingTextureUpdates.clear();
+  for(const entry of entries){
+    update3DTextureFromCanvas(entry.canvas, entry.zoneName, entry.attempt || 0);
+  }
+}
 
 // —————————————— Échelle produit ——————————————
 const productScales = { mug:[1.2,1.2,1.2], tumbler:[1.5,1.5,1.5], bottle:[2,2,2] };
@@ -40,6 +63,7 @@ function fitCameraToObject(camera, object, controls, renderer, offset=2){
 
 // —————————————— Helpers zones ——————————————
 function getZone(zoneName=null){
+  if(!zones) return null;
   if(zoneName && zones[zoneName]) return zones[zoneName];
   // sinon, prend la première zone dont le nom contient "impression"
   const key = Object.keys(zones).find(n => n.toLowerCase().includes('impression'));
@@ -48,6 +72,8 @@ function getZone(zoneName=null){
 
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
 function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
+  destroy3DScene();
+
   const container = document.getElementById(containerId);
   const canvas    = document.getElementById(canvasId);
   if(!container || !canvas){
@@ -56,6 +82,7 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   }
 
   scene = new THREE.Scene();
+  zones = {};
 
   const rect = container.getBoundingClientRect();
   const width  = Math.max(1, rect.width);
@@ -198,16 +225,33 @@ function loadModel(modelUrl){
       const s = getScaleForProduct(modelUrl);
       modelRoot.scale.set(s[0], s[1], s[2]);
       scene.add(modelRoot);
-      fitCameraToObject(camera, modelRoot, controls, renderer);    },
+      fitCameraToObject(camera, modelRoot, controls, renderer);
+      flushPendingTextureUpdates();
+    },
     undefined,
     (err)=>console.error('[3D] ❌ Erreur GLB:', err)
   );
 }
 
 // —————————————— APPLIQUER IMAGE (overlay alpha, fill identique bouteille) ——————————————
-window.update3DTextureFromCanvas = async function(canvas, zoneName=null){
+window.update3DTextureFromCanvas = async function(canvas, zoneName=null, attempt=0){
+  if(!canvas){
+    console.warn('[3D] Canvas manquant pour update3DTextureFromCanvas');
+    return;
+  }
+
   const zone = getZone(zoneName);
-  if(!zone || !canvas){ console.warn('[3D] Zone/canvas manquant'); return; }
+  if(!zone){
+    if(attempt >= MAX_PENDING_TEXTURE_ATTEMPTS){
+      console.warn(`[3D] Zone "${zoneName || 'auto'}" introuvable après ${attempt} tentatives`);
+      pendingTextureUpdates.delete(getPendingKey(zoneName));
+      return;
+    }
+    rememberPendingTextureUpdate(canvas, zoneName, attempt + 1);
+    return;
+  }
+
+  pendingTextureUpdates.delete(getPendingKey(zoneName));
 
   const url = canvas.toDataURL('image/png'); // garde l’alpha
   const texLoader = new THREE.TextureLoader();
@@ -217,7 +261,8 @@ window.update3DTextureFromCanvas = async function(canvas, zoneName=null){
     const tex = await texLoader.loadAsync(url);
     tex.flipY = false;
     if('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace; else tex.encoding = THREE.sRGBEncoding;
-    tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
+    const maxAnisotropy = renderer?.capabilities?.getMaxAnisotropy?.();
+    tex.anisotropy = (typeof maxAnisotropy === 'number' && maxAnisotropy > 0) ? maxAnisotropy : 1;
     tex.needsUpdate = true;
 
     const m = zone.overlay.material.clone();
@@ -238,6 +283,8 @@ window.update3DTextureFromCanvas = async function(canvas, zoneName=null){
 
 // —————————————— RETIRER IMAGE (on garde le fill qui bouche le creux) ——————————————
 window.clear3DTexture = function(zoneName=null){
+  pendingTextureUpdates.delete(getPendingKey(zoneName));
+
   const zone = getZone(zoneName);
   if(!zone) return;
 
@@ -254,6 +301,10 @@ window.clear3DTexture = function(zoneName=null){
 // —————————————— Debug ——————————————
 window.logZones = function(){
   const out = {};
+  if(!zones){
+    console.table(out);
+    return;
+  }
   for(const k of Object.keys(zones)){
     out[k] = { fill: !!zones[k].fill, overlay: !!zones[k].overlay };
   }
@@ -262,10 +313,74 @@ window.logZones = function(){
 
 // —————————————— Loop ——————————————
 function animate(){
-  requestAnimationFrame(animate);
+  animationFrameId = requestAnimationFrame(animate);
   if(controls) controls.update();
   if(renderer && scene && camera) renderer.render(scene, camera);
 }
 
+function disposeMaterial(material){
+  if(!material) return;
+  if(Array.isArray(material)){
+    material.forEach(disposeMaterial);
+    return;
+  }
+  const textureProps = [
+    'map','lightMap','aoMap','emissiveMap','bumpMap','normalMap','displacementMap',
+    'roughnessMap','metalnessMap','alphaMap','envMap','specularMap','gradientMap'
+  ];
+  for(const prop of textureProps){
+    const tex = material[prop];
+    if(tex && typeof tex.dispose === 'function'){
+      tex.dispose();
+    }
+  }
+  if(typeof material.dispose === 'function') material.dispose();
+}
+
+function destroy3DScene(){
+  if(animationFrameId !== null){
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+
+  if(controls && typeof controls.dispose === 'function') controls.dispose();
+  controls = null;
+
+  if(resizeObserver3D){
+    resizeObserver3D.disconnect();
+    resizeObserver3D = null;
+  }
+
+  if(scene){
+    scene.traverse((child)=>{
+      if(child.isMesh){
+        if(child.geometry && typeof child.geometry.dispose === 'function') child.geometry.dispose();
+        disposeMaterial(child.material);
+      } else if(child.material){
+        disposeMaterial(child.material);
+      }
+    });
+
+    if(scene.environment && typeof scene.environment.dispose === 'function') scene.environment.dispose();
+    if(scene.background && typeof scene.background.dispose === 'function') scene.background.dispose();
+  }
+
+  if(modelRoot && scene) scene.remove(modelRoot);
+
+  if(renderer){
+    if(typeof renderer.dispose === 'function') renderer.dispose();
+    if(typeof renderer.forceContextLoss === 'function') renderer.forceContextLoss();
+  }
+
+  pendingTextureUpdates.clear();
+
+  scene = null;
+  camera = null;
+  renderer = null;
+  modelRoot = null;
+  zones = null;
+}
+
 // —————————————— API ——————————————
 window.init3DScene = init3DScene;
+window.destroy3DScene = destroy3DScene;
