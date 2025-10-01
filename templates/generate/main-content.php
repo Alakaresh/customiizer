@@ -91,6 +91,15 @@
                                 src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
                                 alt="Image d'attente"
                         />
+                        <button
+                                type="button"
+                                id="generation-preview-use-button"
+                                class="generation-preview__use-button"
+                                aria-label="Utiliser cette image sur un produit"
+                                hidden
+                        >
+                                <span>Utiliser sur un produit</span>
+                        </button>
                 </div>
                 <div id="generation-preview-thumbnails" class="generation-preview__thumbnails" aria-label="Variations générées">
                         <button type="button" class="generation-preview__thumbnail is-placeholder" disabled>

@@ -144,6 +144,156 @@ function refreshKnownDbRatios() {
     return knownDbRatios;
 }
 
+function getProductUsageDetailsForFormat(format) {
+        const normalizedFormat = normalizeFormatValue(format);
+        const cache = window.formatProductsCache;
+
+        if (!normalizedFormat) {
+                return { success: false, reason: 'format-missing', format: normalizedFormat };
+        }
+
+        if (!cache) {
+                return { success: false, reason: 'cache-missing', format: normalizedFormat };
+        }
+
+        const cached = cache.get(normalizedFormat);
+        if (typeof cached === 'undefined') {
+                return { success: false, reason: 'format-unknown', format: normalizedFormat };
+        }
+
+        if (!cached || !cached.success || !Array.isArray(cached.choices) || cached.choices.length === 0) {
+                return { success: false, reason: 'no-choices', format: normalizedFormat };
+        }
+
+        const grouped = {};
+        cached.choices.forEach((choice) => {
+                if (!choice || typeof choice.product_id === 'undefined' || !choice.product_name) {
+                        return;
+                }
+
+                const productKey = String(choice.product_id);
+                if (!grouped[productKey]) {
+                        grouped[productKey] = {
+                                name: choice.product_name,
+                                variants: [],
+                        };
+                }
+
+                grouped[productKey].variants.push(choice);
+        });
+
+        const productIds = Object.keys(grouped).filter((id) => {
+                const product = grouped[id];
+                if (!product || !product.name) {
+                        delete grouped[id];
+                        return false;
+                }
+
+                product.variants = (Array.isArray(product.variants) ? product.variants : []).filter(Boolean);
+                return product.variants.length > 0;
+        });
+
+        if (productIds.length === 0) {
+                return {
+                        success: false,
+                        reason: 'no-valid-products',
+                        format: normalizedFormat,
+                        grouped,
+                        choices: cached.choices,
+                };
+        }
+
+        return {
+                success: true,
+                format: normalizedFormat,
+                grouped,
+                productIds,
+                choices: cached.choices,
+        };
+}
+
+function launchProductUsageFromDetails(details, { src, prompt, format, productNameOverride = null } = {}) {
+        if (!details || !details.success) {
+                return { success: false, reason: details ? details.reason : 'invalid-details' };
+        }
+
+        const normalizedFormat = normalizeFormatValue(format || details.format);
+        const { grouped, productIds } = details;
+
+        if (!Array.isArray(productIds) || productIds.length === 0) {
+                return { success: false, reason: 'no-valid-products', format: normalizedFormat };
+        }
+
+        if (productIds.length === 1) {
+                const group = grouped[productIds[0]];
+                if (!group || !Array.isArray(group.variants) || group.variants.length === 0) {
+                        return { success: false, reason: 'no-valid-products', format: normalizedFormat };
+                }
+
+                if (group.variants.length === 1) {
+                        const variant = group.variants[0];
+                        redirectToConfigurator(
+                                productNameOverride || group.name,
+                                variant.product_id,
+                                src,
+                                prompt,
+                                normalizedFormat,
+                                variant.variant_id,
+                        );
+                        return {
+                                success: true,
+                                mode: 'redirect',
+                                format: normalizedFormat,
+                                productId: variant.product_id,
+                                variantId: variant.variant_id,
+                        };
+                }
+
+                showProductChooserOverlay(
+                        group.variants,
+                        src,
+                        prompt,
+                        normalizedFormat,
+                        productNameOverride || group.name,
+                );
+                return {
+                        success: true,
+                        mode: 'chooser',
+                        format: normalizedFormat,
+                        productCount: 1,
+                };
+        }
+
+        const allVariants = productIds.flatMap((id) => {
+                const group = grouped[id];
+                return group && Array.isArray(group.variants) ? group.variants : [];
+        });
+
+        showProductChooserOverlay(allVariants, src, prompt, normalizedFormat);
+        return {
+                success: true,
+                mode: 'chooser',
+                format: normalizedFormat,
+                productCount: productIds.length,
+        };
+}
+
+function startImageProductUsageFlow({ src, prompt, format, productNameOverride = null } = {}) {
+        const details = getProductUsageDetailsForFormat(format);
+        if (!details.success) {
+                return details;
+        }
+
+        return launchProductUsageFromDetails(details, {
+                src,
+                prompt,
+                format: details.format,
+                productNameOverride,
+        });
+}
+
+window.startImageProductUsageFlow = startImageProductUsageFlow;
+
 document.addEventListener('DOMContentLoaded', () => {
     const cache = window.formatProductsCache;
     if (!cache) {
@@ -401,142 +551,50 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
                 formatTextElement.textContent = 'Non défini';
         };
 
-        const processData = (data) => {
-                console.log('[preview] processing cached product data', {
-                        format: targetFormat || null,
-                        success: data ? data.success : undefined,
-                        choices: data && Array.isArray(data.choices) ? data.choices.length : undefined
-                });
-                if (!data || !data.success || !Array.isArray(data.choices) || data.choices.length === 0) {
+        const hydrateFormatSection = () => {
+                formatTextElement.textContent = '';
+                updateUseImageButtonHandler(null);
+                useImageButton.disabled = true;
+
+                if (!targetFormat) {
+                        console.warn('[preview] aucun format exploitable fourni par l\'image, bouton désactivé', {
+                                format: formatImage,
+                                userId
+                        });
                         setUndefinedFormatMessage();
-                        updateUseImageButtonHandler(null);
-                        useImageButton.disabled = true;
                         return;
                 }
 
-                const grouped = {};
-                data.choices.forEach((choice) => {
-                        if (!choice || !choice.product_id || !choice.product_name) {
-                                return;
-                        }
-
-                        if (!grouped[choice.product_id]) {
-                                grouped[choice.product_id] = {
-                                        name: choice.product_name,
-                                        variants: []
-                                };
-                        }
-
-                        grouped[choice.product_id].variants.push(choice);
-                });
-
-                const productIds = Object.keys(grouped).filter((id) => {
-                        const product = grouped[id];
-                        if (!product || !product.name) {
-                                delete grouped[id];
-                                return false;
-                        }
-
-                        product.variants = (Array.isArray(product.variants) ? product.variants : []).filter(Boolean);
-                        return product.variants.length > 0;
-                });
+                const usageDetails = getProductUsageDetailsForFormat(targetFormat);
+                if (!usageDetails.success) {
+                        console.warn('[preview] utilisation produit indisponible pour le format', {
+                                format: targetFormat || null,
+                                reason: usageDetails.reason
+                        });
+                        setUndefinedFormatMessage();
+                        return;
+                }
 
                 console.log('[preview] affichage formats via cache', {
                         format: targetFormat || null,
-                        products: productIds.length,
-                        variants: data.choices.length,
-                        productNames: productIds.map((id) => grouped[id].name)
+                        products: usageDetails.productIds.length,
+                        variants: Array.isArray(usageDetails.choices) ? usageDetails.choices.length : undefined,
+                        productNames: usageDetails.productIds.map((id) => usageDetails.grouped[id]?.name)
                 });
 
-                if (productIds.length === 0) {
-                        setUndefinedFormatMessage();
-                        updateUseImageButtonHandler(null);
-                        useImageButton.disabled = true;
-                        return;
-                }
-
-                renderFormatProductList(formatTextElement, grouped, productIds);
-
+                renderFormatProductList(formatTextElement, usageDetails.grouped, usageDetails.productIds);
                 useImageButton.disabled = false;
 
-                if (productIds.length === 1) {
-                        const { name, variants } = grouped[productIds[0]];
-                        updateUseImageButtonHandler(() => {
-                                if (variants.length === 1) {
-                                        const v = variants[0];
-                                        redirectToConfigurator(name, v.product_id, src, prompt, targetFormat, v.variant_id);
-                                } else {
-                                        showProductChooserOverlay(variants, src, prompt, targetFormat, name);
-                                }
+                updateUseImageButtonHandler(() => {
+                        launchProductUsageFromDetails(usageDetails, {
+                                src,
+                                prompt,
+                                format: targetFormat
                         });
-                } else {
-                        updateUseImageButtonHandler(() => {
-                                const allVariants = productIds.flatMap((id) => grouped[id].variants);
-                                showProductChooserOverlay(allVariants, src, prompt, targetFormat);
-                        });
-                }
-        };
-
-        const loadProductInfo = () => {
-                const cache = window.formatProductsCache;
-
-                const handleError = (err) => {
-                        console.error("❌ Erreur chargement produits compatibles :", err);
-                        updateUseImageButtonHandler(null);
-                        useImageButton.disabled = true;
-                        setUndefinedFormatMessage();
-                };
-
-                if (!cache) {
-                        console.warn('[preview] formatProductsCache indisponible, impossible de charger', { format: targetFormat || null });
-                        updateUseImageButtonHandler(null);
-                        setUndefinedFormatMessage();
-                        return;
-                }
-
-                if (!targetFormat) {
-                        console.warn('[preview] format image absent ou invalide, chargement abandonné', { userId });
-                        updateUseImageButtonHandler(null);
-                        useImageButton.disabled = true;
-                        setUndefinedFormatMessage();
-                        return;
-                }
-
-                const cached = cache.get(targetFormat);
-                if (typeof cached === 'undefined') {
-                        const availableFormats = cache.getCache ? Object.keys(cache.getCache()) : [];
-                        console.warn('[preview] format absent du cache – aucune requête API lancée', {
-                                format: targetFormat,
-                                knownInDb: dbRatios.has(targetFormat),
-                                availableFormats
-                        });
-                        updateUseImageButtonHandler(null);
-                        useImageButton.disabled = true;
-                        setUndefinedFormatMessage();
-                        return;
-                }
-
-                try {
-                        processData(cached);
-                } catch (error) {
-                        handleError(error);
-                }
-        };
-
-        formatTextElement.textContent = '';
-        updateUseImageButtonHandler(null);
-        useImageButton.disabled = true;
-
-        if (!targetFormat) {
-                console.warn('[preview] aucun format exploitable fourni par l\'image, bouton désactivé', {
-                        format: formatImage,
-                        userId
                 });
-                setUndefinedFormatMessage();
-                return;
-        }
+        };
 
-        loadProductInfo();
+        hydrateFormatSection();
 
 
 }
