@@ -823,12 +823,14 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-preview {
     display: none;
     width: 100%;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
     gap: 16px;
     flex: 1 1 auto;
     max-height: min(100%, max(280px, calc(100dvh - var(--header-height, 88px) - 120px)));
     min-height: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
     --generation-preview-max-size: max(
         280px,
         calc(100dvh - var(--header-height, 88px) - 120px)
@@ -855,7 +857,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         display: flex;
         align-items: center;
         justify-content: center;
-        align-self: flex-start;
+        align-self: center;
         min-height: 0;
         aspect-ratio: 1 / 1;
         width: min(100%, var(--generation-preview-max-size));
