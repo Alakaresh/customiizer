@@ -619,6 +619,23 @@ jQuery(function($) {
 
         restoreGenerationProgress();
 
+        function getActiveVariant() {
+                if (typeof window === 'undefined') {
+                        return null;
+                }
+
+                const variant = window.selectedVariant;
+                if (!variant || typeof variant !== 'object') {
+                        return null;
+                }
+
+                if (variant.variant_id == null && variant.variantId == null) {
+                        return null;
+                }
+
+                return variant;
+        }
+
         function showAlert(message) {
                 if (!alertBox) {
                         return;
@@ -1133,14 +1150,33 @@ jQuery(function($) {
                 updateJobFormatState(selectedRatio, { persist: false });
                 updatePromptState(customTextInput.textContent, { persist: false });
 
+                const activeVariant = getActiveVariant();
+
                 console.log(`${LOG_PREFIX} Demande de génération`, {
                         prompt,
                         format_image: jobFormat,
                         userId: currentUser && currentUser.ID,
+                        variantId:
+                                activeVariant && activeVariant.variant_id != null
+                                        ? activeVariant.variant_id
+                                        : activeVariant && activeVariant.variantId != null
+                                                ? activeVariant.variantId
+                                                : null,
                 });
 
                 if (!prompt) {
                         showAlert('Veuillez entrer du texte avant de générer des images.');
+                        return;
+                }
+
+                if (!activeVariant) {
+                        showAlert('Veuillez sélectionner un produit avant de générer des images.');
+
+                        const variantSummaryTrigger = document.getElementById('variant-summary');
+                        if (variantSummaryTrigger && typeof variantSummaryTrigger.focus === 'function') {
+                                variantSummaryTrigger.focus();
+                        }
+
                         return;
                 }
 
@@ -1152,7 +1188,6 @@ jQuery(function($) {
                 if (!currentUser || !currentUser.ID) {
                         localStorage.setItem('savedPromptText', prompt);
 
-                        const activeVariant = typeof window !== 'undefined' ? window.selectedVariant : null;
                         if (activeVariant && typeof activeVariant === 'object' && activeVariant.variant_id != null) {
                                 try {
                                         const payload = {
