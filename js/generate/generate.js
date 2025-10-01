@@ -22,6 +22,7 @@ let clearStateTimeoutId = null;
 let previewGalleryImages = [];
 let selectedPreviewIndex = 0;
 let previewThumbnailsVisible = false;
+let hasLoggedUserEssentialsError = false;
 const PROGRESS_STORAGE_KEY = 'customiizerGenerationProgress';
 const PROGRESS_EVENT_NAME = 'customiizer:generation-progress-update';
 
@@ -53,6 +54,131 @@ jQuery(function($) {
 
         resetPreviewGallery();
         setPreviewThumbnailsVisibility(false);
+
+        function extractFirstStringFromSource(source, keys) {
+                if (!source || typeof source !== 'object') {
+                        return '';
+                }
+
+                for (const key of keys) {
+                        if (!Object.prototype.hasOwnProperty.call(source, key)) {
+                                continue;
+                        }
+
+                        const value = source[key];
+                        if (value == null) {
+                                continue;
+                        }
+
+                        if (typeof value === 'string') {
+                                const trimmed = value.trim();
+                                if (trimmed !== '') {
+                                        return trimmed;
+                                }
+                        } else if (typeof value === 'number' || typeof value === 'boolean') {
+                                const normalized = String(value);
+                                if (normalized !== '') {
+                                        return normalized;
+                                }
+                        }
+                }
+
+                return '';
+        }
+
+        function getCurrentUserPreviewDetails() {
+                const details = {
+                        user_id: '',
+                        display_name: '',
+                        user_logo: '',
+                };
+
+                if (typeof currentUser === 'object' && currentUser !== null) {
+                        if (currentUser.ID != null) {
+                                details.user_id = String(currentUser.ID);
+                        }
+                        if (typeof currentUser.display_name === 'string' && currentUser.display_name.trim() !== '') {
+                                details.display_name = currentUser.display_name.trim();
+                        }
+                }
+
+                if (typeof sessionStorage !== 'undefined') {
+                        try {
+                                const cached = sessionStorage.getItem('USER_ESSENTIALS');
+                                if (cached) {
+                                        const parsed = JSON.parse(cached);
+                                        if (parsed && typeof parsed === 'object') {
+                                                const parsedId =
+                                                        parsed.user_id != null ? String(parsed.user_id) : '';
+                                                if (!details.user_id || parsedId === details.user_id) {
+                                                        if (parsedId) {
+                                                                details.user_id = parsedId;
+                                                        }
+                                                        if (
+                                                                typeof parsed.display_name === 'string' &&
+                                                                parsed.display_name.trim() !== ''
+                                                        ) {
+                                                                details.display_name = parsed.display_name.trim();
+                                                        }
+                                                        if (
+                                                                typeof parsed.user_logo === 'string' &&
+                                                                parsed.user_logo.trim() !== ''
+                                                        ) {
+                                                                details.user_logo = parsed.user_logo.trim();
+                                                        }
+                                                }
+                                        }
+                                }
+                        } catch (error) {
+                                if (!hasLoggedUserEssentialsError) {
+                                        console.warn(
+                                                `${LOG_PREFIX} Impossible de récupérer USER_ESSENTIALS depuis le cache`,
+                                                error
+                                        );
+                                        hasLoggedUserEssentialsError = true;
+                                }
+                        }
+                }
+
+                if (!details.user_logo && details.user_id) {
+                        details.user_logo = `/wp-sauvegarde/user/${details.user_id}/user_logo.png`;
+                }
+
+                return details;
+        }
+
+        function resolveImageUserDetails(imageData) {
+                const fallback = getCurrentUserPreviewDetails();
+                const userId =
+                        extractFirstStringFromSource(imageData, ['user_id', 'userId', 'author_id', 'authorId']) ||
+                        fallback.user_id;
+                const isCurrentUser = Boolean(userId) && Boolean(fallback.user_id) && userId === fallback.user_id;
+
+                const displayName =
+                        extractFirstStringFromSource(imageData, ['display_name', 'displayName', 'user_display_name']) ||
+                        (isCurrentUser ? fallback.display_name : '');
+                const providedLogo = extractFirstStringFromSource(imageData, [
+                        'user_logo',
+                        'userLogo',
+                        'user_logo_url',
+                        'avatar',
+                        'avatar_url',
+                ]);
+
+                let userLogo = providedLogo;
+                if (!userLogo && isCurrentUser) {
+                        userLogo = fallback.user_logo;
+                }
+                if (!userLogo && userId) {
+                        userLogo = `/wp-sauvegarde/user/${userId}/user_logo.png`;
+                }
+
+                return {
+                        user_id: userId,
+                        display_name: displayName,
+                        user_logo: userLogo,
+                };
+        }
 
         function getPreviewImageElement() {
                 return document.getElementById('generation-preview-image');
@@ -248,15 +374,25 @@ jQuery(function($) {
                 imageElement.alt = imageData.prompt || 'Image générée';
 
                 if (imageElement.dataset) {
-                        imageElement.dataset.jobId = imageData.jobId || '';
-                        imageElement.dataset.taskId = imageData.taskId || '';
-                        imageElement.dataset.formatImage = imageData.formatImage || '';
-                        imageElement.dataset.prompt = imageData.prompt || prompt;
+                        const formatValue =
+                                extractFirstStringFromSource(imageData, ['formatImage', 'format_image', 'format']) ||
+                                jobFormat;
+                        const promptValue =
+                                typeof imageData.prompt === 'string' && imageData.prompt.trim() !== ''
+                                        ? imageData.prompt
+                                        : prompt;
+
+                        imageElement.dataset.jobId = imageData.jobId || currentJobId || '';
+                        imageElement.dataset.taskId = imageData.taskId || currentTaskId || '';
+                        imageElement.dataset.formatImage = formatValue || '';
+                        imageElement.dataset.prompt = promptValue || '';
                 }
 
-                imageElement.setAttribute('data-display_name', imageData.display_name || '');
-                imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
-                imageElement.setAttribute('data-user-id', imageData.user_id || '');
+                const userDetails = resolveImageUserDetails(imageData);
+
+                imageElement.setAttribute('data-display_name', userDetails.display_name || '');
+                imageElement.setAttribute('data-user-logo', userDetails.user_logo || '');
+                imageElement.setAttribute('data-user-id', userDetails.user_id || '');
         }
 
         function renderPreviewGallery() {
@@ -326,15 +462,22 @@ jQuery(function($) {
                         .filter(image => image && typeof image.url === 'string' && image.url.trim() !== '')
                         .map(image => {
                                 const trimmedUrl = image.url.trim();
+                                const userDetails = resolveImageUserDetails(image);
+                                const formatValue =
+                                        extractFirstStringFromSource(image, ['format', 'format_image', 'formatImage']) ||
+                                        jobFormat;
+
                                 return {
                                         url: trimmedUrl,
                                         prompt: image.prompt || prompt,
-                                        formatImage: image.format || '',
+                                        format: formatValue || '',
+                                        formatImage: formatValue || '',
+                                        format_image: formatValue || '',
                                         jobId: currentJobId || '',
                                         taskId: currentTaskId || '',
-                                        display_name: image.display_name || '',
-                                        user_logo: image.user_logo || '',
-                                        user_id: image.user_id || '',
+                                        display_name: userDetails.display_name || '',
+                                        user_logo: userDetails.user_logo || '',
+                                        user_id: userDetails.user_id || '',
                                 };
                         });
 
@@ -761,13 +904,24 @@ jQuery(function($) {
                                 imageElement.classList.remove('preview-enlarge');
                                 imageElement.src = trimmedUrl;
                                 imageElement.alt = imageData.prompt || 'Image générée';
+                                const formatValue =
+                                        extractFirstStringFromSource(imageData, ['format', 'format_image', 'formatImage']) ||
+                                        jobFormat;
+                                const promptValue =
+                                        typeof imageData.prompt === 'string' && imageData.prompt.trim() !== ''
+                                                ? imageData.prompt
+                                                : prompt;
+
                                 imageElement.dataset.jobId = currentJobId || '';
                                 imageElement.dataset.taskId = currentTaskId || '';
-                                imageElement.dataset.formatImage = imageData.format || '';
-                                imageElement.dataset.prompt = imageData.prompt || prompt;
-                                imageElement.setAttribute('data-display_name', imageData.display_name || '');
-                                imageElement.setAttribute('data-user-logo', imageData.user_logo || '');
-                                imageElement.setAttribute('data-user-id', imageData.user_id || '');
+                                imageElement.dataset.formatImage = formatValue || '';
+                                imageElement.dataset.prompt = promptValue || '';
+
+                                const userDetails = resolveImageUserDetails(imageData);
+
+                                imageElement.setAttribute('data-display_name', userDetails.display_name || '');
+                                imageElement.setAttribute('data-user-logo', userDetails.user_logo || '');
+                                imageElement.setAttribute('data-user-id', userDetails.user_id || '');
                                 imageElement.classList.add('preview-enlarge');
                                 hasUpdatedImage = true;
                         });
@@ -808,6 +962,17 @@ jQuery(function($) {
                         previewImage.dataset.livePreviewUrl = imageUrl;
                 }
 
+                const previewDetails = getCurrentUserPreviewDetails();
+                if (previewImage.dataset) {
+                        previewImage.dataset.jobId = currentJobId || '';
+                        previewImage.dataset.taskId = currentTaskId || '';
+                        previewImage.dataset.formatImage = jobFormat || '';
+                        previewImage.dataset.prompt = prompt || '';
+                }
+
+                previewImage.setAttribute('data-display_name', previewDetails.display_name || '');
+                previewImage.setAttribute('data-user-logo', previewDetails.user_logo || '');
+                previewImage.setAttribute('data-user-id', previewDetails.user_id || '');
                 previewImage.classList.remove('preview-enlarge');
                 previewImage.src = imageUrl;
                 previewImage.alt = prompt ? `Aperçu de génération pour ${prompt}` : 'Aperçu de génération en cours';
