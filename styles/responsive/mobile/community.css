@@ -1,20 +1,63 @@
 @media screen and (max-width: 1024px) {
-        /*==========COMMUNITY==========*/
         body {
                 overflow-x: hidden;
         }
-        .image-container {
-                gap: 12px;
-                box-sizing: border-box;
+
+        .community-feed__header {
+                gap: 24px;
         }
 
-        .image-container .image-column {
-                flex: 1 1 0;
+        .community-search__field {
+                gap: 10px;
         }
 }
 
-@media screen and (max-width: 640px) {
-        .image-container {
-                flex-direction: column;
+@media screen and (max-width: 768px) {
+        .community-page {
+                padding: clamp(24px, 6vw, 60px);
+        }
+
+        .community-hero__card,
+        .community-feed__card {
+                padding: clamp(24px, 6vw, 44px);
+        }
+
+        .community-feed__header {
+                align-items: stretch;
+        }
+
+        .community-tabs__button {
+                flex: 1 1 auto;
+        }
+}
+
+@media screen and (max-width: 540px) {
+        .community-page {
+                padding: 22px 16px 88px;
+        }
+
+        .community-hero__card,
+        .community-feed__card {
+                padding: 22px;
+        }
+
+        .community-search__label {
+                letter-spacing: 0.18em;
+        }
+
+        .community-tabs {
+                gap: 8px;
+        }
+
+        .community-tabs__button {
+                padding: 10px 14px;
+        }
+
+        .community-feed__grid .image-container {
+                gap: 12px;
+        }
+
+        .image-container .image-column {
+                gap: 12px;
         }
 }
