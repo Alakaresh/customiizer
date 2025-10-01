@@ -86,6 +86,71 @@ jQuery(function($) {
                 return '';
         }
 
+        function normalizeFormatValue(value) {
+                if (typeof value === 'undefined' || value === null) {
+                        return '';
+                }
+
+                const rawValue = typeof value === 'string' ? value : String(value);
+                const trimmed = rawValue.trim();
+
+                if (!trimmed) {
+                        return '';
+                }
+
+                return trimmed.toLowerCase() === 'inconnu' ? '' : trimmed;
+        }
+
+        function updateJobFormatState(nextFormat, options = {}) {
+                const shouldPersist = options.persist !== false;
+                const normalizedFormat = normalizeFormatValue(nextFormat);
+
+                if (normalizedFormat === jobFormat) {
+                        return jobFormat;
+                }
+
+                jobFormat = normalizedFormat;
+
+                syncPreviewFormatAttribute(jobFormat);
+
+                if (shouldPersist) {
+                        persistProgressState({
+                                format: jobFormat,
+                        });
+                }
+
+                return jobFormat;
+        }
+
+        function updatePromptState(nextPrompt, options = {}) {
+                const shouldPersist = options.persist !== false;
+                const sanitizedPrompt = typeof nextPrompt === 'string' ? nextPrompt.trim() : '';
+
+                if (sanitizedPrompt === prompt) {
+                        return prompt;
+                }
+
+                prompt = sanitizedPrompt;
+
+                if (shouldPersist) {
+                        persistProgressState({
+                                prompt,
+                        });
+                }
+
+                return prompt;
+        }
+
+        function syncPreviewFormatAttribute(nextFormat = jobFormat) {
+                const previewImage = getPreviewImageElement();
+                if (!previewImage || !previewImage.dataset) {
+                        return;
+                }
+
+                const normalized = normalizeFormatValue(nextFormat);
+                previewImage.dataset.formatImage = normalized || '';
+        }
+
         function getCurrentUserPreviewDetails() {
                 const details = {
                         user_id: '',
@@ -374,9 +439,14 @@ jQuery(function($) {
                 imageElement.alt = imageData.prompt || 'Image générée';
 
                 if (imageElement.dataset) {
-                        const formatValue =
+                        const rawFormat =
                                 extractFirstStringFromSource(imageData, ['formatImage', 'format_image', 'format']) ||
                                 jobFormat;
+                        const resolvedFormat = normalizeFormatValue(rawFormat);
+                        if (!jobFormat && resolvedFormat) {
+                                updateJobFormatState(resolvedFormat);
+                        }
+
                         const promptValue =
                                 typeof imageData.prompt === 'string' && imageData.prompt.trim() !== ''
                                         ? imageData.prompt
@@ -384,7 +454,7 @@ jQuery(function($) {
 
                         imageElement.dataset.jobId = imageData.jobId || currentJobId || '';
                         imageElement.dataset.taskId = imageData.taskId || currentTaskId || '';
-                        imageElement.dataset.formatImage = formatValue || '';
+                        imageElement.dataset.formatImage = resolvedFormat || '';
                         imageElement.dataset.prompt = promptValue || '';
                 }
 
@@ -458,21 +528,29 @@ jQuery(function($) {
                         return;
                 }
 
+                let didSyncFormatFromImages = false;
+
                 const normalizedImages = images
                         .filter(image => image && typeof image.url === 'string' && image.url.trim() !== '')
                         .map(image => {
                                 const trimmedUrl = image.url.trim();
                                 const userDetails = resolveImageUserDetails(image);
-                                const formatValue =
+                                const rawFormat =
                                         extractFirstStringFromSource(image, ['format', 'format_image', 'formatImage']) ||
                                         jobFormat;
+                                const normalizedFormat = normalizeFormatValue(rawFormat);
+
+                                if (!didSyncFormatFromImages && normalizedFormat) {
+                                        updateJobFormatState(normalizedFormat);
+                                        didSyncFormatFromImages = true;
+                                }
 
                                 return {
                                         url: trimmedUrl,
                                         prompt: image.prompt || prompt,
-                                        format: formatValue || '',
-                                        formatImage: formatValue || '',
-                                        format_image: formatValue || '',
+                                        format: normalizedFormat || '',
+                                        formatImage: normalizedFormat || '',
+                                        format_image: normalizedFormat || '',
                                         jobId: currentJobId || '',
                                         taskId: currentTaskId || '',
                                         display_name: userDetails.display_name || '',
@@ -652,7 +730,7 @@ jQuery(function($) {
                 }
 
                 const jobPrompt = job && typeof job.prompt === 'string' ? job.prompt : '';
-                const jobFormatValue =
+                const rawJobFormat =
                         job && typeof job.format === 'string'
                                 ? job.format
                                 : job && typeof job.format_image === 'string'
@@ -660,6 +738,11 @@ jQuery(function($) {
                                         : job && typeof job.formatImage === 'string'
                                                 ? job.formatImage
                                                 : '';
+                const normalizedFormat = normalizeFormatValue(rawJobFormat || jobFormat);
+
+                if (normalizedFormat) {
+                        updateJobFormatState(normalizedFormat);
+                }
 
                 const displayName =
                         job && job.display_name != null ? String(job.display_name) : '';
@@ -670,7 +753,7 @@ jQuery(function($) {
                         {
                                 url: fallbackUrl,
                                 prompt: jobPrompt || prompt,
-                                format: jobFormatValue || jobFormat,
+                                format: normalizedFormat || '',
                                 display_name: displayName,
                                 user_logo: userLogo,
                                 user_id: userIdValue,
@@ -766,6 +849,16 @@ jQuery(function($) {
 
         function handleJobStatus(job) {
                 currentJobId = job.jobId || null;
+
+                const jobFormatValue = extractFirstStringFromSource(job, ['format', 'format_image', 'formatImage']);
+                if (jobFormatValue) {
+                        updateJobFormatState(jobFormatValue);
+                }
+
+                const jobPromptValue = typeof job.prompt === 'string' ? job.prompt.trim() : '';
+                if (jobPromptValue) {
+                        updatePromptState(jobPromptValue);
+                }
 
                 const previousMessage = lastKnownMessage;
                 const progressValue = clampProgress(job.progress);
@@ -904,9 +997,13 @@ jQuery(function($) {
                                 imageElement.classList.remove('preview-enlarge');
                                 imageElement.src = trimmedUrl;
                                 imageElement.alt = imageData.prompt || 'Image générée';
-                                const formatValue =
+                                const rawFormat =
                                         extractFirstStringFromSource(imageData, ['format', 'format_image', 'formatImage']) ||
                                         jobFormat;
+                                const normalizedFormat = normalizeFormatValue(rawFormat);
+                                if (!jobFormat && normalizedFormat) {
+                                        updateJobFormatState(normalizedFormat);
+                                }
                                 const promptValue =
                                         typeof imageData.prompt === 'string' && imageData.prompt.trim() !== ''
                                                 ? imageData.prompt
@@ -914,7 +1011,7 @@ jQuery(function($) {
 
                                 imageElement.dataset.jobId = currentJobId || '';
                                 imageElement.dataset.taskId = currentTaskId || '';
-                                imageElement.dataset.formatImage = formatValue || '';
+                                imageElement.dataset.formatImage = normalizedFormat || '';
                                 imageElement.dataset.prompt = promptValue || '';
 
                                 const userDetails = resolveImageUserDetails(imageData);
@@ -963,10 +1060,12 @@ jQuery(function($) {
                 }
 
                 const previewDetails = getCurrentUserPreviewDetails();
+                const normalizedFormat = normalizeFormatValue(jobFormat);
+
                 if (previewImage.dataset) {
                         previewImage.dataset.jobId = currentJobId || '';
                         previewImage.dataset.taskId = currentTaskId || '';
-                        previewImage.dataset.formatImage = jobFormat || '';
+                        previewImage.dataset.formatImage = normalizedFormat || '';
                         previewImage.dataset.prompt = prompt || '';
                 }
 
@@ -1018,9 +1117,8 @@ jQuery(function($) {
                 resetGenerationState();
                 resetLoadingState();
 
-                const ratioSetting = selectedRatio;
-                jobFormat = ratioSetting;
-                prompt = customTextInput.textContent.trim();
+                updateJobFormatState(selectedRatio, { persist: false });
+                updatePromptState(customTextInput.textContent, { persist: false });
 
                 console.log(`${LOG_PREFIX} Demande de génération`, {
                         prompt,
@@ -1033,7 +1131,7 @@ jQuery(function($) {
                         return;
                 }
 
-                if (!ratioSetting) {
+                if (!jobFormat) {
                         showAlert("Veuillez choisir une taille d'image avant de générer des images.");
                         return;
                 }
@@ -1297,6 +1395,14 @@ jQuery(function($) {
                 }
 
                 stopPolling();
+
+                if (Object.prototype.hasOwnProperty.call(storedState, 'prompt')) {
+                        updatePromptState(storedState.prompt, { persist: false });
+                }
+
+                if (Object.prototype.hasOwnProperty.call(storedState, 'format')) {
+                        updateJobFormatState(storedState.format, { persist: false });
+                }
 
                 currentTaskId = storedState.taskId;
                 currentJobId = storedState.jobId || null;
