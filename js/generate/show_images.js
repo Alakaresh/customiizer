@@ -2,14 +2,76 @@ var allImages = [];
 const PLACEHOLDER_IMAGE_SRC = 'https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png';
 
 jQuery(document).ready(function() {
-	// Requête AJAX pour récupérer les images
-	loadImages();
+        // Requête AJAX pour récupérer les images
+        loadImages();
+
+        initializeGenerationPreviewUseButton();
 });
 
+function initializeGenerationPreviewUseButton() {
+        const previewImage = document.getElementById('generation-preview-image');
+        const useButton = document.getElementById('generation-preview-use-button');
+
+        if (!previewImage || !useButton) {
+                return;
+        }
+
+        const updateButtonState = () => {
+                const canUseImage =
+                        previewImage.classList.contains('preview-enlarge') &&
+                        Boolean(previewImage.getAttribute('data-format-image'));
+
+                useButton.disabled = !canUseImage;
+                useButton.classList.toggle('is-disabled', !canUseImage);
+
+                if (!canUseImage) {
+                        useButton.setAttribute('aria-disabled', 'true');
+                } else {
+                        useButton.removeAttribute('aria-disabled');
+                }
+        };
+
+        const observer = new MutationObserver(updateButtonState);
+        observer.observe(previewImage, {
+                attributes: true,
+                attributeFilter: ['src', 'class', 'data-format-image', 'data-prompt']
+        });
+
+        updateButtonState();
+
+        useButton.addEventListener('click', () => {
+                if (useButton.disabled) {
+                        return;
+                }
+
+                const src = previewImage.getAttribute('src');
+                const format = previewImage.getAttribute('data-format-image');
+                const prompt = previewImage.getAttribute('data-prompt');
+                const displayName = previewImage.getAttribute('data-display_name') || '';
+                const userId = previewImage.getAttribute('data-user-id') || '';
+
+                if (typeof startImageProductUsageFlow === 'function') {
+                        const result = startImageProductUsageFlow({
+                                src,
+                                prompt,
+                                format
+                        });
+
+                        if (!result || result.success !== true) {
+                                if (typeof openImageOverlay === 'function') {
+                                        openImageOverlay(src, userId, displayName, format, prompt);
+                                }
+                        }
+                } else if (typeof openImageOverlay === 'function') {
+                        openImageOverlay(src, userId, displayName, format, prompt);
+                }
+        });
+}
+
 function loadImages() {
-	if (allImages.length === 0) {
-		fetch('/wp-json/api/v1/images/load')
-			.then(response => response.json())
+        if (allImages.length === 0) {
+                fetch('/wp-json/api/v1/images/load')
+                        .then(response => response.json())
 			.then(data => { // ← ICI
 
 			if (data.success && data.images) {
