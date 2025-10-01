@@ -865,10 +865,101 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         align-self: center;
         min-height: 0;
         aspect-ratio: 1 / 1;
-        width: min(100%, var(--generation-preview-max-size));
-        max-width: 100%;
-        height: auto;
-    }
+    width: min(100%, var(--generation-preview-max-size));
+    max-width: 100%;
+    height: auto;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease, background-color 0.25s ease;
+        background: rgba(15, 23, 42, 0.1);
+        z-index: 2;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__main:hover
+    .generation-preview__action[data-enabled="true"],
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__main:focus-within
+    .generation-preview__action[data-enabled="true"] {
+        opacity: 1;
+        background: rgba(15, 23, 42, 0.55);
+        pointer-events: auto;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action-button {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(167, 139, 250, 0.95));
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 1.2;
+        padding: 14px 28px;
+        cursor: pointer;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        pointer-events: auto;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action[data-enabled="true"]
+    .generation-preview__action-button:hover,
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action[data-enabled="true"]
+    .generation-preview__action-button:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.45);
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action-button:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.8);
+        outline-offset: 4px;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action-button[disabled] {
+        cursor: not-allowed;
+        opacity: 0.7;
+        box-shadow: none;
+}
+
+#customize-main.customize-layout:not(.hub-layout)
+    > #content
+    > .content-images
+    .generation-preview__action[data-enabled="false"]
+    .generation-preview__action-button {
+        pointer-events: none;
+}
 
 #customize-main.customize-layout:not(.hub-layout)
     > #content

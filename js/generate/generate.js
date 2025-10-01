@@ -370,6 +370,10 @@ jQuery(function($) {
                 previewImage.src = PLACEHOLDER_IMAGE_SRC;
                 previewImage.alt = "Image d'attente";
                 previewImage.classList.remove('preview-enlarge');
+
+                if (typeof window.updateGenerationPreviewAction === 'function') {
+                        window.updateGenerationPreviewAction();
+                }
         }
 
         function clearPreviewImageDatasets(imageElement) {
@@ -463,6 +467,10 @@ jQuery(function($) {
                 imageElement.setAttribute('data-display_name', userDetails.display_name || '');
                 imageElement.setAttribute('data-user-logo', userDetails.user_logo || '');
                 imageElement.setAttribute('data-user-id', userDetails.user_id || '');
+
+                if (typeof window.updateGenerationPreviewAction === 'function') {
+                        window.updateGenerationPreviewAction();
+                }
         }
 
         function renderPreviewGallery() {
@@ -479,6 +487,11 @@ jQuery(function($) {
                         previewImage.src = PLACEHOLDER_IMAGE_SRC;
                         previewImage.alt = "Image d'attente";
                         previewImage.classList.remove('preview-enlarge');
+
+                        if (typeof window.updateGenerationPreviewAction === 'function') {
+                                window.updateGenerationPreviewAction();
+                        }
+
                         return;
                 }
 

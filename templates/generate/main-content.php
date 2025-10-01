@@ -85,11 +85,27 @@
                                 aria-live="polite"
                                 aria-hidden="true"
                         ></div>
+                        <div
+                                id="generation-preview-action"
+                                class="generation-preview__action"
+                                aria-hidden="true"
+                                data-enabled="false"
+                        >
+                                <button
+                                        type="button"
+                                        id="generation-preview-use-button"
+                                        class="generation-preview__action-button"
+                                        disabled
+                                >
+                                        Utiliser sur le produit
+                                </button>
+                        </div>
                         <img
                                 id="generation-preview-image"
                                 class="centered-image"
                                 src="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
                                 alt="Image d'attente"
+                                data-placeholder="https://customiizer.blob.core.windows.net/assets/SiteDesign/img/attente.png"
                         />
                 </div>
                 <div id="generation-preview-thumbnails" class="generation-preview__thumbnails" aria-label="Variations générées">
