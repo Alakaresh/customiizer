@@ -87,7 +87,8 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
         scene.environment = env;
         scene.background  = null;
         renderer.toneMappingExposure = 1.2 * hdrIntensity;
-        hdr.dispose?.(); pmrem.dispose();
+        //hdr.dispose?.(); 
+        pmrem.dispose();
         renderOnce();
       },
       undefined,
@@ -262,7 +263,23 @@ window.refresh3DModal = function(containerId = 'product3DContainer') {
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
-  renderOnce();
+
+  // ⚡ Reforcer HDR si perdu
+  if (scene && !scene.environment) {
+    const defaultHdr = 'https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_1k.hdr';
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    new THREE.RGBELoader().load(defaultHdr, (hdr) => {
+      const env = pmrem.fromEquirectangular(hdr).texture;
+      scene.environment = env;
+      scene.background = null;
+      renderer.toneMappingExposure = 1.2;
+      hdr.dispose?.();
+      pmrem.dispose();
+      renderOnce();
+    });
+  } else {
+    renderOnce();
+  }
 };
 
 // —————————————— Debug ——————————————
