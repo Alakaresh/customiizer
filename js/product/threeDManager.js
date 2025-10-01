@@ -7,6 +7,7 @@
 let scene, camera, renderer, controls;
 let resizeObserver3D = null;
 let modelRoot = null;
+let animationFrameId = null;
 
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
@@ -47,6 +48,33 @@ function getZone(zoneName=null){
 }
 
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
+function reset3DScene(){
+  if(animationFrameId !== null){
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+
+  if(resizeObserver3D){
+    resizeObserver3D.disconnect();
+    resizeObserver3D = null;
+  }
+
+  if(controls && typeof controls.dispose === 'function'){
+    controls.dispose();
+  }
+  controls = null;
+
+  if(renderer && typeof renderer.dispose === 'function'){
+    renderer.dispose();
+  }
+  renderer = null;
+
+  scene = null;
+  camera = null;
+  modelRoot = null;
+  zones = {};
+}
+
 function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const container = document.getElementById(containerId);
   const canvas    = document.getElementById(canvasId);
@@ -262,10 +290,11 @@ window.logZones = function(){
 
 // —————————————— Loop ——————————————
 function animate(){
-  requestAnimationFrame(animate);
+  animationFrameId = requestAnimationFrame(animate);
   if(controls) controls.update();
   if(renderer && scene && camera) renderer.render(scene, camera);
 }
 
 // —————————————— API ——————————————
 window.init3DScene = init3DScene;
+window.reset3DScene = reset3DScene;

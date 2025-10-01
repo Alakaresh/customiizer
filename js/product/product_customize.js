@@ -417,6 +417,9 @@ jQuery(document).ready(function ($) {
                 window.mockupTimes.pending = Date.now();
 
                 jQuery('#customizeModal').hide();
+                if (typeof window.reset3DScene === 'function') {
+                        window.reset3DScene();
+                }
 
                 if (typeof window.showLoadingOverlay === 'function') {
                         window.showLoadingOverlay();
@@ -977,6 +980,9 @@ jQuery(document).ready(function ($) {
                        updateAddImageButtonVisibility();
                        if (variant.url_3d) {
                                $('#product3DContainer').show();
+                               if (typeof window.reset3DScene === 'function') {
+                                       window.reset3DScene();
+                               }
                                init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
                                threeDInitialized = true;
                        } else {
@@ -1084,6 +1090,9 @@ jQuery(document).ready(function ($) {
                         // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
+                                if (typeof window.reset3DScene === 'function') {
+                                        window.reset3DScene();
+                                }
                                 init3DScene('product3DContainer', selectedVariant.url_3d, 'threeDCanvas');
                                 threeDInitialized = true;
                         } else {
@@ -1106,6 +1115,9 @@ jQuery(document).ready(function ($) {
                 customizeModal.hide();
                 releaseFocus(customizeModal);
                 updateAddImageButtonVisibility();
+                if (typeof window.reset3DScene === 'function') {
+                        window.reset3DScene();
+                }
         });
 
         // Afficher le bouton lors du changement de produit
