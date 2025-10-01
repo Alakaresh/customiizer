@@ -1133,14 +1133,22 @@ jQuery(function($) {
                 updateJobFormatState(selectedRatio, { persist: false });
                 updatePromptState(customTextInput.textContent, { persist: false });
 
+                const activeVariant = typeof window !== 'undefined' ? window.selectedVariant : null;
+
                 console.log(`${LOG_PREFIX} Demande de génération`, {
                         prompt,
                         format_image: jobFormat,
                         userId: currentUser && currentUser.ID,
+                        hasVariant: Boolean(activeVariant && typeof activeVariant === 'object' && activeVariant.variant_id != null),
                 });
 
                 if (!prompt) {
                         showAlert('Veuillez entrer du texte avant de générer des images.');
+                        return;
+                }
+
+                if (!activeVariant || typeof activeVariant !== 'object' || activeVariant.variant_id == null) {
+                        showAlert('Veuillez sélectionner un produit avant de générer des images.');
                         return;
                 }
 
