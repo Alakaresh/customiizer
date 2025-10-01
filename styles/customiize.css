@@ -884,7 +884,8 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.25s ease, background-color 0.25s ease;
-        background: rgba(15, 23, 42, 0.1);
+        background: rgba(17, 26, 21, 0.35);
+        backdrop-filter: none;
         z-index: 2;
 }
 
@@ -899,7 +900,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     .generation-preview__main:focus-within
     .generation-preview__action[data-enabled="true"] {
         opacity: 1;
-        background: rgba(15, 23, 42, 0.55);
+        background: rgba(17, 26, 21, 0.45);
         pointer-events: auto;
 }
 
@@ -910,14 +911,14 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         appearance: none;
         border: none;
         border-radius: 999px;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(167, 139, 250, 0.95));
+        background: linear-gradient(135deg, var(--color-brand-600, #148556), var(--color-brand-400, #2bd879));
         color: #ffffff;
         font-weight: 600;
         font-size: 1rem;
         line-height: 1.2;
         padding: 14px 28px;
         cursor: pointer;
-        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.35);
+        box-shadow: 0 12px 32px rgba(20, 133, 86, 0.45);
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         pointer-events: auto;
 }
@@ -933,7 +934,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     .generation-preview__action[data-enabled="true"]
     .generation-preview__action-button:focus-visible {
         transform: translateY(-1px);
-        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.45);
+        box-shadow: 0 16px 36px rgba(20, 133, 86, 0.55);
 }
 
 #customize-main.customize-layout:not(.hub-layout)
