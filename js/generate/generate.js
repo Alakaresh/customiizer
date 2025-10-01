@@ -54,6 +54,7 @@ jQuery(function($) {
 
         resetPreviewGallery();
         setPreviewThumbnailsVisibility(false);
+        setPreviewUpscaleState(false);
 
         function extractFirstStringFromSource(source, keys) {
                 if (!source || typeof source !== 'object') {
@@ -278,6 +279,38 @@ jQuery(function($) {
                 return document.getElementById('generation-preview-thumbnails');
         }
 
+        function setPreviewUpscaleState(isReady) {
+                const previewWrapper = getPreviewWrapper();
+
+                if (!previewWrapper) {
+                        return;
+                }
+
+                const nextValue = isReady ? 'true' : 'false';
+                if (previewWrapper.dataset && previewWrapper.dataset.upscalesReady === nextValue) {
+                        return;
+                }
+
+                if (previewWrapper.dataset) {
+                        previewWrapper.dataset.upscalesReady = nextValue;
+                } else {
+                        previewWrapper.setAttribute('data-upscales-ready', nextValue);
+                }
+
+                const actionContainer = document.getElementById('generation-preview-action');
+                if (actionContainer) {
+                        if (actionContainer.dataset) {
+                                actionContainer.dataset.upscalesReady = nextValue;
+                        } else {
+                                actionContainer.setAttribute('data-upscales-ready', nextValue);
+                        }
+                }
+
+                if (typeof window.updateGenerationPreviewAction === 'function') {
+                        window.updateGenerationPreviewAction();
+                }
+        }
+
         function getGridContainer() {
                 return document.getElementById('image-grid');
         }
@@ -365,6 +398,7 @@ jQuery(function($) {
 
                 setPreviewThumbnailsVisibility(false);
                 resetPreviewGallery();
+                setPreviewUpscaleState(false);
                 togglePreviewMode(true);
                 clearPreviewImageDatasets(previewImage);
                 previewImage.src = PLACEHOLDER_IMAGE_SRC;
@@ -483,6 +517,7 @@ jQuery(function($) {
 
                 if (!Array.isArray(previewGalleryImages) || previewGalleryImages.length === 0) {
                         resetPreviewGallery();
+                        setPreviewUpscaleState(false);
                         clearPreviewImageDatasets(previewImage);
                         previewImage.src = PLACEHOLDER_IMAGE_SRC;
                         previewImage.alt = "Image d'attente";
@@ -1061,6 +1096,7 @@ jQuery(function($) {
 
                 setPreviewThumbnailsVisibility(true);
                 populatePreviewGallery(images);
+                setPreviewUpscaleState(true);
                 togglePreviewMode(true);
                 closeProgressModal();
 
@@ -1078,6 +1114,7 @@ jQuery(function($) {
                         return;
                 }
 
+                setPreviewUpscaleState(false);
                 togglePreviewMode(true);
                 if (previewImage.dataset && previewImage.dataset.livePreviewUrl === imageUrl) {
                         return;
@@ -1292,6 +1329,7 @@ jQuery(function($) {
                 togglePreviewMode(false);
                 setPreviewThumbnailsVisibility(false);
                 resetPreviewGallery();
+                setPreviewUpscaleState(false);
 
                 const previewImage = getPreviewImageElement();
                 if (!previewImage) {
