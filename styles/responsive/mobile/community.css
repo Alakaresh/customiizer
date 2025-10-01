@@ -1,19 +1,41 @@
 @media screen and (max-width: 1024px) {
-        /*==========COMMUNITY==========*/
         body {
                 overflow-x: hidden;
         }
-        .image-container {
-                gap: 12px;
-                box-sizing: border-box;
+
+        .community-page {
+                padding: clamp(20px, 6vw, 36px);
         }
 
-        .image-container .image-column {
-                flex: 1 1 0;
+        .community-card {
+                border-radius: 24px;
+        }
+
+        .image-container {
+                gap: 16px;
+                box-sizing: border-box;
+        }
+}
+
+@media screen and (max-width: 768px) {
+        .search-and-sort-container {
+                gap: 16px;
+        }
+
+        .search-container {
+                flex-direction: row;
         }
 }
 
 @media screen and (max-width: 640px) {
+        .community-page {
+                padding: 18px;
+        }
+
+        .community-card {
+                padding: 22px;
+        }
+
         .image-container {
                 flex-direction: column;
         }

@@ -1,22 +1,305 @@
+/* --------------------------------------------------------------------------
+   Community page styles aligned with the site's art direction
+   -------------------------------------------------------------------------- */
+
 #content {
     max-height: none;
     margin: 0;
 }
 
-/*
- * Le style global applique display:flex sur #site-content pour certaines pages
- * (ex: accueil, boutique). Cela perturbe la mise en page de la communauté où le
- * contenu doit s'empiler naturellement. On neutralise donc ce comportement
- * uniquement pour la page communauté.
- */
+/* Neutralise flex behaviour applied globally on other sections */
 #site-content {
     display: block;
 }
+
+.community-page {
+    --community-accent: var(--color-brand-400, #2bd879);
+    --community-accent-strong: var(--color-brand-500, #1fb86c);
+    --community-accent-soft: rgba(43, 216, 121, 0.14);
+    --community-border: rgba(43, 216, 121, 0.28);
+    --community-surface: linear-gradient(
+        155deg,
+        rgba(26, 30, 32, 0.92) 0%,
+        rgba(16, 18, 20, 0.9) 55%,
+        rgba(7, 9, 10, 0.88) 100%
+    );
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(24px, 4vw, 40px);
+    height: 100%;
+    padding: clamp(24px, 4vw, 48px);
+    box-sizing: border-box;
+    background:
+        radial-gradient(circle at top right, rgba(43, 216, 121, 0.08), transparent 58%),
+        radial-gradient(circle at bottom left, rgba(20, 133, 86, 0.14), transparent 60%),
+        rgba(10, 12, 14, 0.94);
+    color: var(--color-text, #f5f5f5);
+    overflow-y: auto;
+}
+
+.community-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 3vw, 32px);
+    padding: clamp(24px, 4vw, 48px);
+    border-radius: 28px;
+    border: 1px solid var(--community-border);
+    background: var(--community-surface);
+    box-shadow: 0 28px 58px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(14px);
+    isolation: isolate;
+}
+
+.community-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(43, 216, 121, 0.08), transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.community-hero {
+    overflow: hidden;
+}
+
+.community-hero::after {
+    content: "";
+    position: absolute;
+    width: clamp(260px, 45vw, 420px);
+    height: clamp(260px, 45vw, 420px);
+    bottom: -30%;
+    right: -18%;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(43, 216, 121, 0.24), transparent 65%);
+    filter: blur(0.4px);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.community-hero__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: clamp(20px, 5vw, 40px);
+}
+
+.community-hero__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: min(580px, 100%);
+}
+
+.community-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(43, 216, 121, 0.36);
+    background: var(--community-accent-soft);
+    color: var(--community-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.72rem;
+}
+
+.community-hero__title {
+    margin: 0;
+    font-size: clamp(2.1rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: rgba(246, 246, 246, 0.96);
+}
+
+.community-hero__description {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(220, 220, 220, 0.82);
+}
+
+.community-hero__profile {
+    flex: 0 0 auto;
+    max-width: min(320px, 100%);
+    min-width: 220px;
+}
+
+#community-user-profile {
+    background: rgba(8, 10, 12, 0.75);
+    padding: 24px;
+    border-radius: 22px;
+    border: 1px solid rgba(43, 216, 121, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    display: none;
+}
+
+#community-user-profile-content {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.community-user-logo {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, rgba(43, 216, 121, 0.2), rgba(9, 12, 12, 0.9));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    color: #fff;
+}
+
+.community-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.community-user-info .community-user-name {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: rgba(246, 246, 246, 0.96);
+}
+
+.community-user-info .community-user-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: rgba(215, 215, 215, 0.82);
+}
+
+.community-user-info .community-user-stats p {
+    margin: 0;
+}
+
+.community-hero__toolbar {
+    width: 100%;
+}
+
+.search-and-sort-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: clamp(16px, 3vw, 32px);
+}
+
+.sorting-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sorting-container button {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 999px;
+    color: rgba(230, 230, 230, 0.78);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sorting-container button:hover,
+.sorting-container button:focus-visible {
+    color: #ffffff;
+}
+
+.sorting-container button.active {
+    background: linear-gradient(135deg, rgba(43, 216, 121, 0.42), rgba(31, 184, 108, 0.65));
+    color: #ffffff;
+    box-shadow: 0 14px 32px rgba(43, 216, 121, 0.28);
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#search-input {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    font-size: 0.95rem;
+    min-width: 220px;
+    padding: 6px 4px;
+}
+
+#search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#search-input:focus {
+    outline: none;
+}
+
+#search-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--community-accent-strong), var(--community-accent));
+    color: #ffffff;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(43, 216, 121, 0.32);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#search-button i {
+    margin: 0;
+}
+
+#search-button:hover,
+#search-button:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 36px rgba(43, 216, 121, 0.4);
+}
+
+.community-gallery {
+    gap: clamp(24px, 4vw, 36px);
+    min-height: 0;
+}
+
+.content-container#image-container {
+    width: 100%;
+    min-height: 0;
+}
+
 .image-container {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: clamp(16px, 3vw, 28px);
     width: 100%;
+    box-sizing: border-box;
 }
 
 .image-container .image-column {
@@ -28,7 +311,17 @@
 
 .imageContainer {
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: clamp(18px, 3vw, 28px);
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.45);
+    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.55);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.imageContainer:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 54px rgba(0, 0, 0, 0.6);
 }
 
 .imageContainer img {
@@ -37,32 +330,24 @@
     display: block;
 }
 
-.imageContainer .overlay {
-    position: absolute;
-    color: #fff;
-    text-align: center;
-}
-
 .overlay {
-    position: relative;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.3));
+    position: absolute;
+    inset: 0;
     display: none;
-	box-sizing: border-box;
+    padding: 18px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(3, 8, 6, 0.88) 100%);
+    box-sizing: border-box;
 }
 
 .overlay .prompt-info {
-	white-space: nowrap;
-	overflow: hidden;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
     text-align: left;
-    margin-top: 5px;
-    margin-bottom: 5px; /* Ajouter une petite marge en dessous */
-	margin-left: 5px;
-    color: #ccc;
+    margin: 8px 0 0;
+    color: rgba(220, 220, 220, 0.85);
+    font-size: 0.95rem;
 }
 
 .likes {
@@ -70,233 +355,211 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    padding-left: 3px;
-    padding-right: 3px;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 14px;
+    padding: 6px 10px;
+    gap: 6px;
 }
 
 .thumbIcon {
-    width: 15px !important;
+    width: 16px !important;
     height: auto !important;
-    margin-right: 10px;
+    font-size: 18px;
+    color: var(--community-accent, #ff5252);
 }
 
 .likes span {
-    font-size: 20px;
-    color: white;
+    font-size: 0.95rem;
+    color: #ffffff;
     display: flex;
     align-items: center;
-}
-
-.imageContainer:hover .likes {
-    display: flex;
-}
-
-.imageContainer:hover .overlay {
-    display: block;
-}
-
-body {
-    color: #fff;
-    font-family: Arial, sans-serif;
-}
-
-.search-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+    gap: 6px;
 }
 
 .icon-overlay {
     position: absolute;
-    top: 10px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
     display: none;
-    justify-content: center;
     align-items: center;
-    gap: 10px; /* Espace entre les icônes */
-    background-color: rgba(0, 0, 0, 0.5); /* Fond noir transparent */
-    border-radius: 10px; /* Optionnel : pour des coins arrondis */
-    padding: 5px 10px; /* Optionnel : pour ajouter du padding */
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 14px;
+    padding: 8px 14px;
     z-index: 1;
 }
 
-.like-icon, .star-icon {
-    font-size: 25px; /* Taille des icônes */
+.like-icon,
+.star-icon {
+    font-size: 24px;
     cursor: pointer;
-    color: white; /* Couleur de base des icônes */
-    transition: color 0.3s;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color 0.3s ease;
 }
 
-.thumbIcon {
-    font-size: 20px; /* Taille des icônes */
-    color: red; /* Couleur de base des icônes */
-    transition: color 0.3s;
-}
-
-.like-icon:hover {
-    color: red; /* Couleur des icônes au survol */
-}
-
-.star-icon:hover {
-    color: gold; /* Couleur des icônes au survol */
-}
-
+.like-icon:hover,
 .like-icon.liked {
-    color: red; /* Couleur des icônes lorsqu'elles sont sélectionnées */
+    color: #ff6b6b;
 }
 
+.star-icon:hover,
 .star-icon.favorited {
-    color: gold; /* Couleur des icônes lorsqu'elles sont sélectionnées */
+    color: #ffd166;
 }
 
-.search-and-sort-container {
+.imageContainer:hover .likes,
+.imageContainer:hover .overlay {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
 }
 
-.sorting-container {
-    display: flex;
-    align-items: center;
-}
-
-.sorting-container button {
-    background: none;
-    border: none;
-    color: #ffffff;
-    cursor: pointer;
-    padding: 10px;
-    font-size: 16px;
-    transition: color 0.3s, opacity 0.3s;
-}
-
-.sorting-container button:hover {
-    color: #ffffff;
-    opacity: 0.8;
-}
-
-.sorting-container button.active {
-    color: #ffffff;
-    opacity: 1;
-    font-weight: 600;
-}
-
-.search-container {
-    display: flex;
-    align-items: center;
-}
-
-#search-input {
-    border: 2px solid #555;
-    padding: 5px 10px;
-    background-color: transparent;
-    color: #fff;
-    margin-right: 10px;
-    border-radius: 20px;
-    outline: none;
-}
-
-#search-input::placeholder {
-    color: #fff;
-}
-
-#search-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    font-size: 20px;
-    padding-left: 0px;
-}
-
-#search-button .fa-search {
-    margin-right: -10px;
-}
-
-#search-button .fa-search {
-    position: relative;
-    right: 50px;
-}
-
-#community-user-profile {
-    background-color: #333; /* Fond légèrement plus foncé */
-    padding: 30px; /* Bord du container */
-    border-radius: 30px;
-    margin-bottom: 20px;
-    display: inline-block; /* Adapter la taille du container à son contenu */
-}
-
-#community-user-profile-content {
-    display: flex;
-    align-items: center;
-}
-
-.community-user-logo {
-    width: 100px; /* Taille du logo */
-    height: 100px; /* Taille du logo */
-    border-radius: 50%;
-    background-color: #555; /* Couleur de fond pour le logo */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px; /* Taille du texte dans le logo */
-    color: #fff;
-    margin-right: 20px;
-}
-
-.community-user-info {
-    display: flex;
+.imageContainer:hover .overlay {
     flex-direction: column;
+    justify-content: flex-end;
 }
 
-.community-user-info .community-user-name {
-    font-weight: bold; /* Met en gras */
-    font-size: 20px; /* Taille légèrement augmentée */
-    color: #fff;
-    margin-bottom: 10px;
-}
-
-.community-user-info .community-user-stats {
+.imageContainer:hover .icon-overlay {
     display: flex;
-    gap: 15px; /* Espace entre les informations supplémentaires */
 }
 
-.community-user-info .community-user-stats p {
-    margin: 0;
-    color: #fff;
-}
-
-#scroll-message {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px;
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #fff;
+.community-gallery__loading {
+    align-self: center;
+    padding: 10px 24px;
+    border-radius: 999px;
+    background: var(--community-accent-soft);
+    border: 1px solid var(--community-border);
+    color: rgba(240, 240, 240, 0.9);
+    font-size: 0.95rem;
     display: none;
-    z-index: 1000;
 }
 
 #load-more-trigger {
     height: 1px;
 }
 
-@media (max-width: 768px) {
+#imageModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+#imageModal .modal-content {
+    max-width: min(100%, 920px);
+    border-radius: 20px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+}
+
+#caption {
+    margin-top: 16px;
+    color: rgba(240, 240, 240, 0.85);
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 1200px) {
+    .community-page {
+        padding: clamp(20px, 6vw, 40px);
+    }
+
+    .community-card {
+        padding: clamp(20px, 6vw, 40px);
+    }
+
+    #search-input {
+        min-width: 180px;
+    }
+}
+
+@media (max-width: 960px) {
+    .community-hero__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .community-hero__profile {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #community-user-profile {
+        width: 100%;
+    }
+
     .search-and-sort-container {
         flex-direction: column;
         align-items: stretch;
     }
 
     .search-container {
-        margin-top: 10px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #search-input {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .image-container {
+        gap: 18px;
     }
 }
 
+@media (max-width: 720px) {
+    .community-page {
+        padding: 20px;
+    }
+
+    .community-card {
+        padding: 24px;
+        border-radius: 24px;
+    }
+
+    .sorting-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .sorting-container button {
+        flex: 1 1 0;
+        text-align: center;
+    }
+
+    .image-container {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 540px) {
+    .community-card {
+        padding: 20px;
+    }
+
+    .community-hero__title {
+        font-size: clamp(1.9rem, 8vw, 2.4rem);
+    }
+
+    .community-hero__description {
+        font-size: 0.98rem;
+    }
+
+    .search-container {
+        padding: 6px 12px;
+    }
+
+    #search-button {
+        width: 38px;
+        height: 38px;
+    }
+}
