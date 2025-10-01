@@ -1037,6 +1037,7 @@ jQuery(document).ready(function ($) {
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
+                setTimeout(() => window.force3DResize?.(), 50);
                 const productImageSrc = jQuery("#product-main-image").attr("src");
                 jQuery("#footerProductImage").attr("src", productImageSrc);
                 const productName = jQuery(".product-name").text().trim();
@@ -1085,6 +1086,7 @@ jQuery(document).ready(function ($) {
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
                                 init3DScene('product3DContainer', selectedVariant.url_3d, 'threeDCanvas');
+                                window.force3DResize?.();
                                 threeDInitialized = true;
                         } else {
                                 $('#product3DContainer').hide();

@@ -7,6 +7,8 @@
 let scene, camera, renderer, controls;
 let resizeObserver3D = null;
 let modelRoot = null;
+let containerEl = null;
+let resizeRetryCount = 0;
 
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
@@ -47,6 +49,32 @@ function getZone(zoneName=null){
 }
 
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
+function forceRendererResize(allowRetry=false){
+  if(!renderer || !camera || !containerEl) return;
+  const rect = containerEl.getBoundingClientRect();
+  const width  = Math.round(rect.width);
+  const height = Math.round(rect.height || rect.width);
+
+  if(width <= 1 || height <= 1){
+    if(allowRetry && resizeRetryCount < 12){
+      resizeRetryCount++;
+      requestAnimationFrame(()=>forceRendererResize(true));
+    }
+    return;
+  }
+
+  resizeRetryCount = 0;
+  renderer.setSize(width, height, false);
+  camera.aspect = width/height;
+  camera.updateProjectionMatrix();
+  renderOnce();
+}
+
+window.force3DResize = () => {
+  resizeRetryCount = 0;
+  requestAnimationFrame(()=>forceRendererResize(true));
+};
+
 function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const container = document.getElementById(containerId);
   const canvas    = document.getElementById(canvasId);
@@ -54,6 +82,8 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
     setTimeout(()=>init3DScene(containerId, modelUrl, canvasId, opts), 120);
     return;
   }
+
+  containerEl = container;
 
   scene = new THREE.Scene();
 
@@ -109,11 +139,20 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
 
   if(resizeObserver3D) resizeObserver3D.disconnect();
   resizeObserver3D = new ResizeObserver(({0:{contentRect}})=>{
-    const w = Math.max(1,contentRect.width), h = Math.max(1,contentRect.height);
+    if(!contentRect) return;
+    const w = Math.round(contentRect.width);
+    const h = Math.round(contentRect.height || contentRect.width);
+    if(w <= 1 || h <= 1){
+      return;
+    }
     renderer.setSize(w,h,false);
-    camera.aspect = w/h; camera.updateProjectionMatrix(); renderOnce();
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+    renderOnce();
   });
   resizeObserver3D.observe(container);
+
+  forceRendererResize(true);
 
   loadModel(modelUrl);
   animate();
