@@ -443,9 +443,16 @@ try {
 jQuery(document).ready(function ($) {
         const apiBaseURL = '/wp-json/api/v1/products';
         const mainProductImage = $('#product-main-image');
+        const productMain3DContainer = $('#productMain3DContainer');
 
         let currentVariants = [];
         let main3DInitialized = false;
+
+        function resetMain3DView() {
+                productMain3DContainer.hide();
+                mainProductImage.show();
+                main3DInitialized = false;
+        }
 
         // Préchargement du template et du modèle 3D pour une variante
         async function preloadVariantAssets(variant) {
@@ -630,7 +637,7 @@ jQuery(document).ready(function ($) {
                                 'left': `${currentMockup.position_left}%`
                         });
                         // 🆕 Aligne le conteneur 3D sur l'image principale
-                        jQuery('#productMain3DContainer').css({
+                        productMain3DContainer.css({
                                 'top': `${currentMockup.position_top}%`,
                                 'left': `${currentMockup.position_left}%`
                         });
@@ -956,9 +963,7 @@ jQuery(document).ready(function ($) {
         function updateThumbnails(variants) {
                 const thumbnailsContainer = $('.image-thumbnails').empty();
                 // 🧹 Réinitialise l'affichage 3D
-                jQuery('#productMain3DContainer').hide();
-                mainProductImage.show();
-                main3DInitialized = false;
+                resetMain3DView();
 
                 const hideExtra = shouldShowSingleMockup();
 
@@ -977,8 +982,7 @@ jQuery(document).ready(function ($) {
                                                 'top': `${mockup.position_top}%`,
                                                 'left': `${mockup.position_left}%`
                                         });
-                                        jQuery('#productMain3DContainer').hide();
-                                        mainProductImage.show();
+                                        resetMain3DView();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
@@ -1000,8 +1004,7 @@ jQuery(document).ready(function ($) {
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         mainProductImage.hide();
-                                        const container = jQuery('#productMain3DContainer');
-                                        container.show();
+                                        productMain3DContainer.show();
                                         if (!main3DInitialized) {
                                                 requestAnimationFrame(() => {
                                                         init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
@@ -1019,9 +1022,30 @@ jQuery(document).ready(function ($) {
 
         // 🔥 Ecoute l'événement personnalisé envoyé par le dropdown
         $(document).on('productSelected', function (event, productId) {
+                resetMain3DView();
                 showLoadingOverlay();
                 loadProductDetails(productId);
         });
+
+        $(document).on('click', '#customizeModal .close-button, #saveDesignButton', function () {
+                resetMain3DView();
+        });
+
+        const customizeModalElement = document.getElementById('customizeModal');
+        if (customizeModalElement) {
+                let wasModalVisible = $(customizeModalElement).is(':visible');
+                const customizeModalObserver = new MutationObserver(() => {
+                        const isVisible = $(customizeModalElement).is(':visible');
+                        if (wasModalVisible && !isVisible) {
+                                resetMain3DView();
+                        }
+                        wasModalVisible = isVisible;
+                });
+                customizeModalObserver.observe(customizeModalElement, {
+                        attributes: true,
+                        attributeFilter: ['style', 'class']
+                });
+        }
 	// ✅ Permet d'ouvrir ou fermer la description détaillée du produit
         $(document).on('click', '.toggle-description', function (event) {
                 event.preventDefault();
