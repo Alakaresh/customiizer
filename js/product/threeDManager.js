@@ -63,7 +63,6 @@ function reset3DScene(){
     controls.dispose();
   }
   controls = null;
-
   if(renderer){
     if(typeof renderer.dispose === 'function'){
       renderer.dispose();
