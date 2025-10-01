@@ -251,6 +251,20 @@ window.clear3DTexture = function(zoneName=null){
 
   renderOnce();};
 
+window.refresh3DModal = function(containerId = 'product3DContainer') {
+  const container = document.getElementById(containerId);
+  if (!container || !renderer || !camera) return;
+
+  const rect = container.getBoundingClientRect();
+  const w = Math.max(1, rect.width);
+  const h = Math.max(1, rect.height);
+
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderOnce();
+};
+
 // —————————————— Debug ——————————————
 window.logZones = function(){
   const out = {};
