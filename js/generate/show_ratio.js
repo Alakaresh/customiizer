@@ -208,6 +208,10 @@ function clearSelectedVariantState() {
     }
     window.selectedVariant = null;
 
+    if (typeof window.updateGenerationPreviewAction === 'function') {
+        window.updateGenerationPreviewAction();
+    }
+
     highlightVariantSelection(null);
     updateVariantSummaryImage(DEFAULT_SUMMARY_IMAGE);
 
@@ -224,6 +228,10 @@ function resetVariantSelection() {
         selectedVariant = null;
     }
     window.selectedVariant = null;
+
+    if (typeof window.updateGenerationPreviewAction === 'function') {
+        window.updateGenerationPreviewAction();
+    }
 
     setDefaultSelectedInfo();
     setVariantPanelVisibility(false);
@@ -595,6 +603,10 @@ function handleVariantSelection(element, variant, options = {}) {
         selectedVariant = variant;
     }
     window.selectedVariant = variant;
+
+    if (typeof window.updateGenerationPreviewAction === 'function') {
+        window.updateGenerationPreviewAction();
+    }
 
     setActiveProductButton(selectedProductKey);
 
