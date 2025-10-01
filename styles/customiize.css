@@ -823,7 +823,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
 #customize-main.customize-layout:not(.hub-layout) > #content > .content-images .generation-preview {
     display: none;
     width: 100%;
-    align-items: stretch;
+    align-items: flex-start;
     justify-content: center;
     gap: 16px;
     flex: 1 1 auto;
@@ -855,7 +855,7 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         display: flex;
         align-items: center;
         justify-content: center;
-        align-self: center;
+        align-self: flex-start;
         min-height: 0;
         aspect-ratio: 1 / 1;
         width: min(100%, var(--generation-preview-max-size));
@@ -882,8 +882,10 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     flex-direction: column;
     gap: 12px;
     flex: 0 0 152px;
-    max-height: 100%;
+    max-height: var(--generation-preview-max-size);
+    height: 100%;
     overflow: auto;
+    align-self: stretch;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -978,12 +980,14 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         > .content-images
         .generation-preview.is-active {
         flex-direction: column;
+        align-items: stretch;
     }
 
     #customize-main.customize-layout:not(.hub-layout)
         > #content
         > .content-images
         .generation-preview__main {
+        align-self: center;
         width: min(100%, var(--generation-preview-max-size));
         aspect-ratio: 1 / 1;
         height: auto;
@@ -996,7 +1000,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         width: 100%;
         flex-direction: row;
         max-height: none;
+        height: auto;
         overflow: visible;
+        align-self: auto;
     }
 
     #customize-main.customize-layout:not(.hub-layout)
