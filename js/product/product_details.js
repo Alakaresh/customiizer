@@ -1080,7 +1080,7 @@ jQuery(document).ready(function ($) {
                                         if (!main3DInitialized) {
                                                 requestAnimationFrame(() => {
                                                         refreshMain3DContainerLayout();
-                                                        init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
+                                                        init3DScene('productMain3DContainer', variant.url_3d, 'productMain3DCanvas');
                                                 });
                                                 main3DInitialized = true;
                                         } else {
