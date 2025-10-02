@@ -259,6 +259,25 @@ window.logZones = function(){
   }
   console.table(out);
 };
+window.dispose3DScene = function() {
+  try {
+    if (renderer) {
+      renderer.dispose();
+      renderer.forceContextLoss?.();
+      renderer.domElement = null;
+      renderer = null;
+    }
+    scene = null;
+    camera = null;
+    controls = null;
+    modelRoot = null;
+    zones = {};
+    threeDInitialized = false; // flag global
+    console.log("🗑️ Three.js scene disposed");
+  } catch (e) {
+    console.warn("⚠️ Failed to dispose 3D scene", e);
+  }
+};
 
 // —————————————— Loop ——————————————
 function animate(){
