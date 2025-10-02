@@ -448,6 +448,24 @@ jQuery(document).ready(function ($) {
         let currentVariants = [];
         let main3DInitialized = false;
         let mainImageLayoutRaf = null;
+        let suppressMain3DRebuild = false;
+
+        function resetMain3DContainerElements() {
+                const containerEl = main3DContainer.get(0);
+                if (!containerEl) {
+                        return;
+                }
+
+                const overlay = containerEl.querySelector('.loading-overlay');
+                if (overlay) {
+                        overlay.remove();
+                }
+
+                const canvasEl = containerEl.querySelector('canvas');
+                if (canvasEl) {
+                        canvasEl.remove();
+                }
+        }
 
         function teardownMain3DScene({ hideContainer = false } = {}) {
                 const disposeFn = (typeof window !== 'undefined' && typeof window.dispose3DScene === 'function')
@@ -456,6 +474,12 @@ jQuery(document).ready(function ($) {
                 const activeContainerId = (typeof window !== 'undefined' && typeof window.getActive3DContainerId === 'function')
                         ? window.getActive3DContainerId()
                         : null;
+
+                const shouldSuppressRebuild = hideContainer === true;
+
+                if (shouldSuppressRebuild) {
+                        suppressMain3DRebuild = true;
+                }
 
                 if (disposeFn && (activeContainerId === 'productMain3DContainer' || (!activeContainerId && main3DInitialized))) {
                         try {
@@ -467,9 +491,17 @@ jQuery(document).ready(function ($) {
 
                 main3DInitialized = false;
 
+                resetMain3DContainerElements();
+
                 if (hideContainer) {
                         main3DContainer.hide();
                         showMainProductImage();
+                }
+
+                if (shouldSuppressRebuild) {
+                        setTimeout(() => {
+                                suppressMain3DRebuild = false;
+                        }, 0);
                 }
         }
 
@@ -507,7 +539,19 @@ jQuery(document).ready(function ($) {
                 scheduleMain3DContainerLayout();
         });
 
+        window.addEventListener('customizer:close', () => {
+                main3DInitialized = false;
+                resetMain3DContainerElements();
+                main3DContainer.hide();
+                showMainProductImage();
+                scheduleMain3DContainerLayout();
+        });
+
         window.addEventListener('threeDSceneDisposed', function () {
+                if (suppressMain3DRebuild) {
+                        return;
+                }
+
                 main3DInitialized = false;
 
                 if (!selectedVariant || !selectedVariant.url_3d) {
@@ -1145,6 +1189,7 @@ jQuery(document).ready(function ($) {
                                 .text('3D')
                                 .on('click', function () {
                                         teardownMain3DScene();
+                                        resetMain3DContainerElements();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         scheduleMain3DContainerLayout();
