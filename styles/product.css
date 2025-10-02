@@ -740,7 +740,7 @@ body {
 /* Style pour l'image du produit */
 .product-image {
         position: absolute;
-		left: 50%;
+        left: 50%;
         top: var(--stage-anchor-position);
         width: var(--stage-width);
         max-width: 100%;
@@ -749,22 +749,28 @@ body {
         transform-origin: 50% 100%;
 }
 
+.product-image.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+}
+
 /* 🆕 Conteneur principal pour l'affichage 3D du produit */
 #productMain3DContainer {
         position: absolute;
-		left: 50%;
-        top: var(--stage-anchor-position);
-        width: var(--stage-width);
-        max-width: 100%;
-        aspect-ratio: 1/1;
-		transform: translate(-50%, var(--stage-translate-y));
-        transform-origin: 50% 100%;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
         display: none;
+        pointer-events: auto;
+        transform: none;
 }
 
 #productMain3DContainer canvas {
         width: 100%;
         height: 100%;
+        display: block;
 }
 
 /* Position et style des bulles d'images */
