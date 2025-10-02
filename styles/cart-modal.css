@@ -253,7 +253,7 @@
   height: 32px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   background-color: rgba(9, 40, 42, 0.85) !important; /* force le fond sombre */
   color: #e8f7f3;
   font-weight: 600;
