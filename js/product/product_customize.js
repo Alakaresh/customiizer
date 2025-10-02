@@ -427,6 +427,24 @@ jQuery(document).ready(function ($) {
 
         window.addEventListener('canvas:image-change', () => scheduleDesignAutosave('canvas-event'));
 
+        function dispatchCustomizerLifecycleEvent(name, detail = {}) {
+                if (typeof window === 'undefined' || typeof window.dispatchEvent !== 'function') {
+                        return;
+                }
+
+                let event;
+                if (typeof window.CustomEvent === 'function') {
+                        event = new CustomEvent(name, { detail });
+                } else if (typeof document !== 'undefined' && typeof document.createEvent === 'function') {
+                        event = document.createEvent('CustomEvent');
+                        event.initCustomEvent(name, false, false, detail);
+                }
+
+                if (event) {
+                        window.dispatchEvent(event);
+                }
+        }
+
         // Assurer la sauvegarde avant de quitter la page
         window.addEventListener('beforeunload', function () {
                 cancelPendingDesignAutosave();
@@ -541,7 +559,9 @@ jQuery(document).ready(function ($) {
                }
 
                if (threeDInitialized) {
-                       dispose3DScene();
+                       if (typeof window !== 'undefined' && typeof window.dispose3DScene === 'function') {
+                               window.dispose3DScene();
+                       }
                        threeDInitialized = false;
                }
 
@@ -550,6 +570,7 @@ jQuery(document).ready(function ($) {
                }
 
                customizerActive = false;
+               dispatchCustomizerLifecycleEvent('customizer:close', { reason, source: 'product-page' });
        }
 
        function handleModalHidden({ reason = 'manual', flushAutosave = true } = {}) {
@@ -1048,8 +1069,18 @@ jQuery(document).ready(function ($) {
                        updateAddImageButtonVisibility();
                        if (variant.url_3d) {
                                $('#product3DContainer').show();
-                               init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
-                               threeDInitialized = true;
+                               if (threeDInitialized && typeof window !== 'undefined') {
+                                       const activeContainerId = typeof window.getActive3DContainerId === 'function'
+                                               ? window.getActive3DContainerId()
+                                               : null;
+                                       if (typeof window.dispose3DScene === 'function'
+                                               && (!activeContainerId || activeContainerId === 'product3DContainer')) {
+                                               window.dispose3DScene();
+                                               threeDInitialized = false;
+                                       }
+                               }
+                                init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
+                                threeDInitialized = true;
                        } else {
                                $('#product3DContainer').hide();
                        }
@@ -1108,6 +1139,7 @@ jQuery(document).ready(function ($) {
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
+                dispatchCustomizerLifecycleEvent('customizer:open', { source: 'product-page' });
                 modalWasVisible = true;
                 const productImageSrc = jQuery("#product-main-image").attr("src");
                 jQuery("#footerProductImage").attr("src", productImageSrc);
