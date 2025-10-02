@@ -11,7 +11,12 @@
   align-items: flex-start;
   padding-top: 80px;
   padding-right: 20px;
+
+  /* AJOUTER UN OVERLAY */
+  background: rgba(0, 0, 0, 0.6); /* noir semi-transparent */
+  backdrop-filter: blur(4px); /* optionnel : flou léger derrière */
 }
+
 
 /* === BOÎTE MODALE COMPACTE === */
 .cart-modal-content {
