@@ -292,26 +292,24 @@
 
 .remove-item {
   position: absolute;
-  bottom: 12px; /* aligné en bas du bloc */
+  bottom: 12px;
   right: 12px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(109, 242, 210, 0.18);
-  background: rgba(5, 18, 20, 0.85);
-  color: rgba(232, 247, 243, 0.55);
-  font-size: 1.1rem;
+  background: none;     /* plus de fond rond */
+  border: none;         /* plus de bordure */
+  width: auto;          /* pas de largeur forcée */
+  height: auto;         /* pas de hauteur forcée */
+  color: rgba(232, 247, 243, 0.8);
+  font-size: 1.1rem;    /* taille de l’icône */
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: transform 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  transition: color 0.3s ease;
 }
-
 
 .remove-item:hover,
 .remove-item:focus-visible {
-  color: #041013;
+  color: #6df2d2;
   background: linear-gradient(135deg, #6df2d2, #1abc9c);
   box-shadow: 0 12px 30px rgba(26, 188, 156, 0.35);
   transform: scale(1.05);
