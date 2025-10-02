@@ -207,6 +207,59 @@ function customiizer_get_worker_socket_settings() {
     return $cached;
 }
 
+/**
+ * Determine whether a product has at least one variant with a 3D asset URL.
+ *
+ * @param int $product_id The product identifier received from the frontend.
+ * @return bool|null True when at least one variant exposes url_3d, false when
+ *                   none do, null when the lookup could not be performed.
+ */
+function customiizer_product_supports_3d($product_id) {
+    static $cache = [];
+
+    $product_id = (int) $product_id;
+    if ($product_id <= 0) {
+        return null;
+    }
+
+    if (array_key_exists($product_id, $cache)) {
+        return $cache[$product_id];
+    }
+
+    global $wpdb;
+    if (!isset($wpdb)) {
+        return null;
+    }
+
+    $prefix = 'WPC_';
+    $table = $prefix . 'variants';
+
+    $query = $wpdb->prepare(
+        "SELECT 1 FROM {$table} WHERE product_id = %d AND url_3d IS NOT NULL AND url_3d <> '' LIMIT 1",
+        $product_id
+    );
+
+    if ($query === false) {
+        return null;
+    }
+
+    $previous_error = $wpdb->last_error;
+    $wpdb->last_error = '';
+    $result = $wpdb->get_var($query);
+    $current_error = $wpdb->last_error;
+
+    if ($current_error !== '') {
+        $wpdb->last_error = $current_error;
+        return null;
+    }
+
+    $wpdb->last_error = $previous_error;
+
+    $cache[$product_id] = $result !== null;
+
+    return $cache[$product_id];
+}
+
 function customiizer_log($context, $message = '') {
     $log_file = __DIR__ . '/customiizer.log';
     $date = date('Y-m-d H:i:s');
