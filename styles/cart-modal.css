@@ -290,22 +290,20 @@
   -moz-appearance: textfield;
 }
 
-.remove-item {
+.custom-cart-item .remove-item {
+  all: unset; /* reset complet */
   position: absolute;
   bottom: 12px;
   right: 12px;
-  background: none;     /* plus de fond rond */
-  border: none;         /* plus de bordure */
-  width: auto;          /* pas de largeur forcée */
-  height: auto;         /* pas de hauteur forcée */
-  color: rgba(232, 247, 243, 0.8);
-  font-size: 1.1rem;    /* taille de l’icône */
   cursor: pointer;
+  font-size: 1.2rem;
+  color: rgba(232, 247, 243, 0.8);
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.3s ease;
 }
+
 .remove-item:hover,
 .remove-item:focus,
 .remove-item:active {
