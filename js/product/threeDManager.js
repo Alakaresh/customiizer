@@ -11,6 +11,32 @@ let modelRoot = null;
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
 
+function disposeMaterial(mat) {
+  if (!mat) return;
+
+  const textureKeys = [
+    'map',
+    'normalMap',
+    'roughnessMap',
+    'metalnessMap',
+    'aoMap',
+    'alphaMap',
+    'emissiveMap'
+  ];
+
+  textureKeys.forEach((key) => {
+    const tex = mat[key];
+    if (tex && typeof tex.dispose === 'function') {
+      mat[key] = null;
+      tex.dispose();
+    }
+  });
+
+  if (typeof mat.dispose === 'function') {
+    mat.dispose();
+  }
+}
+
 // —————————————— Échelle produit ——————————————
 const productScales = { mug:[1.2,1.2,1.2], tumbler:[1.5,1.5,1.5], bottle:[2,2,2] };
 function getScaleForProduct(modelUrl){
@@ -280,6 +306,57 @@ window.refresh3DModal = function(containerId = 'product3DContainer') {
   } else {
     renderOnce();
   }
+};
+
+window.dispose3DScene = function() {
+  if (resizeObserver3D) {
+    resizeObserver3D.disconnect();
+    resizeObserver3D = null;
+  }
+
+  if (controls && typeof controls.dispose === 'function') {
+    controls.dispose();
+  }
+  controls = null;
+
+  if (scene) {
+    const env = scene.environment;
+    if (env && typeof env.dispose === 'function') {
+      env.dispose();
+    }
+
+    scene.traverse((child) => {
+      if (child.isMesh) {
+        if (child.geometry && typeof child.geometry.dispose === 'function') {
+          child.geometry.dispose();
+        }
+
+        if (Array.isArray(child.material)) {
+          child.material.forEach(disposeMaterial);
+        } else {
+          disposeMaterial(child.material);
+        }
+      }
+    });
+  }
+
+  scene = null;
+  camera = null;
+  modelRoot = null;
+  zones = {};
+
+  if (renderer) {
+    renderer.dispose();
+    if (typeof renderer.forceContextLoss === 'function') {
+      renderer.forceContextLoss();
+    }
+    if (renderer.domElement) {
+      renderer.domElement.width = 0;
+      renderer.domElement.height = 0;
+    }
+  }
+
+  renderer = null;
 };
 
 // —————————————— Debug ——————————————

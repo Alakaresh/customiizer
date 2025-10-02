@@ -983,6 +983,9 @@ jQuery(document).ready(function ($) {
             $('#product3DContainer').show();
 
             if (!threeDInitialized) {
+                if (typeof window.dispose3DScene === 'function') {
+                    window.dispose3DScene();
+                }
                 // Première fois → init complet
                 init3DScene('product3DContainer', variant.url_3d, 'threeDCanvas');
                 threeDInitialized = true;
@@ -1048,6 +1051,9 @@ jQuery(document).ready(function ($) {
 
         // 2) Ouvrir le modal de personnalisation
         customizeButton.on('click', async function (event) {
+                if (typeof window.dispose3DScene === 'function') {
+                        window.dispose3DScene();
+                }
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
@@ -1098,6 +1104,9 @@ jQuery(document).ready(function ($) {
                         // 3. Lancer Three.js si disponible
                         if (selectedVariant.url_3d) {
                                 $('#product3DContainer').show();
+                                if (typeof window.dispose3DScene === 'function') {
+                                        window.dispose3DScene();
+                                }
                                 init3DScene('product3DContainer', selectedVariant.url_3d, 'threeDCanvas');
                                 threeDInitialized = true;
                         } else {
@@ -1119,6 +1128,10 @@ jQuery(document).ready(function ($) {
                 }
                 customizeModal.hide();
                 releaseFocus(customizeModal);
+                if (typeof window.dispose3DScene === 'function') {
+                        window.dispose3DScene();
+                }
+                threeDInitialized = false;
                 updateAddImageButtonVisibility();
         });
 
