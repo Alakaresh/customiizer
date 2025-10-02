@@ -22,6 +22,11 @@ jQuery(document).ready(function($) {
                 const button = $(this);
                 button.prop('disabled', true);
 
+                const enableAddToCartButton = () => {
+                        button.prop('disabled', false);
+                        window.addToCartTemporarilyDisabled = false;
+                };
+
                 const cartModal = document.getElementById('cartModal');
                 if (cartModal) {
                         cartModal.style.display = 'flex';
@@ -31,11 +36,14 @@ jQuery(document).ready(function($) {
                         }
                 }
 
-                const proceed = (pid) => { addToCartAjax(pid); };
+                const proceed = (pid) => {
+                        return addToCartAjax(pid).finally(() => {
+                                enableAddToCartButton();
+                        });
+                };
 
                 if (window.generatedProductId) {
-                        proceed(window.generatedProductId);
-                        return;
+                        return proceed(window.generatedProductId);
                 }
 
                 let productDataToSend = null;
@@ -66,16 +74,17 @@ jQuery(document).ready(function($) {
                                 technique: selectedVariant.technique || 'sublimation'
                         };
                 } else {
-			alert("Erreur : Aucun produit ou variante sélectionné !");
-			console.error("❌ Aucun produit ou variante sélectionné.");
-			return;
-		}
+                        alert("Erreur : Aucun produit ou variante sélectionné !");
+                        console.error("❌ Aucun produit ou variante sélectionné.");
+                        enableAddToCartButton();
+                        return;
+                }
 
                 if (window.productCreationPromise) {
                         window.productCreationPromise.then(proceed).catch(err => {
                                 console.error('❌ [AJAX ERROR] ', err);
                                 alert('Impossible de créer le produit personnalisé.');
-                                button.prop('disabled', false);
+                                enableAddToCartButton();
                         });
                         return;
                 }
@@ -85,7 +94,7 @@ jQuery(document).ready(function($) {
                         .catch(err => {
                                 console.error('❌ [AJAX ERROR] Erreur création produit :', err);
                                 alert('Impossible de créer le produit personnalisé.');
-                                button.prop('disabled', false);
+                                enableAddToCartButton();
                         })
                         .finally(() => { window.productCreationPromise = null; });
         });
@@ -107,7 +116,7 @@ jQuery(document).ready(function($) {
 
 
         function addToCartAjax(productId) {
-                fetch(`/?add-to-cart=${productId}`, {
+                return fetch(`/?add-to-cart=${productId}`, {
                         method: 'GET',
                         headers: {
                                 'X-Requested-With': 'XMLHttpRequest'
