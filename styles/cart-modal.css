@@ -21,7 +21,7 @@
 /* === BOÎTE MODALE COMPACTE === */
 .cart-modal-content {
   position: relative;
-  width: 420px;
+  width: 380px;
   max-width: 95%;
   border-radius: 22px;
   padding: 4px;
@@ -80,21 +80,22 @@
 .tax-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
+  gap: 4px;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
   color: rgba(232, 247, 243, 0.7);
 }
 
 .tax-toggle span {
   text-transform: none;
+  font-weight: 500;
 }
 
 .tax-toggle .switch {
   position: relative;
   display: inline-flex;
-  width: 48px;
-  height: 24px;
+  width: 36px;
+  height: 18px;
   padding: 2px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
@@ -124,7 +125,7 @@
   content: "";
   position: absolute;
   left: 4px;
-  width: 18px;
+  width: 12px;
   height: 18px;
   border-radius: 50%;
   background: linear-gradient(135deg, #6df2d2, #1abc9c);
