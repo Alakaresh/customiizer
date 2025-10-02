@@ -41,8 +41,8 @@ async function applyTextureFromURL(url, zoneName = null, { fromQueue = false } =
     return;
   }
 
-  const zone = getZone(zoneName);
-  if (!zone) {
+  const zoneEntries = getZoneEntries(zoneName);
+  if (zoneEntries.length === 0) {
     if (!zonesReady) {
       queuePendingTextureUpdate(url, zoneName);
       if (!fromQueue) {
@@ -64,17 +64,19 @@ async function applyTextureFromURL(url, zoneName = null, { fromQueue = false } =
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
     tex.needsUpdate = true;
 
-    const materialClone = zone.overlay.material.clone();
-    materialClone.map = tex;
-    materialClone.color.set(0xffffff);
-    materialClone.transparent = true;
-    materialClone.alphaTest = 0.01;
-    materialClone.depthTest = true;
-    materialClone.depthWrite = false;
-    materialClone.needsUpdate = true;
+    zoneEntries.forEach(([, zone]) => {
+      const materialClone = zone.overlay.material.clone();
+      materialClone.map = tex;
+      materialClone.color.set(0xffffff);
+      materialClone.transparent = true;
+      materialClone.alphaTest = 0.01;
+      materialClone.depthTest = true;
+      materialClone.depthWrite = false;
+      materialClone.needsUpdate = true;
 
-    zone.overlay.material = materialClone;
-    zone.overlay.visible = true;
+      zone.overlay.material = materialClone;
+      zone.overlay.visible = true;
+    });
     renderOnce();
   } catch (e) {
     console.error('[3D] ❌ Échec texture:', e);
@@ -162,11 +164,22 @@ function fitCameraToObject(camera, object, controls, renderer, offset=2){
 }
 
 // —————————————— Helpers zones ——————————————
+function getZoneEntries(zoneName = null) {
+  if (zoneName) {
+    return zones[zoneName] ? [[zoneName, zones[zoneName]]] : [];
+  }
+
+  const impressionEntries = Object.entries(zones).filter(([name]) => name.toLowerCase().includes('impression'));
+  if (impressionEntries.length > 0) {
+    return impressionEntries;
+  }
+
+  return Object.entries(zones);
+}
+
 function getZone(zoneName=null){
-  if(zoneName && zones[zoneName]) return zones[zoneName];
-  // sinon, prend la première zone dont le nom contient "impression"
-  const key = Object.keys(zones).find(n => n.toLowerCase().includes('impression'));
-  return key ? zones[key] : null;
+  const entries = getZoneEntries(zoneName);
+  return entries.length ? entries[0][1] : null;
 }
 
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
@@ -409,16 +422,18 @@ window.update3DTextureFromImageURL = function(imageUrl, zoneName = null) {
 
 // —————————————— RETIRER IMAGE (on garde le fill qui bouche le creux) ——————————————
 window.clear3DTexture = function(zoneName=null){
-  const zone = getZone(zoneName);
-  if(!zone) return;
+  const zoneEntries = getZoneEntries(zoneName);
+  if(zoneEntries.length === 0) return;
 
-  // on masque simplement l’overlay
-  zone.overlay.visible = false;
+  zoneEntries.forEach(([, zone]) => {
+    // on masque simplement l’overlay
+    zone.overlay.visible = false;
 
-  // et on enlève la map si tu préfères (pas obligatoire)
-  zone.overlay.material.map = null;
-  zone.overlay.material.alphaTest = 0.0;
-  zone.overlay.material.needsUpdate = true;
+    // et on enlève la map si tu préfères (pas obligatoire)
+    zone.overlay.material.map = null;
+    zone.overlay.material.alphaTest = 0.0;
+    zone.overlay.material.needsUpdate = true;
+  });
 
   renderOnce();
   pendingTextureUpdate = null;
