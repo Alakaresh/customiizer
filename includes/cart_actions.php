@@ -23,6 +23,7 @@ function customiizer_get_cart_body_html() {
                     $price_ttc      = wc_get_price_including_tax( $_product );
                     $line_total_ht  = wc_get_price_excluding_tax( $_product, array( 'qty' => $cart_item['quantity'] ) );
                     $line_total_ttc = wc_get_price_including_tax( $_product, array( 'qty' => $cart_item['quantity'] ) );
+                    $input_id       = 'cart-qty-' . $cart_item_key;
                     ?>
                     <li class="custom-cart-item" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
                         <div class="item-image">
@@ -39,11 +40,19 @@ function customiizer_get_cart_body_html() {
                                 </p>
                             </div>
                             <div class="item-qty">
-                                <label>Qté :</label>
-                                <input type="number" min="1" step="1" value="<?php echo esc_attr( $cart_item['quantity'] ); ?>" class="quantity" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
+                                <label for="<?php echo esc_attr( $input_id ); ?>">Qté :</label>
+                                <div class="qty-controls">
+                                    <input id="<?php echo esc_attr( $input_id ); ?>" type="number" min="1" step="1" value="<?php echo esc_attr( $cart_item['quantity'] ); ?>" class="quantity" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
+                                    <button type="button" class="remove-item" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>" title="Supprimer l&rsquo;article" aria-label="Supprimer l&rsquo;article">
+                                        <svg class="remove-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M9 10.5a.75.75 0 0 1 1.5 0v8a.75.75 0 0 1-1.5 0v-8Zm4.5-.75a.75.75 0 0 0-.75.75v8a.75.75 0 0 0 1.5 0v-8a.75.75 0 0 0-.75-.75ZM6.75 6a.75.75 0 0 0 0 1.5h10.5a.75.75 0 0 0 0-1.5H6.75Z" />
+                                            <path d="M10.5 3.75a.75.75 0 0 0-.75.75v.75h-3a.75.75 0 0 0 0 1.5h10.5a.75.75 0 0 0 0-1.5h-3V4.5a.75.75 0 0 0-.75-.75h-3Zm-4.2 4.5h11.4l-.57 11.102a2.25 2.25 0 0 1-2.247 2.148H9.017a2.25 2.25 0 0 1-2.247-2.148L6.3 8.25Z" />
+                                        </svg>
+                                        <span class="sr-only">Supprimer l&rsquo;article</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <button class="remove-item" data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>" title="Supprimer">🗑️</button>
                     </li>
                 <?php endif; endforeach; ?>
         </ul>
