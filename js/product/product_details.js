@@ -449,64 +449,6 @@ jQuery(document).ready(function ($) {
         let main3DInitialized = false;
         let mainImageLayoutRaf = null;
 
-        function teardownMain3DScene({ hideContainer = false } = {}) {
-                const disposeFn = (typeof window !== 'undefined' && typeof window.dispose3DScene === 'function')
-                        ? window.dispose3DScene
-                        : null;
-                const activeContainerId = (typeof window !== 'undefined' && typeof window.getActive3DContainerId === 'function')
-                        ? window.getActive3DContainerId()
-                        : null;
-
-                if (disposeFn && (activeContainerId === 'productMain3DContainer' || (!activeContainerId && main3DInitialized))) {
-                        try {
-                                disposeFn();
-                        } catch (err) {
-                                console.warn('[3D] Failed to dispose product page scene', err);
-                        }
-                }
-
-                main3DInitialized = false;
-
-                if (hideContainer) {
-                        main3DContainer.hide();
-                        showMainProductImage();
-                }
-        }
-
-        window.addEventListener('customizer:open', () => {
-                teardownMain3DScene({ hideContainer: true });
-
-                const thumbnails = $('.image-thumbnails .thumbnail');
-                if (!thumbnails.length) {
-                        scheduleMain3DContainerLayout();
-                        return;
-                }
-
-                const non3DThumbs = thumbnails.filter((_, el) => !$(el).hasClass('three-d-thumb'));
-                if (!non3DThumbs.length) {
-                        scheduleMain3DContainerLayout();
-                        return;
-                }
-
-                let targetThumb = null;
-                if (currentMockup && currentMockup.mockup_id != null) {
-                        targetThumb = non3DThumbs.filter((_, el) => {
-                                const $el = $(el);
-                                const styleId = $el.attr('data-style-id');
-                                const viewName = $el.attr('data-view-name') || '';
-                                return styleId === String(currentMockup.mockup_id) && viewName === String(currentMockup.view_name || '');
-                        }).first();
-                }
-
-                const fallbackThumb = (targetThumb && targetThumb.length) ? targetThumb : non3DThumbs.first();
-                if (fallbackThumb && fallbackThumb.length) {
-                        thumbnails.removeClass('selected');
-                        fallbackThumb.addClass('selected');
-                }
-
-                scheduleMain3DContainerLayout();
-        });
-
         window.addEventListener('threeDSceneDisposed', function () {
                 main3DInitialized = false;
 
@@ -1104,8 +1046,10 @@ jQuery(document).ready(function ($) {
         function updateThumbnails(variants) {
                 const thumbnailsContainer = $('.image-thumbnails').empty();
                 // 🧹 Réinitialise l'affichage 3D
-                teardownMain3DScene({ hideContainer: true });
+                main3DContainer.hide();
+                showMainProductImage();
                 scheduleMain3DContainerLayout();
+                main3DInitialized = false;
 
                 const hideExtra = shouldShowSingleMockup();
 
@@ -1124,7 +1068,8 @@ jQuery(document).ready(function ($) {
                                                 'top': `${mockup.position_top}%`,
                                                 'left': `${mockup.position_left}%`
                                         });
-                                        teardownMain3DScene({ hideContainer: true });
+                                        main3DContainer.hide();
+                                        showMainProductImage();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
@@ -1144,7 +1089,6 @@ jQuery(document).ready(function ($) {
                                 .addClass('thumbnail three-d-thumb')
                                 .text('3D')
                                 .on('click', function () {
-                                        teardownMain3DScene();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         scheduleMain3DContainerLayout();
