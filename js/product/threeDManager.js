@@ -11,6 +11,14 @@ let modelRoot = null;
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
 
+function resolveZoneName(zoneName = null) {
+  if (zoneName && zones[zoneName]) return zoneName;
+  const key = Object.keys(zones).find((name) => name.toLowerCase().includes('impression'));
+  if (key) return key;
+  const firstKey = Object.keys(zones)[0];
+  return firstKey || null;
+}
+
 let activeContainerId = null;
 let activeCanvasId = null;
 let pendingTextureUpdate = null;
@@ -41,7 +49,8 @@ async function applyTextureFromURL(url, zoneName = null, { fromQueue = false } =
     return;
   }
 
-  const zone = getZone(zoneName);
+  const resolvedZoneName = resolveZoneName(zoneName);
+  const zone = resolvedZoneName ? zones[resolvedZoneName] : null;
   if (!zone) {
     if (!zonesReady) {
       queuePendingTextureUpdate(url, zoneName);
@@ -75,6 +84,12 @@ async function applyTextureFromURL(url, zoneName = null, { fromQueue = false } =
 
     zone.overlay.material = materialClone;
     zone.overlay.visible = true;
+    if (resolvedZoneName) {
+      console.log('[3D] Application zone impression', {
+        zone: resolvedZoneName,
+        fromQueue,
+      });
+    }
     renderOnce();
   } catch (e) {
     console.error('[3D] ❌ Échec texture:', e);
@@ -163,10 +178,8 @@ function fitCameraToObject(camera, object, controls, renderer, offset=2){
 
 // —————————————— Helpers zones ——————————————
 function getZone(zoneName=null){
-  if(zoneName && zones[zoneName]) return zones[zoneName];
-  // sinon, prend la première zone dont le nom contient "impression"
-  const key = Object.keys(zones).find(n => n.toLowerCase().includes('impression'));
-  return key ? zones[key] : null;
+  const resolvedName = resolveZoneName(zoneName);
+  return resolvedName ? zones[resolvedName] : null;
 }
 
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
@@ -311,10 +324,11 @@ function loadModel(modelUrl){
         });
 
         // 2) Pour chaque mesh "impression", créer 2 couches : fill + overlay
-        modelRoot.traverse((child)=>{
-          if(!child.isMesh) return;
-          const lname = (child.name || '').toLowerCase();
-          if(!lname.includes('impression')) return;
+  const detectedZones = [];
+  modelRoot.traverse((child)=>{
+    if(!child.isMesh) return;
+    const lname = (child.name || '').toLowerCase();
+    if(!lname.includes('impression')) return;
 
           const parent = child.parent;
 
@@ -362,7 +376,12 @@ function loadModel(modelUrl){
           child.visible = false;
 
           zones[child.name] = { fill: fillMesh, overlay: overlayMesh };
+          detectedZones.push(child.name);
         });
+
+        if (detectedZones.length > 0) {
+          console.log('[3D] Zones impression détectées', detectedZones);
+        }
 
         // Échelle & caméra
         const s = getScaleForProduct(modelUrl);
@@ -464,7 +483,6 @@ window.dispose3DScene = function() {
     activeCanvasId = null;
     threeDInitialized = false;
 
-    console.log("🗑️ Three.js scene disposed");
 
     window.dispatchEvent(new CustomEvent('threeDSceneDisposed', {
       detail: {

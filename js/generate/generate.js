@@ -4,7 +4,6 @@ if (typeof baseUrl === 'undefined') {
 
 const LOG_PREFIX = '[Customiizer][Generate]';
 const GENERATE_SAVED_VARIANT_STORAGE_KEY = 'customiizerSavedVariant';
-console.log(`${LOG_PREFIX} Script initialisé`, { baseUrl });
 
 const POLL_INTERVAL_MS = 1000;
 const UPSCALE_TARGET_COUNT = 4;
@@ -694,7 +693,6 @@ jQuery(function($) {
         }
 
         function resetGenerationState() {
-                console.log(`${LOG_PREFIX} Réinitialisation de l'état de génération`);
                 stopPolling();
 
                 currentTaskId = null;
@@ -935,15 +933,6 @@ jQuery(function($) {
                 const remoteStatus = normalizeJobStatus(job.status);
                 const upscaleDone = extractUpscaleDone(job);
                 const hasCompleted = hasCompletedUpscales(remoteStatus, upscaleDone);
-                console.log(`${LOG_PREFIX} Statut pollé`, {
-                        taskId: currentTaskId,
-                        jobId: currentJobId,
-                        rawStatus: job.status,
-                        remoteStatus,
-                        progress: progressValue,
-                        upscaleDone,
-                        hasCompleted,
-                });
                 const isErrorStatus = remoteStatus === 'error';
                 const progressForPersist = lastKnownProgress === null ? 0 : lastKnownProgress;
                 const progressForMessage = progressValue !== null ? progressValue : progressForPersist;
@@ -991,12 +980,6 @@ jQuery(function($) {
                 if (hasCompleted) {
                         const rawImages = Array.isArray(job.images) ? job.images : [];
                         const images = hasValidRenderableImage(rawImages) ? rawImages : buildFallbackImages(job);
-                        console.log(`${LOG_PREFIX} Tentative de rendu des images finalisées`, {
-                                taskId: currentTaskId,
-                                jobId: currentJobId,
-                                imagesCount: images.length,
-                                upscaleDone,
-                        });
                         const didRenderImages = renderGeneratedImages(images);
 
                         if (!didRenderImages) {
@@ -1005,20 +988,10 @@ jQuery(function($) {
                                 return;
                         }
 
-                        console.log(`${LOG_PREFIX} Rendu final confirmé, finalisation UI.`, {
-                                taskId: currentTaskId,
-                                jobId: currentJobId,
-                        });
                         finalizeGeneration(false);
                         return;
                 }
 
-                console.log(`${LOG_PREFIX} Job non finalisé, nouvelle vérification programmée.`, {
-                        taskId: currentTaskId,
-                        jobId: currentJobId,
-                        remoteStatus,
-                        upscaleDone,
-                });
                 scheduleNextPoll();
         }
 
@@ -1100,7 +1073,6 @@ jQuery(function($) {
                 togglePreviewMode(true);
                 closeProgressModal();
 
-                console.log(`${LOG_PREFIX} Images rendues`, { images });
                 return true;
         }
 
@@ -1189,18 +1161,6 @@ jQuery(function($) {
 
                 const activeVariant = getActiveVariant();
 
-                console.log(`${LOG_PREFIX} Demande de génération`, {
-                        prompt,
-                        format_image: jobFormat,
-                        userId: currentUser && currentUser.ID,
-                        variantId:
-                                activeVariant && activeVariant.variant_id != null
-                                        ? activeVariant.variant_id
-                                        : activeVariant && activeVariant.variantId != null
-                                                ? activeVariant.variantId
-                                                : null,
-                });
-
                 if (!prompt) {
                         showAlert('Veuillez entrer du texte avant de générer des images.');
                         return;
@@ -1280,7 +1240,6 @@ jQuery(function($) {
                         }
 
                         const data = await response.json();
-                        console.log(`${LOG_PREFIX} Réponse du backend`, data);
 
                         if (!data.success || !data.taskId) {
                                 throw new Error(data.message || 'Réponse invalide du backend');

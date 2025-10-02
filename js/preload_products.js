@@ -114,11 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const added = Object.keys(map).length;
-            console.log('[preload] ratios produits mémorisés', {
-                contexte: context,
-                formatsAjoutes: added,
-                totalFormats: Object.keys(window.customizerCache.formatProducts).length
-            });
 
             return added;
         } catch (error) {

@@ -159,11 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const missing = ratios.filter((format) => typeof cache.get(format) === 'undefined');
 
     if (missing.length === 0) {
-        console.log('[preview] tous les ratios DB sont déjà en cache', { formats: ratios.length });
         return;
     }
 
-    console.log('[preview] préchargement des ratios manquants', { formats: missing.length });
     cache.preloadFormats(missing);
 });
 
@@ -241,13 +239,6 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
         const initialCachedEntry = cacheInstance && targetFormat ? cacheInstance.get(targetFormat) : undefined;
         const hasInitialCache = typeof initialCachedEntry !== 'undefined';
         const isDbRatio = targetFormat ? dbRatios.has(targetFormat) : false;
-
-        console.log('[preview] ouverture overlay', {
-                format: targetFormat || null,
-                userId,
-                knownInDb: isDbRatio,
-                hasCachedEntry: hasInitialCache
-        });
 
         const overlay = document.createElement('div');
         overlay.classList.add('preview-overlay');
@@ -413,11 +404,6 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
         };
 
         const processData = (data) => {
-                console.log('[preview] processing cached product data', {
-                        format: targetFormat || null,
-                        success: data ? data.success : undefined,
-                        choices: data && Array.isArray(data.choices) ? data.choices.length : undefined
-                });
                 if (!data || !data.success || !Array.isArray(data.choices) || data.choices.length === 0) {
                         setUndefinedFormatMessage();
                         updateUseImageButtonHandler(null);
@@ -450,13 +436,6 @@ function openImageOverlay(src, userId, username, formatImage, prompt) {
 
                         product.variants = (Array.isArray(product.variants) ? product.variants : []).filter(Boolean);
                         return product.variants.length > 0;
-                });
-
-                console.log('[preview] affichage formats via cache', {
-                        format: targetFormat || null,
-                        products: productIds.length,
-                        variants: data.choices.length,
-                        productNames: productIds.map((id) => grouped[id].name)
                 });
 
                 if (productIds.length === 0) {

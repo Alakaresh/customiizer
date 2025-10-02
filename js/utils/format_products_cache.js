@@ -35,30 +35,12 @@
         return (value || '').toString().trim();
     }
 
-    function logCacheSnapshot(context) {
-        try {
-            const snapshot = JSON.parse(JSON.stringify(cache));
-            console.log('[preview] cache ratios enregistré', {
-                contexte: context,
-                totalFormats: Object.keys(snapshot).length,
-                contenu: snapshot
-            });
-        } catch (error) {
-            console.warn('[preview] impossible de journaliser le cache ratios', {
-                contexte: context,
-                erreur: error
-            });
-        }
-    }
-
     function persist(context = 'persist') {
         try {
             if (global.sessionStorage) {
                 global.sessionStorage.setItem(CACHE_KEY, JSON.stringify(cache));
             }
         } catch (error) {}
-
-        logCacheSnapshot(context);
     }
 
     async function fetchFormat(format) {
@@ -219,12 +201,6 @@
             });
 
             persist(`hydrate:${context}`);
-
-            console.log('[preview] cache formats hydraté depuis variantes', {
-                contexte: context,
-                formats,
-                variantes: variants
-            });
 
             return { hydrated: true, formats, variants };
         } catch (error) {
