@@ -327,7 +327,6 @@ window.dispose3DScene = function() {
     }
 
     scene.environment = null;
-
     scene.traverse((child) => {
       if (child.isMesh) {
         if (child.geometry && typeof child.geometry.dispose === 'function') {
