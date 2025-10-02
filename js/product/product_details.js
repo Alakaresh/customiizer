@@ -443,9 +443,85 @@ try {
 jQuery(document).ready(function ($) {
         const apiBaseURL = '/wp-json/api/v1/products';
         const mainProductImage = $('#product-main-image');
+        const main3DContainer = $('#productMain3DContainer');
 
         let currentVariants = [];
         let main3DInitialized = false;
+        let mainImageLayoutRaf = null;
+
+        function computeMainImageMetrics() {
+                const imgEl = mainProductImage.get(0);
+                const containerEl = main3DContainer.get(0);
+
+                if (!imgEl || !containerEl) {
+                        return null;
+                }
+
+                const parentEl = containerEl.offsetParent || containerEl.parentElement;
+
+                if (!parentEl) {
+                        return null;
+                }
+
+                const imageRect = imgEl.getBoundingClientRect();
+
+                if (!imageRect.width || !imageRect.height) {
+                        return null;
+                }
+
+                const parentRect = parentEl.getBoundingClientRect();
+
+                return {
+                        top: imageRect.top - parentRect.top,
+                        left: imageRect.left - parentRect.left,
+                        width: imageRect.width,
+                        height: imageRect.height
+                };
+        }
+
+        function applyMain3DContainerMetrics(metrics) {
+                if (!metrics) {
+                        return;
+                }
+
+                main3DContainer.css({
+                        top: `${metrics.top}px`,
+                        left: `${metrics.left}px`,
+                        width: `${metrics.width}px`,
+                        height: `${metrics.height}px`
+                });
+        }
+
+        function refreshMain3DContainerLayout() {
+                applyMain3DContainerMetrics(computeMainImageMetrics());
+        }
+
+        function scheduleMain3DContainerLayout() {
+                if (mainImageLayoutRaf) {
+                        cancelAnimationFrame(mainImageLayoutRaf);
+                }
+
+                mainImageLayoutRaf = requestAnimationFrame(() => {
+                        mainImageLayoutRaf = null;
+                        refreshMain3DContainerLayout();
+                });
+        }
+
+        function hideMainProductImage() {
+                mainProductImage.addClass('is-hidden');
+        }
+
+        function showMainProductImage() {
+                mainProductImage.removeClass('is-hidden');
+        }
+
+        $(window).on('resize', scheduleMain3DContainerLayout);
+
+        mainProductImage.on('load', scheduleMain3DContainerLayout);
+
+        if (mainProductImage.length && mainProductImage.get(0).complete) {
+                scheduleMain3DContainerLayout();
+        }
 
         // Préchargement du template et du modèle 3D pour une variante
         async function preloadVariantAssets(variant) {
@@ -630,10 +706,7 @@ jQuery(document).ready(function ($) {
                                 'left': `${currentMockup.position_left}%`
                         });
                         // 🆕 Aligne le conteneur 3D sur l'image principale
-                        jQuery('#productMain3DContainer').css({
-                                'top': `${currentMockup.position_top}%`,
-                                'left': `${currentMockup.position_left}%`
-                        });
+                        scheduleMain3DContainerLayout();
                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
 
                 }
@@ -956,8 +1029,9 @@ jQuery(document).ready(function ($) {
         function updateThumbnails(variants) {
                 const thumbnailsContainer = $('.image-thumbnails').empty();
                 // 🧹 Réinitialise l'affichage 3D
-                jQuery('#productMain3DContainer').hide();
-                mainProductImage.show();
+                main3DContainer.hide();
+                showMainProductImage();
+                scheduleMain3DContainerLayout();
                 main3DInitialized = false;
 
                 const hideExtra = shouldShowSingleMockup();
@@ -977,11 +1051,12 @@ jQuery(document).ready(function ($) {
                                                 'top': `${mockup.position_top}%`,
                                                 'left': `${mockup.position_left}%`
                                         });
-                                        jQuery('#productMain3DContainer').hide();
-                                        mainProductImage.show();
+                                        main3DContainer.hide();
+                                        showMainProductImage();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         $(document).trigger('mockupSelected', [selectedVariant, currentMockup]);
+                                        scheduleMain3DContainerLayout();
                                 });
 
                                 thumbnailsContainer.append(imgElement);
@@ -999,14 +1074,17 @@ jQuery(document).ready(function ($) {
                                 .on('click', function () {
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
-                                        mainProductImage.hide();
-                                        const container = jQuery('#productMain3DContainer');
-                                        container.show();
+                                        scheduleMain3DContainerLayout();
+                                        hideMainProductImage();
+                                        main3DContainer.show();
                                         if (!main3DInitialized) {
                                                 requestAnimationFrame(() => {
+                                                        refreshMain3DContainerLayout();
                                                         init3DScene('productMain3DContainer', variant.url_3d, variant.color, 'productMain3DCanvas');
                                                 });
                                                 main3DInitialized = true;
+                                        } else {
+                                                scheduleMain3DContainerLayout();
                                         }
                                 });
                         thumbnailsContainer.append(threeDThumb);
