@@ -216,7 +216,7 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const defaultHdr = 'https://customiizer.blob.core.windows.net/assets/Hdr/rogland_clear_night_1k.hdr';
   const useHdr = opts.hdr !== 0 && opts.hdr !== false;
   const hdrUrl = (typeof opts.hdr==='string' && opts.hdr && opts.hdr!=='1') ? opts.hdr : defaultHdr;
-  const hdrIntensity = Number.isFinite(opts.hdrIntensity) ? opts.hdrIntensity : 1.0;
+  const hdrIntensity = Number.isFinite(opts.hdrIntensity) ? opts.hdrIntensity : 2.0;
 
   let environmentReady = false;
   const handleEnvironmentReady = () => {
