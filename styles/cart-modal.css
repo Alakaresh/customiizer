@@ -307,14 +307,6 @@
   transition: color 0.3s ease;
 }
 
-.remove-item:hover,
-.remove-item:focus-visible {
-  color: #6df2d2;
-  box-shadow: 0 0 12px 4px rgba(109, 242, 210, 0.35);
-  border-radius: 50%;
-  transform: scale(1.05);
-}
-
 /* === RÉCAP === */
 .cart-summary {
   margin: 0 0 12px;
