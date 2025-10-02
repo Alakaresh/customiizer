@@ -206,8 +206,15 @@ function loadModel(modelUrl){
 
 // —————————————— APPLIQUER IMAGE (overlay alpha, fill identique bouteille) ——————————————
 window.update3DTextureFromCanvas = async function(canvas, zoneName=null){
+  if (!renderer || !scene || !camera) {
+    console.warn('[3D] Scene inactive → texture ignorée');
+    return;
+  }
   const zone = getZone(zoneName);
-  if(!zone || !canvas){ console.warn('[3D] Zone/canvas manquant'); return; }
+  if(!zone || !canvas){ 
+    console.warn('[3D] Zone/canvas manquant'); 
+    return; 
+  }
 
   const url = canvas.toDataURL('image/png'); // garde l’alpha
   const texLoader = new THREE.TextureLoader();
