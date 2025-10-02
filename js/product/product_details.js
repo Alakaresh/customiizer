@@ -448,6 +448,24 @@ jQuery(document).ready(function ($) {
         let currentVariants = [];
         let main3DInitialized = false;
         let mainImageLayoutRaf = null;
+        let suppressMain3DRebuild = false;
+
+        function resetMain3DContainerElements() {
+                const containerEl = main3DContainer.get(0);
+                if (!containerEl) {
+                        return;
+                }
+
+                const overlay = containerEl.querySelector('.loading-overlay');
+                if (overlay) {
+                        overlay.remove();
+                }
+
+                const canvasEl = containerEl.querySelector('canvas');
+                if (canvasEl) {
+                        canvasEl.remove();
+                }
+        }
 
         function resetMain3DContainerElements() {
                 const containerEl = main3DContainer.get(0);
@@ -474,6 +492,12 @@ jQuery(document).ready(function ($) {
                         ? window.getActive3DContainerId()
                         : null;
 
+                const shouldSuppressRebuild = hideContainer === true;
+
+                if (shouldSuppressRebuild) {
+                        suppressMain3DRebuild = true;
+                }
+
                 if (disposeFn && (activeContainerId === 'productMain3DContainer' || (!activeContainerId && main3DInitialized))) {
                         try {
                                 disposeFn();
@@ -489,6 +513,12 @@ jQuery(document).ready(function ($) {
                 if (hideContainer) {
                         main3DContainer.hide();
                         showMainProductImage();
+                }
+
+                if (shouldSuppressRebuild) {
+                        setTimeout(() => {
+                                suppressMain3DRebuild = false;
+                        }, 0);
                 }
         }
 
@@ -535,6 +565,10 @@ jQuery(document).ready(function ($) {
         });
 
         window.addEventListener('threeDSceneDisposed', function () {
+                if (suppressMain3DRebuild) {
+                        return;
+                }
+
                 main3DInitialized = false;
 
                 if (!selectedVariant || !selectedVariant.url_3d) {
