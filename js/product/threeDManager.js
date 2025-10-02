@@ -49,7 +49,12 @@ function getZone(zoneName=null){
 // —————————————— INIT (HDR par défaut + fallback) ——————————————
 function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const container = document.getElementById(containerId);
-  const canvas    = document.getElementById(canvasId);
+  let canvas = document.getElementById(canvasId);
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = canvasId;
+    container.appendChild(canvas);
+  }
   if(!container || !canvas){
     setTimeout(()=>init3DScene(containerId, modelUrl, canvasId, opts), 120);
     return;
