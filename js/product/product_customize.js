@@ -1097,16 +1097,23 @@ jQuery(document).ready(function ($) {
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
-                cancelPendingDesignAutosave();
-                try {
-                        flushDesignAutosave('modal-close');
-                } catch (err) {
-                        console.warn('[Autosave] flush modal-close failed', err);
-                }
-                customizeModal.hide();
-                releaseFocus(customizeModal);
-                updateAddImageButtonVisibility();
-        });
+		    cancelPendingDesignAutosave();
+		    try {
+		        flushDesignAutosave('modal-close');
+		    } catch (err) {
+		        console.warn('[Autosave] flush modal-close failed', err);
+		    }
+		
+		    // 👉 Reset Three.js
+		    if (threeDInitialized) {
+		        dispose3DScene();
+		    }
+		
+		    customizeModal.hide();
+		    releaseFocus(customizeModal);
+		    updateAddImageButtonVisibility();
+		});
+
 
         // Afficher le bouton lors du changement de produit
         $(document).on('productSelected', function () {
