@@ -11,6 +11,52 @@ let modelRoot = null;
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
 
+// —————————————— UI helpers ——————————————
+function ensureLoadingOverlay(container, message = 'Chargement du modèle 3D…') {
+  if (!container) return null;
+
+  let overlay = container.querySelector('.loading-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.setAttribute('aria-hidden', 'false');
+    overlay.innerHTML = `
+      <div class="loading-spinner" role="status" aria-live="polite">
+        <span class="sr-only">${message}</span>
+      </div>
+      <div class="loading-text" aria-hidden="true">${message}</div>
+    `;
+    container.appendChild(overlay);
+  } else {
+    updateOverlayMessage(overlay, message);
+  }
+
+  return overlay;
+}
+
+function updateOverlayMessage(overlay, message) {
+  if (!overlay) return;
+  const text = overlay.querySelector('.loading-text');
+  if (text) text.textContent = message;
+  const srOnly = overlay.querySelector('.sr-only');
+  if (srOnly) srOnly.textContent = message;
+}
+
+function showLoadingOverlay(container, message = 'Chargement du modèle 3D…') {
+  const overlay = ensureLoadingOverlay(container, message);
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  overlay.setAttribute('aria-hidden', 'false');
+}
+
+function hideLoadingOverlay(container) {
+  if (!container) return;
+  const overlay = container.querySelector('.loading-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
 // —————————————— Échelle produit ——————————————
 const productScales = { mug:[1.2,1.2,1.2], tumbler:[1.5,1.5,1.5], bottle:[2,2,2] };
 function getScaleForProduct(modelUrl){
@@ -50,12 +96,21 @@ function getZone(zoneName=null){
 function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const container = document.getElementById(containerId);
   let canvas = document.getElementById(canvasId);
+
+  if (!container) {
+    setTimeout(()=>init3DScene(containerId, modelUrl, canvasId, opts), 120);
+    return;
+  }
+
+  showLoadingOverlay(container, 'Initialisation de la vue 3D…');
+
   if (!canvas) {
     canvas = document.createElement('canvas');
     canvas.id = canvasId;
     container.appendChild(canvas);
   }
-  if(!container || !canvas){
+
+  if(!canvas){
     setTimeout(()=>init3DScene(containerId, modelUrl, canvasId, opts), 120);
     return;
   }
@@ -83,6 +138,28 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   const hdrUrl = (typeof opts.hdr==='string' && opts.hdr && opts.hdr!=='1') ? opts.hdr : defaultHdr;
   const hdrIntensity = Number.isFinite(opts.hdrIntensity) ? opts.hdrIntensity : 1.0;
 
+  let environmentReady = false;
+  const handleEnvironmentReady = () => {
+    if (environmentReady) return;
+    environmentReady = true;
+
+    if (!modelUrl) {
+      console.warn('[3D] Aucun modèle GLB fourni');
+      hideLoadingOverlay(container);
+      return;
+    }
+
+    showLoadingOverlay(container, 'Chargement du modèle 3D…');
+    loadModel(modelUrl)
+      .then(() => {
+        hideLoadingOverlay(container);
+      })
+      .catch((err) => {
+        console.error('[3D] ❌ Échec chargement modèle', err);
+        hideLoadingOverlay(container);
+      });
+  };
+
   if(useHdr){
     const pmrem = new THREE.PMREMGenerator(renderer);
     new THREE.RGBELoader().load(
@@ -93,20 +170,22 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
         scene.background  = null;
         renderer.toneMappingExposure = 1.2 * hdrIntensity;
         hdr.dispose?.(); pmrem.dispose();
-        renderOnce();
+        handleEnvironmentReady();
       },
       undefined,
       (err)=>{
         console.warn('⚠️ HDR KO → fallback lumières', err);
         const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
         const fill = new THREE.AmbientLight(0xffffff, 0.25);
-        scene.add(key, fill); renderOnce();
+        scene.add(key, fill);
+        handleEnvironmentReady();
       }
     );
   } else {
     const key  = new THREE.DirectionalLight(0xffffff, 1); key.position.set(5,6,4);
     const fill = new THREE.AmbientLight(0xffffff, 0.25);
     scene.add(key, fill);
+    handleEnvironmentReady();
   }
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -120,93 +199,105 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   });
   resizeObserver3D.observe(container);
 
-  loadModel(modelUrl);
   animate();
 }
 
 // —————————————— LOAD MODEL (construit 2 couches par zone) ——————————————
 function loadModel(modelUrl){
-  const loader = new THREE.GLTFLoader();
-  loader.load(
-    modelUrl,
-    (gltf)=>{
-      modelRoot = gltf.scene;
-      zones = {};
+  return new Promise((resolve, reject) => {
+    if (!modelUrl) {
+      reject(new Error('Missing model URL'));
+      return;
+    }
 
-      // 1) Trouver un matériau de **référence bouteille** (non "impression")
-      let bottleRefMaterial = null;
-      modelRoot.traverse((child)=>{
-        if(!child.isMesh) return;
-        const lname = (child.name || '').toLowerCase();
-        const isImpression = lname.includes('impression');
-        if(!isImpression && !bottleRefMaterial){
-          // Premier matériau "corps" rencontré
-          bottleRefMaterial = child.material;
-        }
-      });
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+      modelUrl,
+      (gltf)=>{
+        modelRoot = gltf.scene;
+        zones = {};
 
-      // 2) Pour chaque mesh "impression", créer 2 couches : fill + overlay
-      modelRoot.traverse((child)=>{
-        if(!child.isMesh) return;
-        const lname = (child.name || '').toLowerCase();
-        if(!lname.includes('impression')) return;
+        // 1) Trouver un matériau de **référence bouteille** (non "impression")
+        let bottleRefMaterial = null;
+        modelRoot.traverse((child)=>{
+          if(!child.isMesh) return;
+          const lname = (child.name || '').toLowerCase();
+          const isImpression = lname.includes('impression');
+          if(!isImpression && !bottleRefMaterial){
+            // Premier matériau "corps" rencontré
+            bottleRefMaterial = child.material;
+          }
+        });
 
-        const parent = child.parent;
+        // 2) Pour chaque mesh "impression", créer 2 couches : fill + overlay
+        modelRoot.traverse((child)=>{
+          if(!child.isMesh) return;
+          const lname = (child.name || '').toLowerCase();
+          if(!lname.includes('impression')) return;
 
-        // Geometry et matrices identiques
-        const geom = child.geometry;
+          const parent = child.parent;
 
-        // — fill : clone du matériau BOUTEILLE (même teinte/rendu) — //
-        let fillMat;
-        if (bottleRefMaterial){
-          fillMat = bottleRefMaterial.clone();
-        } else {
-          // fallback si pas trouvé (noir PBR neutre)
-          fillMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1, metalness: 0 });
-        }
+          // Geometry et matrices identiques
+          const geom = child.geometry;
 
-        const fillMesh = new THREE.Mesh(geom, fillMat);
-        fillMesh.name = child.name + '_Fill';
-        // Copie des transforms locales
-        fillMesh.position.copy(child.position);
-        fillMesh.quaternion.copy(child.quaternion);
-        fillMesh.scale.copy(child.scale);
-        // Écrit la profondeur : il “bouche” le creux
-        fillMesh.renderOrder = 1;
-        parent.add(fillMesh);
+          // — fill : clone du matériau BOUTEILLE (même teinte/rendu) — //
+          let fillMat;
+          if (bottleRefMaterial){
+            fillMat = bottleRefMaterial.clone();
+          } else {
+            // fallback si pas trouvé (noir PBR neutre)
+            fillMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1, metalness: 0 });
+          }
 
-        // — overlay : clone du matériau d’origine (indépendant), pas de map au départ — //
-        const overlayMat = child.material.clone();
-        overlayMat.map = null;
-        overlayMat.color.set(0xffffff);
-        overlayMat.transparent = true;   // on affichera l’image avec alpha
-        overlayMat.alphaTest = 0.0;      // pas d’alphaTest tant qu’il n’y a pas d’image
-        overlayMat.depthTest = true;
-        overlayMat.depthWrite = false;   // ne bouche pas la bouteille/fill
-        overlayMat.needsUpdate = true;
+          const fillMesh = new THREE.Mesh(geom, fillMat);
+          fillMesh.name = child.name + '_Fill';
+          // Copie des transforms locales
+          fillMesh.position.copy(child.position);
+          fillMesh.quaternion.copy(child.quaternion);
+          fillMesh.scale.copy(child.scale);
+          // Écrit la profondeur : il “bouche” le creux
+          fillMesh.renderOrder = 1;
+          parent.add(fillMesh);
 
-        const overlayMesh = new THREE.Mesh(geom, overlayMat);
-        overlayMesh.name = child.name + '_Overlay';
-        overlayMesh.position.copy(child.position);
-        overlayMesh.quaternion.copy(child.quaternion);
-        overlayMesh.scale.copy(child.scale);
-        overlayMesh.renderOrder = 2;     // après le fill
-        parent.add(overlayMesh);
+          // — overlay : clone du matériau d’origine (indépendant), pas de map au départ — //
+          const overlayMat = child.material.clone();
+          overlayMat.map = null;
+          overlayMat.color.set(0xffffff);
+          overlayMat.transparent = true;   // on affichera l’image avec alpha
+          overlayMat.alphaTest = 0.0;      // pas d’alphaTest tant qu’il n’y a pas d’image
+          overlayMat.depthTest = true;
+          overlayMat.depthWrite = false;   // ne bouche pas la bouteille/fill
+          overlayMat.needsUpdate = true;
 
-        // On supprime l’ancien mesh child (remplacé par fill+overlay)
-        child.visible = false;
+          const overlayMesh = new THREE.Mesh(geom, overlayMat);
+          overlayMesh.name = child.name + '_Overlay';
+          overlayMesh.position.copy(child.position);
+          overlayMesh.quaternion.copy(child.quaternion);
+          overlayMesh.scale.copy(child.scale);
+          overlayMesh.renderOrder = 2;     // après le fill
+          parent.add(overlayMesh);
 
-        zones[child.name] = { fill: fillMesh, overlay: overlayMesh };
-      });
+          // On supprime l’ancien mesh child (remplacé par fill+overlay)
+          child.visible = false;
 
-      // Échelle & caméra
-      const s = getScaleForProduct(modelUrl);
-      modelRoot.scale.set(s[0], s[1], s[2]);
-      scene.add(modelRoot);
-      fitCameraToObject(camera, modelRoot, controls, renderer);    },
-    undefined,
-    (err)=>console.error('[3D] ❌ Erreur GLB:', err)
-  );
+          zones[child.name] = { fill: fillMesh, overlay: overlayMesh };
+        });
+
+        // Échelle & caméra
+        const s = getScaleForProduct(modelUrl);
+        modelRoot.scale.set(s[0], s[1], s[2]);
+        scene.add(modelRoot);
+        fitCameraToObject(camera, modelRoot, controls, renderer);
+        renderOnce();
+        resolve(modelRoot);
+      },
+      undefined,
+      (err)=>{
+        console.error('[3D] ❌ Erreur GLB:', err);
+        reject(err);
+      }
+    );
+  });
 }
 
 // —————————————— APPLIQUER IMAGE (overlay alpha, fill identique bouteille) ——————————————
@@ -281,8 +372,11 @@ window.dispose3DScene = function() {
     if (renderer) {
       renderer.dispose();
       renderer.forceContextLoss?.();
-      if (renderer.domElement && renderer.domElement.parentNode) {
-        renderer.domElement.parentNode.removeChild(renderer.domElement);
+      const parentNode = renderer.domElement?.parentNode || null;
+      if (parentNode) {
+        const overlay = parentNode.querySelector('.loading-overlay');
+        overlay?.remove();
+        parentNode.removeChild(renderer.domElement);
       }
       renderer.domElement = null;
       renderer = null;
