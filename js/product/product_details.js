@@ -449,6 +449,23 @@ jQuery(document).ready(function ($) {
         let main3DInitialized = false;
         let mainImageLayoutRaf = null;
 
+        window.addEventListener('threeDSceneDisposed', function () {
+                main3DInitialized = false;
+
+                if (!selectedVariant || !selectedVariant.url_3d) {
+                        return;
+                }
+
+                if (!main3DContainer.is(':visible')) {
+                        return;
+                }
+
+                scheduleMain3DContainerLayout();
+                requestAnimationFrame(() => {
+                        init3DScene('productMain3DContainer', selectedVariant.url_3d, 'productMain3DCanvas');
+                });
+        });
+
         function computeMainImageMetrics() {
                 const imgEl = mainProductImage.get(0);
                 const containerEl = main3DContainer.get(0);
@@ -1146,6 +1163,17 @@ jQuery(document).ready(function ($) {
                                 designUrl = cached.canvas_image_url;
                         } else if (cached?.design_image_url) {
                                 designUrl = cached.design_image_url;
+                        }
+                }
+
+                if (variant?.url_3d && typeof window.is3DSceneReady === 'function' && !window.is3DSceneReady()) {
+                        main3DInitialized = false;
+
+                        if (main3DContainer.is(':visible')) {
+                                scheduleMain3DContainerLayout();
+                                requestAnimationFrame(() => {
+                                        init3DScene('productMain3DContainer', variant.url_3d, 'productMain3DCanvas');
+                                });
                         }
                 }
                 if (designUrl && typeof window.update3DTextureFromImageURL === 'function') {

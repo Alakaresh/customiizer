@@ -11,6 +11,83 @@ let modelRoot = null;
 // zones[zoneName] = { fill: Mesh, overlay: Mesh }
 let zones = {};
 
+let activeContainerId = null;
+let activeCanvasId = null;
+let pendingTextureUpdate = null;
+
+function isSceneReady() {
+  return !!(renderer && scene && camera && renderer.domElement);
+}
+
+function queuePendingTextureUpdate(url, zoneName) {
+  if (!url) {
+    pendingTextureUpdate = null;
+    return;
+  }
+  pendingTextureUpdate = { url, zoneName: zoneName || null };
+}
+
+async function applyTextureFromURL(url, zoneName = null, { fromQueue = false } = {}) {
+  if (!url) return;
+
+  const sceneActive = isSceneReady();
+  const zonesReady = Object.keys(zones).length > 0;
+
+  if (!sceneActive || !zonesReady) {
+    queuePendingTextureUpdate(url, zoneName);
+    if (!fromQueue) {
+      console.warn('[3D] Scene not ready yet → texture queued');
+    }
+    return;
+  }
+
+  const zone = getZone(zoneName);
+  if (!zone) {
+    if (!zonesReady) {
+      queuePendingTextureUpdate(url, zoneName);
+      if (!fromQueue) {
+        console.warn('[3D] Zone not ready → texture queued');
+      }
+      return;
+    }
+    console.warn('[3D] Zone introuvable pour texture', zoneName);
+    return;
+  }
+
+  const texLoader = new THREE.TextureLoader();
+  texLoader.setCrossOrigin('anonymous');
+
+  try {
+    const tex = await texLoader.loadAsync(url);
+    tex.flipY = false;
+    if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace; else tex.encoding = THREE.sRGBEncoding;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
+    tex.needsUpdate = true;
+
+    const materialClone = zone.overlay.material.clone();
+    materialClone.map = tex;
+    materialClone.color.set(0xffffff);
+    materialClone.transparent = true;
+    materialClone.alphaTest = 0.01;
+    materialClone.depthTest = true;
+    materialClone.depthWrite = false;
+    materialClone.needsUpdate = true;
+
+    zone.overlay.material = materialClone;
+    zone.overlay.visible = true;
+    renderOnce();
+  } catch (e) {
+    console.error('[3D] ❌ Échec texture:', e);
+  }
+}
+
+function flushPendingTextureUpdate() {
+  if (!pendingTextureUpdate) return;
+  const payload = pendingTextureUpdate;
+  pendingTextureUpdate = null;
+  applyTextureFromURL(payload.url, payload.zoneName, { fromQueue: true });
+}
+
 // —————————————— UI helpers ——————————————
 function ensureLoadingOverlay(container, message = 'Chargement du modèle 3D…') {
   if (!container) return null;
@@ -132,6 +209,9 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height, false);
 
+  activeContainerId = containerId;
+  activeCanvasId = canvasId;
+
   // HDRI par défaut (comme ton viewer)
   const defaultHdr = 'https://customiizer.blob.core.windows.net/assets/Hdr/studio_country_hall_1k.hdr';
   const useHdr = opts.hdr !== 0 && opts.hdr !== false;
@@ -153,6 +233,7 @@ function init3DScene(containerId, modelUrl, canvasId='threeDCanvas', opts={}){
     loadModel(modelUrl)
       .then(() => {
         hideLoadingOverlay(container);
+        flushPendingTextureUpdate();
       })
       .catch((err) => {
         console.error('[3D] ❌ Échec chargement modèle', err);
@@ -301,42 +382,29 @@ function loadModel(modelUrl){
 }
 
 // —————————————— APPLIQUER IMAGE (overlay alpha, fill identique bouteille) ——————————————
-window.update3DTextureFromCanvas = async function(canvas, zoneName=null){
-  if (!renderer || !scene || !camera) {
-    console.warn('[3D] Scene inactive → texture ignorée');
+window.update3DTextureFromCanvas = function(canvas, zoneName = null) {
+  if (!canvas) {
+    console.warn('[3D] Canvas manquant → texture ignorée');
     return;
   }
-  const zone = getZone(zoneName);
-  if(!zone || !canvas){ 
-    console.warn('[3D] Zone/canvas manquant'); 
-    return; 
-  }
-
-  const url = canvas.toDataURL('image/png'); // garde l’alpha
-  const texLoader = new THREE.TextureLoader();
-  texLoader.setCrossOrigin('anonymous');
-
   try {
-    const tex = await texLoader.loadAsync(url);
-    tex.flipY = false;
-    if('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace; else tex.encoding = THREE.sRGBEncoding;
-    tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
-    tex.needsUpdate = true;
-
-    const m = zone.overlay.material.clone();
-    m.map = tex;
-    m.color.set(0xffffff);
-    m.transparent = true;
-    m.alphaTest = 0.01;     // coupe les pixels 100% transparents pour éviter les franges
-    m.depthTest = true;
-    m.depthWrite = false;   // superpose proprement
-    m.needsUpdate = true;
-
-    zone.overlay.material = m;
-    zone.overlay.visible = true;   // s’assure que l’overlay est actif
-    renderOnce();  } catch (e) {
-    console.error('[3D] ❌ Échec texture:', e);
+    const url = canvas.toDataURL('image/png');
+    if (!url) {
+      console.warn('[3D] toDataURL vide → texture ignorée');
+      return;
+    }
+    applyTextureFromURL(url, zoneName);
+  } catch (e) {
+    console.error('[3D] ❌ Échec conversion canvas → texture', e);
   }
+};
+
+window.update3DTextureFromImageURL = function(imageUrl, zoneName = null) {
+  if (!imageUrl) {
+    console.warn('[3D] URL image manquante → texture ignorée');
+    return;
+  }
+  applyTextureFromURL(imageUrl, zoneName);
 };
 
 // —————————————— RETIRER IMAGE (on garde le fill qui bouche le creux) ——————————————
@@ -352,7 +420,9 @@ window.clear3DTexture = function(zoneName=null){
   zone.overlay.material.alphaTest = 0.0;
   zone.overlay.material.needsUpdate = true;
 
-  renderOnce();};
+  renderOnce();
+  pendingTextureUpdate = null;
+};
 
 // —————————————— Debug ——————————————
 window.logZones = function(){
@@ -364,6 +434,9 @@ window.logZones = function(){
 };
 window.dispose3DScene = function() {
   try {
+    const disposedContainerId = activeContainerId;
+    const disposedCanvasId = activeCanvasId;
+
     if (resizeObserver3D) {
       resizeObserver3D.disconnect();
       resizeObserver3D = null;
@@ -387,9 +460,18 @@ window.dispose3DScene = function() {
     controls = null;
     modelRoot = null;
     zones = {};
+    activeContainerId = null;
+    activeCanvasId = null;
     threeDInitialized = false;
 
     console.log("🗑️ Three.js scene disposed");
+
+    window.dispatchEvent(new CustomEvent('threeDSceneDisposed', {
+      detail: {
+        containerId: disposedContainerId || null,
+        canvasId: disposedCanvasId || null
+      }
+    }));
   } catch (e) {
     console.warn("⚠️ Failed to dispose 3D scene", e);
   }
@@ -404,3 +486,5 @@ function animate(){
 
 // —————————————— API ——————————————
 window.init3DScene = init3DScene;
+window.is3DSceneReady = isSceneReady;
+window.getActive3DContainerId = function() { return activeContainerId; };
