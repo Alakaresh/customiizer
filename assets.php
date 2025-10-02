@@ -171,18 +171,33 @@ function customiizer_enqueue_customize_assets() {
                 wp_enqueue_style('design-style', get_stylesheet_directory_uri() . '/styles/design_product.css', [], $ver);
                 wp_enqueue_style('file-library', get_stylesheet_directory_uri() . '/styles/file_library.css', [], $ver);
 
-		// --- JS externes (Three.js & Fabric) ---
+                // --- JS externes (Three.js & Fabric) ---
                 wp_enqueue_script('fabric-js', 'https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js', [], $ver, true);
-                wp_enqueue_script('three-js', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', [], $ver, true);
-                wp_enqueue_script('gltf-loader', get_stylesheet_directory_uri() . '/assets/GLTFLoader.js', ['three-js'], $ver, true);
-                wp_enqueue_script('rgbe-loader', get_stylesheet_directory_uri() . '/assets/RGBELoader.js', ['three-js'], $ver, true);
-                wp_enqueue_script('orbit-controls', get_stylesheet_directory_uri() . '/assets/OrbitControls.js', ['three-js'], $ver, true);
+
+                $product_id_param = isset($_GET['id']) ? absint($_GET['id']) : 0;
+                $product_has_3d = null;
+
+                if ($product_id_param > 0 && function_exists('customiizer_product_supports_3d')) {
+                        $product_has_3d = customiizer_product_supports_3d($product_id_param);
+                }
+
+                $should_enqueue_3d = $product_has_3d !== false;
+
+                if ($should_enqueue_3d) {
+                        wp_enqueue_script('three-js', 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', [], $ver, true);
+                        wp_enqueue_script('gltf-loader', get_stylesheet_directory_uri() . '/assets/GLTFLoader.js', ['three-js'], $ver, true);
+                        wp_enqueue_script('rgbe-loader', get_stylesheet_directory_uri() . '/assets/RGBELoader.js', ['three-js'], $ver, true);
+                        wp_enqueue_script('orbit-controls', get_stylesheet_directory_uri() . '/assets/OrbitControls.js', ['three-js'], $ver, true);
+                }
 
 		// --- JS internes ---
                 wp_enqueue_script('product-dropdown', get_stylesheet_directory_uri() . '/js/product/product_dropdown.js', ['jquery'], $ver, true);
                 wp_enqueue_script('product-custom', get_stylesheet_directory_uri() . '/js/product/product_customize.js', ['jquery'], $ver, true);
+                wp_add_inline_script('product-custom', 'window.customiizerProductSupports3D = ' . wp_json_encode($should_enqueue_3d) . ';', 'before');
                 wp_enqueue_script('product-details', get_stylesheet_directory_uri() . '/js/product/product_details.js', ['jquery'], $ver, true);
-                wp_enqueue_script('product-3d', get_stylesheet_directory_uri() . '/js/product/threeDManager.js', ['jquery'], $ver, true);
+                if ($should_enqueue_3d) {
+                        wp_enqueue_script('product-3d', get_stylesheet_directory_uri() . '/js/product/threeDManager.js', ['jquery'], $ver, true);
+                }
                 wp_enqueue_script('product-images', get_stylesheet_directory_uri() . '/js/product/product_images.js', ['jquery'], $ver, true);
 
                 wp_enqueue_script('product-canvas', get_stylesheet_directory_uri() . '/js/product/canvasManager.js', ['jquery'], $ver, true);
