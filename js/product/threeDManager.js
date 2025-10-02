@@ -261,18 +261,28 @@ window.logZones = function(){
 };
 window.dispose3DScene = function() {
   try {
+    if (resizeObserver3D) {
+      resizeObserver3D.disconnect();
+      resizeObserver3D = null;
+    }
+
     if (renderer) {
       renderer.dispose();
       renderer.forceContextLoss?.();
+      if (renderer.domElement && renderer.domElement.parentNode) {
+        renderer.domElement.parentNode.removeChild(renderer.domElement);
+      }
       renderer.domElement = null;
       renderer = null;
     }
+
     scene = null;
     camera = null;
     controls = null;
     modelRoot = null;
     zones = {};
-    threeDInitialized = false; // flag global
+    threeDInitialized = false;
+
     console.log("🗑️ Three.js scene disposed");
   } catch (e) {
     console.warn("⚠️ Failed to dispose 3D scene", e);
