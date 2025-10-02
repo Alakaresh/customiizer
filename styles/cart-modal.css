@@ -306,6 +306,14 @@
   justify-content: center;
   transition: color 0.3s ease;
 }
+.remove-item:hover,
+.remove-item:focus,
+.remove-item:active {
+  background: none !important; /* plus de fond */
+  border: none !important;     /* plus de bordure */
+  box-shadow: none !important; /* plus d’effet lumineux */
+  color: #6df2d2;              /* option : juste la corbeille un peu plus claire */
+}
 
 /* === RÉCAP === */
 .cart-summary {
