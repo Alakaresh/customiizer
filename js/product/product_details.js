@@ -1091,6 +1091,28 @@ jQuery(document).ready(function ($) {
                                 .on('click', function () {
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
+
+                                        if (typeof window !== 'undefined') {
+                                                const disposeScene = typeof window.dispose3DScene === 'function'
+                                                        ? window.dispose3DScene
+                                                        : null;
+                                                const getActiveContainerId = typeof window.getActive3DContainerId === 'function'
+                                                        ? window.getActive3DContainerId
+                                                        : null;
+
+                                                if (disposeScene) {
+                                                        const activeContainerId = getActiveContainerId ? getActiveContainerId() : null;
+                                                        if (!activeContainerId || activeContainerId === 'productMain3DContainer') {
+                                                                try {
+                                                                        disposeScene();
+                                                                } catch (err) {
+                                                                        console.warn('[3D] Failed to dispose scene before main reinit', err);
+                                                                }
+                                                        }
+                                                }
+                                        }
+
+                                        main3DInitialized = false;
                                         scheduleMain3DContainerLayout();
                                         hideMainProductImage();
                                         main3DContainer.show();
