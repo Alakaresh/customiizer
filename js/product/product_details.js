@@ -449,6 +449,23 @@ jQuery(document).ready(function ($) {
         let main3DInitialized = false;
         let mainImageLayoutRaf = null;
 
+        function resetMain3DContainerElements() {
+                const containerEl = main3DContainer.get(0);
+                if (!containerEl) {
+                        return;
+                }
+
+                const overlay = containerEl.querySelector('.loading-overlay');
+                if (overlay) {
+                        overlay.remove();
+                }
+
+                const canvasEl = containerEl.querySelector('canvas');
+                if (canvasEl) {
+                        canvasEl.remove();
+                }
+        }
+
         function teardownMain3DScene({ hideContainer = false } = {}) {
                 const disposeFn = (typeof window !== 'undefined' && typeof window.dispose3DScene === 'function')
                         ? window.dispose3DScene
@@ -466,6 +483,8 @@ jQuery(document).ready(function ($) {
                 }
 
                 main3DInitialized = false;
+
+                resetMain3DContainerElements();
 
                 if (hideContainer) {
                         main3DContainer.hide();
@@ -504,6 +523,14 @@ jQuery(document).ready(function ($) {
                         fallbackThumb.addClass('selected');
                 }
 
+                scheduleMain3DContainerLayout();
+        });
+
+        window.addEventListener('customizer:close', () => {
+                main3DInitialized = false;
+                resetMain3DContainerElements();
+                main3DContainer.hide();
+                showMainProductImage();
                 scheduleMain3DContainerLayout();
         });
 
@@ -1145,6 +1172,7 @@ jQuery(document).ready(function ($) {
                                 .text('3D')
                                 .on('click', function () {
                                         teardownMain3DScene();
+                                        resetMain3DContainerElements();
                                         $('.image-thumbnails .thumbnail').removeClass('selected');
                                         $(this).addClass('selected');
                                         scheduleMain3DContainerLayout();
