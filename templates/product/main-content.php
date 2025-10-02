@@ -12,9 +12,7 @@
                                        <!-- ✅ Image principale du produit -->
                                        <img id="product-main-image" src="wp-content/themes/customiizer/images/default-image.png" alt="Produit affiché" class="product-image">
                                        <!-- 🆕 Conteneur pour l'affichage 3D du produit -->
-                                       <div id="productMain3DContainer">
-                                               <canvas id="productMain3DCanvas"></canvas>
-                                       </div>
+                                       <div id="productMain3DContainer"></div>
 					<!-- Section texte et options du produit à gauche -->
 					<div class="product-info">
 						<!-- Menu de sélection de produit -->

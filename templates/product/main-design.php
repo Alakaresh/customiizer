@@ -59,9 +59,7 @@
 
 
                                 <!-- Conteneur pour l'affichage 3D -->
-                                <div id="product3DContainer">
-                                        <canvas id="threeDCanvas"></canvas>
-                                </div>
+                                <div id="product3DContainer"></div>
                         </div>
                 </div>
                 
