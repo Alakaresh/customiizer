@@ -412,150 +412,6 @@ function scheduleDesignAutosave(reason) {
 
 
 jQuery(document).ready(function ($) {
-        jQuery('#saveDesignButton').on('click', function () {
-                // Démarre le suivi du temps dès le clic sur "Valider la personnalisation"
-                window.mockupTimes.pending = Date.now();
-
-                jQuery('#customizeModal').hide();
-
-                if (typeof window.showLoadingOverlay === 'function') {
-                        window.showLoadingOverlay();
-                }
-
-                const designBase64 = CanvasManager.exportPrintAreaPNG();
-                const formData = new FormData();
-                formData.append('action', 'generate_mockup');
-                formData.append('image_base64', designBase64);
-                formData.append('product_id', window.currentProductId || '');
-                formData.append('variant_id', selectedVariant?.variant_id || '');
-                formData.append('placement', selectedVariant?.placement || selectedVariant?.zone_3d_name || '');
-                formData.append('technique', selectedVariant?.technique || '');
-                formData.append('width', selectedVariant.print_area_width);
-                formData.append('height', selectedVariant.print_area_height);
-                formData.append('left', 0);
-                formData.append('top', 0);
-                const requestStart = Date.now();
-                if (window.mockupTimes.pending) {
-                        const delay = ((requestStart - window.mockupTimes.pending) / 1000).toFixed(1);                }
-                window.mockupTimes.requestSent = requestStart;
-
-                // Mise en cache locale de la personnalisation pour réouverture future
-                const placement = CanvasManager.getCurrentImageData() || {};
-                const canvasState = (typeof CanvasManager.exportState === 'function')
-                        ? CanvasManager.exportState()
-                        : [];
-                const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
-                        ? CanvasManager.getClipWindowBBox()
-                        : { left: 0, top: 0 };
-                const productData = {
-                        product_name: jQuery('.product-name').text().trim(),
-                        product_price: selectedVariant.price,
-                        delivery_price: selectedVariant?.delivery_price,
-                        mockup_url: '',
-                        design_image_url: null,
-                        canvas_image_url: null,
-                        design_width: placement.width || selectedVariant.print_area_width,
-                        design_height: placement.height || selectedVariant.print_area_height,
-                        design_left: (placement.left != null ? placement.left - bbox.left : 0),
-                        design_top: (placement.top != null ? placement.top - bbox.top : 0),
-                        design_angle: placement.angle || 0,
-                        design_flipX: placement.flipX || false,
-                        variant_id: selectedVariant?.variant_id,
-                        placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
-                        technique: selectedVariant?.technique || '',
-                        product_id: window.currentProductId != null ? String(window.currentProductId) : null,
-                        canvas_state: Array.isArray(canvasState) ? canvasState : []
-                };
-                cancelPendingDesignAutosave();
-                window.productData = productData;
-                const savedBeforeRequest = persistDesignLocally(productData) || productData;
-                updateAutoSaveSignature(savedBeforeRequest);
-
-                const firstViewName = getFirstMockup(selectedVariant)?.view_name;
-
-                fetch(ajaxurl, { method: 'POST', body: formData })
-                        .then(res => res.json())
-                        .then(async data => {
-                                if (data.data?.timings) {                                }
-
-                                if (data.success && Array.isArray(data.data?.files)) {
-                                        window.mockupTimes.pending = null;
-                                        const eligibleFiles = data.data.files.filter(f => f && f.name !== 'texture');
-                                        const designFile = eligibleFiles.find(f => f.name === 'design');
-                                        const otherFiles = eligibleFiles.filter(f => f !== designFile);
-
-                                        const designUrl = await deriveImageUrlFromFile(designFile, {
-                                                fallbackBase64: designBase64,
-                                                filenameHint: designFile?.name || 'design'
-                                        });
-
-                                        if (designUrl) {
-                                                productData.design_image_url = designUrl;
-                                                productData.canvas_image_url = designUrl;
-                                        }
-
-                                        const mockupResults = [];
-                                        for (const file of otherFiles) {
-                                                const viewName = file?.name;
-                                                if (!viewName) {
-                                                        continue;
-                                                }
-                                                const filenameHint = viewName || 'mockup';
-                                                const resolvedUrl = await deriveImageUrlFromFile(file, { filenameHint });
-                                                if (resolvedUrl) {
-                                                        mockupResults.push({ viewName, url: resolvedUrl });
-                                                        updateMockupThumbnail(viewName, resolvedUrl);
-                                                } else {
-                                                        console.warn('[Mockup] Unable to derive URL for view', viewName);
-                                                }
-                                        }
-
-                                        if (!productData.mockup_url) {
-                                                const preferredView = mockupResults.find(entry => entry.viewName === firstViewName)
-                                                        || mockupResults[0];
-                                                if (preferredView) {
-                                                        productData.mockup_url = preferredView.url;
-                                                }
-                                        }
-
-                                } else if (data.success && data.data?.url && firstViewName) {
-                                        window.mockupTimes.pending = null;
-                                        const absoluteUrl = toAbsoluteHttpUrl(data.data.url);
-                                        if (absoluteUrl) {
-                                                productData.mockup_url = absoluteUrl;
-                                                updateMockupThumbnail(firstViewName, absoluteUrl);
-                                        } else {
-                                                console.warn('[Mockup] Received non-URL mockup response');
-                                        }
-                                } else if (data.success && data.data?.mockup_url && firstViewName) {
-                                        window.mockupTimes.pending = null;
-                                        const absoluteUrl = toAbsoluteHttpUrl(data.data.mockup_url);
-                                        if (absoluteUrl) {
-                                                productData.mockup_url = absoluteUrl;
-                                                updateMockupThumbnail(firstViewName, absoluteUrl);
-                                        } else {
-                                                console.warn('[Mockup] Received non-URL mockup response');
-                                        }
-                                } else {
-                                        alert("Erreur lors de la génération du mockup");
-                                }
-                                cancelPendingDesignAutosave();
-                                const savedAfterRequest = persistDesignLocally(productData) || productData;
-                                updateAutoSaveSignature(savedAfterRequest);
-                        })
-                        .catch(err => {
-                                console.error("❌ Erreur réseau :", err.message);
-                        })
-                        .finally(() => {
-                                if (typeof window.hideLoadingOverlay === 'function') {
-                                        window.hideLoadingOverlay();
-                                }
-                        });
-
-        });
-});
-
-jQuery(document).ready(function ($) {
 
         let importedFiles = [];
 
@@ -566,6 +422,8 @@ jQuery(document).ready(function ($) {
         const imageSourceModal = $('#imageSourceModal');
         const closeButtonImageModal = $('#imageSourceModal .close-button');
         const uploadPcImageButton = $('#uploadPcImageButton');
+        let modalWasVisible = customizeModal.is(':visible');
+        let customizerActive = false;
 
         window.addEventListener('canvas:image-change', () => scheduleDesignAutosave('canvas-event'));
 
@@ -639,24 +497,234 @@ jQuery(document).ready(function ($) {
        window.releaseFocus = releaseFocus;
 
        function updateAddImageButtonVisibility() {
-               const hasImage = CanvasManager.hasImage();
+               const hasImage = window.CanvasManager && typeof CanvasManager.hasImage === 'function'
+                       ? CanvasManager.hasImage()
+                       : false;
+
                if (hasImage) {
                        addImageButton.hide();
                        visualHeader.css('display', 'flex');
                        $('.visual-zone').addClass('with-header');
                        imageControls.css('display', 'flex').show();
-                       CanvasManager.resizeToContainer('product2DContainer');
                } else {
                        addImageButton.show();
                        imageControls.hide();
                        visualHeader.css('display', 'none');
                        $('.visual-zone').removeClass('with-header');
+               }
+
+               const canResize = window.CanvasManager
+                       && typeof CanvasManager.resizeToContainer === 'function'
+                       && (typeof CanvasManager.isReady !== 'function' || CanvasManager.isReady());
+               if (canResize) {
                        CanvasManager.resizeToContainer('product2DContainer');
                }
+
                resetImageButton.prop('disabled', !hasImage);
        }
        window.updateAddImageButtonVisibility = updateAddImageButtonVisibility;
 
+
+       function performCustomizerTeardown({ reason = 'manual', flushAutosave = true } = {}) {
+               if (!customizerActive) {
+                       return;
+               }
+
+               cancelPendingDesignAutosave();
+
+               if (flushAutosave) {
+                       try {
+                               flushDesignAutosave(reason);
+                       } catch (err) {
+                               console.warn('[Autosave] flush', reason, 'failed', err);
+                       }
+               }
+
+               if (threeDInitialized) {
+                       dispose3DScene();
+                       threeDInitialized = false;
+               }
+
+               if (window.CanvasManager && typeof CanvasManager.destroy === 'function') {
+                       CanvasManager.destroy();
+               }
+
+               customizerActive = false;
+       }
+
+       function handleModalHidden({ reason = 'manual', flushAutosave = true } = {}) {
+               performCustomizerTeardown({ reason, flushAutosave });
+               releaseFocus(customizeModal);
+               updateAddImageButtonVisibility();
+       }
+
+       function closeCustomizeModal({ reason = 'manual', flushAutosave = true } = {}) {
+               const wasVisible = customizeModal.is(':visible');
+               if (wasVisible) {
+                       customizeModal.hide();
+                       modalWasVisible = false;
+               }
+               handleModalHidden({ reason, flushAutosave });
+       }
+
+       if (typeof window !== 'undefined') {
+               window.closeCustomizeModal = closeCustomizeModal;
+       }
+
+       if (typeof MutationObserver === 'function' && customizeModal.length) {
+               const modalObserver = new MutationObserver(() => {
+                       const currentlyVisible = customizeModal.is(':visible');
+                       if (!currentlyVisible && modalWasVisible) {
+                               handleModalHidden({ reason: 'observer' });
+                       }
+                       modalWasVisible = currentlyVisible;
+               });
+               modalObserver.observe(customizeModal[0], { attributes: true, attributeFilter: ['style', 'class'] });
+       }
+
+
+       $('#saveDesignButton').on('click', function () {
+               window.mockupTimes.pending = Date.now();
+
+               const designBase64 = CanvasManager.exportPrintAreaPNG();
+               const formData = new FormData();
+               formData.append('action', 'generate_mockup');
+               formData.append('image_base64', designBase64);
+               formData.append('product_id', window.currentProductId || '');
+               formData.append('variant_id', selectedVariant?.variant_id || '');
+               formData.append('placement', selectedVariant?.placement || selectedVariant?.zone_3d_name || '');
+               formData.append('technique', selectedVariant?.technique || '');
+               formData.append('width', selectedVariant.print_area_width);
+               formData.append('height', selectedVariant.print_area_height);
+               formData.append('left', 0);
+               formData.append('top', 0);
+
+               const placement = CanvasManager.getCurrentImageData() || {};
+               const canvasState = (typeof CanvasManager.exportState === 'function')
+                       ? CanvasManager.exportState()
+                       : [];
+               const bbox = (typeof CanvasManager.getClipWindowBBox === 'function')
+                       ? CanvasManager.getClipWindowBBox()
+                       : { left: 0, top: 0 };
+               const productData = {
+                       product_name: jQuery('.product-name').text().trim(),
+                       product_price: selectedVariant.price,
+                       delivery_price: selectedVariant?.delivery_price,
+                       mockup_url: '',
+                       design_image_url: null,
+                       canvas_image_url: null,
+                       design_width: placement.width || selectedVariant.print_area_width,
+                       design_height: placement.height || selectedVariant.print_area_height,
+                       design_left: (placement.left != null ? placement.left - bbox.left : 0),
+                       design_top: (placement.top != null ? placement.top - bbox.top : 0),
+                       design_angle: placement.angle || 0,
+                       design_flipX: placement.flipX || false,
+                       variant_id: selectedVariant?.variant_id,
+                       placement: selectedVariant?.placement || selectedVariant?.zone_3d_name || '',
+                       technique: selectedVariant?.technique || '',
+                       product_id: window.currentProductId != null ? String(window.currentProductId) : null,
+                       canvas_state: Array.isArray(canvasState) ? canvasState : []
+               };
+
+               cancelPendingDesignAutosave();
+               window.productData = productData;
+               const savedBeforeRequest = persistDesignLocally(productData) || productData;
+               updateAutoSaveSignature(savedBeforeRequest);
+
+               closeCustomizeModal({ reason: 'save-design' });
+
+               if (typeof window.showLoadingOverlay === 'function') {
+                       window.showLoadingOverlay();
+               }
+
+               const requestStart = Date.now();
+               if (window.mockupTimes.pending) {
+                       const delay = ((requestStart - window.mockupTimes.pending) / 1000).toFixed(1);
+               }
+               window.mockupTimes.requestSent = requestStart;
+
+               const firstViewName = getFirstMockup(selectedVariant)?.view_name;
+
+               fetch(ajaxurl, { method: 'POST', body: formData })
+                       .then(res => res.json())
+                       .then(async data => {
+                               if (data.data?.timings) {                                }
+
+                               if (data.success && Array.isArray(data.data?.files)) {
+                                       window.mockupTimes.pending = null;
+                                       const eligibleFiles = data.data.files.filter(f => f && f.name !== 'texture');
+                                       const designFile = eligibleFiles.find(f => f.name === 'design');
+                                       const otherFiles = eligibleFiles.filter(f => f !== designFile);
+
+                                       const designUrl = await deriveImageUrlFromFile(designFile, {
+                                               fallbackBase64: designBase64,
+                                               filenameHint: designFile?.name || 'design'
+                                       });
+
+                                       if (designUrl) {
+                                               productData.design_image_url = designUrl;
+                                               productData.canvas_image_url = designUrl;
+                                       }
+
+                                       const mockupResults = [];
+                                       for (const file of otherFiles) {
+                                               const viewName = file?.name;
+                                               if (!viewName) {
+                                                       continue;
+                                               }
+                                               const filenameHint = viewName || 'mockup';
+                                               const resolvedUrl = await deriveImageUrlFromFile(file, { filenameHint });
+                                               if (resolvedUrl) {
+                                                       mockupResults.push({ viewName, url: resolvedUrl });
+                                                       updateMockupThumbnail(viewName, resolvedUrl);
+                                               } else {
+                                                       console.warn('[Mockup] Unable to derive URL for view', viewName);
+                                               }
+                                       }
+
+                                       if (!productData.mockup_url) {
+                                               const preferredView = mockupResults.find(entry => entry.viewName === firstViewName)
+                                                       || mockupResults[0];
+                                               if (preferredView) {
+                                                       productData.mockup_url = preferredView.url;
+                                               }
+                                       }
+
+                               } else if (data.success && data.data?.url && firstViewName) {
+                                       window.mockupTimes.pending = null;
+                                       const absoluteUrl = toAbsoluteHttpUrl(data.data.url);
+                                       if (absoluteUrl) {
+                                               productData.mockup_url = absoluteUrl;
+                                               updateMockupThumbnail(firstViewName, absoluteUrl);
+                                       } else {
+                                               console.warn('[Mockup] Received non-URL mockup response');
+                                       }
+                               } else if (data.success && data.data?.mockup_url && firstViewName) {
+                                       window.mockupTimes.pending = null;
+                                       const absoluteUrl = toAbsoluteHttpUrl(data.data.mockup_url);
+                                       if (absoluteUrl) {
+                                               productData.mockup_url = absoluteUrl;
+                                               updateMockupThumbnail(firstViewName, absoluteUrl);
+                                       } else {
+                                               console.warn('[Mockup] Received non-URL mockup response');
+                                       }
+                               } else {
+                                       alert("Erreur lors de la génération du mockup");
+                               }
+                               cancelPendingDesignAutosave();
+                               const savedAfterRequest = persistDesignLocally(productData) || productData;
+                               updateAutoSaveSignature(savedAfterRequest);
+                       })
+                       .catch(err => {
+                               console.error("❌ Erreur réseau :", err.message);
+                       })
+                       .finally(() => {
+                               if (typeof window.hideLoadingOverlay === 'function') {
+                                       window.hideLoadingOverlay();
+                               }
+                       });
+
+       });
 
        async function restoreLastDesignToCanvas(done) {
                const finish = (value) => {
@@ -973,6 +1041,9 @@ jQuery(document).ready(function ($) {
                                template = data.template;
                                window.customizerCache.templates[variant.variant_id] = template;
                        }
+                       if (customizeModal.is(':visible')) {
+                               customizerActive = true;
+                       }
                        CanvasManager.init(template, 'product2DContainer');
                        updateAddImageButtonVisibility();
                        if (variant.url_3d) {
@@ -1037,6 +1108,7 @@ jQuery(document).ready(function ($) {
                 threeDInitialized = false;
                 fetchUserImages(); // images perso si besoin
                 customizeModal.show();
+                modalWasVisible = true;
                 const productImageSrc = jQuery("#product-main-image").attr("src");
                 jQuery("#footerProductImage").attr("src", productImageSrc);
                 const productName = jQuery(".product-name").text().trim();
@@ -1071,6 +1143,7 @@ jQuery(document).ready(function ($) {
                         }
 
                         // 2. Lancer Fabric.js dans le container
+                        customizerActive = true;
                         CanvasManager.init(template, 'product2DContainer');
                         updateAddImageButtonVisibility();
                         if (!shouldSkipRestore) {
@@ -1097,22 +1170,8 @@ jQuery(document).ready(function ($) {
 
         // 3) Fermer le modal principal
         closeButtonMain.on('click', function () {
-		    cancelPendingDesignAutosave();
-		    try {
-		        flushDesignAutosave('modal-close');
-		    } catch (err) {
-		        console.warn('[Autosave] flush modal-close failed', err);
-		    }
-		
-		    // 👉 Reset Three.js
-		    if (threeDInitialized) {
-		        dispose3DScene();
-		    }
-		
-		    customizeModal.hide();
-		    releaseFocus(customizeModal);
-		    updateAddImageButtonVisibility();
-		});
+                closeCustomizeModal({ reason: 'close-button' });
+        });
 
 
         // Afficher le bouton lors du changement de produit

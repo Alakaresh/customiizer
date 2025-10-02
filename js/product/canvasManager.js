@@ -5,6 +5,7 @@ let template = null;
 let bgImage = null;       // Image de fond (template)
 let maskPath = null;      // Clip path (image_path), NON ajouté à la scène
 let resizeObserver = null;
+let resizeListener = null;
 
 // Mémo du conteneur pour resize public
 let _containerId = null;
@@ -213,6 +214,10 @@ const CanvasManager = {
     maskReady = new Promise(r => (_maskReadyResolve = r));
 
     if (resizeObserver) resizeObserver.disconnect();
+    if (resizeListener) {
+      window.removeEventListener('resize', resizeListener);
+      resizeListener = null;
+    }
     resizeObserver = new ResizeObserver(() => this._resizeToContainer(containerId));
     resizeObserver.observe(container);
     CM.log('init: resizeObserver attach');
@@ -282,7 +287,8 @@ const CanvasManager = {
     }, { crossOrigin: 'anonymous' });
 
     // Recalcule si la fenêtre change
-    window.addEventListener('resize', () => this._resizeToContainer(containerId));
+    resizeListener = () => this._resizeToContainer(containerId);
+    window.addEventListener('resize', resizeListener);
 
     // Listeners : sync + notif + sélection
     const logEvent = (name) => () => {
@@ -771,6 +777,10 @@ const CanvasManager = {
     return v;
   },
 
+  isReady() {
+    return !!canvas && !!bgImage;
+  },
+
   hasActiveImage() {
     const a = canvas?.getActiveObject();
     return !!(a && a.type === 'image' && a !== bgImage);
@@ -1124,6 +1134,42 @@ const CanvasManager = {
   },
 
   forceNotify() { notifyChange('forceNotify'); },
+
+  destroy() {
+    CM.log('destroy: start');
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+    if (resizeListener) {
+      window.removeEventListener('resize', resizeListener);
+      resizeListener = null;
+    }
+    if (canvas) {
+      try {
+        canvas.dispose();
+      } catch (err) {
+        CM.warn('destroy: canvas.dispose failed', err);
+      }
+      canvas = null;
+    }
+    const container = _containerId ? document.getElementById(_containerId) : null;
+    if (container) {
+      const wrapper = container.querySelector('#productCanvasWrapper');
+      if (wrapper) {
+        wrapper.remove();
+      }
+    }
+    template = null;
+    bgImage = null;
+    maskPath = null;
+    _containerId = null;
+    _bgReadyResolve = null;
+    _maskReadyResolve = null;
+    bgReady = Promise.resolve();
+    maskReady = Promise.resolve();
+    CM.log('destroy: end');
+  },
 };
 
 window.CanvasManager = CanvasManager;
