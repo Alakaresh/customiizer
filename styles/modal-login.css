@@ -1,187 +1,444 @@
+
 .login-modal {
     display: none;
     position: fixed;
-    left: 0;
-    top: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Couleur de fond semi-transparente */
-    backdrop-filter: blur(10px); /* Effet de flou */
+    background: rgba(4, 12, 10, 0.72);
+    backdrop-filter: blur(18px);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: clamp(16px, 3vw, 40px);
     z-index: 1000;
+    overflow-y: auto;
 }
 
 .loginModal-content {
-	position: relative;
+    position: relative;
     display: flex;
-    background-color: #333;
-    border-radius: 8px;
-    overflow: hidden; /* Masque les débordements */
+    flex-wrap: wrap;
+    width: min(960px, 100%);
+    border-radius: 26px;
+    overflow: hidden;
+    border: 1px solid rgba(109, 242, 210, 0.18);
+    box-shadow: 0 36px 90px rgba(4, 16, 19, 0.55);
+    background: linear-gradient(165deg, rgba(14, 24, 26, 0.94) 0%, rgba(6, 12, 14, 0.96) 100%);
 }
+
+.loginModal-content::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(109, 242, 210, 0.12), transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.form-container {
+    position: relative;
+    flex: 1 1 400px;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: clamp(32px, 5vw, 56px);
+    background: linear-gradient(165deg, rgba(10, 16, 18, 0.9) 0%, rgba(6, 10, 12, 0.92) 100%);
+    z-index: 1;
+}
+
+.login-box {
+    position: relative;
+    width: min(420px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: rgba(232, 247, 243, 0.92);
+}
+
+.login-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.login-box .title {
+    font-size: clamp(24px, 4vw, 30px);
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+
+.login-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(109, 242, 210, 0.12);
+    border: 1px solid rgba(109, 242, 210, 0.32);
+    color: #6df2d2;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
 .new-user-prompt {
-    margin-bottom: 10px; /* Ajoute 10 pixels d'espacement en dessous */
+    margin: 0;
+    font-size: 15px;
+    color: rgba(214, 238, 232, 0.78);
+}
+
+.new-user-prompt a {
+    color: #6df2d2;
+    font-weight: 600;
 }
 
 .close {
     position: absolute;
-    top: 10px;
-    right: 15px;
-    cursor: pointer;
-    font-size: 25px;
-}
-
-.login-box {
-    padding: 20px;
-    width: 400px; /* Ajustez selon vos besoins */
-	height: 550px;
-}
-
-.login-title {
-    margin-bottom: 15px;
-}
-
-.split-line {
-    position: relative;
-    border: none;
-    height: 1px;
-    background-color: #ccc;
-    margin: 30px 0; /* Espace vertical autour de la ligne */
-    overflow: visible; /* Permet aux enfants de se positionner correctement */
-}
-
-.split-line::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
+    top: 0;
     right: 0;
-    width: 100%;
-    height: 1px;
-    background-color: #ccc;
-    z-index: 1;
-}
-
-.split-line::after {
-    content: "OR";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Centrage parfait */
-    background-color: #333; /* Couleur de fond pour cacher la ligne derrière le texte */
-    color: #fff; /* Couleur du texte */
-    font-size: 12px; /* Taille de la police pour le texte */
-    padding: 0 10px; /* Espacement horizontal autour du texte */
-    z-index: 2;
-}
-
-
-.input-box {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.signup-button {
-    background-color: #007BFF; /* Bleu vif pour attirer l'attention */
-    color: white; /* Texte blanc pour le contraste */
-    border: none; /* Aucune bordure pour un look moderne */
-    border-radius: 4px; /* Coins arrondis */
-    padding: 10px 20px; /* Espacement interne pour le confort de clic */
-    font-size: 16px; /* Taille de la police pour une bonne lisibilité */
-    cursor: pointer; /* Indique que c'est cliquable */
-    display: block; /* Affiche comme un bloc pour prendre toute la largeur si nécessaire */
-    width: 100%; /* Utilise toute la largeur disponible */
-    margin: 10px 0; /* Marge pour l'espacement autour du bouton */
-    transition: background-color 0.3s; /* Transition douce pour le survol */
-}
-
-.signup-button:hover {
-    background-color: #0056b3; /* Assombrit le bouton lors du survol */
-}
-
-.remember-forget-box {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-	margin-top: 10px;
-	margin-bottom: 15px;
-}
-
-.signin-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.signin-button:hover {
-    background-color: #0056b3;
-}
-
-.login-background {
-	display: flex;
-	position: relative;
-    width: 500px; /* Ajustez selon vos besoins */
-	color: #fff;
-    background-size: cover;
-    background-position: center;
-	align-items: center;
-    justify-content: center;
-    flex-direction: column; /* Organise les éléments en colonne */
-    text-align: left; /* Ajustez en fonction de votre préférence */
-}
-h2.title_login {
-	text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
-    font-size: 24px;
-}
-.background-content p {
-    margin: 10px 0; /* Espacement entre les points */
-    display: flex;
+    transform: translate(24px, -24px);
+    display: inline-flex;
     align-items: center;
-    font-size: 16px; /* Ajustez la taille de la police selon vos besoins */
-	text-shadow: 2px 2px 2px rgba(0, 0, 0, 1);
-    font-weight: bold;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    color: #6df2d2;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
 }
 
-.background-content i {
-    margin-right: 15px;
+.close:hover,
+.close:focus-visible {
+    background: rgba(109, 242, 210, 0.18);
+    color: #ffffff;
+    transform: translate(24px, -24px) scale(1.05);
 }
 
 .social-button {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(109, 242, 210, 0.18);
+    background: rgba(20, 42, 38, 0.72);
+    color: #eafdf7;
     font-size: 16px;
-}
-
-.facebook { background-color: #3b5998; }
-.google { background-color: #dd4b39; }
-.apple { background-color: #000; }
-
-.close {
-    position: absolute; /* Position absolue pour un meilleur contrôle */
-    top: 10px; /* Ajustement vertical depuis le haut du contenu du modal */
-    right: 15px; /* Ajustement horizontal depuis le côté droit du contenu du modal */
+    font-weight: 600;
     cursor: pointer;
-    font-size: 25px;
-    color: #fff; /* Assurez-vous que la couleur blanche est appliquée */
-    z-index: 1050; /* S'assurer qu'elle est au-dessus de tous les autres éléments du modal */
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
 }
 
-.close:hover,
-.close:focus {
-    color: red; /* Changement de couleur lors du survol ou du focus */
-    text-decoration: none;
+.social-button .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #6df2d2;
+}
+
+.social-button .social-label {
+    letter-spacing: 0.04em;
+}
+
+.social-button:hover,
+.social-button:focus-visible {
+    background: rgba(26, 188, 156, 0.25);
+    border-color: rgba(109, 242, 210, 0.6);
+    transform: translateY(-1px);
+}
+
+.split-line {
+    position: relative;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(109, 242, 210, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+    margin: 12px 0 4px;
+}
+
+.split-line::after {
+    content: "ou";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0 12px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(214, 238, 232, 0.75);
+    background: rgba(8, 12, 12, 0.95);
+    border-radius: 999px;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 16px;
+    color: rgba(109, 242, 210, 0.7);
+}
+
+.input-box {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    border-radius: 14px;
+    border: 1px solid rgba(109, 242, 210, 0.18);
+    background: rgba(8, 12, 12, 0.9);
+    color: #e6faf5;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.input-box::placeholder {
+    color: rgba(214, 238, 232, 0.48);
+}
+
+.input-box:focus {
+    outline: none;
+    border-color: rgba(109, 242, 210, 0.7);
+    box-shadow: 0 0 0 4px rgba(109, 242, 210, 0.18);
+    background: rgba(12, 20, 20, 0.95);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.remember-forget-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: rgba(214, 238, 232, 0.75);
+}
+
+.remember-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.remember-option input {
+    accent-color: #1abc9c;
+}
+
+.forgot-link {
+    color: #6df2d2;
+    font-weight: 600;
+}
+
+.signin-button,
+.signup-button,
+.email-signup-button,
+.reset-password-button,
+.confirm-reset-button {
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, #6df2d2 0%, #1abc9c 100%);
+    color: #041312;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 18px 30px rgba(26, 188, 156, 0.32);
+}
+
+.signin-button:hover,
+.signup-button:hover,
+.email-signup-button:hover,
+.reset-password-button:hover,
+.confirm-reset-button:hover,
+.signin-button:focus-visible,
+.signup-button:focus-visible,
+.email-signup-button:focus-visible,
+.reset-password-button:focus-visible,
+.confirm-reset-button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 36px rgba(26, 188, 156, 0.46);
+}
+
+.email-signup-button {
+    margin-top: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.login-background {
+    flex: 1 1 320px;
+    position: relative;
+    min-height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: clamp(32px, 5vw, 60px);
+    color: #ffffff;
+    background-size: cover;
+    background-position: center;
+    border-left: 1px solid rgba(109, 242, 210, 0.18);
+}
+
+.background-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(4, 12, 10, 0.88) 12%, rgba(20, 48, 42, 0.4) 60%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+.background-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 320px;
+    text-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+h2.title_login {
+    margin: 0;
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.background-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.background-list li {
+    display: inline-flex;
+    gap: 12px;
+    align-items: center;
+    font-weight: 500;
+    color: rgba(232, 247, 243, 0.88);
+}
+
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    background: rgba(109, 242, 210, 0.14);
+    border: 1px solid rgba(109, 242, 210, 0.32);
+    color: #6df2d2;
+    font-size: 14px;
+}
+
+.feature-text {
+    letter-spacing: 0.02em;
+}
+
+.background-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(109, 242, 210, 0.14);
+    border: 1px solid rgba(109, 242, 210, 0.32);
+    color: #6df2d2;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-size: 0.62rem;
+    font-weight: 600;
+}
+
+.section-intro {
+    margin: -4px 0 8px;
+    font-size: 0.9rem;
+    color: rgba(214, 238, 232, 0.82);
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .loginModal-content {
+        border-radius: 18px;
+    }
+
+    .close {
+        transform: translate(16px, -16px);
+    }
+
+    .close:hover,
+    .close:focus-visible {
+        transform: translate(16px, -16px) scale(1.05);
+    }
+
+    .form-container {
+        padding: clamp(28px, 6vw, 48px);
+    }
+}
+
+@media (max-width: 720px) {
+    .loginModal-content {
+        flex-direction: column;
+    }
+
+    .login-background {
+        order: -1;
+        align-items: flex-start;
+        min-height: 280px;
+    }
+
+    .background-content {
+        max-width: none;
+    }
+}
+
+@media (max-width: 520px) {
+    .form-container {
+        padding: clamp(20px, 6vw, 36px);
+    }
+
+    .login-box {
+        gap: 16px;
+    }
+
+    .remember-forget-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .close,
+    .close:hover,
+    .close:focus-visible {
+        transform: translate(8px, -8px);
+    }
 }
