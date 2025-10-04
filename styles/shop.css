@@ -51,10 +51,18 @@ body.shop-flex-layout #customize-main > #content {
         align-items: flex-start;
         align-content: flex-start;
         flex: 1;
-        min-height: calc(100dvh - var(--layout-top-offset, 120px));
+        width: min(100%, 100vw);
+        min-width: 100%;
+        min-height: calc(100dvh - var(--layout-top-offset, 0px));
         box-sizing: border-box;
         position: relative;
         z-index: 1;
+}
+
+@supports not (height: 100dvh) {
+        .product-list {
+                min-height: calc(100vh - var(--layout-top-offset, 0px));
+        }
 }
 
 .product-card {
