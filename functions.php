@@ -20,6 +20,9 @@ add_filter(
                 return $classes;
         }
 );
+
+// Désactive complètement les feuilles de style par défaut de WooCommerce
+add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
 add_filter('woocommerce_order_actions', function($actions) {
     $actions['test_action'] = '🚀 Test bouton';
     return $actions;
