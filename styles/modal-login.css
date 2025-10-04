@@ -197,25 +197,25 @@
 }
 
 .input-box {
-    width: 100%;
-    padding: 14px 16px 14px 48px;
-    border-radius: 14px;
-    border: 1px solid rgba(109, 242, 210, 0.18);
-    background: rgba(8, 12, 12, 0.9);
-    color: #e6faf5;
-    font-size: 15px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    width: 100% !important;
+    padding: 14px 16px 14px 48px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(109, 242, 210, 0.18) !important;
+    background: rgba(8, 12, 12, 0.9) !important;
+    color: #e6faf5 !important;
+    font-size: 15px !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
 }
 
 .input-box::placeholder {
-    color: rgba(214, 238, 232, 0.48);
+    color: rgba(214, 238, 232, 0.48) !important;
 }
 
 .input-box:focus {
     outline: none;
-    border-color: rgba(109, 242, 210, 0.7);
-    box-shadow: 0 0 0 4px rgba(109, 242, 210, 0.18);
-    background: rgba(12, 20, 20, 0.95);
+    border-color: rgba(109, 242, 210, 0.7) !important;
+    box-shadow: 0 0 0 4px rgba(109, 242, 210, 0.18) !important;
+    background: rgba(12, 20, 20, 0.95) !important;
 }
 
 .sr-only {

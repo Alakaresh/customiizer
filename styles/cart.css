@@ -18,5 +18,5 @@
 }
 
 .woocommerce-cart-form .loyalty-points-controls input[type="number"] {
-    max-width: 120px;
+    max-width: 120px !important;
 }
