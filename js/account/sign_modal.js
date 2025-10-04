@@ -16,15 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
 
-	function switchView(view) {
-		// Hide all views
-		loginBox.style.display = 'none';
-		signupOptions.style.display = 'none';
-		emailSignupBox.style.display = 'none';
+        function switchView(view) {
+                // Hide all views
+                loginBox.style.display = 'none';
+                signupOptions.style.display = 'none';
+                emailSignupBox.style.display = 'none';
 
-		// Show the requested view
-		view.style.display = 'block';
-	}
+                // Show the requested view
+                view.style.display = 'flex';
+        }
 
 	showSignup.addEventListener('click', function() {
 		switchView(signupOptions);
@@ -46,15 +46,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 });
 document.getElementById('showForgotPassword').addEventListener('click', function (e) {
-	e.preventDefault();
-	document.getElementById('signin').style.display = 'none';
-	document.getElementById('forgotPassword').style.display = 'block';
+        e.preventDefault();
+        document.getElementById('signin').style.display = 'none';
+        document.getElementById('forgotPassword').style.display = 'flex';
 });
 
 document.getElementById('backToLogin').addEventListener('click', function (e) {
-	e.preventDefault();
-	document.getElementById('forgotPassword').style.display = 'none';
-	document.getElementById('signin').style.display = 'block';
+        e.preventDefault();
+        document.getElementById('forgotPassword').style.display = 'none';
+        document.getElementById('signin').style.display = 'flex';
 });
 document.querySelector('.reset-password-button').addEventListener('click', function () {
 	const email = document.getElementById('reset-email').value;
@@ -78,11 +78,11 @@ document.querySelector('.reset-password-button').addEventListener('click', funct
 	.then(data => {
 		if (data.success) {
 			alert("📧 Un lien de réinitialisation vous a été envoyé !");
-			document.getElementById('forgotPassword').style.display = 'none';
-			document.getElementById('signin').style.display = 'block';
-		} else {
-			alert("⚠️ " + data.data.message);
-		}
+                        document.getElementById('forgotPassword').style.display = 'none';
+                        document.getElementById('signin').style.display = 'flex';
+                } else {
+                        alert("⚠️ " + data.data.message);
+                }
 	})
 	.catch(err => {
 		console.error(err);
@@ -121,8 +121,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	if (key && login) {
 		document.getElementById('loginModal').style.display = 'flex';
-		document.getElementById('signin').style.display = 'none';
-		document.getElementById('resetPasswordSection').style.display = 'block';
+                document.getElementById('signin').style.display = 'none';
+                document.getElementById('resetPasswordSection').style.display = 'flex';
 
 		document.querySelector('.confirm-reset-button').addEventListener('click', function () {
 			const pass1 = document.getElementById('newPass1').value;
