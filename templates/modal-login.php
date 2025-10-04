@@ -48,6 +48,9 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 			<!-- Étape intermédiaire avant inscription -->
                         <div class="login-box" id="signupOptions" style="display: none;">
                                 <button type="button" class="close" aria-label="Fermer le module d'inscription">✖</button>
+                                <button type="button" class="back-button" data-target="signin" aria-label="Retour à la connexion">
+                                        <span aria-hidden="true">←</span>
+                                </button>
                                <div class="login-heading">
                                        <h2 class="title">Créer votre compte Customiizer</h2>
                                </div>
@@ -64,6 +67,9 @@ $signup_nonce = wp_create_nonce('signup_nonce');
                         <!-- Inscription avec adresse e-mail -->
                         <div class="login-box" id="signup" style="display: none;">
                                 <button type="button" class="close" aria-label="Fermer le module d'inscription">✖</button>
+                                <button type="button" class="back-button" data-target="signupOptions" aria-label="Retour à l'étape précédente">
+                                        <span aria-hidden="true">←</span>
+                                </button>
                                <div class="login-heading">
                                        <h2 class="title">Inscription avec votre e-mail</h2>
                                </div>
