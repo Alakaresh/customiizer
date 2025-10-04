@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	const showSignup = document.getElementById('showSignup');
 	const showEmailSignup = document.getElementById('showEmailSignup');
 	const showLogin = document.getElementById('showLogin');
-	const closeModalButtons = document.querySelectorAll('.close');
+        const closeModalButtons = document.querySelectorAll('.close');
+        const backButtons = document.querySelectorAll('.back-button');
 	const socialButtons = document.querySelectorAll('.social-button');
 
         socialButtons.forEach(button => {
@@ -34,9 +35,19 @@ document.addEventListener('DOMContentLoaded', function() {
 		switchView(emailSignupBox);
 	});
 
-	showLogin.addEventListener('click', function() {
-		switchView(loginBox);
-	});
+        showLogin.addEventListener('click', function() {
+                switchView(loginBox);
+        });
+
+        backButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                        const targetId = button.getAttribute('data-target');
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                                switchView(targetElement);
+                        }
+                });
+        });
 
 	closeModalButtons.forEach(button => {
 		button.addEventListener('click', function() {
