@@ -13,11 +13,10 @@ $signup_nonce = wp_create_nonce('signup_nonce');
                         <!-- Partie Connexion -->
                         <div class="login-box" id="signin">
                                 <button type="button" class="close" aria-label="Fermer le module de connexion">✖</button>
-                                <div class="login-heading">
-                                        <span class="login-eyebrow">Espace client</span>
-                                        <h2 class="title">Bienvenue sur Customiizer&nbsp;!</h2>
-                                        <p class="new-user-prompt">Pas encore de compte&nbsp;? <a href="#" id="showSignup">Créer un compte</a></p>
-                                </div>
+                               <div class="login-heading">
+                                       <h2 class="title">Bienvenue sur Customiizer&nbsp;!</h2>
+                                       <p class="new-user-prompt">Pas encore de compte&nbsp;? <a href="#" id="showSignup">Créer un compte</a></p>
+                               </div>
 
                                 <button class="social-button google" id="googleLoginBtn">
                                         <span class="social-icon" aria-hidden="true"><i class="fab fa-google"></i></span>
@@ -49,10 +48,9 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 			<!-- Étape intermédiaire avant inscription -->
                         <div class="login-box" id="signupOptions" style="display: none;">
                                 <button type="button" class="close" aria-label="Fermer le module d'inscription">✖</button>
-                                <div class="login-heading">
-                                        <span class="login-eyebrow">Nouveau chez Customiizer&nbsp;?</span>
-                                        <h2 class="title">Créer votre compte Customiizer</h2>
-                                </div>
+                               <div class="login-heading">
+                                       <h2 class="title">Créer votre compte Customiizer</h2>
+                               </div>
 
                                 <button class="social-button google" id="googleSignupBtn">
                                         <span class="social-icon" aria-hidden="true"><i class="fab fa-google"></i></span>
@@ -66,10 +64,9 @@ $signup_nonce = wp_create_nonce('signup_nonce');
                         <!-- Inscription avec adresse e-mail -->
                         <div class="login-box" id="signup" style="display: none;">
                                 <button type="button" class="close" aria-label="Fermer le module d'inscription">✖</button>
-                                <div class="login-heading">
-                                        <span class="login-eyebrow">Rejoignez la communauté</span>
-                                        <h2 class="title">Inscription avec votre e-mail</h2>
-                                </div>
+                               <div class="login-heading">
+                                       <h2 class="title">Inscription avec votre e-mail</h2>
+                               </div>
                                 <div class="input-group">
                                         <label class="sr-only" for="signup-username">Nom d'utilisateur</label>
                                         <span class="input-icon" aria-hidden="true"><i class="far fa-user"></i></span>
@@ -97,10 +94,9 @@ $signup_nonce = wp_create_nonce('signup_nonce');
                         <!-- Mot de passe oublié -->
                         <div class="login-box" id="forgotPassword" style="display: none;">
                                 <button type="button" class="close" aria-label="Fermer le module de récupération du mot de passe">✖</button>
-                                <div class="login-heading">
-                                        <span class="login-eyebrow">Réinitialisation</span>
-                                        <h2 class="title">Mot de passe oublié&nbsp;?</h2>
-                                </div>
+                               <div class="login-heading">
+                                       <h2 class="title">Mot de passe oublié&nbsp;?</h2>
+                               </div>
                                 <p class="section-intro">Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
                                 <div class="input-group">
                                         <label class="sr-only" for="reset-email">Adresse e-mail</label>
@@ -113,10 +109,9 @@ $signup_nonce = wp_create_nonce('signup_nonce');
                         <!-- Réinitialisation du mot de passe -->
                         <div class="login-box" id="resetPasswordSection" style="display: none;">
                                 <button type="button" class="close" aria-label="Fermer le module de nouveau mot de passe">✖</button>
-                                <div class="login-heading">
-                                        <span class="login-eyebrow">Sécurisez votre accès</span>
-                                        <h2 class="title">Définir un nouveau mot de passe</h2>
-                                </div>
+                               <div class="login-heading">
+                                       <h2 class="title">Définir un nouveau mot de passe</h2>
+                               </div>
                                 <div class="input-group">
                                         <label class="sr-only" for="newPass1">Nouveau mot de passe</label>
                                         <span class="input-icon" aria-hidden="true"><i class="fas fa-lock"></i></span>

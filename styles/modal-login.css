@@ -69,21 +69,6 @@
     color: #ffffff;
 }
 
-.login-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(109, 242, 210, 0.12);
-    border: 1px solid rgba(109, 242, 210, 0.32);
-    color: #6df2d2;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    font-size: 0.68rem;
-    font-weight: 600;
-}
-
 .new-user-prompt {
     margin: 0;
     font-size: 15px;
@@ -297,7 +282,7 @@
     position: relative;
     min-height: 100%;
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: flex-start;
     padding: clamp(32px, 5vw, 60px);
     color: #ffffff;
