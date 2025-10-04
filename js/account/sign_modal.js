@@ -16,15 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
 
-	function switchView(view) {
-		// Hide all views
-		loginBox.style.display = 'none';
-		signupOptions.style.display = 'none';
-		emailSignupBox.style.display = 'none';
+        function switchView(view) {
+                const views = [loginBox, signupOptions, emailSignupBox];
+                views.forEach(element => {
+                        element.style.display = 'none';
+                        element.classList.remove('is-active');
+                });
 
-		// Show the requested view
-		view.style.display = 'block';
-	}
+                view.style.display = 'flex';
+                view.classList.add('is-active');
+        }
 
 	showSignup.addEventListener('click', function() {
 		switchView(signupOptions);
@@ -46,15 +47,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 });
 document.getElementById('showForgotPassword').addEventListener('click', function (e) {
-	e.preventDefault();
-	document.getElementById('signin').style.display = 'none';
-	document.getElementById('forgotPassword').style.display = 'block';
+        e.preventDefault();
+        const signinBox = document.getElementById('signin');
+        signinBox.style.display = 'none';
+        signinBox.classList.remove('is-active');
+        const forgotPassword = document.getElementById('forgotPassword');
+        forgotPassword.style.display = 'flex';
+        forgotPassword.classList.add('is-active');
 });
 
 document.getElementById('backToLogin').addEventListener('click', function (e) {
-	e.preventDefault();
-	document.getElementById('forgotPassword').style.display = 'none';
-	document.getElementById('signin').style.display = 'block';
+        e.preventDefault();
+        const forgotPassword = document.getElementById('forgotPassword');
+        forgotPassword.style.display = 'none';
+        forgotPassword.classList.remove('is-active');
+        const signinBox = document.getElementById('signin');
+        signinBox.style.display = 'flex';
+        signinBox.classList.add('is-active');
 });
 document.querySelector('.reset-password-button').addEventListener('click', function () {
 	const email = document.getElementById('reset-email').value;
@@ -77,9 +86,13 @@ document.querySelector('.reset-password-button').addEventListener('click', funct
 	.then(res => res.json())
 	.then(data => {
 		if (data.success) {
-			alert("📧 Un lien de réinitialisation vous a été envoyé !");
-			document.getElementById('forgotPassword').style.display = 'none';
-			document.getElementById('signin').style.display = 'block';
+                        alert("📧 Un lien de réinitialisation vous a été envoyé !");
+                        const forgotPasswordBox = document.getElementById('forgotPassword');
+                        forgotPasswordBox.style.display = 'none';
+                        forgotPasswordBox.classList.remove('is-active');
+                        const signinBox = document.getElementById('signin');
+                        signinBox.style.display = 'flex';
+                        signinBox.classList.add('is-active');
 		} else {
 			alert("⚠️ " + data.data.message);
 		}
@@ -119,10 +132,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	const key = params.get('reset_key');
 	const login = params.get('login');
 
-	if (key && login) {
-		document.getElementById('loginModal').style.display = 'flex';
-		document.getElementById('signin').style.display = 'none';
-		document.getElementById('resetPasswordSection').style.display = 'block';
+        if (key && login) {
+                document.getElementById('loginModal').style.display = 'flex';
+                const signinBox = document.getElementById('signin');
+                signinBox.style.display = 'none';
+                signinBox.classList.remove('is-active');
+                const resetSection = document.getElementById('resetPasswordSection');
+                resetSection.style.display = 'flex';
+                resetSection.classList.add('is-active');
 
 		document.querySelector('.confirm-reset-button').addEventListener('click', function () {
 			const pass1 = document.getElementById('newPass1').value;
