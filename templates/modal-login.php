@@ -79,7 +79,7 @@ $signup_nonce = wp_create_nonce('signup_nonce');
 		</div>
 
 		<!-- Partie fixe avec visuel à droite -->
-		<div class="login-background" style="background-image: url('/wp-content/themes/customiizer/assets/img/login-modal_bg.webp');">
+               <div class="login-background" style="background-image: url('https://customiizer.blob.core.windows.net/assets/SiteDesign/backgrounds/background_login.png');">
 			<div class="background-content">
 				<h2 class="title_login">Donnez vie à vos idées avec Customiizer !</h2>
 				<p><i class="fas fa-infinity"></i> Créez et Personnalisez à l'infini</p>
