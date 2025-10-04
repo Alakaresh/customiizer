@@ -504,11 +504,6 @@ function buildVariantSection(variants, options = {}) {
     section.className = 'product-group';
     section.setAttribute('role', 'listitem');
 
-    const title = document.createElement('h4');
-    title.className = 'product-group-title';
-    title.textContent = 'Variantes disponibles';
-    section.appendChild(title);
-
     const list = document.createElement('div');
     list.className = 'product-variants-grid';
     section.appendChild(list);

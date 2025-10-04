@@ -214,22 +214,14 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > #content
     > .content-images
     .variant-display
-    .product-group-title {
-    margin: 0;
-    font-size: 0.95rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(239, 248, 246, 0.74);
-}
-
-#customize-main.customize-layout:not(.hub-layout)
-    > #content
-    > .content-images
-    .variant-display
     .product-variants-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(180px, min(220px, 100%))
+    );
     gap: 24px;
+    justify-content: center;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -237,6 +229,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > .content-images
     .variant-display
     .product-item {
+    max-width: 220px;
+    width: 100%;
+    justify-self: center;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -1341,9 +1336,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     font-size: 1rem;
     font-weight: 600;
     color: rgba(244, 248, 247, 0.95);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 #customize-main.customize-layout:not(.hub-layout) #left-sidebar .variant-summary-card__action {

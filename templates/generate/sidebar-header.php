@@ -38,7 +38,7 @@
     <!-- Conteneur pour le bouton de génération -->
     <div id="aspect-ratio-container" class="aspect-ratio-container">
         <div id="buttons-container">
-            <button type="submit" id="validate-button">Générer</button>
+            <button type="submit" id="validate-button">✨ Générer mon visuel</button>
         </div>
     </div>
 

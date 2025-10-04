@@ -21,7 +21,6 @@
                 <div class="variant-panel">
                         <header class="variant-panel__header">
                                 <div class="variant-panel__heading">
-                                        <p class="variant-panel__eyebrow">Sélection</p>
                                         <h2 class="variant-panel__title">Choisissez votre modèle</h2>
                                         <p class="variant-panel__description">
                                                 Explorez les produits disponibles et sélectionnez la variante idéale pour vos visuels générés.
