@@ -631,17 +631,48 @@ td:last-child {
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
-.woocommerce-js input,
-.woocommerce-js textarea {
+body.woocommerce-account .woocommerce form .form-row input[type=text],
+body.woocommerce-account .woocommerce form .form-row input[type=email],
+body.woocommerce-account .woocommerce form .form-row input[type=password],
+body.woocommerce-account .woocommerce form .form-row input[type=tel],
+body.woocommerce-account .woocommerce form .form-row input[type=url],
+body.woocommerce-account .woocommerce form .form-row input[type=number],
+body.woocommerce-account .woocommerce form .form-row input[type=search],
+body.woocommerce-account .woocommerce form .form-row textarea,
+body.woocommerce-account .woocommerce form .form-row select {
   background: rgba(28, 28, 28, 0.92) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 12px !important;
   box-shadow: none !important;
   padding: 12px !important;
   width: 100% !important;
-  color: var(--color-text) !important;
+  color: var(--color-text, rgba(246, 250, 249, 0.94)) !important;
   font-size: 0.95rem;
   box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+body.woocommerce-account .woocommerce form label {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, rgba(214, 224, 223, 0.68));
+}
+
+body.woocommerce-account .woocommerce form .form-row input:focus,
+body.woocommerce-account .woocommerce form .form-row textarea:focus,
+body.woocommerce-account .woocommerce form .form-row select:focus {
+  border-color: rgba(26, 188, 156, 0.55) !important;
+  background: rgba(24, 24, 24, 0.95) !important;
+  box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.2) !important;
+  outline: none;
+}
+
+body.woocommerce-account .woocommerce form .form-row input[readonly],
+body.woocommerce-account .woocommerce form .form-row textarea[readonly] {
+  background: rgba(30, 30, 30, 0.75) !important;
+  color: rgba(200, 200, 200, 0.6) !important;
+  cursor: not-allowed;
 }
 
 

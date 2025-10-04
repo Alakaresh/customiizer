@@ -20,6 +20,7 @@ add_filter(
                 return $classes;
         }
 );
+
 add_filter('woocommerce_order_actions', function($actions) {
     $actions['test_action'] = '🚀 Test bouton';
     return $actions;
