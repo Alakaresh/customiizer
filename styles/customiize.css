@@ -215,13 +215,18 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > .content-images
     .variant-display
     .product-variants-grid {
+    --product-variant-min-width: 160px;
+    --product-variant-max-width: 200px;
     display: grid;
     grid-template-columns: repeat(
         auto-fit,
-        minmax(180px, min(220px, 100%))
+        minmax(
+            var(--product-variant-min-width),
+            min(var(--product-variant-max-width), 100%)
+        )
     );
     gap: 24px;
-    justify-content: center;
+    justify-items: stretch;
 }
 
 #customize-main.customize-layout:not(.hub-layout)
@@ -229,9 +234,10 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
     > .content-images
     .variant-display
     .product-item {
-    max-width: 220px;
+    min-width: var(--product-variant-min-width, 160px);
+    max-width: var(--product-variant-max-width, 200px);
     width: 100%;
-    justify-self: center;
+    justify-self: stretch;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -791,8 +797,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         > #content
         > .content-images
         .variant-display
-        .product-variants-grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    .product-variants-grid {
+        --product-variant-min-width: 160px;
+        --product-variant-max-width: 200px;
         gap: 20px;
     }
 }
@@ -809,8 +816,9 @@ body.customize-layout-page:not(.hub-layout-page) #site-content.full-content {
         > #content
         > .content-images
         .variant-display
-        .product-variants-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    .product-variants-grid {
+        --product-variant-min-width: 160px;
+        --product-variant-max-width: 200px;
         gap: 18px;
     }
 }
